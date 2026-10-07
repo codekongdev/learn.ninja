@@ -31,6 +31,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 
 ## Rules
 
+- The UI follows shadcn's Vega style (`aria-vega` in both `components.json` files). Build from shadcn components and their shapes (`rounded-md` controls, `rounded-lg` alerts, `rounded-xl` cards, `shadow-xs`, 1px borders) instead of hand-rolled styles. Add missing pieces with `npx shadcn@latest add` rather than copying their classes.
 - Player screens import UI only from `@workspace/ui/components/*`, never from `react-aria-components` or `@base-ui/react` directly. The drag-and-drop module in `packages/player` is the one exception. This keeps a future library switch cheap.
 - Build with webpack (`next dev/build --webpack`, already in the scripts). React Aria's locale-trimming plugin doesn't support Turbopack.
 - React Aria stores Arabic strings as `ar-AE`. Use that code in `apps/web/next.config.ts`; any other Arabic code silently strips them.

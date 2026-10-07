@@ -27,8 +27,8 @@ const markStyles =
   "data-[status=partial]:border-amber-500 data-[status=partial]:bg-amber-500/10"
 
 const cardStyles =
-  "w-full rounded-2xl border-[1.5px] bg-card text-start text-card-foreground shadow-[0_2px_0_var(--border)] transition-colors " +
-  "hover:border-ring data-selected:border-primary data-selected:bg-primary/5 data-pressed:translate-y-px " +
+  "w-full rounded-lg border bg-background text-start shadow-xs transition-colors " +
+  "hover:bg-muted data-selected:border-primary data-selected:bg-muted data-pressed:translate-y-px " +
   markStyles
 
 const letter = (i: number) => String.fromCharCode(65 + i)
@@ -37,7 +37,7 @@ function KeyBadge({ i }: { i: number }) {
   return (
     <span
       aria-hidden="true"
-      className="grid size-7 shrink-0 place-items-center rounded-lg border-[1.5px] font-mono text-xs font-semibold text-muted-foreground group-data-selected:border-primary group-data-selected:bg-primary group-data-selected:text-primary-foreground"
+      className="grid size-6 shrink-0 place-items-center rounded-md border font-mono text-xs font-semibold text-muted-foreground group-data-selected:border-primary group-data-selected:bg-primary group-data-selected:text-primary-foreground"
     >
       {letter(i)}
     </span>
@@ -351,7 +351,7 @@ export function MatchExercise({
   const badge = (k: number) => (
     <span
       aria-hidden="true"
-      className="grid size-6 shrink-0 place-items-center rounded-full border-[1.5px] border-dashed text-[0.6875rem] font-bold text-white"
+      className="grid size-6 shrink-0 place-items-center rounded-full border border-dashed text-[0.6875rem] font-bold text-white"
       style={
         k >= 0
           ? {
@@ -366,7 +366,7 @@ export function MatchExercise({
     </span>
   )
   const chip =
-    "flex w-full items-center gap-2.5 rounded-xl border-[1.5px] bg-card px-3 py-2.5 text-start text-[0.9375rem] shadow-[0_2px_0_var(--border)] hover:border-ring data-selected:border-primary " +
+    "flex w-full items-center gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-start text-[0.9375rem] shadow-xs hover:bg-muted data-selected:border-primary data-selected:bg-muted " +
     markStyles
 
   return (
@@ -446,7 +446,7 @@ export function BlankExercise({
         lang={step.lang}
         dir={code ? "ltr" : undefined}
         className={cn(
-          "rounded-2xl border bg-card px-5 py-4 whitespace-pre-wrap",
+          "rounded-xl bg-card px-5 py-4 whitespace-pre-wrap shadow-xs ring-1 ring-foreground/10",
           code
             ? "font-mono text-[0.9375rem] leading-loose"
             : "text-xl leading-[2.3]"
@@ -466,9 +466,9 @@ export function BlankExercise({
               isDisabled={locked}
               data-status={marks[id]}
               className={cn(
-                "mx-0.5 inline-block min-w-[4.5rem] rounded-t-md rounded-b-sm border-b-[2.5px] border-primary bg-muted px-2 text-center align-baseline leading-normal",
+                "mx-0.5 inline-block min-w-[4.5rem] rounded-md border-b-2 border-primary bg-muted px-2 text-center align-baseline leading-normal",
                 "data-selected:bg-primary/10",
-                value && "bg-card shadow-[0_0_0_1.5px_var(--border)]",
+                value && "border border-border bg-background shadow-xs",
                 markStyles
               )}
             >
@@ -492,7 +492,7 @@ export function BlankExercise({
               isDisabled={locked}
               lang={step.lang}
               className={cn(
-                "rounded-xl border-[1.5px] bg-card px-3.5 py-2 shadow-[0_2px_0_var(--border)] hover:border-ring data-selected:opacity-45",
+                "rounded-md border bg-background px-3 py-1.5 shadow-xs hover:bg-muted data-selected:opacity-45",
                 code ? "font-mono text-sm" : "text-[0.9375rem]"
               )}
             >

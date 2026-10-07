@@ -18,6 +18,7 @@ import {
 
 import type { Concept } from "@workspace/spec"
 import { Button, LinkButton } from "@workspace/ui/components/button"
+import { Card, CardContent } from "@workspace/ui/components/card"
 import {
   Dialog,
   DialogClose,
@@ -33,6 +34,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
+import { Progress } from "@workspace/ui/components/progress"
 
 import { RichText } from "./rich-text"
 import {
@@ -183,19 +185,11 @@ export function LessonHeader({
           </DialogFooter>
         </Dialog>
       </div>
-      <div
-        role="progressbar"
+      <Progress
+        value={progress}
         aria-label={t.progress}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={progress}
-        className="h-2 w-16 shrink-0 overflow-hidden rounded-full bg-muted sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink"
-      >
-        <div
-          className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+        className="w-16 shrink-0 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink"
+      />
       <div className="flex items-center justify-end sm:flex-1">
         <ShareButton title={title} url={shareUrl} t={t} />
       </div>
@@ -416,18 +410,22 @@ export function TheoryPanel({
         {concepts.length ? (
           <ol className="grid gap-3">
             {concepts.map((c) => (
-              <li key={c.id} className="rounded-2xl border bg-card p-4">
-                <h3 className="font-semibold">{c.title}</h3>
-                <RichText
-                  text={c.body}
-                  className="mt-1 block text-[0.9375rem] text-muted-foreground"
-                />
-                {c.term ? (
-                  <p className="mt-3 text-sm">
-                    <strong className="font-semibold">{c.term.word}</strong>{" "}
-                    <RichText text={c.term.definition} />
-                  </p>
-                ) : null}
+              <li key={c.id}>
+                <Card size="sm">
+                  <CardContent className="gap-1">
+                    <h3 className="text-base font-semibold">{c.title}</h3>
+                    <RichText
+                      text={c.body}
+                      className="block text-[0.9375rem] text-muted-foreground"
+                    />
+                    {c.term ? (
+                      <p className="mt-2">
+                        <strong className="font-semibold">{c.term.word}</strong>{" "}
+                        <RichText text={c.term.definition} />
+                      </p>
+                    ) : null}
+                  </CardContent>
+                </Card>
               </li>
             ))}
           </ol>

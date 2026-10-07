@@ -106,7 +106,7 @@ export function DropZone({
       )}
       className={cn(
         layout === "grid" ? "flex flex-wrap gap-2" : "flex flex-col gap-2",
-        "min-h-14 rounded-2xl border border-dashed p-2 outline-none",
+        "min-h-14 rounded-lg border border-dashed p-2 outline-none",
         "data-drop-target:border-primary data-drop-target:bg-primary/5 data-focus-visible:ring-[3px] data-focus-visible:ring-ring/50",
         className
       )}
@@ -117,7 +117,7 @@ export function DropZone({
           textValue={item.textValue}
           data-status={item.mark}
           className={cn(
-            "flex items-center gap-2 rounded-xl border bg-card px-3 py-2 text-[0.9375rem] shadow-xs outline-none",
+            "flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-[0.9375rem] shadow-xs outline-none",
             !disabled && "cursor-grab",
             "data-dragging:opacity-50 data-focus-visible:ring-[3px] data-focus-visible:ring-ring/50",
             "data-[status=correct]:border-green-600 data-[status=correct]:bg-green-600/10",

@@ -4,7 +4,10 @@ import * as React from "react"
 import { ClockIcon, LightbulbIcon, PanelRightIcon } from "lucide-react"
 
 import type { Lesson, Step } from "@workspace/spec"
+import { Alert, AlertDescription } from "@workspace/ui/components/alert"
+import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
+import { Card, CardContent } from "@workspace/ui/components/card"
 import { DirectionProvider } from "@workspace/ui/components/direction"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -336,7 +339,7 @@ function Player({
         t={t}
       />
       <div className="flex min-h-0 flex-1 sm:px-8">
-        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-background sm:rounded-[2rem] sm:border">
+        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-background sm:rounded-xl sm:border">
           <div className="relative flex min-w-0 flex-1 flex-col">
             <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
               <Button
@@ -389,10 +392,10 @@ function ExpiryPill({ expiresAt, t }: { expiresAt: number; t: Strings }) {
   const hours = useHoursLeft(expiresAt)
   if (hours === null) return null
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border bg-muted px-2.5 py-1 text-xs font-medium whitespace-nowrap text-muted-foreground tabular-nums">
-      <ClockIcon className="size-3.5" aria-hidden="true" />
+    <Badge variant="outline" className="tabular-nums">
+      <ClockIcon data-icon="inline-start" aria-hidden="true" />
       {t.expires(hours)}
-    </span>
+    </Badge>
   )
 }
 
@@ -464,20 +467,20 @@ function Screen({
           <p className="max-w-prose text-lg text-muted-foreground">
             {lesson.summary}
           </p>
-          <div className="flex flex-wrap gap-2 text-sm">
-            <span className="inline-flex items-center gap-1.5 rounded-full border bg-muted px-2.5 py-1 font-medium text-muted-foreground">
-              <ClockIcon className="size-3.5" aria-hidden="true" />
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline">
+              <ClockIcon data-icon="inline-start" aria-hidden="true" />
               {t.minutes(lesson.estimatedMinutes)}
-            </span>
-            <span className="rounded-full border bg-muted px-2.5 py-1 font-medium text-muted-foreground">
-              {t.levels[lesson.level]}
-            </span>
+            </Badge>
+            <Badge variant="outline">{t.levels[lesson.level]}</Badge>
             {expiresAt ? <ExpiryPill expiresAt={expiresAt} t={t} /> : null}
           </div>
-          <div className="rounded-2xl border bg-card p-4">
-            <Eyebrow muted>{t.objective}</Eyebrow>
-            <p className="mt-1">{lesson.objective}</p>
-          </div>
+          <Card size="sm">
+            <CardContent className="gap-1 text-base">
+              <Eyebrow muted>{t.objective}</Eyebrow>
+              <p>{lesson.objective}</p>
+            </CardContent>
+          </Card>
         </div>
       )
     case "concept": {
@@ -493,7 +496,7 @@ function Screen({
             <RichText text={c.body} />
           </p>
           {c.term ? (
-            <div className="flex items-baseline gap-3 rounded-2xl bg-secondary px-4 py-3 text-secondary-foreground">
+            <div className="flex items-baseline gap-3 rounded-lg bg-secondary px-4 py-3 text-secondary-foreground">
               <strong className="font-semibold whitespace-nowrap">
                 {c.term.word}
               </strong>
@@ -568,7 +571,7 @@ function StepScreen({
         <p className="-mt-3 text-sm text-muted-foreground">{helper}</p>
       ) : null}
       {step.type === "scenario" ? (
-        <div className="rounded-e-2xl border-s-[3px] border-primary bg-muted px-4 py-3 text-[1.03125rem]">
+        <div className="rounded-e-lg border-s-2 border-primary bg-muted px-4 py-3 text-[1.03125rem]">
           <RichText text={step.situation} />
         </div>
       ) : null}
@@ -595,13 +598,12 @@ function StepScreen({
         <BlankExercise {...props} bank={state.bank} />
       ) : null}
       {state.hintOpen && step.hint ? (
-        <div className="flex items-start gap-2.5 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-[0.9375rem]">
-          <LightbulbIcon
-            className="mt-0.5 size-4 shrink-0 text-amber-600"
-            aria-hidden="true"
-          />
-          <RichText text={step.hint} />
-        </div>
+        <Alert>
+          <LightbulbIcon aria-hidden="true" />
+          <AlertDescription className="text-[0.9375rem] text-foreground">
+            <RichText text={step.hint} />
+          </AlertDescription>
+        </Alert>
       ) : null}
     </>
   )
@@ -657,8 +659,12 @@ function WrapUp({
         <Eyebrow muted>{t.takeaways}</Eyebrow>
         <ul className="grid gap-2.5">
           {lesson.wrapup.takeaways.map((k) => (
-            <li key={k} className="rounded-2xl border bg-card px-4 py-3">
-              <RichText text={k} />
+            <li key={k}>
+              <Card size="sm">
+                <CardContent className="text-base">
+                  <RichText text={k} />
+                </CardContent>
+              </Card>
             </li>
           ))}
         </ul>

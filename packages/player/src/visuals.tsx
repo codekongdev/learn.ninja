@@ -144,7 +144,7 @@ function HtmlFrame({
   const interactive = Boolean(hotspots)
   return (
     <div
-      className="visual-stage overflow-hidden rounded-2xl border bg-muted/40 bg-[radial-gradient(var(--border)_1px,transparent_1.2px)] [background-size:16px_16px]"
+      className="visual-stage overflow-hidden rounded-xl border bg-muted/40 bg-[radial-gradient(var(--border)_1px,transparent_1.2px)] [background-size:16px_16px]"
       inert={!interactive}
     >
       <iframe
@@ -188,7 +188,7 @@ function CodeBlock({
   return (
     <div
       dir="ltr"
-      className="overflow-x-auto rounded-2xl border bg-muted/40 text-start"
+      className="overflow-x-auto rounded-xl border bg-muted/40 text-start"
     >
       <pre className="m-0 flex min-w-max flex-col py-3 font-mono text-[0.90625rem] leading-7">
         {lines.map((tokens, i) => {
@@ -260,7 +260,7 @@ function MathBlock({ tex }: { tex: string }) {
   return (
     <div
       dir="ltr"
-      className="flex justify-center overflow-x-auto rounded-2xl border bg-muted/40 px-4 py-5 text-lg"
+      className="flex justify-center overflow-x-auto rounded-xl border bg-muted/40 px-4 py-5 text-lg"
     >
       {html ? (
         <div dangerouslySetInnerHTML={{ __html: html }} />
