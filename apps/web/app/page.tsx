@@ -1,5 +1,7 @@
 import Link from "next/link"
 
+import { Card } from "@workspace/ui/components/card"
+
 import { getLesson, LESSON_SLUGS } from "@/lib/lessons"
 
 export default function Page() {
@@ -18,26 +20,25 @@ export default function Page() {
       </header>
       <ul className="grid gap-3">
         {lessons.map(({ slug, lesson }) => (
-          <li
-            key={slug}
-            className="flex items-center justify-between gap-4 rounded-2xl border bg-card p-4"
-          >
-            <Link
-              href={`/lessons/${slug}`}
-              className="flex min-w-0 flex-col gap-0.5 hover:underline"
-            >
-              <span className="font-semibold">{lesson.title}</span>
-              <span className="text-sm text-muted-foreground">
-                {lesson.topic} · {lesson.estimatedMinutes} min
-              </span>
-            </Link>
-            <Link
-              href={`/lessons/${slug}?ui=ar`}
-              className="shrink-0 text-sm text-muted-foreground hover:underline"
-              lang="ar"
-            >
-              العربية
-            </Link>
+          <li key={slug}>
+            <Card className="flex-row items-center justify-between gap-4 px-4 py-4">
+              <Link
+                href={`/lessons/${slug}`}
+                className="flex min-w-0 flex-col gap-0.5 hover:underline"
+              >
+                <span className="font-semibold">{lesson.title}</span>
+                <span className="text-sm text-muted-foreground">
+                  {lesson.topic} · {lesson.estimatedMinutes} min
+                </span>
+              </Link>
+              <Link
+                href={`/lessons/${slug}?ui=ar`}
+                className="shrink-0 text-sm text-muted-foreground hover:underline"
+                lang="ar"
+              >
+                العربية
+              </Link>
+            </Card>
           </li>
         ))}
       </ul>

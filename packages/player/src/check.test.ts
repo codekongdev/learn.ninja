@@ -13,7 +13,13 @@ import {
   solution,
   type Answer,
 } from "./check"
-import { buildSequence, outcomeFor, progressAt, summarize } from "./flow"
+import {
+  buildSequence,
+  outcomeFor,
+  partAt,
+  progressAt,
+  summarize,
+} from "./flow"
 
 function lesson(file: string): Lesson {
   const result = validateLesson(
@@ -230,5 +236,34 @@ describe("flow", () => {
         false
       )
     ).toBe(100)
+  })
+  it("splits progress into one part per loop plus the challenge", () => {
+    const items = buildSequence(prd)
+    const at = (kind: string, n = 0) =>
+      items.findIndex(
+        (i, k) =>
+          (i.kind === kind || (i.kind === "step" && i.role === kind)) &&
+          items.slice(0, k).filter((j) => j.kind === kind).length === n
+      )
+    expect(partAt(items, 0, false)).toEqual({
+      count: 4,
+      current: 0,
+      fraction: 0,
+      done: false,
+    })
+    // The warm-up starts part 1; the first concept comes next in the same part.
+    expect(partAt(items, at("hook"), false).current).toBe(0)
+    const loop2 = at("concept", 1)
+    expect(partAt(items, loop2, false)).toMatchObject({
+      current: 1,
+      fraction: 0,
+    })
+    expect(partAt(items, loop2 + 1, false).fraction).toBeCloseTo(1 / 3)
+    expect(partAt(items, at("challenge"), false)).toMatchObject({
+      current: 3,
+      fraction: 0,
+      done: false,
+    })
+    expect(partAt(items, at("wrap"), false).done).toBe(true)
   })
 })

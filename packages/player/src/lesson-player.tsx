@@ -35,7 +35,7 @@ import {
 import {
   buildSequence,
   outcomeFor,
-  progressAt,
+  partAt,
   summarize,
   type Item,
   type Outcome,
@@ -51,7 +51,13 @@ import {
   useHoursLeft,
   usePreferences,
 } from "./shell"
-import { ariaLocaleFor, stringsFor, type Strings, type Theme } from "./strings"
+import {
+  ariaLocaleFor,
+  stringsFor,
+  type Strings,
+  type TextSize,
+  type Theme,
+} from "./strings"
 import { Visual } from "./visuals"
 
 export interface LessonPlayerProps {
@@ -66,6 +72,9 @@ export interface LessonPlayerProps {
   visualsCss?: string
   /** Where the logo in the header goes. */
   homeHref?: string
+  /** Header links to the docs and to making a lesson. Omit either to hide its button. */
+  docsHref?: string
+  createHref?: string
   /** The link Share copies. Defaults to the current page. */
   shareUrl?: string
   /** The app's color theme. Pass both to show the theme setting in the footer. */
@@ -80,6 +89,8 @@ export function LessonPlayer({
   expiresAt,
   visualsCss = "/lesson-visuals.css",
   homeHref = "/",
+  docsHref,
+  createHref,
   shareUrl,
   theme,
   onThemeChange,
@@ -101,8 +112,11 @@ export function LessonPlayer({
         >
           <Player
             lesson={lesson}
+            textSize={prefs.textSize}
             expiresAt={expiresAt}
             homeHref={homeHref}
+            docsHref={docsHref}
+            createHref={createHref}
             shareUrl={shareUrl}
           />
           <LessonFooter
@@ -301,13 +315,19 @@ function reducer(state: State, action: Action): State {
 
 function Player({
   lesson,
+  textSize,
   expiresAt,
   homeHref,
+  docsHref,
+  createHref,
   shareUrl,
 }: {
   lesson: Lesson
+  textSize: TextSize
   expiresAt?: number
   homeHref: string
+  docsHref?: string
+  createHref?: string
   shareUrl?: string
 }) {
   const { t } = usePlayer()
@@ -319,7 +339,7 @@ function Player({
   React.useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 })
   }, [state.index])
-  const progress = progressAt(state.items, state.index, state.inFix)
+  const parts = partAt(state.items, state.index, state.inFix)
   const seenConcepts = state.items
     .slice(0, state.index + 1)
     .flatMap((i) => (i.kind === "concept" ? [i.concept] : []))
@@ -328,9 +348,11 @@ function Player({
     <>
       <LessonHeader
         title={lesson.title}
-        progress={progress}
+        parts={parts}
         expiresAt={expiresAt}
         homeHref={homeHref}
+        docsHref={docsHref}
+        createHref={createHref}
         shareUrl={shareUrl}
         onRestart={() => {
           setTheoryOpen(false)
@@ -338,7 +360,7 @@ function Player({
         }}
         t={t}
       />
-      <div className="flex min-h-0 flex-1 sm:px-8">
+      <div className="relative flex min-h-0 flex-1 gap-4 sm:px-8">
         <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-background sm:rounded-xl sm:border">
           <div className="relative flex min-w-0 flex-1 flex-col">
             <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
@@ -356,6 +378,7 @@ function Player({
             <main ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
               <div
                 key={state.index}
+                data-text-size={textSize}
                 className="mx-auto flex max-w-2xl flex-col gap-5 px-4 pt-14 pb-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1 sm:px-6 sm:pt-16"
               >
                 <Screen
@@ -372,17 +395,19 @@ function Player({
               item={item}
               state={state}
               dispatch={dispatch}
+              textSize={textSize}
             />
           </div>
-          {theoryOpen ? (
-            <TheoryPanel
-              id={theoryId}
-              concepts={seenConcepts}
-              onClose={() => setTheoryOpen(false)}
-              t={t}
-            />
-          ) : null}
         </div>
+        {theoryOpen ? (
+          <TheoryPanel
+            id={theoryId}
+            concepts={seenConcepts}
+            onClose={() => setTheoryOpen(false)}
+            t={t}
+            textSize={textSize}
+          />
+        ) : null}
       </div>
     </>
   )
@@ -571,7 +596,7 @@ function StepScreen({
         <p className="-mt-3 text-sm text-muted-foreground">{helper}</p>
       ) : null}
       {step.type === "scenario" ? (
-        <div className="rounded-e-lg border-s-2 border-primary bg-muted px-4 py-3 text-[1.03125rem]">
+        <div className="rounded-e-lg border-s-2 border-primary bg-muted px-4 py-3 text-base">
           <RichText text={step.situation} />
         </div>
       ) : null}
@@ -600,7 +625,7 @@ function StepScreen({
       {state.hintOpen && step.hint ? (
         <Alert>
           <LightbulbIcon aria-hidden="true" />
-          <AlertDescription className="text-[0.9375rem] text-foreground">
+          <AlertDescription className="text-base text-foreground">
             <RichText text={step.hint} />
           </AlertDescription>
         </Alert>
@@ -643,7 +668,7 @@ function WrapUp({
             </div>
           </div>
         </div>
-        <ul className="grid gap-1.5 text-[0.9375rem]">
+        <ul className="grid gap-1.5 text-base">
           {rows.map(([color, n, label]) => (
             <li key={label} className="flex items-center gap-2">
               <span
@@ -669,7 +694,7 @@ function WrapUp({
           ))}
         </ul>
         {lesson.wrapup.next ? (
-          <p className="text-[0.9375rem] text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             {t.next}:{" "}
             <strong className="text-foreground">{lesson.wrapup.next}</strong>
           </p>
@@ -688,11 +713,13 @@ function ActionBar({
   item,
   state,
   dispatch,
+  textSize,
 }: {
   lesson: Lesson
   item: Item
   state: State
   dispatch: React.Dispatch<Action>
+  textSize: TextSize
 }) {
   const { t } = usePlayer()
   let tone: Tone = "neutral"
@@ -805,7 +832,7 @@ function ActionBar({
             />
           ) : null}
           {title ? (
-            <div className="min-w-0">
+            <div data-text-size={textSize} className="min-w-0">
               <div
                 className={cn(
                   "text-lg leading-tight font-bold",
@@ -815,10 +842,7 @@ function ActionBar({
                 {title}
               </div>
               {message ? (
-                <RichText
-                  text={message}
-                  className="mt-0.5 block text-[0.9375rem]"
-                />
+                <RichText text={message} className="mt-0.5 block text-base" />
               ) : null}
             </div>
           ) : (

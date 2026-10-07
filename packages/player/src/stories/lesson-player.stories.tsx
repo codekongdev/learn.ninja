@@ -21,6 +21,8 @@ const meta = {
           uiLanguage={globals.ui}
           expiresAt={Date.now() + 14 * 3.6e6}
           homeHref="#"
+          docsHref="#"
+          createHref="#"
           theme={globals.theme === "dark" ? "dark" : "light"}
           onThemeChange={(theme) =>
             updateGlobals({

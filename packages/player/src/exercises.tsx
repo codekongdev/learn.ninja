@@ -121,7 +121,7 @@ export function OptionsExercise({
                   <RichText
                     text={o.text}
                     lang={o.lang}
-                    className="px-1 text-[0.96875rem]"
+                    className="px-1 text-base"
                   />
                 ) : null}
               </>
@@ -133,7 +133,7 @@ export function OptionsExercise({
                     <RichText
                       text={o.text}
                       lang={o.lang}
-                      className="text-[0.96875rem]"
+                      className="text-base"
                     />
                   ) : null}
                   {o.visual ? <Visual visual={o.visual} /> : null}
@@ -351,7 +351,7 @@ export function MatchExercise({
   const badge = (k: number) => (
     <span
       aria-hidden="true"
-      className="grid size-6 shrink-0 place-items-center rounded-full border border-dashed text-[0.6875rem] font-bold text-white"
+      className="grid size-6 shrink-0 place-items-center rounded-full border border-dashed text-xs font-bold text-white"
       style={
         k >= 0
           ? {
@@ -366,7 +366,7 @@ export function MatchExercise({
     </span>
   )
   const chip =
-    "flex w-full items-center gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-start text-[0.9375rem] shadow-xs hover:bg-muted data-selected:border-primary data-selected:bg-muted " +
+    "flex w-full items-center gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-start text-base shadow-xs hover:bg-muted data-selected:border-primary data-selected:bg-muted " +
     markStyles
 
   return (
@@ -447,9 +447,7 @@ export function BlankExercise({
         dir={code ? "ltr" : undefined}
         className={cn(
           "rounded-xl bg-card px-5 py-4 whitespace-pre-wrap shadow-xs ring-1 ring-foreground/10",
-          code
-            ? "font-mono text-[0.9375rem] leading-loose"
-            : "text-xl leading-[2.3]"
+          code ? "font-mono text-base leading-loose" : "text-xl leading-[2.3]"
         )}
       >
         {parts.map((part, i) => {
@@ -493,7 +491,7 @@ export function BlankExercise({
               lang={step.lang}
               className={cn(
                 "rounded-md border bg-background px-3 py-1.5 shadow-xs hover:bg-muted data-selected:opacity-45",
-                code ? "font-mono text-sm" : "text-[0.9375rem]"
+                code ? "font-mono text-sm" : "text-base"
               )}
             >
               {word}

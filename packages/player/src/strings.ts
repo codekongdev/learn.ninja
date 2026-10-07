@@ -69,6 +69,9 @@ export type Strings = {
   stay: string
   home: string
   share: string
+  docs: string
+  createLesson: string
+  part: (i: number, n: number) => string
   linkCopied: string
   theory: string
   theoryEmpty: string
@@ -166,6 +169,9 @@ const en: Strings = {
   stay: "Keep learning",
   home: "Learn home",
   share: "Share",
+  docs: "Docs",
+  createLesson: "Create lesson",
+  part: (i, n) => `Part ${i} of ${n}`,
   linkCopied: "Link copied",
   theory: "Theory",
   theoryEmpty: "Concepts show up here as you learn them.",
@@ -248,6 +254,9 @@ const ar: Strings = {
   stay: "تابع التعلم",
   home: "الصفحة الرئيسية",
   share: "مشاركة",
+  docs: "الدليل",
+  createLesson: "أنشئ درسًا",
+  part: (i, n) => `الجزء ${i} من ${n}`,
   linkCopied: "تم نسخ الرابط",
   theory: "النظرية",
   theoryEmpty: "ستظهر المفاهيم هنا أثناء تعلّمك.",

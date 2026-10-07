@@ -17,6 +17,8 @@ export function LessonView(props: LessonPlayerProps) {
   React.useEffect(() => setMounted(true), [])
   return (
     <LessonPlayer
+      docsHref="/docs"
+      createHref="/create"
       {...props}
       theme={mounted ? ((theme as Theme | undefined) ?? "system") : "system"}
       onThemeChange={setTheme}

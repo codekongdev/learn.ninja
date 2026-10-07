@@ -146,3 +146,23 @@
   25% { transform: rotate(-7deg); }
   75% { transform: rotate(6deg); }
 }
+
+/* The learner's text size setting. It scales Tailwind's text sizes only inside elements marked with
+   data-text-size (the lesson content), so the app's own header, footer, and buttons keep their size. */
+[data-text-size="md"] {
+  --text-scale: 1.125;
+}
+[data-text-size="lg"] {
+  --text-scale: 1.25;
+}
+[data-text-size] {
+  --text-xs: calc(0.75rem * var(--text-scale, 1));
+  --text-sm: calc(0.875rem * var(--text-scale, 1));
+  --text-base: calc(1rem * var(--text-scale, 1));
+  --text-lg: calc(1.125rem * var(--text-scale, 1));
+  --text-xl: calc(1.25rem * var(--text-scale, 1));
+  --text-2xl: calc(1.5rem * var(--text-scale, 1));
+  --text-3xl: calc(1.875rem * var(--text-scale, 1));
+  --text-4xl: calc(2.25rem * var(--text-scale, 1));
+  font-size: var(--text-base);
+}

@@ -35,7 +35,9 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
 import { Progress } from "@workspace/ui/components/progress"
+import { cn } from "@workspace/ui/lib/utils"
 
+import type { PartProgress } from "./flow"
 import { RichText } from "./rich-text"
 import {
   UI_LANGUAGES,
@@ -63,11 +65,6 @@ export interface Preferences {
 }
 
 const PREFERENCES_KEY = "learn:preferences"
-const ROOT_FONT_SIZE: Record<TextSize, string> = {
-  sm: "",
-  md: "112.5%",
-  lg: "125%",
-}
 
 export function usePreferences() {
   const [prefs, setPrefs] = React.useState<Preferences>({ textSize: "sm" })
@@ -92,14 +89,6 @@ export function usePreferences() {
       return next
     })
   }, [])
-  // Everything is sized in rem, so the root font size scales the whole lesson.
-  React.useEffect(() => {
-    const root = document.documentElement
-    root.style.fontSize = ROOT_FONT_SIZE[prefs.textSize]
-    return () => {
-      root.style.fontSize = ""
-    }
-  }, [prefs.textSize])
   return [prefs, update] as const
 }
 
@@ -121,17 +110,21 @@ export function useHoursLeft(expiresAt?: number): number | null {
 
 export function LessonHeader({
   title,
-  progress,
+  parts,
   expiresAt,
   homeHref,
+  docsHref,
+  createHref,
   shareUrl,
   onRestart,
   t,
 }: {
   title: string
-  progress: number
+  parts: PartProgress
   expiresAt?: number
   homeHref: string
+  docsHref?: string
+  createHref?: string
   shareUrl?: string
   onRestart: () => void
   t: Strings
@@ -139,7 +132,7 @@ export function LessonHeader({
   const hours = useHoursLeft(expiresAt)
   const [confirmRestart, setConfirmRestart] = React.useState(false)
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2 px-4 sm:h-20 sm:px-8">
+    <header className="flex h-14 shrink-0 items-center gap-2 px-4 sm:h-16 sm:px-8">
       <div className="flex min-w-0 flex-1 items-center gap-1">
         <LinkButton
           href={homeHref}
@@ -185,15 +178,54 @@ export function LessonHeader({
           </DialogFooter>
         </Dialog>
       </div>
-      <Progress
-        value={progress}
-        aria-label={t.progress}
-        className="w-16 shrink-0 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink"
-      />
-      <div className="flex items-center justify-end sm:flex-1">
+      <PartsProgress parts={parts} t={t} />
+      <div className="flex items-center justify-end gap-2 sm:flex-1">
+        {docsHref ? (
+          <LinkButton
+            href={docsHref}
+            variant="outline"
+            size="xs"
+            className="max-sm:hidden"
+          >
+            {t.docs}
+          </LinkButton>
+        ) : null}
         <ShareButton title={title} url={shareUrl} t={t} />
+        {createHref ? (
+          <LinkButton href={createHref} size="xs" className="max-sm:hidden">
+            {t.createLesson}
+          </LinkButton>
+        ) : null}
       </div>
     </header>
+  )
+}
+
+/** One segment per part: finished parts and upcoming parts are short pills, the current part is a full bar. */
+function PartsProgress({ parts, t }: { parts: PartProgress; t: Strings }) {
+  return (
+    <div className="flex min-w-0 items-center gap-1.5 sm:flex-1 sm:gap-2">
+      {Array.from({ length: parts.count }, (_, i) =>
+        i === parts.current ? (
+          <Progress
+            key={i}
+            value={Math.round(parts.fraction * 100)}
+            aria-label={t.progress}
+            valueLabel={t.part(i + 1, parts.count)}
+            className="w-16 min-w-0 shrink-0 transition-all duration-500 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink [&_[data-slot=progress-track]]:h-3"
+          />
+        ) : (
+          <span
+            key={i}
+            aria-hidden="true"
+            className={cn(
+              "h-3 w-3 shrink-0 rounded-full transition-colors duration-500 sm:w-[18px]",
+              i < parts.current || parts.done ? "bg-primary" : "bg-muted"
+            )}
+          />
+        )
+      )}
+    </div>
   )
 }
 
@@ -235,8 +267,12 @@ function ShareButton({
   const label = copied ? t.linkCopied : t.share
   return (
     <>
-      <Button size="xs" onPress={share} aria-label={label}>
-        {copied ? <CheckIcon /> : <ShareIcon />}
+      <Button variant="outline" size="xs" onPress={share} aria-label={label}>
+        {copied ? (
+          <CheckIcon data-icon="inline-start" />
+        ) : (
+          <ShareIcon className="sm:hidden" />
+        )}
         <span className="max-sm:sr-only">{label}</span>
       </Button>
       <span aria-live="polite" className="sr-only">
@@ -267,7 +303,7 @@ export function LessonFooter({
   const ThemeIcon =
     theme === "dark" ? MoonIcon : theme === "light" ? SunIcon : MonitorIcon
   return (
-    <footer className="flex h-14 shrink-0 items-center gap-2 px-4 pb-[env(safe-area-inset-bottom,0px)] sm:h-20 sm:px-8">
+    <footer className="flex h-14 shrink-0 items-center gap-2 px-4 pb-[env(safe-area-inset-bottom,0px)] sm:h-16 sm:px-8">
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium">
         <span className="truncate">
           <span className="max-sm:hidden">© {new Date().getFullYear()} </span>
@@ -342,11 +378,7 @@ function SettingMenu<K extends string>({
 }) {
   return (
     <DropdownMenuTrigger>
-      <Button
-        variant="outline"
-        size="xs"
-        aria-label={`${label}: ${valueLabel}`}
-      >
+      <Button variant="ghost" size="xs" aria-label={`${label}: ${valueLabel}`}>
         {icon}
         <span className="max-sm:sr-only">{valueLabel}</span>
       </Button>
@@ -383,17 +415,19 @@ export function TheoryPanel({
   concepts,
   onClose,
   t,
+  textSize,
 }: {
   id: string
   concepts: Concept[]
   onClose: () => void
   t: Strings
+  textSize: TextSize
 }) {
   return (
     <aside
       id={id}
       aria-label={t.theory}
-      className="absolute inset-0 z-20 flex flex-col bg-background motion-safe:animate-in motion-safe:fade-in-0 lg:static lg:w-96 lg:shrink-0 lg:border-s"
+      className="absolute inset-0 z-20 flex flex-col overflow-hidden border-y bg-background motion-safe:animate-in motion-safe:fade-in-0 sm:inset-x-8 sm:rounded-xl sm:border lg:static lg:w-[360px] lg:shrink-0"
     >
       <div className="flex items-center justify-between gap-2 px-6 pt-6 pb-3">
         <h2 className="text-sm font-semibold">{t.theory}</h2>
@@ -406,7 +440,10 @@ export function TheoryPanel({
           <XIcon />
         </Button>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+      <div
+        data-text-size={textSize}
+        className="min-h-0 flex-1 overflow-y-auto px-6 pb-6"
+      >
         {concepts.length ? (
           <ol className="grid gap-3">
             {concepts.map((c) => (
@@ -416,7 +453,7 @@ export function TheoryPanel({
                     <h3 className="text-base font-semibold">{c.title}</h3>
                     <RichText
                       text={c.body}
-                      className="block text-[0.9375rem] text-muted-foreground"
+                      className="block text-base text-muted-foreground"
                     />
                     {c.term ? (
                       <p className="mt-2">

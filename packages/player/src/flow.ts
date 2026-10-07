@@ -72,3 +72,46 @@ export function progressAt(
   const fixAt = items.findIndex((i) => i.kind === "fix")
   return Math.round(((index - 1) / Math.max(1, fixAt - 1)) * 100)
 }
+
+/** Where the learner is in the lesson's parts: one per loop (the warm-up belongs to the first), then the challenge. */
+export interface PartProgress {
+  count: number
+  /** The part being played (0-based). */
+  current: number
+  /** How far through the current part, from 0 to 1. */
+  fraction: number
+  /** True once the challenge is behind them (fixing mistakes, wrap-up). */
+  done: boolean
+}
+
+export function partAt(
+  items: Item[],
+  index: number,
+  inFix: boolean
+): PartProgress {
+  let part = 0
+  const parts = items.map((item) => {
+    if (item.kind === "concept") part = item.index - 1
+    if (item.kind === "step" && item.role === "challenge") part = -2
+    if (item.kind === "intro" || item.kind === "fix" || item.kind === "wrap")
+      return -1
+    return part === -2 ? Infinity : part
+  })
+  const count = items.filter((i) => i.kind === "concept").length + 1
+  const challenge = (p: number) => (p === Infinity ? count - 1 : p)
+  const item = items[index]
+  if (inFix || item?.kind === "fix" || item?.kind === "wrap")
+    return { count, current: count - 1, fraction: 1, done: true }
+  if (!item || item.kind === "intro")
+    return { count, current: 0, fraction: 0, done: false }
+  const current = challenge(parts[index]!)
+  const members = parts
+    .map((p, i) => (p !== -1 && challenge(p) === current ? i : -1))
+    .filter((i) => i >= 0)
+  return {
+    count,
+    current,
+    fraction: members.indexOf(index) / members.length,
+    done: false,
+  }
+}
