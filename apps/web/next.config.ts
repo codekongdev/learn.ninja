@@ -6,7 +6,7 @@ import optimizeLocales from "@react-aria/optimize-locales-plugin"
 const LOCALES = ["en-US", "ar-AE"]
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui", "@workspace/player"],
+  transpilePackages: ["@workspace/ui", "@workspace/player", "@workspace/spec"],
   // Builds use webpack (next dev/build --webpack): the locale plugin doesn't support Turbopack.
   webpack(config, { isServer }) {
     if (!isServer) {

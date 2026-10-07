@@ -1,0 +1,309 @@
+import type { Step } from "@workspace/spec"
+
+// Pure answer logic for every building block: the starting answer, whether it's ready to check,
+// checking it, the correct answer, and what to keep on a retry. No React here, so it's easy to test.
+
+export type Answer =
+  | { kind: "select"; ids: string[] } // choice, compare, scenario, hotspot
+  | { kind: "zones"; zones: Record<string, string[]> } // sort: "pool" plus one zone per group
+  | { kind: "sequence"; ids: string[] } // order
+  | { kind: "pairs"; links: Record<number, number> } // match: left index → right index
+  | { kind: "gaps"; values: Record<string, string> } // blank
+
+export type Mark = "correct" | "wrong" | "partial"
+
+export type MissKey =
+  "missOne" | "hotspot" | "hotspotLine" | "sort" | "order" | "match" | "blank"
+
+export interface CheckResult {
+  correct: boolean
+  /** Scenario only: an "okay" choice. */
+  partial?: boolean
+  /** Lesson-written feedback (an option's feedback, a mistake's feedback, or a scenario outcome). */
+  feedback?: string
+  /** Otherwise, which generic player message to show, with a count where it needs one. */
+  missKey?: MissKey
+  count?: number
+  /** Per-element marks, keyed by option, item, hotspot, or blank id ("L0"/"R2" for match sides). */
+  marks: Record<string, Mark>
+}
+
+export const POOL = "pool"
+
+export function shuffle<T>(
+  items: readonly T[],
+  random: () => number = Math.random
+): T[] {
+  const a = [...items]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1))
+    ;[a[i], a[j]] = [a[j]!, a[i]!]
+  }
+  return a
+}
+
+/** Shuffle, but never hand back the original order (so ordering exercises aren't pre-solved). */
+function shuffleAway<T>(items: readonly T[], random: () => number): T[] {
+  if (items.length < 2) return [...items]
+  const s = shuffle(items, random)
+  return s.every((v, i) => v === items[i]) ? [...s.slice(1), s[0]!] : s
+}
+
+export function initialAnswer(
+  step: Step,
+  random: () => number = Math.random
+): Answer {
+  switch (step.type) {
+    case "sort":
+      return {
+        kind: "zones",
+        zones: Object.fromEntries([
+          [
+            POOL,
+            shuffle(
+              step.items.map((i) => i.id),
+              random
+            ),
+          ],
+          ...step.groups.map((g) => [g.id, [] as string[]]),
+        ]),
+      }
+    case "order":
+      return {
+        kind: "sequence",
+        ids: shuffleAway(
+          step.items.map((i) => i.id),
+          random
+        ),
+      }
+    case "match":
+      return { kind: "pairs", links: {} }
+    case "blank":
+      return {
+        kind: "gaps",
+        values: Object.fromEntries(step.blanks.map((b) => [b.id, ""])),
+      }
+    default:
+      return { kind: "select", ids: [] }
+  }
+}
+
+export function isReady(step: Step, answer: Answer): boolean {
+  switch (answer.kind) {
+    case "select":
+      return answer.ids.length > 0
+    case "zones":
+      return (answer.zones[POOL] ?? []).length === 0
+    case "sequence":
+      return true
+    case "pairs":
+      return (
+        step.type === "match" &&
+        Object.keys(answer.links).length === step.pairs.length
+      )
+    case "gaps":
+      return Object.values(answer.values).every((v) => v !== "")
+  }
+}
+
+const sameSet = (a: string[], b: string[]) =>
+  a.length === b.length && a.every((x) => b.includes(x))
+
+export function checkAnswer(step: Step, answer: Answer): CheckResult {
+  switch (step.type) {
+    case "choice":
+    case "compare": {
+      const picked = answer.kind === "select" ? answer.ids : []
+      const correct = step.type === "choice" ? step.correct : [step.correct]
+      const ok = sameSet(picked, correct)
+      const marks: Record<string, Mark> = {}
+      for (const id of picked)
+        marks[id] = correct.includes(id) ? "correct" : "wrong"
+      if (ok) return { correct: true, marks }
+      const wrong = picked.find((id) => !correct.includes(id))
+      const feedback = wrong
+        ? step.options.find((o) => o.id === wrong)?.feedback
+        : undefined
+      return feedback
+        ? { correct: false, feedback, marks }
+        : { correct: false, missKey: "missOne", marks }
+    }
+    case "scenario": {
+      const picked = answer.kind === "select" ? answer.ids[0] : undefined
+      const option = step.options.find((o) => o.id === picked)
+      if (!option) return { correct: false, marks: {} }
+      const mark: Mark =
+        option.quality === "best"
+          ? "correct"
+          : option.quality === "okay"
+            ? "partial"
+            : "wrong"
+      return {
+        correct: option.quality === "best",
+        partial: option.quality === "okay",
+        feedback: option.outcome,
+        marks: { [option.id]: mark },
+      }
+    }
+    case "hotspot": {
+      const picked = answer.kind === "select" ? answer.ids : []
+      const ok = sameSet(picked, step.correct)
+      const marks: Record<string, Mark> = {}
+      for (const id of picked)
+        marks[id] = step.correct.includes(id) ? "correct" : "wrong"
+      return ok
+        ? { correct: true, marks }
+        : {
+            correct: false,
+            missKey: step.visual.kind === "code" ? "hotspotLine" : "hotspot",
+            marks,
+          }
+    }
+    case "sort": {
+      const zones = answer.kind === "zones" ? answer.zones : {}
+      const marks: Record<string, Mark> = {}
+      let wrong = 0
+      for (const item of step.items) {
+        const ok = (zones[item.group] ?? []).includes(item.id)
+        marks[item.id] = ok ? "correct" : "wrong"
+        if (!ok) wrong++
+      }
+      return wrong
+        ? { correct: false, missKey: "sort", count: wrong, marks }
+        : { correct: true, marks }
+    }
+    case "order": {
+      const seq = answer.kind === "sequence" ? answer.ids : []
+      const target = step.items.map((i) => i.id)
+      const accepted = [target, ...(step.alsoAccept ?? [])]
+      const matched = accepted.find(
+        (a) => a.join("\u0000") === seq.join("\u0000")
+      )
+      const marks: Record<string, Mark> = {}
+      seq.forEach(
+        (id, i) =>
+          (marks[id] = matched || target[i] === id ? "correct" : "wrong")
+      )
+      return matched
+        ? { correct: true, marks }
+        : { correct: false, missKey: "order", marks }
+    }
+    case "match": {
+      const links = answer.kind === "pairs" ? answer.links : {}
+      const marks: Record<string, Mark> = {}
+      let wrong = 0
+      step.pairs.forEach((_, i) => {
+        const ok = links[i] === i
+        marks[`L${i}`] = ok ? "correct" : "wrong"
+        if (links[i] !== undefined)
+          marks[`R${links[i]}`] = ok ? "correct" : "wrong"
+        if (!ok) wrong++
+      })
+      return wrong
+        ? { correct: false, missKey: "match", count: wrong, marks }
+        : { correct: true, marks }
+    }
+    case "blank": {
+      const values = answer.kind === "gaps" ? answer.values : {}
+      const marks: Record<string, Mark> = {}
+      let feedback: string | undefined
+      let anyWrong = false
+      for (const b of step.blanks) {
+        const v = values[b.id] ?? ""
+        const ok = b.accept.some((a) =>
+          step.caseSensitive
+            ? a === v
+            : a.toLocaleLowerCase() === v.toLocaleLowerCase()
+        )
+        marks[b.id] = ok ? "correct" : "wrong"
+        if (!ok && !anyWrong) {
+          anyWrong = true
+          feedback = b.mistakes?.find(
+            (m) => m.answer.toLocaleLowerCase() === v.toLocaleLowerCase()
+          )?.feedback
+        }
+      }
+      if (!anyWrong) return { correct: true, marks }
+      return feedback
+        ? { correct: false, feedback, marks }
+        : { correct: false, missKey: "blank", marks }
+    }
+    case "number":
+      // Not allowed in v1 lessons (the spec validator rejects them).
+      return { correct: false, marks: {} }
+  }
+}
+
+/** The answer to show after a second miss. */
+export function solution(step: Step): Answer {
+  switch (step.type) {
+    case "choice":
+      return { kind: "select", ids: step.correct }
+    case "compare":
+      return { kind: "select", ids: [step.correct] }
+    case "scenario":
+      return {
+        kind: "select",
+        ids: step.options
+          .filter((o) => o.quality === "best")
+          .map((o) => o.id)
+          .slice(0, 1),
+      }
+    case "hotspot":
+      return { kind: "select", ids: step.correct }
+    case "sort":
+      return {
+        kind: "zones",
+        zones: Object.fromEntries([
+          [POOL, []],
+          ...step.groups.map((g) => [
+            g.id,
+            step.items.filter((i) => i.group === g.id).map((i) => i.id),
+          ]),
+        ]),
+      }
+    case "order":
+      return { kind: "sequence", ids: step.items.map((i) => i.id) }
+    case "match":
+      return {
+        kind: "pairs",
+        links: Object.fromEntries(step.pairs.map((_, i) => [i, i])),
+      }
+    case "blank":
+      return {
+        kind: "gaps",
+        values: Object.fromEntries(
+          step.blanks.map((b) => [b.id, b.accept[0]!])
+        ),
+      }
+    case "number":
+      return { kind: "select", ids: [] }
+  }
+}
+
+/** Marks that show the whole solution as correct. */
+export function solutionMarks(step: Step): Record<string, Mark> {
+  const answer = solution(step)
+  return checkAnswer(step, answer).marks
+}
+
+/**
+ * What the learner keeps when they try again: selections are cleared (so they choose afresh),
+ * while arrangements stay so they only fix what was wrong.
+ */
+export function retryAnswer(step: Step, answer: Answer): Answer {
+  if (answer.kind === "select") return { kind: "select", ids: [] }
+  if (answer.kind === "gaps" && step.type === "blank") {
+    const result = checkAnswer(step, answer)
+    return {
+      kind: "gaps",
+      values: Object.fromEntries(
+        Object.entries(answer.values).map(([id, v]) => [
+          id,
+          result.marks[id] === "wrong" ? "" : v,
+        ])
+      ),
+    }
+  }
+  return answer
+}

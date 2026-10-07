@@ -131,3 +131,18 @@
     cursor: pointer;
     }
 }
+/* Code highlighted by Shiki at render time: light colors inline, dark colors in --shiki-dark */
+.dark .shiki-token {
+  color: var(--shiki-dark) !important;
+}
+
+@keyframes mascot-bounce {
+  0% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-7px) scale(1.04, 0.97); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes mascot-shake {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-7deg); }
+  75% { transform: rotate(6deg); }
+}

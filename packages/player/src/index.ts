@@ -1,4 +1,4 @@
-// React components for every lesson screen and building block.
-// Import UI only from @workspace/ui wrappers, never from react-aria-components directly
-// (the drag-and-drop module is the one exception).
-export {}
+// Client-safe exports. The server-only preparer is imported from "@workspace/player/prepare".
+export { LessonPlayer, type LessonPlayerProps } from "./lesson-player"
+export type { Prepared } from "./prepared"
+export { stringsFor, type Strings } from "./strings"

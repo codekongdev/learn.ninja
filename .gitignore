@@ -56,3 +56,7 @@ spikes/
 
 # local Claude Code settings
 .claude/settings.local.json
+
+# generated lesson-visuals stylesheet
+apps/web/public/lesson-visuals.css
+apps/web/.visuals/
