@@ -23,6 +23,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `npm run dev`: start the web app (webpack)
 - `npm run check`: lint, type-check, and tests across all packages; run after every change
 - `npm run build`: production build
+- `npm run schema -w @workspace/spec`: re-export `packages/spec/schema/lesson.schema.json` after changing the spec (a test fails if it's stale)
 - Add shadcn components from `apps/web`: `npx shadcn@latest add <name>` (they land in `packages/ui`)
 
 ## Rules

@@ -1,0 +1,528 @@
+import katex from "katex"
+
+import type { Lesson, Step, Visual } from "./schema"
+
+// Rules the schema can't express: cross-references, teaching quality, v1 limits, and safety.
+// Every message says what's wrong and how to fix it, so an LLM can correct the lesson on its own.
+
+export type IssueKind = "structure" | "teaching" | "v1" | "safety"
+
+export interface Issue {
+  path: string
+  message: string
+  kind: IssueKind
+}
+
+export const LIMITS = {
+  practiceTotal: { min: 4, max: 8 },
+  minStepTypes: 3,
+  maxSameTypeInARow: 2,
+  promptWords: 40,
+  conceptBodyWords: 80,
+  htmlVisualBytes: 20 * 1024,
+  lessonBytes: 500 * 1024,
+} as const
+
+/** A step together with where it sits in the lesson, in play order. */
+interface PlacedStep {
+  step: Step
+  path: string
+}
+
+function placedSteps(lesson: Lesson): PlacedStep[] {
+  return [
+    { step: lesson.hook, path: "hook" },
+    ...lesson.loops.flatMap((loop, i) =>
+      loop.practice.map((step, j) => ({
+        step,
+        path: `loops[${i}].practice[${j}]`,
+      }))
+    ),
+    { step: lesson.challenge, path: "challenge" },
+  ]
+}
+
+const countWords = (s: string) =>
+  s.replace(/[*`]/g, "").trim().split(/\s+/).filter(Boolean).length
+
+function duplicates(values: string[]): string[] {
+  const seen = new Set<string>()
+  const dupes = new Set<string>()
+  for (const v of values) (seen.has(v) ? dupes : seen).add(v)
+  return [...dupes]
+}
+
+const sameSet = (a: string[], b: string[]) =>
+  a.length === b.length && a.every((x) => b.includes(x))
+
+/** Ids of the tappable regions in a hotspot visual. */
+function hotspotIds(v: Visual): string[] {
+  if (v.kind === "html")
+    return [...v.html.matchAll(/data-hotspot\s*=\s*["']([^"']+)["']/g)].map(
+      (m) => m[1]!
+    )
+  if (v.kind === "code") return (v.hotspots ?? []).map((h) => h.id)
+  return []
+}
+
+export function checkLesson(lesson: Lesson, raw: string): Issue[] {
+  const issues: Issue[] = []
+  const add = (kind: IssueKind, path: string, message: string) =>
+    issues.push({ kind, path, message })
+  const steps = placedSteps(lesson)
+
+  // ---------- structure ----------
+
+  const practiceCount = lesson.loops.reduce((n, l) => n + l.practice.length, 0)
+  if (
+    practiceCount < LIMITS.practiceTotal.min ||
+    practiceCount > LIMITS.practiceTotal.max
+  ) {
+    add(
+      "structure",
+      "loops",
+      `The lesson has ${practiceCount} practice steps in total; it needs ${LIMITS.practiceTotal.min}–${LIMITS.practiceTotal.max}. Add or remove practice steps (2–4 per loop).`
+    )
+  }
+
+  const lessonIds = [
+    ...steps.map((s) => s.step.id),
+    ...lesson.loops.map((l) => l.concept.id),
+  ]
+  for (const dupe of duplicates(lessonIds)) {
+    add(
+      "structure",
+      "",
+      `The id "${dupe}" is used more than once. Every step and concept id must be unique within the lesson.`
+    )
+  }
+
+  for (const { step, path } of steps) checkStepReferences(step, path, add)
+
+  // ---------- v1 limits ----------
+
+  for (const { step, path } of steps) {
+    if (step.type === "number") {
+      add(
+        "v1",
+        path,
+        "Number steps aren't supported in v1. Rewrite this as a choice step whose wrong options come from common mistakes, each with feedback."
+      )
+    }
+    if (step.type === "blank") {
+      step.blanks.forEach((b, i) => {
+        if (!b.choices) {
+          add(
+            "v1",
+            `${path}.blanks[${i}]`,
+            `Blank "${b.id}" has no choices. Typed answers aren't supported in v1: add a "choices" word bank that includes the accepted answer and one or two decoys.`
+          )
+        }
+      })
+    }
+  }
+
+  // ---------- teaching quality ----------
+
+  const types = new Set(steps.map((s) => s.step.type))
+  if (types.size < LIMITS.minStepTypes) {
+    add(
+      "teaching",
+      "",
+      `The lesson uses ${types.size} building block type(s) (${[...types].join(", ")}); use at least ${LIMITS.minStepTypes} different types across the hook, practice, and challenge.`
+    )
+  }
+
+  let run = 1
+  for (let i = 1; i < steps.length; i++) {
+    run = steps[i]!.step.type === steps[i - 1]!.step.type ? run + 1 : 1
+    if (run > LIMITS.maxSameTypeInARow) {
+      add(
+        "teaching",
+        steps[i]!.path,
+        `This makes ${run} "${steps[i]!.step.type}" steps in a row; use no more than ${LIMITS.maxSameTypeInARow} of the same type in a row. Change this step's type or reorder steps.`
+      )
+    }
+  }
+
+  for (const { step, path } of steps) {
+    if (countWords(step.prompt) > LIMITS.promptWords) {
+      add(
+        "teaching",
+        `${path}.prompt`,
+        `The prompt has ${countWords(step.prompt)} words; keep it to ${LIMITS.promptWords} or fewer.`
+      )
+    }
+    if (step.type === "choice" || step.type === "compare") {
+      const correct = step.type === "choice" ? step.correct : [step.correct]
+      step.options.forEach((o, i) => {
+        if (!correct.includes(o.id) && !o.feedback) {
+          add(
+            "teaching",
+            `${path}.options[${i}]`,
+            `Wrong option "${o.id}" has no feedback. Explain why it's wrong, so the learner learns from the mistake.`
+          )
+        }
+      })
+    }
+  }
+
+  lesson.loops.forEach((loop, i) => {
+    const words = countWords(loop.concept.body)
+    if (words > LIMITS.conceptBodyWords) {
+      add(
+        "teaching",
+        `loops[${i}].concept.body`,
+        `The concept body has ${words} words; keep it to ${LIMITS.conceptBodyWords} or fewer and one idea only.`
+      )
+    }
+  })
+
+  // ---------- languages ----------
+
+  for (const [path, code] of languageCodes(lesson)) {
+    try {
+      Intl.getCanonicalLocales(code)
+    } catch {
+      add(
+        "structure",
+        path,
+        `"${code}" isn't a valid BCP 47 language code. Use codes like "en", "es", "ar", or "pt-BR".`
+      )
+    }
+  }
+
+  // ---------- formulas ----------
+
+  walkStrings(lesson, "", (value, path) => {
+    if (/\.(html|css|code)$/.test(path)) return
+    if (path.endsWith(".tex")) return checkFormula(value, path, add)
+    const opens = value.split("\\(").length - 1
+    const closes = value.split("\\)").length - 1
+    if (opens !== closes) {
+      add(
+        "structure",
+        path,
+        `Unbalanced inline formula: ${opens} "\\(" and ${closes} "\\)". Wrap each formula as \\( ... \\).`
+      )
+      return
+    }
+    for (const m of value.matchAll(/\\\(([\s\S]*?)\\\)/g))
+      checkFormula(m[1]!, path, add)
+  })
+
+  // ---------- safety and size ----------
+
+  walkVisuals(lesson, (v, path) => {
+    if (v.kind !== "html") return
+    const html = v.html
+    if (/<\s*script\b/i.test(html))
+      add(
+        "safety",
+        `${path}.html`,
+        "Visuals can't contain <script>. Use plain HTML and CSS only."
+      )
+    if (/<\s*(iframe|form|object|embed|frame)\b/i.test(html))
+      add(
+        "safety",
+        `${path}.html`,
+        "Visuals can't contain iframes, forms, objects, or embeds."
+      )
+    if (/\son[a-z]+\s*=/i.test(html))
+      add(
+        "safety",
+        `${path}.html`,
+        "Visuals can't contain event handlers (onclick and similar)."
+      )
+    if (/javascript\s*:/i.test(html))
+      add("safety", `${path}.html`, "Visuals can't contain javascript: URLs.")
+    const external =
+      /(?:src|href|srcset|action)\s*=\s*["']?\s*(?:https?:)?\/\/|url\(\s*["']?\s*(?:https?:)?\/\//i
+    if (
+      external.test(html) ||
+      (v.css && external.test(v.css)) ||
+      (v.css && /@import/i.test(v.css))
+    ) {
+      add(
+        "safety",
+        path,
+        "Visuals can't load anything from external URLs. Use the built-in UI kit, inline SVG, and CSS only."
+      )
+    }
+    const bytes = new TextEncoder().encode(html + (v.css ?? "")).length
+    if (bytes > LIMITS.htmlVisualBytes) {
+      add(
+        "safety",
+        path,
+        `This visual is ${Math.round(bytes / 1024)} KB; keep each HTML visual under ${LIMITS.htmlVisualBytes / 1024} KB.`
+      )
+    }
+  })
+
+  const lessonBytes = new TextEncoder().encode(raw).length
+  if (lessonBytes > LIMITS.lessonBytes) {
+    add(
+      "safety",
+      "",
+      `The lesson file is ${Math.round(lessonBytes / 1024)} KB; keep it under ${LIMITS.lessonBytes / 1024} KB.`
+    )
+  }
+
+  return issues
+}
+
+function checkStepReferences(
+  step: Step,
+  path: string,
+  add: (k: IssueKind, p: string, m: string) => void
+) {
+  switch (step.type) {
+    case "choice": {
+      const ids = step.options.map((o) => o.id)
+      for (const d of duplicates(ids))
+        add(
+          "structure",
+          `${path}.options`,
+          `Option id "${d}" is used more than once.`
+        )
+      for (const c of step.correct)
+        if (!ids.includes(c))
+          add(
+            "structure",
+            `${path}.correct`,
+            `"${c}" isn't one of this step's option ids (${ids.join(", ")}).`
+          )
+      if (!step.multiple && step.correct.length !== 1)
+        add(
+          "structure",
+          `${path}.correct`,
+          `With "multiple": false, "correct" must list exactly one option id.`
+        )
+      if (step.correct.length >= ids.length)
+        add("teaching", `${path}.correct`, "At least one option must be wrong.")
+      break
+    }
+    case "compare": {
+      const ids = step.options.map((o) => o.id)
+      for (const d of duplicates(ids))
+        add(
+          "structure",
+          `${path}.options`,
+          `Option id "${d}" is used more than once.`
+        )
+      if (!ids.includes(step.correct))
+        add(
+          "structure",
+          `${path}.correct`,
+          `"${step.correct}" isn't one of this step's option ids (${ids.join(", ")}).`
+        )
+      break
+    }
+    case "scenario": {
+      const ids = step.options.map((o) => o.id)
+      for (const d of duplicates(ids))
+        add(
+          "structure",
+          `${path}.options`,
+          `Option id "${d}" is used more than once.`
+        )
+      if (!step.options.some((o) => o.quality === "best"))
+        add(
+          "teaching",
+          `${path}.options`,
+          `A scenario needs at least one option with "quality": "best".`
+        )
+      break
+    }
+    case "order": {
+      const ids = step.items.map((i) => i.id)
+      for (const d of duplicates(ids))
+        add(
+          "structure",
+          `${path}.items`,
+          `Item id "${d}" is used more than once.`
+        )
+      ;(step.alsoAccept ?? []).forEach((alt, i) => {
+        if (!sameSet(alt, ids))
+          add(
+            "structure",
+            `${path}.alsoAccept[${i}]`,
+            `Each alternative order must list every item id exactly once (${ids.join(", ")}).`
+          )
+      })
+      break
+    }
+    case "sort": {
+      const groupIds = step.groups.map((g) => g.id)
+      for (const d of duplicates(groupIds))
+        add(
+          "structure",
+          `${path}.groups`,
+          `Group id "${d}" is used more than once.`
+        )
+      for (const d of duplicates(step.items.map((i) => i.id)))
+        add(
+          "structure",
+          `${path}.items`,
+          `Item id "${d}" is used more than once.`
+        )
+      step.items.forEach((it, i) => {
+        if (!groupIds.includes(it.group))
+          add(
+            "structure",
+            `${path}.items[${i}].group`,
+            `"${it.group}" isn't one of this step's group ids (${groupIds.join(", ")}).`
+          )
+      })
+      break
+    }
+    case "blank": {
+      const gaps = [...step.template.matchAll(/\[\[([^\]]+)\]\]/g)].map(
+        (m) => m[1]!
+      )
+      const blankIds = step.blanks.map((b) => b.id)
+      for (const d of duplicates(blankIds))
+        add(
+          "structure",
+          `${path}.blanks`,
+          `Blank id "${d}" is used more than once.`
+        )
+      for (const d of duplicates(gaps))
+        add(
+          "structure",
+          `${path}.template`,
+          `The gap [[${d}]] appears more than once in the template.`
+        )
+      for (const g of gaps)
+        if (!blankIds.includes(g))
+          add(
+            "structure",
+            `${path}.template`,
+            `The gap [[${g}]] has no matching entry in "blanks".`
+          )
+      for (const b of blankIds)
+        if (!gaps.includes(b))
+          add(
+            "structure",
+            `${path}.blanks`,
+            `Blank "${b}" doesn't appear in the template as [[${b}]].`
+          )
+      step.blanks.forEach((b, i) => {
+        if (b.choices && !b.accept.some((a) => b.choices!.includes(a))) {
+          add(
+            "structure",
+            `${path}.blanks[${i}].choices`,
+            `None of blank "${b.id}"'s accepted answers is among its choices, so it can't be answered. Add "${b.accept[0]}" to "choices".`
+          )
+        }
+      })
+      break
+    }
+    case "hotspot": {
+      const ids = hotspotIds(step.visual)
+      if (ids.length === 0)
+        add(
+          "structure",
+          `${path}.visual`,
+          `A hotspot visual needs tappable regions: data-hotspot="id" attributes in html, or "hotspots" on a code visual.`
+        )
+      for (const d of duplicates(ids))
+        add(
+          "structure",
+          `${path}.visual`,
+          `Hotspot id "${d}" is used more than once.`
+        )
+      for (const c of step.correct)
+        if (!ids.includes(c))
+          add(
+            "structure",
+            `${path}.correct`,
+            `"${c}" isn't one of this visual's hotspot ids (${ids.join(", ") || "none"}).`
+          )
+      if (!step.multiple && step.correct.length !== 1)
+        add(
+          "structure",
+          `${path}.correct`,
+          `With "multiple": false, "correct" must list exactly one hotspot id.`
+        )
+      if (step.visual.kind === "code") {
+        const lines = step.visual.code.split("\n").length
+        ;(step.visual.hotspots ?? []).forEach((h, i) => {
+          if (h.line > lines)
+            add(
+              "structure",
+              `${path}.visual.hotspots[${i}]`,
+              `Line ${h.line} doesn't exist; the code has ${lines} lines.`
+            )
+        })
+      }
+      break
+    }
+    default:
+      break
+  }
+}
+
+function checkFormula(
+  tex: string,
+  path: string,
+  add: (k: IssueKind, p: string, m: string) => void
+) {
+  try {
+    katex.renderToString(tex, { throwOnError: true })
+  } catch (e) {
+    add(
+      "structure",
+      path,
+      `This formula doesn't render: ${(e as Error).message.replace(/^KaTeX parse error: /, "")}`
+    )
+  }
+}
+
+function languageCodes(lesson: Lesson): [string, string][] {
+  const found: [string, string][] = [["language", lesson.language]]
+  if (lesson.targetLanguage)
+    found.push(["targetLanguage", lesson.targetLanguage])
+  walkObjects(lesson, "", (obj, path) => {
+    for (const key of ["lang", "leftLang", "rightLang"] as const) {
+      const v = obj[key]
+      if (typeof v === "string") found.push([path ? `${path}.${key}` : key, v])
+    }
+  })
+  return found
+}
+
+function walkObjects(
+  value: unknown,
+  path: string,
+  visit: (obj: Record<string, unknown>, path: string) => void
+) {
+  if (Array.isArray(value))
+    value.forEach((v, i) => walkObjects(v, `${path}[${i}]`, visit))
+  else if (value && typeof value === "object") {
+    visit(value as Record<string, unknown>, path)
+    for (const [k, v] of Object.entries(value))
+      walkObjects(v, path ? `${path}.${k}` : k, visit)
+  }
+}
+
+function walkStrings(
+  value: unknown,
+  path: string,
+  visit: (s: string, path: string) => void
+) {
+  if (typeof value === "string") visit(value, path)
+  else if (Array.isArray(value))
+    value.forEach((v, i) => walkStrings(v, `${path}[${i}]`, visit))
+  else if (value && typeof value === "object") {
+    for (const [k, v] of Object.entries(value))
+      walkStrings(v, path ? `${path}.${k}` : k, visit)
+  }
+}
+
+function walkVisuals(lesson: Lesson, visit: (v: Visual, path: string) => void) {
+  walkObjects(lesson, "", (obj, path) => {
+    if (obj.kind === "html" || obj.kind === "code" || obj.kind === "math")
+      visit(obj as unknown as Visual, path)
+  })
+}

@@ -1,0 +1,1076 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "spec": {
+      "type": "string",
+      "const": "0.2"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 35
+    },
+    "targetLanguage": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 35
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ]
+    },
+    "estimatedMinutes": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 10
+    },
+    "topic": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "hook": {
+      "$ref": "#/$defs/HookStep"
+    },
+    "loops": {
+      "minItems": 1,
+      "maxItems": 3,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Loop"
+      }
+    },
+    "challenge": {
+      "$ref": "#/$defs/Step"
+    },
+    "wrapup": {
+      "type": "object",
+      "properties": {
+        "takeaways": {
+          "minItems": 2,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "next": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "takeaways"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "spec",
+    "title",
+    "summary",
+    "objective",
+    "language",
+    "level",
+    "estimatedMinutes",
+    "hook",
+    "loops",
+    "challenge",
+    "wrapup"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "HookStep": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ChoiceStep"
+        },
+        {
+          "$ref": "#/$defs/CompareStep"
+        }
+      ]
+    },
+    "ChoiceStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "choice"
+        },
+        "options": {
+          "minItems": 2,
+          "maxItems": 5,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Option"
+          }
+        },
+        "correct": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        "multiple": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "explanation",
+        "type",
+        "options",
+        "correct",
+        "multiple"
+      ],
+      "additionalProperties": false
+    },
+    "Visual": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/HtmlVisual"
+        },
+        {
+          "$ref": "#/$defs/CodeVisual"
+        },
+        {
+          "$ref": "#/$defs/MathVisual"
+        }
+      ]
+    },
+    "HtmlVisual": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "html"
+        },
+        "html": {
+          "type": "string",
+          "minLength": 1
+        },
+        "css": {
+          "type": "string"
+        },
+        "height": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "kind",
+        "html"
+      ],
+      "additionalProperties": false
+    },
+    "CodeVisual": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "code"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "type": "string",
+          "minLength": 1
+        },
+        "highlight": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "hotspots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "line": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "id",
+              "line"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "code",
+        "language"
+      ],
+      "additionalProperties": false
+    },
+    "MathVisual": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "math"
+        },
+        "tex": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "tex"
+      ],
+      "additionalProperties": false
+    },
+    "Option": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "feedback": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lang": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 35
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "CompareStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "compare"
+        },
+        "options": {
+          "minItems": 2,
+          "maxItems": 2,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Option"
+          }
+        },
+        "correct": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "explanation",
+        "type",
+        "options",
+        "correct"
+      ],
+      "additionalProperties": false
+    },
+    "Loop": {
+      "type": "object",
+      "properties": {
+        "concept": {
+          "$ref": "#/$defs/Concept"
+        },
+        "practice": {
+          "minItems": 2,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step"
+          }
+        }
+      },
+      "required": [
+        "concept",
+        "practice"
+      ],
+      "additionalProperties": false
+    },
+    "Concept": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "term": {
+          "type": "object",
+          "properties": {
+            "word": {
+              "type": "string",
+              "minLength": 1
+            },
+            "definition": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "word",
+            "definition"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "Step": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ChoiceStep"
+        },
+        {
+          "$ref": "#/$defs/CompareStep"
+        },
+        {
+          "$ref": "#/$defs/OrderStep"
+        },
+        {
+          "$ref": "#/$defs/SortStep"
+        },
+        {
+          "$ref": "#/$defs/MatchStep"
+        },
+        {
+          "$ref": "#/$defs/BlankStep"
+        },
+        {
+          "$ref": "#/$defs/HotspotStep"
+        },
+        {
+          "$ref": "#/$defs/ScenarioStep"
+        },
+        {
+          "$ref": "#/$defs/NumberStep"
+        }
+      ]
+    },
+    "OrderStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "order"
+        },
+        "items": {
+          "minItems": 3,
+          "maxItems": 6,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OrderItem"
+          }
+        },
+        "alsoAccept": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "explanation",
+        "type",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "OrderItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "lang": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 35
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "SortStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "sort"
+        },
+        "groups": {
+          "minItems": 2,
+          "maxItems": 3,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "lang": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 35
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "items": {
+          "minItems": 4,
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "group": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "lang": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 35
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "group"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "explanation",
+        "type",
+        "groups",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "MatchStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "match"
+        },
+        "pairs": {
+          "minItems": 3,
+          "maxItems": 5,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "left": {
+                "type": "string",
+                "minLength": 1
+              },
+              "right": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "left",
+              "right"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "leftLang": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 35
+        },
+        "rightLang": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 35
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "explanation",
+        "type",
+        "pairs"
+      ],
+      "additionalProperties": false
+    },
+    "BlankStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "blank"
+        },
+        "template": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "text",
+            "code"
+          ]
+        },
+        "language": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lang": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 35
+        },
+        "caseSensitive": {
+          "type": "boolean"
+        },
+        "blanks": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Blank"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "explanation",
+        "type",
+        "template",
+        "format",
+        "blanks"
+      ],
+      "additionalProperties": false
+    },
+    "Blank": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "accept": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "choices": {
+          "minItems": 2,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mistakes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "string",
+                "minLength": 1
+              },
+              "feedback": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "answer",
+              "feedback"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "numeric": {
+          "type": "boolean"
+        },
+        "tolerance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "strictAccents": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "accept"
+      ],
+      "additionalProperties": false
+    },
+    "HotspotStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/HtmlVisual"
+            },
+            {
+              "$ref": "#/$defs/CodeVisual"
+            }
+          ]
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "hotspot"
+        },
+        "correct": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        "multiple": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "visual",
+        "explanation",
+        "type",
+        "correct",
+        "multiple"
+      ],
+      "additionalProperties": false
+    },
+    "ScenarioStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "scenario"
+        },
+        "situation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "options": {
+          "minItems": 2,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "quality": {
+                "type": "string",
+                "enum": [
+                  "best",
+                  "okay",
+                  "poor"
+                ]
+              },
+              "outcome": {
+                "type": "string",
+                "minLength": 1
+              },
+              "lang": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 35
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "quality",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "explanation",
+        "type",
+        "situation",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "NumberStep": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visual": {
+          "$ref": "#/$defs/Visual"
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "const": "number"
+        },
+        "answer": {
+          "type": "number"
+        },
+        "tolerance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mistakes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "number"
+              },
+              "feedback": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "answer",
+              "feedback"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "prompt",
+        "explanation",
+        "type",
+        "answer"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "title": "Lesson (spec 0.2)"
+}
