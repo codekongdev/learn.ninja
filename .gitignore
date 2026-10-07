@@ -64,3 +64,6 @@ apps/web/.visuals/
 # generated for Storybook
 packages/player/src/stories/prepared.generated.json
 apps/storybook/storybook-static/
+
+# local lesson storage (development)
+apps/web/.data/

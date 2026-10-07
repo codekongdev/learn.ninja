@@ -8,14 +8,14 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 
 ## Layout
 
-- `apps/web`: Next.js 16 app: lesson pages now; publish API (route handlers) later
+- `apps/web`: Next.js 16 app: bundled test lessons at `/lessons/{slug}`, published lessons at `/l/{slug}-{id}`, and the publish API (`POST /api/lessons`, `PUT /api/lessons/{id}`) in `lib/publish/`
 - `apps/storybook`: Storybook 10 (Vite) for the player and UI components; stories live next to components as `*.stories.tsx`
 - `packages/ui`: shadcn/ui components on React Aria (`--base aria`), shared Tailwind styles and theme
 - `packages/spec`: the lesson spec v0.2: Zod schema, exported JSON Schema, validation rules (single source of truth)
 - `packages/player`: React components for every lesson screen and building block
-- `packages/cli`: publish command used by the skill (stub until the publish API exists)
+- `packages/cli`: the `learn` command (validate, publish, schema) the skill runs; bundled into `skills/learn/scripts/learn.mjs`
 - `packages/eslint-config`, `packages/typescript-config`: shared configs
-- `skill/`: the installable lesson skill (placeholder)
+- `skills/learn/`: the installable skill (`npx skills add cmicpace/learn --skill learn -g`): SKILL.md, teaching guide, format reference, and generated copies of the schema, examples, and bundled CLI
 - `examples/`: the five test lessons as JSON, used as fixtures
 - `spikes/`: throwaway test builds, git-ignored; never import from here
 
@@ -25,6 +25,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `npm run check`: lint, type-check, and tests across all packages; run after every change
 - `npm run build`: production build
 - `npm run storybook`: Storybook at http://localhost:6006 (theme and language switches in the toolbar)
+- `npm run skill:build -w @workspace/cli`: rebuild `skills/learn` (bundled CLI, schema, examples) after changing the spec, CLI, or examples; a test fails if it's stale
 - `npm run schema -w @workspace/spec`: re-export `packages/spec/schema/lesson.schema.json` after changing the spec (a test fails if it's stale)
 - Add shadcn components from `apps/web`: `npx shadcn@latest add <name>` (they land in `packages/ui`)
 
@@ -37,6 +38,13 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - Use logical CSS (`ms-*`, `me-*`, `ps-*`, `pe-*`, `start-*`, `end-*`), never left/right, so right-to-left works.
 - Lesson visuals are LLM-written HTML shown in a sandboxed iframe with Basecoat and no scripts. Never let lesson content run code.
 - Never commit secrets. Real values go in `.env.local` (git-ignored); document variable names in `.env.example`.
+
+## Publishing
+
+- Storage goes through `LessonStore` (`apps/web/lib/publish/store.ts`): Upstash Redis when `UPSTASH_REDIS_REST_URL`/`TOKEN` (or Vercel's `KV_REST_API_URL`/`TOKEN`) are set, otherwise a local folder (`apps/web/.data/lessons`) in development.
+- Lessons expire 24 hours after publishing; updates keep the expiry. Edit tokens are only stored hashed.
+- `prepareLesson()` runs at publish time: KaTeX, Shiki, and Tailwind utilities for the lesson's HTML. The result is stored with the lesson.
+- Bump `LATEST_SKILL_VERSION` (`apps/web/lib/publish/handlers.ts`) and `SKILL_VERSION` (`packages/cli/src/cli.ts`) together when the skill changes; older skills are told to update.
 
 ## Storybook
 

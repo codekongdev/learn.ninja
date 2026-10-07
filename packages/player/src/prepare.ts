@@ -10,9 +10,10 @@ import {
 import type { Lesson } from "@workspace/spec"
 
 import { codeKey, INLINE_MATH, mathKey, type Prepared } from "./prepared"
+import { visualClasses, visualsCssFor } from "./visual-css"
 
-// Server-only: renders formulas with KaTeX and highlights code with Shiki, once per lesson,
-// so the learner's browser loads no math or highlighting library.
+// Server-only: renders formulas with KaTeX, highlights code with Shiki, and compiles the Tailwind CSS
+// a lesson's visuals use, once per lesson, so the learner's browser loads none of those libraries.
 
 const THEMES = { light: "github-light", dark: "github-dark" } as const
 
@@ -38,7 +39,11 @@ async function getHighlighter(languages: string[]): Promise<Highlighter> {
 }
 
 export async function prepareLesson(lesson: Lesson): Promise<Prepared> {
-  const prepared: Prepared = { math: {}, code: {} }
+  const prepared: Prepared = {
+    math: {},
+    code: {},
+    visualsCss: await visualsCssFor(visualClasses(lesson)),
+  }
   const codeBlocks: { language: string; code: string }[] = []
 
   walk(lesson, (value, key, parent) => {

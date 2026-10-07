@@ -9,9 +9,11 @@ export interface Prepared {
   math: Record<string, string>
   /** Highlighted code lines, keyed by codeKey(). */
   code: Record<string, CodeLines>
+  /** Tailwind utilities for the classes this lesson's HTML visuals use, injected into each sandbox. */
+  visualsCss: string
 }
 
-export const emptyPrepared: Prepared = { math: {}, code: {} }
+export const emptyPrepared: Prepared = { math: {}, code: {}, visualsCss: "" }
 
 export const mathKey = (tex: string, display: boolean) =>
   `${display ? "d" : "i"}:${tex}`

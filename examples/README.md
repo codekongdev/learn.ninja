@@ -1,4 +1,3 @@
 # Example lessons
 
-The five test lessons (button hierarchy, writing a PRD, compound interest, Spanish greetings, map vs forEach),
-as JSON files that follow spec v0.2. Used as test fixtures and as references for the skill.
+The five test lessons, as JSON files that follow spec v0.2: button hierarchy, writing a PRD, compound interest, Spanish greetings, and map vs forEach. Used as test fixtures, in Storybook, at `/lessons/{slug}` in the web app, and copied into `skills/learn/examples` as references for the skill (`npm run skill:build -w @workspace/cli`).

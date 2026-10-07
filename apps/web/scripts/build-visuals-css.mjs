@@ -1,11 +1,10 @@
-// Builds public/lesson-visuals.css: the stylesheet HTML lesson visuals load inside their sandbox.
-// Basecoat (Maia style, to match the shadcn preset) + Tailwind utilities for exactly the classes the
-// bundled lessons use + the app's own theme tokens, so visuals and the player look the same.
-// This is the concept-phase version of the publish-time CSS step.
+// Builds public/lesson-visuals.css: the shared base stylesheet HTML lesson visuals load inside their
+// sandbox. Basecoat (Maia style, to match the shadcn preset) + the app's theme tokens, so visuals and the
+// player look the same. Each lesson's Tailwind utilities are compiled separately by prepareLesson().
 
 import { execFileSync } from "node:child_process"
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
-import { dirname, join, relative } from "node:path"
+import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const web = join(dirname(fileURLToPath(import.meta.url)), "..")
@@ -29,14 +28,9 @@ function block(selector) {
 
 const outDir = join(web, ".visuals")
 mkdirSync(outDir, { recursive: true })
-const examples = relative(outDir, join(web, "../../examples")).replaceAll(
-  "\\",
-  "/"
-)
 
 const input = `@import "tailwindcss" source(none);
 @import "basecoat-css/maia";
-@source "${examples}/**/*.json";
 
 /* Theme tokens copied from packages/ui/src/styles/globals.css (they override Basecoat's defaults) */
 ${block("@theme inline")}

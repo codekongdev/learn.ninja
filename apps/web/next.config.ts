@@ -7,6 +7,13 @@ const LOCALES = ["en-US", "ar-AE"]
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui", "@workspace/player", "@workspace/spec"],
+  // prepareLesson() reads Tailwind's own stylesheets at runtime to compile each lesson's visuals CSS,
+  // so they must ship with the server functions that publish and render lessons.
+  outputFileTracingIncludes: {
+    "/api/lessons": ["../../node_modules/tailwindcss/*.css", "../../node_modules/tailwindcss/package.json"],
+    "/api/lessons/[id]": ["../../node_modules/tailwindcss/*.css", "../../node_modules/tailwindcss/package.json"],
+    "/lessons/[slug]": ["../../node_modules/tailwindcss/*.css", "../../node_modules/tailwindcss/package.json"],
+  },
   // Builds use webpack (next dev/build --webpack): the locale plugin doesn't support Turbopack.
   webpack(config, { isServer }) {
     if (!isServer) {

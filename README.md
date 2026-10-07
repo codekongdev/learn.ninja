@@ -19,6 +19,16 @@ npm run storybook
 
 Storybook runs at http://localhost:6006, with every exercise type in every state.
 
+## The lesson skill
+
+Install it in your agent (Claude Code, Cursor, Codex…), then ask it to make a lesson from anything:
+
+```bash
+npx skills add cmicpace/learn --skill learn -g
+```
+
+The skill writes a lesson file, checks it, and publishes it with `node <skill>/scripts/learn.mjs publish lesson.json`. Set `LEARN_API_URL` to publish somewhere other than the default server (e.g. `http://localhost:3000`).
+
 ## Checks
 
 ```bash
@@ -36,6 +46,6 @@ Runs lint, type-checking, and tests across every package. CI runs the same check
 | `packages/ui` | shadcn/ui components on React Aria, shared styles |
 | `packages/spec` | The lesson spec (v0.2) |
 | `packages/player` | Lesson screens and building blocks |
-| `packages/cli` | Publish command (coming later) |
-| `skill/` | The installable lesson skill (coming later) |
+| `packages/cli` | The `learn` command: validate and publish lessons |
+| `skills/learn` | The installable lesson skill |
 | `examples/` | Test lessons |

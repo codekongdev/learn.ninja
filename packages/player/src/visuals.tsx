@@ -65,7 +65,7 @@ function HtmlFrame({
   hotspots?: HotspotControl
   label?: string
 }) {
-  const { visualsCss, dir } = usePlayer()
+  const { visualsCss, dir, prepared } = usePlayer()
   const dark = useIsDark()
   const ref = React.useRef<HTMLIFrameElement>(null)
   const [measured, setMeasured] = React.useState<number | null>(null)
@@ -77,8 +77,8 @@ function HtmlFrame({
   const srcDoc = React.useMemo(
     () =>
       // Without an explicit height the body keeps its natural size, so the player can measure it.
-      `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="${visualsCss}"><style>html,body{background:transparent}body{margin:0;padding:16px;display:flex;justify-content:center;align-items:center;box-sizing:border-box${height ? ";min-height:100vh" : ""}}${css ?? ""}</style></head><body>${html}</body></html>`,
-    [html, css, visualsCss, height]
+      `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="${visualsCss}"><style>${prepared.visualsCss}</style><style>html,body{background:transparent}body{margin:0;padding:16px;display:flex;justify-content:center;align-items:center;box-sizing:border-box${height ? ";min-height:100vh" : ""}}${css ?? ""}</style></head><body>${html}</body></html>`,
+    [html, css, visualsCss, height, prepared.visualsCss]
   )
 
   // Size the frame to its content. allow-same-origin (without allow-scripts) lets the player measure it.

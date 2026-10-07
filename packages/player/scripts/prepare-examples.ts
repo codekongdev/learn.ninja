@@ -6,10 +6,12 @@ import { readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { validateLesson } from "@workspace/spec"
 
 import { prepareLesson } from "../src/prepare"
+import { visualClasses, visualsCssFor } from "../src/visual-css"
 import type { Prepared } from "../src/prepared"
 
 const dir = new URL("../../../examples/", import.meta.url)
-const merged: Prepared = { math: {}, code: {} }
+const merged: Prepared = { math: {}, code: {}, visualsCss: "" }
+const classes = new Set<string>()
 
 for (const file of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   const result = validateLesson(readFileSync(new URL(file, dir), "utf8"))
@@ -17,7 +19,9 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   const prepared = await prepareLesson(result.lesson)
   Object.assign(merged.math, prepared.math)
   Object.assign(merged.code, prepared.code)
+  for (const c of visualClasses(result.lesson)) classes.add(c)
 }
+merged.visualsCss = await visualsCssFor([...classes])
 
 const out = new URL("../src/stories/prepared.generated.json", import.meta.url)
 writeFileSync(out, JSON.stringify(merged))

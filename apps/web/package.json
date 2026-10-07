@@ -12,9 +12,12 @@
     "typecheck": "tsc --noEmit",
     "visuals:css": "node scripts/build-visuals-css.mjs",
     "predev": "npm run visuals:css",
-    "prebuild": "npm run visuals:css"
+    "prebuild": "npm run visuals:css",
+    "test": "vitest run"
   },
   "dependencies": {
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0",
     "@workspace/player": "^0.0.0",
     "@workspace/spec": "^0.0.0",
     "@workspace/ui": "*",
@@ -36,6 +39,7 @@
     "@workspace/typescript-config": "*",
     "basecoat-css": "^1.0.2",
     "eslint": "^10",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   }
 }

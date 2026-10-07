@@ -9,13 +9,20 @@
   "scripts": {
     "lint": "eslint",
     "format": "prettier --write \"**/*.ts\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "skill:build": "node scripts/build-skill.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
     "@workspace/eslint-config": "^0.0.0",
     "@workspace/typescript-config": "^0.0.0",
+    "esbuild": "^0.28.2",
     "eslint": "^10.12.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  },
+  "dependencies": {
+    "@workspace/spec": "^0.0.0"
   }
 }
