@@ -6,6 +6,10 @@ export type Strings = {
   check: string
   continue: string
   tryAgain: string
+  nudge: string
+  praise: string[]
+  why: string
+  getHelp: string
   hint: string
   correct: string
   correctWithHint: string
@@ -90,9 +94,13 @@ export type Theme = "system" | "light" | "dark"
 
 const en: Strings = {
   start: "Start lesson",
-  check: "Check",
+  check: "Check answer",
   continue: "Continue",
   tryAgain: "Try again",
+  nudge: "Give it one more look. I think you can catch it.",
+  praise: ["There you go", "Nice work", "Exactly", "You got it", "Spot on"],
+  why: "Why?",
+  getHelp: "Get help",
   hint: "Hint",
   correct: "Correct!",
   correctWithHint: "Correct, with a hint",
@@ -187,9 +195,13 @@ const en: Strings = {
 
 const ar: Strings = {
   start: "ابدأ الدرس",
-  check: "تحقّق",
+  check: "تحقّق من الإجابة",
   continue: "متابعة",
   tryAgain: "حاول مرة أخرى",
+  nudge: "ألقِ نظرة أخرى، أظنك ستجدها.",
+  praise: ["أحسنت", "عمل رائع", "بالضبط", "إجابة موفقة", "في الصميم"],
+  why: "لماذا؟",
+  getHelp: "احصل على مساعدة",
   hint: "تلميح",
   correct: "إجابة صحيحة!",
   correctWithHint: "صحيحة، بمساعدة تلميح",

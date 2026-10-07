@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  createLucideIcon,
   CheckIcon,
   ChevronDownIcon,
   ClockIcon,
@@ -18,7 +19,6 @@ import {
 
 import type { Concept } from "@workspace/spec"
 import { Button, LinkButton } from "@workspace/ui/components/button"
-import { Card, CardContent } from "@workspace/ui/components/card"
 import {
   Dialog,
   DialogClose,
@@ -55,6 +55,23 @@ export const BRAND = {
   maker: "@cmicpace",
   makerUrl: "https://x.com/cmicpace",
 }
+
+/** Lucide's PanelRight with the panel filled in, for showing the Theory panel is open. */
+export const PanelRightFilledIcon = createLucideIcon("panel-right-filled", [
+  [
+    "rect",
+    { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "frame" },
+  ],
+  ["path", { d: "M15 3v18", key: "divider" }],
+  [
+    "path",
+    {
+      d: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4Z",
+      fill: "currentColor",
+      key: "panel",
+    },
+  ],
+])
 
 // ---------- viewer preferences (kept in this browser only) ----------
 
@@ -137,7 +154,7 @@ export function LessonHeader({
         <LinkButton
           href={homeHref}
           variant="ghost"
-          size="icon-xs"
+          size="icon-sm"
           aria-label={t.home}
         >
           <SmileIcon />
@@ -146,7 +163,7 @@ export function LessonHeader({
           /
         </span>
         <DropdownMenuTrigger>
-          <Button variant="ghost" size="xs" className="min-w-0 shrink gap-3">
+          <Button variant="ghost" size="sm" className="min-w-0 shrink gap-3">
             <span className="truncate">{title}</span>
             <ChevronDownIcon />
           </Button>
@@ -183,8 +200,8 @@ export function LessonHeader({
         {docsHref ? (
           <LinkButton
             href={docsHref}
-            variant="outline"
-            size="xs"
+            variant="ghost"
+            size="sm"
             className="max-sm:hidden"
           >
             {t.docs}
@@ -192,7 +209,7 @@ export function LessonHeader({
         ) : null}
         <ShareButton title={title} url={shareUrl} t={t} />
         {createHref ? (
-          <LinkButton href={createHref} size="xs" className="max-sm:hidden">
+          <LinkButton href={createHref} size="sm" className="max-sm:hidden">
             {t.createLesson}
           </LinkButton>
         ) : null}
@@ -212,7 +229,7 @@ function PartsProgress({ parts, t }: { parts: PartProgress; t: Strings }) {
             value={Math.round(parts.fraction * 100)}
             aria-label={t.progress}
             valueLabel={t.part(i + 1, parts.count)}
-            className="w-16 min-w-0 shrink-0 transition-all duration-500 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink [&_[data-slot=progress-track]]:h-3"
+            className="w-16 min-w-0 shrink-0 transition-all duration-500 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-track]]:h-3"
           />
         ) : (
           <span
@@ -267,7 +284,7 @@ function ShareButton({
   const label = copied ? t.linkCopied : t.share
   return (
     <>
-      <Button variant="outline" size="xs" onPress={share} aria-label={label}>
+      <Button variant="outline" size="sm" onPress={share} aria-label={label}>
         {copied ? (
           <CheckIcon data-icon="inline-start" />
         ) : (
@@ -307,11 +324,11 @@ export function LessonFooter({
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium">
         <span className="truncate">
           <span className="max-sm:hidden">© {new Date().getFullYear()} </span>
-          {BRAND.name}
+          {BRAND.name} {t.by}
         </span>
-        <span className="text-muted-foreground">{t.by}</span>
         <LinkButton
-          size="xs"
+          variant="secondary"
+          size="sm"
           href={BRAND.makerUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -378,7 +395,7 @@ function SettingMenu<K extends string>({
 }) {
   return (
     <DropdownMenuTrigger>
-      <Button variant="ghost" size="xs" aria-label={`${label}: ${valueLabel}`}>
+      <Button variant="ghost" size="sm" aria-label={`${label}: ${valueLabel}`}>
         {icon}
         <span className="max-sm:sr-only">{valueLabel}</span>
       </Button>
@@ -427,15 +444,16 @@ export function TheoryPanel({
     <aside
       id={id}
       aria-label={t.theory}
-      className="absolute inset-0 z-20 flex flex-col overflow-hidden border-y bg-background motion-safe:animate-in motion-safe:fade-in-0 sm:inset-x-8 sm:rounded-xl sm:border lg:static lg:w-[360px] lg:shrink-0"
+      className="absolute inset-0 z-20 flex flex-col overflow-hidden border-y bg-card motion-safe:animate-in motion-safe:fade-in-0 sm:inset-x-8 sm:rounded-xl sm:border-0 sm:shadow-xs sm:ring-1 sm:ring-foreground/10 lg:static lg:w-[360px] lg:shrink-0"
     >
-      <div className="flex items-center justify-between gap-2 px-6 pt-6 pb-3">
-        <h2 className="text-sm font-semibold">{t.theory}</h2>
+      <div className="flex items-center justify-between gap-2 px-6 pt-6 pb-4">
+        <h2 className="text-xl font-semibold">{t.theory}</h2>
         <Button
           variant="ghost"
-          size="icon-xs"
+          size="icon-sm"
           aria-label={t.closeTheory}
           onPress={onClose}
+          className="lg:hidden"
         >
           <XIcon />
         </Button>
@@ -445,24 +463,19 @@ export function TheoryPanel({
         className="min-h-0 flex-1 overflow-y-auto px-6 pb-6"
       >
         {concepts.length ? (
-          <ol className="grid gap-3">
+          <ol className="flex flex-col gap-6">
             {concepts.map((c) => (
-              <li key={c.id}>
-                <Card size="sm">
-                  <CardContent className="gap-1">
-                    <h3 className="text-base font-semibold">{c.title}</h3>
-                    <RichText
-                      text={c.body}
-                      className="block text-base text-muted-foreground"
-                    />
-                    {c.term ? (
-                      <p className="mt-2">
-                        <strong className="font-semibold">{c.term.word}</strong>{" "}
-                        <RichText text={c.term.definition} />
-                      </p>
-                    ) : null}
-                  </CardContent>
-                </Card>
+              <li key={c.id} className="flex flex-col gap-2">
+                <h3 className="text-lg font-semibold">{c.title}</h3>
+                <RichText text={c.body} className="block text-sm" />
+                {c.term ? (
+                  <p className="text-sm text-muted-foreground">
+                    <strong className="font-semibold text-foreground">
+                      {c.term.word}
+                    </strong>{" "}
+                    <RichText text={c.term.definition} />
+                  </p>
+                ) : null}
               </li>
             ))}
           </ol>

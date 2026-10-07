@@ -117,11 +117,11 @@ export function DropZone({
           textValue={item.textValue}
           data-status={item.mark}
           className={cn(
-            "flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-base shadow-xs outline-none",
+            "flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-base shadow-xs outline-none dark:bg-input/30",
             !disabled && "cursor-grab",
             "data-dragging:opacity-50 data-focus-visible:ring-[3px] data-focus-visible:ring-ring/50",
             "data-[status=correct]:border-green-600 data-[status=correct]:bg-green-600/10",
-            "data-[status=wrong]:border-red-600 data-[status=wrong]:bg-red-600/10"
+            "data-[status=wrong]:border-yellow-500 data-[status=wrong]:bg-yellow-500/10"
           )}
         >
           {!disabled && (

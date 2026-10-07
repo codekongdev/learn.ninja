@@ -40,5 +40,6 @@ export const VISUAL_THEME = `@theme inline {
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
-    --font-sans: var(--font-sans);
+    --font-sans: var(--font-inter);
+    --font-mono: var(--font-geist-mono);
 }`

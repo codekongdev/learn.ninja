@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { CheckIcon, XIcon } from "lucide-react"
 
 import type { Step } from "@workspace/spec"
+import { Kbd } from "@workspace/ui/components/kbd"
 import { Selectable } from "@workspace/ui/components/selectable"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -23,24 +25,34 @@ export interface ExerciseProps {
 
 const markStyles =
   "data-[status=correct]:border-green-600 data-[status=correct]:bg-green-600/10 " +
-  "data-[status=wrong]:border-red-600 data-[status=wrong]:bg-red-600/10 " +
+  "data-[status=wrong]:border-yellow-500 data-[status=wrong]:bg-yellow-500/10 " +
   "data-[status=partial]:border-amber-500 data-[status=partial]:bg-amber-500/10"
 
+// Answer options show their result in the key badge, so the row itself stays neutral.
 const cardStyles =
-  "w-full rounded-lg border bg-background text-start shadow-xs transition-colors " +
-  "hover:bg-muted data-selected:border-primary data-selected:bg-muted data-pressed:translate-y-px " +
-  markStyles
+  "w-full rounded-lg border bg-background text-start shadow-xs transition-colors dark:bg-input/30 dark:hover:bg-input/50 dark:data-selected:bg-muted " +
+  "hover:bg-muted data-selected:border-primary data-selected:bg-muted data-pressed:translate-y-px "
 
-const letter = (i: number) => String.fromCharCode(65 + i)
-
-function KeyBadge({ i }: { i: number }) {
+/** The number key that picks an option, or after checking, whether it was right. */
+function KeyHint({ i, mark }: { i: number; mark?: Mark }) {
+  if (mark === "correct" || mark === "wrong" || mark === "partial")
+    return (
+      <Kbd
+        aria-hidden="true"
+        className={cn(
+          "ms-auto shrink-0",
+          mark === "correct"
+            ? "bg-green-500 text-green-950"
+            : "bg-yellow-500 text-yellow-950"
+        )}
+      >
+        {mark === "correct" ? <CheckIcon /> : <XIcon />}
+      </Kbd>
+    )
   return (
-    <span
-      aria-hidden="true"
-      className="grid size-6 shrink-0 place-items-center rounded-md border font-mono text-xs font-semibold text-muted-foreground group-data-selected:border-primary group-data-selected:bg-primary group-data-selected:text-primary-foreground"
-    >
-      {letter(i)}
-    </span>
+    <Kbd aria-hidden="true" className="ms-auto shrink-0 pointer-coarse:hidden">
+      {i + 1}
+    </Kbd>
   )
 }
 
@@ -56,12 +68,10 @@ export function OptionsExercise({
   showOutcomes,
 }: ExerciseProps & { order: string[]; showOutcomes: string[] }) {
   const { t } = usePlayer()
-  if (
-    step.type !== "choice" &&
-    step.type !== "compare" &&
-    step.type !== "scenario"
-  )
-    return null
+  const isOptions =
+    step.type === "choice" ||
+    step.type === "compare" ||
+    step.type === "scenario"
   const selected = answer.kind === "select" ? answer.ids : []
   const multiple = step.type === "choice" && step.multiple
   const toggle = (id: string) => {
@@ -74,9 +84,36 @@ export function OptionsExercise({
       })
     else setAnswer({ kind: "select", ids: [id] })
   }
-  const options = order
-    .map((id) => (step.options as { id: string }[]).find((o) => o.id === id)!)
-    .filter(Boolean)
+  const options = isOptions
+    ? order
+        .map((id) =>
+          (step.options as { id: string }[]).find((o) => o.id === id)!
+        )
+        .filter(Boolean)
+    : []
+
+  // Number keys pick options: 1 for the first, 2 for the second…
+  const toggleRef = React.useRef(toggle)
+  toggleRef.current = toggle
+  const ids = options.map((o) => o.id).join(",")
+  React.useEffect(() => {
+    if (locked) return
+    const list = ids.split(",")
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return
+      const target = e.target as HTMLElement | null
+      if (target?.closest("input, textarea, select, [contenteditable=true]"))
+        return
+      const n = Number(e.key)
+      if (!Number.isInteger(n) || n < 1 || n > list.length) return
+      e.preventDefault()
+      toggleRef.current(list[n - 1]!)
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [ids, locked])
+
+  if (!isOptions) return null
 
   return (
     <div
@@ -105,35 +142,37 @@ export function OptionsExercise({
               cardStyles,
               isCompare
                 ? "flex flex-col gap-2 p-3"
-                : "flex items-start gap-3 px-4 py-3.5"
+                : "flex min-h-12 items-center gap-2 px-4 py-3"
             )}
           >
             {isCompare ? (
               <>
-                <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <KeyBadge i={i} />
-                  {t.optionLabel(letter(i))}
+                <span className="flex items-center gap-2 px-1 text-sm font-medium text-muted-foreground">
+                  {t.optionLabel(String(i + 1))}
+                  <KeyHint i={i} mark={marks[o.id]} />
                 </span>
                 {o.visual ? (
-                  <Visual visual={o.visual} label={t.optionLabel(letter(i))} />
+                  <Visual
+                    visual={o.visual}
+                    label={t.optionLabel(String(i + 1))}
+                  />
                 ) : null}
                 {o.text ? (
                   <RichText
                     text={o.text}
                     lang={o.lang}
-                    className="px-1 text-base"
+                    className="px-1 text-sm font-medium"
                   />
                 ) : null}
               </>
             ) : (
               <>
-                <KeyBadge i={i} />
-                <span className="flex min-w-0 flex-col gap-2 pt-0.5">
+                <span className="flex min-w-0 flex-1 flex-col gap-2">
                   {o.text ? (
                     <RichText
                       text={o.text}
                       lang={o.lang}
-                      className="text-base"
+                      className="text-sm font-medium"
                     />
                   ) : null}
                   {o.visual ? <Visual visual={o.visual} /> : null}
@@ -144,6 +183,7 @@ export function OptionsExercise({
                     />
                   ) : null}
                 </span>
+                <KeyHint i={i} mark={marks[o.id]} />
               </>
             )}
           </Selectable>
@@ -366,7 +406,7 @@ export function MatchExercise({
     </span>
   )
   const chip =
-    "flex w-full items-center gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-start text-base shadow-xs hover:bg-muted data-selected:border-primary data-selected:bg-muted " +
+    "flex w-full items-center gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-start text-base shadow-xs hover:bg-muted data-selected:border-primary data-selected:bg-muted dark:bg-input/30 dark:hover:bg-input/50 dark:data-selected:bg-muted " +
     markStyles
 
   return (
@@ -466,7 +506,8 @@ export function BlankExercise({
               className={cn(
                 "mx-0.5 inline-block min-w-[4.5rem] rounded-md border-b-2 border-primary bg-muted px-2 text-center align-baseline leading-normal",
                 "data-selected:bg-primary/10",
-                value && "border border-border bg-background shadow-xs",
+                value &&
+                  "border border-border bg-background shadow-xs dark:bg-input/30",
                 markStyles
               )}
             >
@@ -490,7 +531,7 @@ export function BlankExercise({
               isDisabled={locked}
               lang={step.lang}
               className={cn(
-                "rounded-md border bg-background px-3 py-1.5 shadow-xs hover:bg-muted data-selected:opacity-45",
+                "rounded-md border bg-background px-3 py-1.5 shadow-xs hover:bg-muted dark:bg-input/30 dark:hover:bg-input/50 data-selected:opacity-45",
                 code ? "font-mono text-sm" : "text-base"
               )}
             >

@@ -1,13 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { ClockIcon, LightbulbIcon, PanelRightIcon } from "lucide-react"
+import { LightbulbIcon, PanelRightIcon } from "lucide-react"
 
 import type { Lesson, Step } from "@workspace/spec"
 import { Alert, AlertDescription } from "@workspace/ui/components/alert"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
+import { Kbd } from "@workspace/ui/components/kbd"
 import { DirectionProvider } from "@workspace/ui/components/direction"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -41,14 +42,14 @@ import {
   type Outcome,
   type Role,
 } from "./flow"
-import { Mascot, type MascotMood } from "./mascot"
+import { Mascot } from "./mascot"
 import { emptyPrepared, type Prepared } from "./prepared"
 import { RichText } from "./rich-text"
 import {
   LessonFooter,
   LessonHeader,
+  PanelRightFilledIcon,
   TheoryPanel,
-  useHoursLeft,
   usePreferences,
 } from "./shell"
 import {
@@ -333,6 +334,10 @@ function Player({
   const { t } = usePlayer()
   const [state, dispatch] = React.useReducer(reducer, lesson, start)
   const [theoryOpen, setTheoryOpen] = React.useState(false)
+  // Theory starts open where there's room for it beside the lesson.
+  React.useEffect(() => {
+    if (matchMedia("(min-width: 64rem)").matches) setTheoryOpen(true)
+  }, [])
   const theoryId = React.useId()
   const item = state.items[state.index]!
   const scrollRef = React.useRef<HTMLElement>(null)
@@ -361,42 +366,50 @@ function Player({
         t={t}
       />
       <div className="relative flex min-h-0 flex-1 gap-4 sm:px-8">
-        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-background sm:rounded-xl sm:border">
+        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-card sm:rounded-xl sm:border-0 sm:shadow-xs sm:ring-1 sm:ring-foreground/10">
           <div className="relative flex min-w-0 flex-1 flex-col">
             <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
               <Button
                 variant="outline"
-                size="xs"
+                size="sm"
                 aria-expanded={theoryOpen}
                 aria-controls={theoryOpen ? theoryId : undefined}
                 onPress={() => setTheoryOpen((open) => !open)}
               >
                 {t.theory}
-                <PanelRightIcon className="rtl:-scale-x-100" />
+                {theoryOpen ? (
+                  <PanelRightFilledIcon className="rtl:-scale-x-100" />
+                ) : (
+                  <PanelRightIcon className="rtl:-scale-x-100" />
+                )}
               </Button>
             </div>
             <main ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
               <div
                 key={state.index}
-                data-text-size={textSize}
-                className="mx-auto flex max-w-2xl flex-col gap-5 px-4 pt-14 pb-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1 sm:px-6 sm:pt-16"
+                className={cn(
+                  "mx-auto flex min-h-full w-full flex-col justify-center gap-8 px-4 py-16 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
+                  columnWidth(item),
+                  item.kind === "step" && "pb-40"
+                )}
               >
-                <Screen
+                <div data-text-size={textSize} className="flex flex-col gap-6">
+                  <Screen
+                    lesson={lesson}
+                    item={item}
+                    state={state}
+                    dispatch={dispatch}
+                  />
+                </div>
+                <ActionArea
                   lesson={lesson}
                   item={item}
                   state={state}
                   dispatch={dispatch}
-                  expiresAt={expiresAt}
+                  textSize={textSize}
                 />
               </div>
             </main>
-            <ActionBar
-              lesson={lesson}
-              item={item}
-              state={state}
-              dispatch={dispatch}
-              textSize={textSize}
-            />
           </div>
         </div>
         {theoryOpen ? (
@@ -413,15 +426,20 @@ function Player({
   )
 }
 
-function ExpiryPill({ expiresAt, t }: { expiresAt: number; t: Strings }) {
-  const hours = useHoursLeft(expiresAt)
-  if (hours === null) return null
-  return (
-    <Badge variant="outline" className="tabular-nums">
-      <ClockIcon data-icon="inline-start" aria-hidden="true" />
-      {t.expires(hours)}
-    </Badge>
-  )
+/** Questions and short screens read best narrow; visuals and side-by-side exercises need room. */
+function columnWidth(item: Item): string {
+  if (item.kind === "intro") return "max-w-sm"
+  if (item.kind === "concept")
+    return item.concept.visual ? "max-w-2xl" : "max-w-lg"
+  if (item.kind !== "step") return "max-w-lg"
+  const { step } = item
+  const wide =
+    Boolean(step.visual) ||
+    step.type === "compare" ||
+    step.type === "sort" ||
+    step.type === "match" ||
+    step.type === "hotspot"
+  return wide ? "max-w-2xl" : "max-w-lg"
 }
 
 const Eyebrow = ({
@@ -441,26 +459,19 @@ const Eyebrow = ({
   </div>
 )
 
-function roleLabel(role: Role, t: Strings) {
-  return role === "hook"
-    ? t.warmUp
-    : role === "practice"
-      ? t.practice
-      : role === "challenge"
-        ? t.challenge
-        : t.fixing
-}
-
+/** Instructions under the prompt, only where the interaction isn't obvious (a single pick needs none). */
 function helperFor(step: Step, t: Strings): string {
   switch (step.type) {
     case "choice":
-      return step.multiple ? t.helper.choiceMany : t.helper.choiceOne
+      return step.multiple ? t.helper.choiceMany : ""
+    case "compare":
+    case "scenario":
+    case "number":
+      return ""
     case "hotspot":
       return step.visual.kind === "code"
         ? t.helper.hotspotLine
         : t.helper.hotspot
-    case "number":
-      return ""
     default:
       return t.helper[step.type]
   }
@@ -471,53 +482,45 @@ function Screen({
   item,
   state,
   dispatch,
-  expiresAt,
 }: {
   lesson: Lesson
   item: Item
   state: State
   dispatch: React.Dispatch<Action>
-  expiresAt?: number
 }) {
   const { t } = usePlayer()
   switch (item.kind) {
     case "intro":
       return (
-        <div className="flex flex-col gap-4 pt-6">
-          <Mascot mood="happy" size="lg" />
-          {lesson.topic ? <Eyebrow>{lesson.topic}</Eyebrow> : null}
-          <h1 className="text-4xl font-bold tracking-tight text-balance">
-            {lesson.title}
-          </h1>
-          <p className="max-w-prose text-lg text-muted-foreground">
-            {lesson.summary}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline">
-              <ClockIcon data-icon="inline-start" aria-hidden="true" />
-              {t.minutes(lesson.estimatedMinutes)}
-            </Badge>
-            <Badge variant="outline">{t.levels[lesson.level]}</Badge>
-            {expiresAt ? <ExpiryPill expiresAt={expiresAt} t={t} /> : null}
+        <>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-2xl font-semibold text-balance">
+                {lesson.title}
+              </h1>
+              <p className="text-sm font-medium text-muted-foreground">
+                {lesson.summary}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {lesson.topic ? (
+                <Badge variant="outline">{lesson.topic}</Badge>
+              ) : null}
+              <Badge variant="outline">
+                {t.minutes(lesson.estimatedMinutes)}
+              </Badge>
+              <Badge variant="outline">{t.levels[lesson.level]}</Badge>
+            </div>
           </div>
-          <Card size="sm">
-            <CardContent className="gap-1 text-base">
-              <Eyebrow muted>{t.objective}</Eyebrow>
-              <p>{lesson.objective}</p>
-            </CardContent>
-          </Card>
-        </div>
+        </>
       )
     case "concept": {
       const c = item.concept
       return (
         <>
-          <Eyebrow>{t.concept(item.index, item.total)}</Eyebrow>
-          <h2 className="text-3xl font-bold tracking-tight text-balance">
-            {c.title}
-          </h2>
+          <h2 className="text-2xl font-semibold text-balance">{c.title}</h2>
           {c.visual ? <Visual visual={c.visual} /> : null}
-          <p className="max-w-prose text-lg">
+          <p className="text-base">
             <RichText text={c.body} />
           </p>
           {c.term ? (
@@ -533,11 +536,9 @@ function Screen({
     }
     case "fix":
       return (
-        <div className="flex flex-col gap-4 pt-6">
-          <Mascot mood="idle" size="lg" />
-          <Eyebrow>{t.fixing}</Eyebrow>
-          <h2 className="text-3xl font-bold tracking-tight">{t.fixTitle}</h2>
-          <p className="text-lg text-muted-foreground">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-2xl font-semibold">{t.fixTitle}</h2>
+          <p className="text-sm font-medium text-muted-foreground">
             {t.fixBody(state.mistakes.length)}
           </p>
         </div>
@@ -588,12 +589,11 @@ function StepScreen({
 
   return (
     <>
-      <Eyebrow muted={role === "hook"}>{roleLabel(role, t)}</Eyebrow>
-      <h2 className="text-2xl font-bold tracking-tight text-balance">
+      <h2 className="text-2xl font-semibold">
         <RichText text={step.prompt} />
       </h2>
       {helper && helper !== step.prompt ? (
-        <p className="-mt-3 text-sm text-muted-foreground">{helper}</p>
+        <p className="-mt-4 text-sm text-muted-foreground">{helper}</p>
       ) : null}
       {step.type === "scenario" ? (
         <div className="rounded-e-lg border-s-2 border-primary bg-muted px-4 py-3 text-base">
@@ -651,10 +651,10 @@ function WrapUp({
     ["bg-red-600", s.missed, t.missed],
   ]
   return (
-    <div className="flex flex-col gap-6 pt-6">
+    <div className="flex flex-col gap-6">
       <Mascot mood="cheer" size="lg" />
       <Eyebrow>{lesson.title}</Eyebrow>
-      <h1 className="-mt-3 text-4xl font-bold tracking-tight">{t.done}</h1>
+      <h1 className="-mt-4 text-2xl font-semibold">{t.done}</h1>
       <div className="flex flex-wrap items-center gap-6">
         <div
           className="grid size-32 place-items-center rounded-full"
@@ -662,7 +662,7 @@ function WrapUp({
             background: `conic-gradient(var(--color-green-600) ${pct}%, var(--muted) 0)`,
           }}
         >
-          <div className="grid size-24 place-items-center rounded-full bg-background text-center">
+          <div className="grid size-24 place-items-center rounded-full bg-card text-center">
             <div className="text-3xl font-extrabold tabular-nums">
               {s.first}/{s.total}
             </div>
@@ -708,7 +708,8 @@ function WrapUp({
 
 type Tone = "neutral" | "good" | "bad" | "warn" | "info"
 
-function ActionBar({
+/** The screen's main action (with Enter as its shortcut), and the feedback after checking. */
+function ActionArea({
   lesson,
   item,
   state,
@@ -723,25 +724,36 @@ function ActionBar({
 }) {
   const { t } = usePlayer()
   let tone: Tone = "neutral"
-  let mood: MascotMood | null = null
   let title: string | null = null
   let message: string | null = null
-  let primary: { label: string; onPress: () => void; isDisabled?: boolean } = {
+  let primary: {
+    label: string
+    onPress: () => void
+    isDisabled?: boolean
+    variant?: "default" | "warning" | "success"
+  } = {
     label: t.continue,
     onPress: () => dispatch({ type: "next" }),
   }
   let secondary: React.ReactNode = null
+  // "Why?" reveals the explanation, so feedback stays one short line until the learner asks.
+  const [why, setWhy] = React.useState(false)
+  React.useEffect(() => setWhy(false), [state.index, state.step?.attempts])
+  let explanation: string | null = null
+  const helpButton = (label: string, onPress: () => void) => (
+    <Button variant="outline" size="sm" onPress={onPress}>
+      {label}
+    </Button>
+  )
 
   if (item.kind === "intro")
     primary = { label: t.start, onPress: () => dispatch({ type: "next" }) }
-  else if (item.kind === "concept") mood = "think"
   else if (item.kind === "fix")
     primary = {
       label: t.fixStart,
       onPress: () => dispatch({ type: "startFix" }),
     }
   else if (item.kind === "wrap") {
-    tone = "good"
     primary = {
       label: t.restart,
       onPress: () => dispatch({ type: "restart", lesson }),
@@ -750,6 +762,7 @@ function ActionBar({
     const s = state.step
     const { step, role } = item
     const r = s.result
+    const canHelp = Boolean(step.hint) && role !== "hook" && !s.usedHint
     const missText = (res: CheckResult) =>
       res.feedback ?? (res.missKey ? missMessage(res, t) : null)
     if (s.phase === "answering") {
@@ -758,109 +771,132 @@ function ActionBar({
         onPress: () => dispatch({ type: "check" }),
         isDisabled: !isReady(step, s.answer),
       }
-      if (step.hint && role !== "hook")
-        secondary = (
-          <Button
-            variant="ghost"
-            onPress={() => dispatch({ type: "hint" })}
-            isDisabled={s.usedHint}
-          >
-            <LightbulbIcon data-icon="inline-start" />
-            {t.hint}
-          </Button>
-        )
+      if (canHelp)
+        secondary = helpButton(t.getHelp, () => dispatch({ type: "hint" }))
     } else if (role === "hook" && r) {
       tone = "info"
-      mood = r.correct ? "happy" : "think"
       title = r.correct ? t.goodGuess : t.hookMiss
-      message = [!r.correct ? missText(r) : null, step.explanation, t.hookNote]
-        .filter(Boolean)
-        .join(" ")
+      explanation = step.explanation
     } else if (s.phase === "feedback" && r?.correct) {
       tone = "good"
-      mood = "happy"
-      title = s.usedHint && s.attempts === 0 ? t.correctWithHint : t.correct
-      message = step.explanation
+      title =
+        s.usedHint && s.attempts === 0
+          ? t.correctWithHint
+          : t.praise[praiseIndex(step.id, t.praise.length)]!
+      explanation = step.explanation
+      primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r) {
-      tone = r.partial ? "warn" : "bad"
-      mood = "oops"
-      title = r.partial ? t.close : t.notQuite
-      message = missText(r)
+      // A miss gets one short line: the option's own feedback, or a nudge to look again.
+      tone = "warn"
+      title = (r.partial ? t.close : missText(r)) ?? t.nudge
+      message = r.partial ? missText(r) : null
       primary = {
         label: t.tryAgain,
         onPress: () => dispatch({ type: "retry" }),
+        variant: "warning",
       }
+      if (canHelp)
+        secondary = helpButton(t.getHelp, () => {
+          dispatch({ type: "retry" })
+          dispatch({ type: "hint" })
+        })
     } else if (s.phase === "revealed") {
       tone = "bad"
-      mood = "think"
       title = t.answer
       message = step.explanation
     }
   }
 
-  const toneClass: Record<Tone, string> = {
-    neutral: "bg-background",
-    good: "border-green-600/30 bg-green-600/10",
-    bad: "border-red-600/30 bg-red-600/10",
-    warn: "border-amber-500/40 bg-amber-500/10",
-    info: "bg-secondary",
+  if (explanation) {
+    if (why) message = explanation
+    else secondary = helpButton(t.why, () => setWhy(true))
   }
-  const titleClass: Record<Tone, string> = {
+
+  // Enter runs the main action, including while an answer option has focus (Space still toggles it).
+  const run = React.useRef(primary)
+  run.current = primary
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || e.repeat || e.defaultPrevented) return
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
+      const target = e.target as HTMLElement | null
+      const onOption = target?.closest("[data-slot=selectable]")
+      if (
+        !onOption &&
+        target?.closest(
+          "button, a, input, textarea, select, [role=grid], [role=menu], [role=dialog], [contenteditable=true]"
+        )
+      )
+        return
+      if (run.current.isDisabled) return
+      e.preventDefault()
+      e.stopPropagation()
+      run.current.onPress()
+    }
+    window.addEventListener("keydown", onKey, { capture: true })
+    return () => window.removeEventListener("keydown", onKey, { capture: true })
+  }, [])
+
+  const toneClass: Record<Tone, string> = {
     neutral: "",
-    good: "text-green-700 dark:text-green-400",
-    bad: "text-red-700 dark:text-red-400",
-    warn: "text-amber-700 dark:text-amber-400",
-    info: "",
+    good: "border-green-500 bg-green-100 text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-200",
+    bad: "border-red-400 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200",
+    warn: "border-yellow-500 bg-yellow-100 text-yellow-900 dark:border-yellow-600 dark:bg-yellow-950 dark:text-yellow-100",
+    info: "border-border bg-popover text-popover-foreground",
   }
 
   return (
-    <div
-      className={cn(
-        "border-t px-4 py-3.5 transition-colors sm:px-6",
-        toneClass[tone]
-      )}
-    >
-      <div
-        aria-live="polite"
-        className="mx-auto flex max-w-2xl flex-wrap items-center gap-3"
-      >
-        <div className="flex min-w-0 flex-[1_1_20rem] items-center gap-3">
-          {mood ? (
-            <Mascot
-              key={`${state.index}-${mood}-${state.step?.attempts ?? 0}`}
-              mood={mood}
-            />
-          ) : null}
-          {title ? (
-            <div data-text-size={textSize} className="min-w-0">
-              <div
-                className={cn(
-                  "text-lg leading-tight font-bold",
-                  titleClass[tone]
-                )}
-              >
-                {title}
-              </div>
-              {message ? (
-                <RichText text={message} className="mt-0.5 block text-base" />
-              ) : null}
-            </div>
-          ) : (
-            secondary
-          )}
-        </div>
+    <>
+      <div className="flex flex-wrap items-center gap-2">
         <Button
-          size="lg"
-          className="min-w-36 max-sm:flex-1"
+          size="sm"
+          variant={primary.variant ?? "default"}
           onPress={primary.onPress}
           isDisabled={primary.isDisabled}
           autoFocus={Boolean(title)}
         >
           {primary.label}
+          <Kbd
+            className={cn(
+              "pointer-coarse:hidden",
+              primary.variant === "warning" &&
+                "bg-yellow-950/10 text-yellow-950",
+              primary.variant === "success" && "bg-green-950/10 text-green-950"
+            )}
+          >
+            Enter
+          </Kbd>
         </Button>
+        {secondary}
       </div>
-    </div>
+      <p aria-live="polite" className="sr-only">
+        {title ? [title, message].filter(Boolean).join(" ") : ""}
+      </p>
+      {title ? (
+        <div
+          key={`${state.index}-${state.step?.attempts ?? 0}-${tone}-${why}`}
+          aria-hidden="true"
+          data-text-size={textSize}
+          className={cn(
+            "absolute inset-x-4 bottom-4 z-10 rounded-xl border px-5 py-4 shadow-xs motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:inset-x-auto sm:start-6 sm:bottom-6 sm:w-fit sm:max-w-80",
+            toneClass[tone]
+          )}
+        >
+          <p className="font-semibold">{title}</p>
+          {message ? (
+            <RichText text={message} className="mt-1 block text-sm" />
+          ) : null}
+        </div>
+      ) : null}
+    </>
   )
+}
+
+/** A stable pick from the praise lines for a step, so it doesn't change on re-render. */
+function praiseIndex(id: string, count: number): number {
+  let h = 0
+  for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0
+  return h % count
 }
 
 function missMessage(r: CheckResult, t: Strings): string {

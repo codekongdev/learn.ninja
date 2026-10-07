@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./typeset.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @plugin "tailwindcss-react-aria-components";
@@ -48,7 +49,8 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
-    --font-sans: var(--font-sans);
+    --font-sans: var(--font-inter);
+    --font-mono: var(--font-geist-mono);
 }
 
 :root {
@@ -165,4 +167,14 @@
   --text-3xl: calc(1.875rem * var(--text-scale, 1));
   --text-4xl: calc(2.25rem * var(--text-scale, 1));
   font-size: var(--text-base);
+}
+
+/* shadcn/typeset preset for docs-style rich content. Apply with class="typeset typeset-docs". */
+.typeset-docs {
+  --typeset-font-body: var(--font-inter);
+  --typeset-font-heading: var(--font-inter);
+  --typeset-font-mono: var(--font-geist-mono);
+  --typeset-size: 15px;
+  --typeset-leading: 1.75;
+  --typeset-flow: 1.25em;
 }
