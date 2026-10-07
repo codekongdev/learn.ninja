@@ -60,3 +60,7 @@ spikes/
 # generated lesson-visuals stylesheet
 apps/web/public/lesson-visuals.css
 apps/web/.visuals/
+
+# generated for Storybook
+packages/player/src/stories/prepared.generated.json
+apps/storybook/storybook-static/

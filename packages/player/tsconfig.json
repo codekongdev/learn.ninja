@@ -2,10 +2,12 @@
   "extends": "@workspace/typescript-config/react-library.json",
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true
   },
   "include": [
-    "src"
+    "src",
+    "scripts"
   ],
   "exclude": [
     "node_modules",

@@ -9,6 +9,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 ## Layout
 
 - `apps/web`: Next.js 16 app: lesson pages now; publish API (route handlers) later
+- `apps/storybook`: Storybook 10 (Vite) for the player and UI components; stories live next to components as `*.stories.tsx`
 - `packages/ui`: shadcn/ui components on React Aria (`--base aria`), shared Tailwind styles and theme
 - `packages/spec`: the lesson spec v0.2: Zod schema, exported JSON Schema, validation rules (single source of truth)
 - `packages/player`: React components for every lesson screen and building block
@@ -23,6 +24,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `npm run dev`: start the web app (webpack)
 - `npm run check`: lint, type-check, and tests across all packages; run after every change
 - `npm run build`: production build
+- `npm run storybook`: Storybook at http://localhost:6006 (theme and language switches in the toolbar)
 - `npm run schema -w @workspace/spec`: re-export `packages/spec/schema/lesson.schema.json` after changing the spec (a test fails if it's stale)
 - Add shadcn components from `apps/web`: `npx shadcn@latest add <name>` (they land in `packages/ui`)
 
@@ -35,6 +37,12 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - Use logical CSS (`ms-*`, `me-*`, `ps-*`, `pe-*`, `start-*`, `end-*`), never left/right, so right-to-left works.
 - Lesson visuals are LLM-written HTML shown in a sandboxed iframe with Basecoat and no scripts. Never let lesson content run code.
 - Never commit secrets. Real values go in `.env.local` (git-ignored); document variable names in `.env.example`.
+
+## Storybook
+
+- Build and review components in Storybook first, then use them in the app.
+- Add a story for every new exercise type or screen, with its states (the Exercises stories use a `state` control: idle, wrong, correct, revealed).
+- Stories use the example lessons from `examples/` via `packages/player/src/stories/fixtures.tsx`; formulas and code are prepared before Storybook starts.
 
 ## v1 scope reminders
 
