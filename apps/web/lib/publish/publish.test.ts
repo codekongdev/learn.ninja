@@ -217,3 +217,23 @@ describe("updating", () => {
     expect(reply).toMatchObject({ status: 404, body: { error: "not_found" } })
   })
 })
+
+describe("respond", () => {
+  it("reports missing storage and unexpected errors as JSON", async () => {
+    const { respond } = await import("./respond")
+    const { StorageNotConfiguredError } = await import("./store")
+    const missing = await respond(async () => {
+      throw new StorageNotConfiguredError()
+    })
+    expect(missing.status).toBe(503)
+    expect((await missing.json()).error).toBe("storage_not_configured")
+    const original = console.error
+    console.error = () => {}
+    const broken = await respond(async () => {
+      throw new Error("boom")
+    })
+    console.error = original
+    expect(broken.status).toBe(500)
+    expect((await broken.json()).error).toBe("server_error")
+  })
+})
