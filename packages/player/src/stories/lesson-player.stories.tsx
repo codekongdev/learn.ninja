@@ -1,25 +1,41 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { useGlobals } from "storybook/preview-api"
 
 import { LessonPlayer } from "../lesson-player"
 import { lessons, prepared } from "./fixtures"
 
-// The whole player, playable end to end. Switch language and theme in the toolbar.
+// The whole player, playable end to end. Switch language and theme in the toolbar or the footer.
 
 const meta = {
   title: "Player/Lesson player",
   component: LessonPlayer,
   args: { lesson: lessons.buttons, prepared },
   argTypes: { lesson: { control: false }, prepared: { control: false } },
-  render: (args, { globals }) => (
-    <div className="h-screen">
-      <LessonPlayer
-        key={globals.ui}
-        {...args}
-        uiLanguage={globals.ui}
-        expiresAt={Date.now() + 14 * 3.6e6}
-      />
-    </div>
-  ),
+  render: function Render(args, { globals }) {
+    const [, updateGlobals] = useGlobals()
+    return (
+      <div className="h-screen">
+        <LessonPlayer
+          key={globals.ui}
+          {...args}
+          uiLanguage={globals.ui}
+          expiresAt={Date.now() + 14 * 3.6e6}
+          homeHref="#"
+          theme={globals.theme === "dark" ? "dark" : "light"}
+          onThemeChange={(theme) =>
+            updateGlobals({
+              theme:
+                theme === "system"
+                  ? matchMedia("(prefers-color-scheme: dark)").matches
+                    ? "dark"
+                    : "light"
+                  : theme,
+            })
+          }
+        />
+      </div>
+    )
+  },
 } satisfies Meta<typeof LessonPlayer>
 
 export default meta

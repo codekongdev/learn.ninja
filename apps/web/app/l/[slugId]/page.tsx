@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 
-import { LessonPlayer } from "@workspace/player"
-
+import { LessonView } from "@/components/lesson-view"
 import { idFromParam } from "@/lib/publish/ids"
 import { getLessonStore } from "@/lib/publish/store"
 
@@ -37,7 +36,7 @@ export default async function PublishedLessonPage({
   const { ui } = await searchParams
   return (
     <div className="h-svh">
-      <LessonPlayer
+      <LessonView
         lesson={record.lesson}
         prepared={record.prepared}
         uiLanguage={ui}

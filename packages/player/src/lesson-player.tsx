@@ -1,19 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { ClockIcon, LightbulbIcon, XIcon } from "lucide-react"
+import { ClockIcon, LightbulbIcon, PanelRightIcon } from "lucide-react"
 
 import type { Lesson, Step } from "@workspace/spec"
 import { Button } from "@workspace/ui/components/button"
-import {
-  Dialog,
-  DialogClose,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@workspace/ui/components/dialog"
 import { DirectionProvider } from "@workspace/ui/components/direction"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -50,19 +41,33 @@ import {
 import { Mascot, type MascotMood } from "./mascot"
 import { emptyPrepared, type Prepared } from "./prepared"
 import { RichText } from "./rich-text"
-import { ariaLocaleFor, stringsFor, type Strings } from "./strings"
+import {
+  LessonFooter,
+  LessonHeader,
+  TheoryPanel,
+  useHoursLeft,
+  usePreferences,
+} from "./shell"
+import { ariaLocaleFor, stringsFor, type Strings, type Theme } from "./strings"
 import { Visual } from "./visuals"
 
 export interface LessonPlayerProps {
   lesson: Lesson
   /** Formulas and code prepared on the server (prepareLesson). */
   prepared?: Prepared
-  /** Language of the player's own text. Defaults to the lesson's language. */
+  /** Language of the player's own text. Defaults to the viewer's saved choice, then the lesson's language. */
   uiLanguage?: string
   /** When the lesson link expires (ms since epoch). Omit to hide the expiry note. */
   expiresAt?: number
   /** Stylesheet loaded inside the sandbox for HTML visuals. */
   visualsCss?: string
+  /** Where the logo in the header goes. */
+  homeHref?: string
+  /** The link Share copies. Defaults to the current page. */
+  shareUrl?: string
+  /** The app's color theme. Pass both to show the theme setting in the footer. */
+  theme?: Theme
+  onThemeChange?: (theme: Theme) => void
 }
 
 export function LessonPlayer({
@@ -71,8 +76,15 @@ export function LessonPlayer({
   uiLanguage,
   expiresAt,
   visualsCss = "/lesson-visuals.css",
+  homeHref = "/",
+  shareUrl,
+  theme,
+  onThemeChange,
 }: LessonPlayerProps) {
-  const ui = uiLanguage ?? lesson.language
+  const [prefs, setPrefs] = usePreferences()
+  // A choice made in the footer wins over the page's default for this session.
+  const [chosen, setChosen] = React.useState<string>()
+  const ui = chosen ?? uiLanguage ?? prefs.uiLanguage ?? lesson.language
   const t = stringsFor(ui)
   const locale = ariaLocaleFor(ui)
   const dir = /^(ar|he|fa|ur)\b/i.test(ui) ? "rtl" : "ltr"
@@ -84,7 +96,23 @@ export function LessonPlayer({
           lang={ui}
           className="flex h-full min-h-0 flex-col bg-background text-foreground"
         >
-          <Player lesson={lesson} expiresAt={expiresAt} />
+          <Player
+            lesson={lesson}
+            expiresAt={expiresAt}
+            homeHref={homeHref}
+            shareUrl={shareUrl}
+          />
+          <LessonFooter
+            t={t}
+            prefs={prefs}
+            onPrefs={(patch) => {
+              if (patch.uiLanguage) setChosen(patch.uiLanguage)
+              setPrefs(patch)
+            }}
+            uiLanguage={ui}
+            theme={theme}
+            onThemeChange={onThemeChange}
+          />
         </div>
       </PlayerProvider>
     </DirectionProvider>
@@ -268,93 +296,97 @@ function reducer(state: State, action: Action): State {
 
 // ---------- player ----------
 
-function Player({ lesson, expiresAt }: { lesson: Lesson; expiresAt?: number }) {
+function Player({
+  lesson,
+  expiresAt,
+  homeHref,
+  shareUrl,
+}: {
+  lesson: Lesson
+  expiresAt?: number
+  homeHref: string
+  shareUrl?: string
+}) {
   const { t } = usePlayer()
   const [state, dispatch] = React.useReducer(reducer, lesson, start)
+  const [theoryOpen, setTheoryOpen] = React.useState(false)
+  const theoryId = React.useId()
   const item = state.items[state.index]!
   const scrollRef = React.useRef<HTMLElement>(null)
   React.useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 })
   }, [state.index])
   const progress = progressAt(state.items, state.index, state.inFix)
+  const seenConcepts = state.items
+    .slice(0, state.index + 1)
+    .flatMap((i) => (i.kind === "concept" ? [i.concept] : []))
 
   return (
     <>
-      <header className="mx-auto flex w-full max-w-3xl items-center gap-3 px-4 py-3">
-        <LeaveButton
-          t={t}
-          onLeave={() => dispatch({ type: "restart", lesson })}
-        />
-        <div
-          role="progressbar"
-          aria-label={t.progress}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={progress}
-          className="h-3 flex-1 overflow-hidden rounded-full bg-muted shadow-[inset_0_0_0_1px_var(--border)]"
-        >
-          <div
-            className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        {expiresAt ? <ExpiryPill expiresAt={expiresAt} t={t} /> : null}
-      </header>
-      <main ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
-        <div
-          key={state.index}
-          className="mx-auto flex max-w-2xl flex-col gap-5 px-4 pt-4 pb-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1"
-        >
-          <Screen
-            lesson={lesson}
-            item={item}
-            state={state}
-            dispatch={dispatch}
-            expiresAt={expiresAt}
-          />
-        </div>
-      </main>
-      <ActionBar
-        lesson={lesson}
-        item={item}
-        state={state}
-        dispatch={dispatch}
+      <LessonHeader
+        title={lesson.title}
+        progress={progress}
+        expiresAt={expiresAt}
+        homeHref={homeHref}
+        shareUrl={shareUrl}
+        onRestart={() => {
+          setTheoryOpen(false)
+          dispatch({ type: "restart", lesson })
+        }}
+        t={t}
       />
+      <div className="flex min-h-0 flex-1 sm:px-8">
+        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-background sm:rounded-[2rem] sm:border">
+          <div className="relative flex min-w-0 flex-1 flex-col">
+            <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
+              <Button
+                variant="outline"
+                size="xs"
+                aria-expanded={theoryOpen}
+                aria-controls={theoryOpen ? theoryId : undefined}
+                onPress={() => setTheoryOpen((open) => !open)}
+              >
+                {t.theory}
+                <PanelRightIcon className="rtl:-scale-x-100" />
+              </Button>
+            </div>
+            <main ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+              <div
+                key={state.index}
+                className="mx-auto flex max-w-2xl flex-col gap-5 px-4 pt-14 pb-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1 sm:px-6 sm:pt-16"
+              >
+                <Screen
+                  lesson={lesson}
+                  item={item}
+                  state={state}
+                  dispatch={dispatch}
+                  expiresAt={expiresAt}
+                />
+              </div>
+            </main>
+            <ActionBar
+              lesson={lesson}
+              item={item}
+              state={state}
+              dispatch={dispatch}
+            />
+          </div>
+          {theoryOpen ? (
+            <TheoryPanel
+              id={theoryId}
+              concepts={seenConcepts}
+              onClose={() => setTheoryOpen(false)}
+              t={t}
+            />
+          ) : null}
+        </div>
+      </div>
     </>
   )
 }
 
-function LeaveButton({ t, onLeave }: { t: Strings; onLeave: () => void }) {
-  return (
-    <DialogTrigger>
-      <Button variant="ghost" size="icon" aria-label={t.leave}>
-        <XIcon />
-      </Button>
-      <Dialog>
-        <DialogHeader>
-          <DialogTitle>{t.leaveTitle}</DialogTitle>
-          <DialogDescription>{t.leaveBody}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose>{t.stay}</DialogClose>
-          <DialogClose variant="destructive" onPress={onLeave}>
-            {t.leaveConfirm}
-          </DialogClose>
-        </DialogFooter>
-      </Dialog>
-    </DialogTrigger>
-  )
-}
-
 function ExpiryPill({ expiresAt, t }: { expiresAt: number; t: Strings }) {
-  const [hours, setHours] = React.useState<number | null>(null)
-  React.useEffect(() => {
-    const update = () =>
-      setHours(Math.max(1, Math.floor((expiresAt - Date.now()) / 3.6e6)))
-    update()
-    const id = setInterval(update, 60_000)
-    return () => clearInterval(id)
-  }, [expiresAt])
+  const hours = useHoursLeft(expiresAt)
   if (hours === null) return null
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border bg-muted px-2.5 py-1 text-xs font-medium whitespace-nowrap text-muted-foreground tabular-nums">
@@ -536,7 +568,7 @@ function StepScreen({
         <p className="-mt-3 text-sm text-muted-foreground">{helper}</p>
       ) : null}
       {step.type === "scenario" ? (
-        <div className="rounded-e-2xl border-s-[3px] border-primary bg-muted px-4 py-3 text-[16.5px]">
+        <div className="rounded-e-2xl border-s-[3px] border-primary bg-muted px-4 py-3 text-[1.03125rem]">
           <RichText text={step.situation} />
         </div>
       ) : null}
@@ -563,7 +595,7 @@ function StepScreen({
         <BlankExercise {...props} bank={state.bank} />
       ) : null}
       {state.hintOpen && step.hint ? (
-        <div className="flex items-start gap-2.5 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-[15px]">
+        <div className="flex items-start gap-2.5 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-[0.9375rem]">
           <LightbulbIcon
             className="mt-0.5 size-4 shrink-0 text-amber-600"
             aria-hidden="true"
@@ -609,7 +641,7 @@ function WrapUp({
             </div>
           </div>
         </div>
-        <ul className="grid gap-1.5 text-[15px]">
+        <ul className="grid gap-1.5 text-[0.9375rem]">
           {rows.map(([color, n, label]) => (
             <li key={label} className="flex items-center gap-2">
               <span
@@ -631,7 +663,7 @@ function WrapUp({
           ))}
         </ul>
         {lesson.wrapup.next ? (
-          <p className="text-[15px] text-muted-foreground">
+          <p className="text-[0.9375rem] text-muted-foreground">
             {t.next}:{" "}
             <strong className="text-foreground">{lesson.wrapup.next}</strong>
           </p>
@@ -749,9 +781,9 @@ function ActionBar({
   }
 
   return (
-    <footer
+    <div
       className={cn(
-        "border-t px-4 pt-3.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] transition-colors",
+        "border-t px-4 py-3.5 transition-colors sm:px-6",
         toneClass[tone]
       )}
     >
@@ -777,7 +809,10 @@ function ActionBar({
                 {title}
               </div>
               {message ? (
-                <RichText text={message} className="mt-0.5 block text-[15px]" />
+                <RichText
+                  text={message}
+                  className="mt-0.5 block text-[0.9375rem]"
+                />
               ) : null}
             </div>
           ) : (
@@ -794,7 +829,7 @@ function ActionBar({
           {primary.label}
         </Button>
       </div>
-    </footer>
+    </div>
   )
 }
 

@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-import { LessonPlayer } from "@workspace/player"
 import { prepareLesson } from "@workspace/player/prepare"
 
+import { LessonView } from "@/components/lesson-view"
 import { getLesson, LESSON_SLUGS } from "@/lib/lessons"
 
 type Props = {
@@ -30,7 +30,7 @@ export default async function LessonPage({ params, searchParams }: Props) {
   const prepared = await prepareLesson(lesson)
   return (
     <div className="h-svh">
-      <LessonPlayer lesson={lesson} prepared={prepared} uiLanguage={ui} />
+      <LessonView lesson={lesson} prepared={prepared} uiLanguage={ui} />
     </div>
   )
 }

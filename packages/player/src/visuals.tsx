@@ -190,7 +190,7 @@ function CodeBlock({
       dir="ltr"
       className="overflow-x-auto rounded-2xl border bg-muted/40 text-start"
     >
-      <pre className="m-0 flex min-w-max flex-col py-3 font-mono text-[14.5px] leading-7">
+      <pre className="m-0 flex min-w-max flex-col py-3 font-mono text-[0.90625rem] leading-7">
         {lines.map((tokens, i) => {
           const n = i + 1
           const id = hotspots ? spotByLine.get(n) : undefined

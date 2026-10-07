@@ -64,12 +64,26 @@ export type Strings = {
   next: string
   restart: string
   progress: string
-  leave: string
-  leaveTitle: string
-  leaveBody: string
+  restartTitle: string
+  restartBody: string
   stay: string
-  leaveConfirm: string
+  home: string
+  share: string
+  linkCopied: string
+  theory: string
+  theoryEmpty: string
+  closeTheory: string
+  by: string
+  textSize: string
+  sizes: Record<TextSize, string>
+  sizesShort: Record<TextSize, string>
+  theme: string
+  themes: Record<Theme, string>
+  language: string
 }
+
+export type TextSize = "sm" | "md" | "lg"
+export type Theme = "system" | "light" | "dark"
 
 const en: Strings = {
   start: "Start lesson",
@@ -146,11 +160,23 @@ const en: Strings = {
   next: "Suggested next lesson",
   restart: "Restart lesson",
   progress: "Lesson progress",
-  leave: "Close lesson",
-  leaveTitle: "Leave this lesson?",
-  leaveBody: "Your progress won't be saved.",
+  restartTitle: "Restart this lesson?",
+  restartBody:
+    "You'll start again from the beginning. Your answers so far won't be kept.",
   stay: "Keep learning",
-  leaveConfirm: "Leave",
+  home: "Learn home",
+  share: "Share",
+  linkCopied: "Link copied",
+  theory: "Theory",
+  theoryEmpty: "Concepts show up here as you learn them.",
+  closeTheory: "Close theory",
+  by: "by",
+  textSize: "Text size",
+  sizes: { sm: "Small", md: "Medium", lg: "Large" },
+  sizesShort: { sm: "Sm", md: "Md", lg: "Lg" },
+  theme: "Theme",
+  themes: { system: "System", light: "Light", dark: "Dark" },
+  language: "Language",
 }
 
 const ar: Strings = {
@@ -217,14 +243,37 @@ const ar: Strings = {
   next: "الدرس التالي المقترح",
   restart: "أعد الدرس",
   progress: "تقدم الدرس",
-  leave: "إغلاق الدرس",
-  leaveTitle: "هل تريد مغادرة هذا الدرس؟",
-  leaveBody: "لن يتم حفظ تقدمك.",
+  restartTitle: "هل تريد إعادة هذا الدرس؟",
+  restartBody: "ستبدأ من جديد، ولن تُحفظ إجاباتك حتى الآن.",
   stay: "تابع التعلم",
-  leaveConfirm: "غادر",
+  home: "الصفحة الرئيسية",
+  share: "مشاركة",
+  linkCopied: "تم نسخ الرابط",
+  theory: "النظرية",
+  theoryEmpty: "ستظهر المفاهيم هنا أثناء تعلّمك.",
+  closeTheory: "إغلاق النظرية",
+  by: "بواسطة",
+  textSize: "حجم النص",
+  sizes: { sm: "صغير", md: "متوسط", lg: "كبير" },
+  sizesShort: { sm: "صغير", md: "متوسط", lg: "كبير" },
+  theme: "المظهر",
+  themes: { system: "النظام", light: "فاتح", dark: "داكن" },
+  language: "اللغة",
 }
 
 const STRINGS: Record<string, Strings> = { en, ar }
+
+/** Languages the player's own text is translated into, with their names for the language menu. */
+export const UI_LANGUAGES = [
+  { code: "en", label: "English (US)" },
+  { code: "ar", label: "العربية" },
+] as const
+
+/** The menu entry for a language code, or undefined when the player has no translation for it. */
+export function uiLanguageFor(lang: string) {
+  const base = lang.toLowerCase().split("-")[0]
+  return UI_LANGUAGES.find((l) => l.code === base)
+}
 
 /** The player's text for a language code ("ar", "ar-EG", "en-US"…), falling back to English. */
 export function stringsFor(lang: string): Strings {
