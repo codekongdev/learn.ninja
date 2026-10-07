@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run test)",
+      "Bash(npm run check)",
+      "Bash(npm run build)",
+      "Bash(npx turbo lint:*)",
+      "Bash(npx turbo typecheck:*)",
+      "Bash(npx turbo test:*)",
+      "Bash(npx turbo build:*)"
+    ]
+  }
+}

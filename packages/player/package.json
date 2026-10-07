@@ -1,0 +1,25 @@
+{
+  "name": "@workspace/player",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@workspace/ui": "^0.0.0",
+    "react": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@workspace/eslint-config": "^0.0.0",
+    "@workspace/typescript-config": "^0.0.0",
+    "eslint": "^10.12.0",
+    "typescript": "^5.9.3"
+  }
+}

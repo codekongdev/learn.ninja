@@ -1,0 +1,22 @@
+{
+  "name": "@workspace/spec",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "format": "prettier --write \"**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@workspace/eslint-config": "^0.0.0",
+    "@workspace/typescript-config": "^0.0.0",
+    "eslint": "^10.12.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
