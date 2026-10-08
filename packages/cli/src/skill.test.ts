@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process"
 import { readdirSync, readFileSync } from "node:fs"
+import { fileURLToPath } from "node:url"
 
 import { describe, expect, it } from "vitest"
 
@@ -9,7 +10,7 @@ import { SKILL_VERSION } from "./cli"
 
 const root = new URL("../../../", import.meta.url)
 const read = (p: string) => readFileSync(new URL(p, root), "utf8")
-const script = new URL("skills/learn/scripts/learn.mjs", root).pathname
+const script = fileURLToPath(new URL("skills/learn/scripts/learn.mjs", root))
 
 describe("skills/learn", () => {
   it("has the current JSON Schema", () => {
@@ -44,7 +45,7 @@ describe("skills/learn", () => {
         [
           script,
           "validate",
-          new URL(`skills/learn/examples/${file}`, root).pathname,
+          fileURLToPath(new URL(`skills/learn/examples/${file}`, root)),
         ],
         { encoding: "utf8" }
       )
