@@ -31,13 +31,7 @@ function brickMarkdown(slug: string, id: string): string {
     ? [lesson.hook, ...lesson.bricks, lesson.challenge].find((b) => b.id === id)
     : undefined
   if (!brick) return ""
-  return [
-    "```json",
-    JSON.stringify(brick, null, 2),
-    "```",
-    "",
-    `From the example lesson "${lesson!.title}": ${SITE.url}/lessons/${slug}`,
-  ].join("\n")
+  return ["```json", JSON.stringify(brick, null, 2), "```"].join("\n")
 }
 
 export function docsIndex(): string {
@@ -112,21 +106,6 @@ Works with any agent that supports skills: ${AGENTS.map((a) => a.name).join(", "
 ## What's in a lesson
 
 One idea in 5 to 10 minutes: a guess before any teaching, one to three short concepts each followed by practice, a final challenge, and takeaways. Practice uses nine kinds of bricks: concept, choice, compare, hotspot, sort, order, match, blank, and scenario. Every wrong option explains the mistake behind it.
-
-## Example lessons
-
-${[
-  "button-hierarchy",
-  "writing-a-prd",
-  "compound-interest",
-  "spanish-greetings",
-  "map-vs-foreach",
-]
-  .map((slug) => {
-    const l = getLesson(slug)!
-    return `- [${l.title}](${SITE.url}/lessons/${slug}): ${l.summary}`
-  })
-  .join("\n")}
 
 ## Questions
 

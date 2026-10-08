@@ -50,13 +50,3 @@ Want a separate copy instead? Ask for "a new link".
 ## 4. Share it
 
 Send the link to anyone. Links last 24 hours for now.
-
-## Try one first
-
-These example lessons show what you'll get:
-
-- [Button hierarchy](/lessons/button-hierarchy)
-- [Writing a PRD](/lessons/writing-a-prd)
-- [How compound interest works](/lessons/compound-interest)
-- [Basic Spanish greetings](/lessons/spanish-greetings)
-- [JavaScript map vs forEach](/lessons/map-vs-foreach)

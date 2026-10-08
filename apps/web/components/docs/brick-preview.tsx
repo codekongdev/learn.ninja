@@ -46,7 +46,6 @@ export async function BrickPreview({
       }
       code={json}
       codeText={text}
-      source={`/lessons/${slug}`}
     />
   )
 }
