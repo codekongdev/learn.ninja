@@ -18,28 +18,38 @@ hook → loop 1 (concept → 2–4 practice) → loop 2 … (1–3 loops) → ch
 - **Hook:** a `choice` or `compare` question asked *before* any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains. Its `explanation` should make the learner want to know why.
 - **Concept cards:** one idea each, 80 words at most. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
 - **Practice:** 2–4 steps right after each concept, 4–8 in total across the lesson. At least 2 practice steps per concept.
-- **Challenge:** one harder, applied step that combines the concepts, usually a `scenario`, a realistic `hotspot`, or a `sort`.
+- **Challenge:** one harder, applied step that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
 - **Wrap-up:** 2–4 takeaways, each one sentence the learner could act on.
 
-## 3. Choose building blocks
+## 3. Choose building blocks by fit
 
-Use **at least 3 different types**, and **never more than 2 of the same type in a row**.
+Each exercise should ask the learner to do what they'd really do with this knowledge. Start from the question you'd ask a learner face to face, then pick the type that asks it most directly. There's no quota and no set order: a lesson can use two types or six, and can repeat a type as often as the content calls for. Never pick a type for variety's sake.
 
-| Category | Types | Use it to |
+| Type | Natural when the learner needs to… | Forced when… |
 | --- | --- | --- |
-| Judge | `choice`, `compare` | Recognize the right answer, or the better of two examples |
-| Spot | `hotspot` | Find the problem inside a realistic example (a UI, a document, a line of code) |
-| Organize | `sort`, `order`, `match` | Classify, sequence, or pair several things at once |
-| Decide | `scenario` | Weigh trade-offs and make a call in context |
+| `choice` | Pick the right answer, cause, or next move | Never really; it's the safe default. Use `multiple: true` only when several answers are genuinely right. |
+| `compare` | Judge which of two real examples is better (two UIs, two sentences, two plans) | The two options are just a right and a wrong statement; that's a `choice`. |
+| `hotspot` | Find something inside a realistic artifact: a screen, a recipe, a contract, a line of code | The "artifact" is a list you built only so there's something to tap. |
+| `sort` | Classify things into categories people really use | The groups are invented for the exercise, or there are only two items per group. |
+| `order` | Sequence a real process where the order matters and mistakes have consequences | The order is arbitrary, or obvious from the wording. |
+| `match` | Pair things that come in pairs: terms and meanings, words and translations, symptoms and causes | It just re-tests the concept card's vocabulary with no thinking involved. |
+| `blank` | Recall exact wording that matters: code, a phrase in another language, a formula | It's a sentence from the concept card with a word removed; that's recall, not understanding. |
+| `scenario` | Make a call in a realistic situation where options have trade-offs | There's one obviously right answer; that's a `choice`. |
 
-Good progression: start with Judge, mix in Spot and Organize during practice, and end on Decide. Pick the type that fits the skill, not for variety's sake:
+Before you keep a step, ask:
 
-- **compare:** "which is better" between two concrete examples. Great with HTML visuals (two UIs) or two short texts.
-- **choice:** one correct answer (or `multiple: true` for "pick all that apply"). 2–5 options.
+- **Would a good teacher ask this, in this form?** If the honest version of the question is multiple choice, use `choice`, even if the previous step was a `choice` too.
+- **Does it ask something new?** Each step should test a different aspect or application of the idea, not restate the last one in another format.
+- **Is the artifact real?** Hotspots, compares and scenarios work when they show something the learner will meet: a real screen, a real recipe step, a real decision.
+
+Mechanics of each type:
+
+- **compare:** exactly 2 options. Great with HTML visuals (two UIs) or two short texts.
+- **choice:** 2–5 options, one correct (or `multiple: true` for "pick all that apply").
 - **hotspot:** tap the part of a visual that matters. In HTML, mark tappable elements with `data-hotspot="id"`; in code, list `hotspots` by line number.
 - **sort:** 4–8 items into 2–3 groups. Every group should get at least one item.
 - **order:** 3–6 items written in the correct order (the player shuffles them). Use `alsoAccept` if another order is genuinely right too.
-- **match:** 3–5 pairs, e.g. terms and meanings, words and translations.
+- **match:** 3–5 pairs.
 - **blank:** fill gaps in a sentence or code from word chips. Each gap's `choices` include the right answer plus 1–2 believable decoys.
 - **scenario:** a short situation and 2–4 options, each with a `quality` (`best`, `okay`, `poor`) and an `outcome` that shows the consequence.
 
@@ -106,4 +116,4 @@ HTML visuals use **Basecoat** (shadcn/ui's design system as plain HTML) plus **T
 ## 9. Before you publish
 
 - Run `validate` and fix every issue. The messages say exactly what to change.
-- Read the lesson once as a learner: is the hook intriguing? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice?
+- Read the lesson once as a learner: is the hook intriguing? Does every exercise feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice?

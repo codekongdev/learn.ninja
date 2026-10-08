@@ -11,7 +11,7 @@ import {
 // The command the lesson skill runs: validate a lesson file, publish it, or update it.
 // Bundled into skills/learn/scripts/learn.mjs, so the skill works without installing anything.
 
-export const SKILL_VERSION = "0.1.0"
+export const SKILL_VERSION = "0.2.0"
 export const DEFAULT_API_URL = "https://learn-cmicpace.vercel.app"
 
 export interface Io {

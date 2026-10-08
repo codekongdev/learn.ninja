@@ -15,8 +15,6 @@ export interface Issue {
 
 export const LIMITS = {
   practiceTotal: { min: 4, max: 8 },
-  minStepTypes: 3,
-  maxSameTypeInARow: 2,
   promptWords: 40,
   conceptBodyWords: 80,
   htmlVisualBytes: 20 * 1024,
@@ -123,27 +121,6 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   }
 
   // ---------- teaching quality ----------
-
-  const types = new Set(steps.map((s) => s.step.type))
-  if (types.size < LIMITS.minStepTypes) {
-    add(
-      "teaching",
-      "",
-      `The lesson uses ${types.size} building block type(s) (${[...types].join(", ")}); use at least ${LIMITS.minStepTypes} different types across the hook, practice, and challenge.`
-    )
-  }
-
-  let run = 1
-  for (let i = 1; i < steps.length; i++) {
-    run = steps[i]!.step.type === steps[i - 1]!.step.type ? run + 1 : 1
-    if (run > LIMITS.maxSameTypeInARow) {
-      add(
-        "teaching",
-        steps[i]!.path,
-        `This makes ${run} "${steps[i]!.step.type}" steps in a row; use no more than ${LIMITS.maxSameTypeInARow} of the same type in a row. Change this step's type or reorder steps.`
-      )
-    }
-  }
 
   for (const { step, path } of steps) {
     if (countWords(step.prompt) > LIMITS.promptWords) {

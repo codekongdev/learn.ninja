@@ -86,7 +86,6 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
 
 - Hook is `choice` or `compare`; 1–3 loops; 2–4 practice per loop; 4–8 practice in total.
 - Unique ids; every reference points to something real (`correct`, `group`, `alsoAccept`, `[[gap]]` ids, hotspot ids, code hotspot lines).
-- At least 3 building block types; no more than 2 of the same type in a row.
 - Every wrong `choice`/`compare` option has `feedback`; every step has an `explanation`; a `choice` has at least one wrong option; a `scenario` has a `best` option.
 - Prompts ≤40 words; concept bodies ≤80 words.
 - No `number` steps; every `blank` has `choices` that include an accepted answer.

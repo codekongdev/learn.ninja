@@ -210,19 +210,10 @@ describe("teaching rules", () => {
     })
   })
 
-  it("allows no more than 2 steps of the same type in a row", () => {
+  it("lets a lesson repeat one step type when that's what fits", () => {
     const l = compound()
     l.loops[0].practice[1] = { ...l.loops[0].practice[0], id: "p2" }
-    expectIssue(l, {
-      path: "loops[0].practice[1]",
-      message: /makes 3 "choice" steps in a row/,
-    })
-  })
-
-  it("requires at least 3 building block types", () => {
-    const l = compound()
-    l.loops[0].practice[1] = { ...l.loops[1].practice[1], id: "p2" }
-    expectIssue(l, { message: /uses 2 building block type\(s\)/ })
+    expect(validateLesson(l).ok).toBe(true)
   })
 
   it("keeps prompts to 40 words", () => {

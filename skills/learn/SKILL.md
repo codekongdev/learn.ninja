@@ -29,6 +29,7 @@ If `publish` prints that a newer version of the skill is available, tell the use
 
 - **Accuracy over flourish.** Teach only what's true and supported by the user's input or well-established knowledge. Don't invent statistics, quotes, studies, or examples presented as real.
 - **One idea, interleaved.** Hook (a guess before any teaching) → 1–3 loops of one short concept card followed right away by 2–4 practice steps → one harder challenge → 2–4 takeaways.
+- **Exercises fit the content.** Pick each step's type by asking how a good teacher would test that point, not to fill a quota. Repeating a type is fine; a forced `order` or `match` isn't.
 - **Every wrong option teaches.** Each wrong option needs `feedback` that explains the misconception, and every step needs an `explanation`. Build wrong options from real, common mistakes.
 - **v1 limits:** no `number` steps (ask numeric questions as `choice` with mistake-based options), every `blank` uses word chips (`choices`), no images or photos, no typed answers.
 - **Visuals are plain HTML with the built-in UI kit** (Basecoat classes and Tailwind utilities). No scripts, event handlers, iframes, forms, or external URLs; the checker rejects them.
