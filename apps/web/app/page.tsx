@@ -8,6 +8,7 @@ import { FromAnything, Points, WrongAnswers } from "@/components/home/features"
 import { GetStarted } from "@/components/home/get-started"
 import { Hero } from "@/components/home/hero"
 import { Section } from "@/components/home/section"
+import { HeaderCopyPrompt } from "@/components/site/header-copy-prompt"
 import { SiteFooter } from "@/components/site/site-footer"
 import { SiteHeader } from "@/components/site/site-header"
 import { getLesson, LESSON_SLUGS } from "@/lib/lessons"
@@ -90,7 +91,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <SiteHeader />
+      <SiteHeader end={<HeaderCopyPrompt />} />
       <main className="flex-1">
         <Hero />
         <Demo lesson={compound.lesson} prepared={compound.prepared} />

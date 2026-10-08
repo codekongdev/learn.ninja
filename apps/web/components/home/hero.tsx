@@ -1,6 +1,6 @@
 import { AgentLogos } from "@/components/site/agent-logos"
 import { CopyButton } from "@/components/site/copy-button"
-import { AGENT_PROMPT } from "@/lib/site"
+import { AGENT_PROMPT, HERO_CTA_ID } from "@/lib/site"
 
 export function Hero() {
   return (
@@ -18,7 +18,7 @@ export function Hero() {
           writes one short lesson you play in the browser, and gives you a link
           to share. Free, no account.
         </p>
-        <CopyButton text={AGENT_PROMPT} size="lg">
+        <CopyButton id={HERO_CTA_ID} text={AGENT_PROMPT} size="lg">
           Copy prompt for agent
         </CopyButton>
       </div>

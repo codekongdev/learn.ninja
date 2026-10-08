@@ -17,6 +17,9 @@ export const INSTALL_COMMAND = "npx skills add https://learn.ninja -g"
 /** What "Copy prompt for agent" copies. */
 export const AGENT_PROMPT = `Install the learn.ninja skill with \`${INSTALL_COMMAND}\`, then read ${SITE.url}/docs and make me a lesson about `
 
+/** The hero's copy button; the header shows its own once this scrolls under it. */
+export const HERO_CTA_ID = "hero-cta"
+
 /** Agents shown on the home page. Logos live in public/agents/ (see its README). */
 export const AGENTS = [
   { name: "Claude Code", logo: "claudecode" },
