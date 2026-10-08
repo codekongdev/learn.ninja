@@ -1,6 +1,6 @@
 import katex from "katex"
 
-import type { Lesson, Step, Visual } from "./schema"
+import type { Lesson, QuestionBrick, Visual } from "./schema"
 
 // Rules the schema can't express: cross-references, teaching quality, v1 limits, and safety.
 // Every message says what's wrong and how to fix it, so an LLM can correct the lesson on its own.
@@ -14,6 +14,9 @@ export interface Issue {
 }
 
 export const LIMITS = {
+  concepts: { min: 1, max: 3 },
+  /** Question bricks after each concept brick. */
+  practicePerConcept: { min: 2, max: 4 },
   practiceTotal: { min: 4, max: 8 },
   promptWords: 40,
   conceptBodyWords: 80,
@@ -21,22 +24,21 @@ export const LIMITS = {
   lessonBytes: 500 * 1024,
 } as const
 
-/** A step together with where it sits in the lesson, in play order. */
-interface PlacedStep {
-  step: Step
+/** A question brick together with where it sits in the lesson, in play order. */
+interface PlacedQuestion {
+  brick: QuestionBrick
   path: string
 }
 
-function placedSteps(lesson: Lesson): PlacedStep[] {
+function placedQuestions(lesson: Lesson): PlacedQuestion[] {
+  const practice: PlacedQuestion[] = []
+  lesson.bricks.forEach((brick, i) => {
+    if (brick.type !== "concept") practice.push({ brick, path: `bricks[${i}]` })
+  })
   return [
-    { step: lesson.hook, path: "hook" },
-    ...lesson.loops.flatMap((loop, i) =>
-      loop.practice.map((step, j) => ({
-        step,
-        path: `loops[${i}].practice[${j}]`,
-      }))
-    ),
-    { step: lesson.challenge, path: "challenge" },
+    { brick: lesson.hook, path: "hook" },
+    ...practice,
+    { brick: lesson.challenge, path: "challenge" },
   ]
 }
 
@@ -67,48 +69,38 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   const issues: Issue[] = []
   const add = (kind: IssueKind, path: string, message: string) =>
     issues.push({ kind, path, message })
-  const steps = placedSteps(lesson)
+  const questions = placedQuestions(lesson)
 
   // ---------- structure ----------
 
-  const practiceCount = lesson.loops.reduce((n, l) => n + l.practice.length, 0)
-  if (
-    practiceCount < LIMITS.practiceTotal.min ||
-    practiceCount > LIMITS.practiceTotal.max
-  ) {
-    add(
-      "structure",
-      "loops",
-      `The lesson has ${practiceCount} practice steps in total; it needs ${LIMITS.practiceTotal.min}–${LIMITS.practiceTotal.max}. Add or remove practice steps (2–4 per loop).`
-    )
-  }
+  checkRhythm(lesson, add)
 
-  const lessonIds = [
-    ...steps.map((s) => s.step.id),
-    ...lesson.loops.map((l) => l.concept.id),
-  ]
+  const lessonIds = [lesson.hook, ...lesson.bricks, lesson.challenge].map(
+    (b) => b.id
+  )
   for (const dupe of duplicates(lessonIds)) {
     add(
       "structure",
       "",
-      `The id "${dupe}" is used more than once. Every step and concept id must be unique within the lesson.`
+      `The id "${dupe}" is used more than once. Every brick id must be unique within the lesson.`
     )
   }
 
-  for (const { step, path } of steps) checkStepReferences(step, path, add)
+  for (const { brick, path } of questions)
+    checkBrickReferences(brick, path, add)
 
   // ---------- v1 limits ----------
 
-  for (const { step, path } of steps) {
-    if (step.type === "number") {
+  for (const { brick, path } of questions) {
+    if (brick.type === "number") {
       add(
         "v1",
         path,
-        "Number steps aren't supported in v1. Rewrite this as a choice step whose wrong options come from common mistakes, each with feedback."
+        "Number bricks aren't supported in v1. Rewrite this as a choice brick whose wrong options come from common mistakes, each with feedback."
       )
     }
-    if (step.type === "blank") {
-      step.blanks.forEach((b, i) => {
+    if (brick.type === "blank") {
+      brick.blanks.forEach((b, i) => {
         if (!b.choices) {
           add(
             "v1",
@@ -122,17 +114,17 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
 
   // ---------- teaching quality ----------
 
-  for (const { step, path } of steps) {
-    if (countWords(step.prompt) > LIMITS.promptWords) {
+  for (const { brick, path } of questions) {
+    if (countWords(brick.prompt) > LIMITS.promptWords) {
       add(
         "teaching",
         `${path}.prompt`,
-        `The prompt has ${countWords(step.prompt)} words; keep it to ${LIMITS.promptWords} or fewer.`
+        `The prompt has ${countWords(brick.prompt)} words; keep it to ${LIMITS.promptWords} or fewer.`
       )
     }
-    if (step.type === "choice" || step.type === "compare") {
-      const correct = step.type === "choice" ? step.correct : [step.correct]
-      step.options.forEach((o, i) => {
+    if (brick.type === "choice" || brick.type === "compare") {
+      const correct = brick.type === "choice" ? brick.correct : [brick.correct]
+      brick.options.forEach((o, i) => {
         if (!correct.includes(o.id) && !o.feedback) {
           add(
             "teaching",
@@ -144,12 +136,13 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
     }
   }
 
-  lesson.loops.forEach((loop, i) => {
-    const words = countWords(loop.concept.body)
+  lesson.bricks.forEach((brick, i) => {
+    if (brick.type !== "concept") return
+    const words = countWords(brick.body)
     if (words > LIMITS.conceptBodyWords) {
       add(
         "teaching",
-        `loops[${i}].concept.body`,
+        `bricks[${i}].body`,
         `The concept body has ${words} words; keep it to ${LIMITS.conceptBodyWords} or fewer and one idea only.`
       )
     }
@@ -248,62 +241,107 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   return issues
 }
 
-function checkStepReferences(
-  step: Step,
+/** Teach, then practise: concept bricks, each followed by the question bricks that practise it. */
+function checkRhythm(
+  lesson: Lesson,
+  add: (k: IssueKind, p: string, m: string) => void
+) {
+  const { concepts, practicePerConcept, practiceTotal } = LIMITS
+  const conceptAt = lesson.bricks.flatMap((b, i) =>
+    b.type === "concept" ? [i] : []
+  )
+  if (lesson.bricks[0]?.type !== "concept") {
+    add(
+      "structure",
+      "bricks[0]",
+      `The first brick must be a concept brick. Teach the idea first, then add the question bricks that practise it.`
+    )
+  }
+  if (conceptAt.length < concepts.min || conceptAt.length > concepts.max) {
+    add(
+      "structure",
+      "bricks",
+      `The lesson has ${conceptAt.length} concept bricks; it needs ${concepts.min}–${concepts.max}, one idea each.`
+    )
+  }
+  conceptAt.forEach((at, n) => {
+    const next = conceptAt[n + 1] ?? lesson.bricks.length
+    const count = next - at - 1
+    if (count < practicePerConcept.min || count > practicePerConcept.max) {
+      const id = lesson.bricks[at]!.id
+      add(
+        "structure",
+        `bricks[${at}]`,
+        `Concept brick "${id}" is followed by ${count} question bricks; it needs ${practicePerConcept.min}–${practicePerConcept.max} before the next concept brick or the challenge.`
+      )
+    }
+  })
+  const practiceCount = lesson.bricks.length - conceptAt.length
+  if (practiceCount < practiceTotal.min || practiceCount > practiceTotal.max) {
+    add(
+      "structure",
+      "bricks",
+      `The lesson has ${practiceCount} practice bricks in total; it needs ${practiceTotal.min}–${practiceTotal.max}. Add or remove question bricks (${practicePerConcept.min}–${practicePerConcept.max} after each concept brick).`
+    )
+  }
+}
+
+function checkBrickReferences(
+  brick: QuestionBrick,
   path: string,
   add: (k: IssueKind, p: string, m: string) => void
 ) {
-  switch (step.type) {
+  switch (brick.type) {
     case "choice": {
-      const ids = step.options.map((o) => o.id)
+      const ids = brick.options.map((o) => o.id)
       for (const d of duplicates(ids))
         add(
           "structure",
           `${path}.options`,
           `Option id "${d}" is used more than once.`
         )
-      for (const c of step.correct)
+      for (const c of brick.correct)
         if (!ids.includes(c))
           add(
             "structure",
             `${path}.correct`,
-            `"${c}" isn't one of this step's option ids (${ids.join(", ")}).`
+            `"${c}" isn't one of this brick's option ids (${ids.join(", ")}).`
           )
-      if (!step.multiple && step.correct.length !== 1)
+      if (!brick.multiple && brick.correct.length !== 1)
         add(
           "structure",
           `${path}.correct`,
           `With "multiple": false, "correct" must list exactly one option id.`
         )
-      if (step.correct.length >= ids.length)
+      if (brick.correct.length >= ids.length)
         add("teaching", `${path}.correct`, "At least one option must be wrong.")
       break
     }
     case "compare": {
-      const ids = step.options.map((o) => o.id)
+      const ids = brick.options.map((o) => o.id)
       for (const d of duplicates(ids))
         add(
           "structure",
           `${path}.options`,
           `Option id "${d}" is used more than once.`
         )
-      if (!ids.includes(step.correct))
+      if (!ids.includes(brick.correct))
         add(
           "structure",
           `${path}.correct`,
-          `"${step.correct}" isn't one of this step's option ids (${ids.join(", ")}).`
+          `"${brick.correct}" isn't one of this brick's option ids (${ids.join(", ")}).`
         )
       break
     }
     case "scenario": {
-      const ids = step.options.map((o) => o.id)
+      const ids = brick.options.map((o) => o.id)
       for (const d of duplicates(ids))
         add(
           "structure",
           `${path}.options`,
           `Option id "${d}" is used more than once.`
         )
-      if (!step.options.some((o) => o.quality === "best"))
+      if (!brick.options.some((o) => o.quality === "best"))
         add(
           "teaching",
           `${path}.options`,
@@ -312,14 +350,14 @@ function checkStepReferences(
       break
     }
     case "order": {
-      const ids = step.items.map((i) => i.id)
+      const ids = brick.items.map((i) => i.id)
       for (const d of duplicates(ids))
         add(
           "structure",
           `${path}.items`,
           `Item id "${d}" is used more than once.`
         )
-      ;(step.alsoAccept ?? []).forEach((alt, i) => {
+      ;(brick.alsoAccept ?? []).forEach((alt, i) => {
         if (!sameSet(alt, ids))
           add(
             "structure",
@@ -330,34 +368,34 @@ function checkStepReferences(
       break
     }
     case "sort": {
-      const groupIds = step.groups.map((g) => g.id)
+      const groupIds = brick.groups.map((g) => g.id)
       for (const d of duplicates(groupIds))
         add(
           "structure",
           `${path}.groups`,
           `Group id "${d}" is used more than once.`
         )
-      for (const d of duplicates(step.items.map((i) => i.id)))
+      for (const d of duplicates(brick.items.map((i) => i.id)))
         add(
           "structure",
           `${path}.items`,
           `Item id "${d}" is used more than once.`
         )
-      step.items.forEach((it, i) => {
+      brick.items.forEach((it, i) => {
         if (!groupIds.includes(it.group))
           add(
             "structure",
             `${path}.items[${i}].group`,
-            `"${it.group}" isn't one of this step's group ids (${groupIds.join(", ")}).`
+            `"${it.group}" isn't one of this brick's group ids (${groupIds.join(", ")}).`
           )
       })
       break
     }
     case "blank": {
-      const gaps = [...step.template.matchAll(/\[\[([^\]]+)\]\]/g)].map(
+      const gaps = [...brick.template.matchAll(/\[\[([^\]]+)\]\]/g)].map(
         (m) => m[1]!
       )
-      const blankIds = step.blanks.map((b) => b.id)
+      const blankIds = brick.blanks.map((b) => b.id)
       for (const d of duplicates(blankIds))
         add(
           "structure",
@@ -384,7 +422,7 @@ function checkStepReferences(
             `${path}.blanks`,
             `Blank "${b}" doesn't appear in the template as [[${b}]].`
           )
-      step.blanks.forEach((b, i) => {
+      brick.blanks.forEach((b, i) => {
         if (b.choices && !b.accept.some((a) => b.choices!.includes(a))) {
           add(
             "structure",
@@ -396,7 +434,7 @@ function checkStepReferences(
       break
     }
     case "hotspot": {
-      const ids = hotspotIds(step.visual)
+      const ids = hotspotIds(brick.visual)
       if (ids.length === 0)
         add(
           "structure",
@@ -409,22 +447,22 @@ function checkStepReferences(
           `${path}.visual`,
           `Hotspot id "${d}" is used more than once.`
         )
-      for (const c of step.correct)
+      for (const c of brick.correct)
         if (!ids.includes(c))
           add(
             "structure",
             `${path}.correct`,
             `"${c}" isn't one of this visual's hotspot ids (${ids.join(", ") || "none"}).`
           )
-      if (!step.multiple && step.correct.length !== 1)
+      if (!brick.multiple && brick.correct.length !== 1)
         add(
           "structure",
           `${path}.correct`,
           `With "multiple": false, "correct" must list exactly one hotspot id.`
         )
-      if (step.visual.kind === "code") {
-        const lines = step.visual.code.split("\n").length
-        ;(step.visual.hotspots ?? []).forEach((h, i) => {
+      if (brick.visual.kind === "code") {
+        const lines = brick.visual.code.split("\n").length
+        ;(brick.visual.hotspots ?? []).forEach((h, i) => {
           if (h.line > lines)
             add(
               "structure",

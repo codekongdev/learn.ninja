@@ -41,8 +41,8 @@ describe("schema", () => {
 
   it("rejects unknown fields, so typos are caught", () => {
     const l = buttons()
-    l.loops[0].practice[0].colour = "blue"
-    expectIssue(l, { path: "loops[0].practice[0]", message: /colour/ })
+    l.bricks[1].colour = "blue"
+    expectIssue(l, { path: "bricks[1]", message: /colour/ })
   })
 
   it("only allows choice or compare as the hook", () => {
@@ -51,89 +51,116 @@ describe("schema", () => {
     expectIssue(l, { path: "hook.type", message: /choice|compare/ })
   })
 
-  it("requires 2–4 practice steps per loop", () => {
+  it("only allows question bricks as the challenge", () => {
     const l = buttons()
-    l.loops[0].practice = l.loops[0].practice.slice(0, 1)
-    expectIssue(l, { path: "loops[0].practice", message: /2/ })
+    l.challenge = { ...l.bricks[0], id: "ch" }
+    expectIssue(l, { path: "challenge.type", message: /concept|choice/ })
   })
 
   it("requires the current spec version", () => {
     const l = buttons()
     l.spec = "0.1"
-    expectIssue(l, { path: "spec", message: /0\.2/ })
+    expectIssue(l, { path: "spec", message: /0\.3/ })
   })
 })
 
 describe("structure rules", () => {
-  it("requires 4–8 practice steps in total", () => {
+  it("starts the bricks with a concept brick", () => {
     const l = buttons()
-    l.loops = l.loops.slice(0, 1)
+    l.bricks = [l.bricks[1], l.bricks[0], ...l.bricks.slice(2)]
+    expectIssue(l, { path: "bricks[0]", message: /must be a concept brick/ })
+  })
+
+  it("requires 2–4 question bricks after each concept brick", () => {
+    const l = buttons()
+    l.bricks.splice(2, 1)
     expectIssue(l, {
-      path: "loops",
-      message: /2 practice steps in total; it needs 4–8/,
+      path: "bricks[0]",
+      message: /"c1" is followed by 1 question bricks; it needs 2–4/,
     })
   })
 
-  it("rejects duplicate step ids", () => {
+  it("allows at most 3 concept bricks", () => {
     const l = buttons()
-    l.loops[0].practice[1].id = "p1"
+    const loop = l.bricks.slice(0, 3)
+    l.bricks = [0, 1, 2, 3].flatMap((n) =>
+      loop.map((b: { id: string }) => ({ ...b, id: `${b.id}-${n}` }))
+    )
+    expectIssue(l, {
+      path: "bricks",
+      message: /4 concept bricks; it needs 1–3/,
+    })
+  })
+
+  it("requires 4–8 practice bricks in total", () => {
+    const l = buttons()
+    l.bricks = l.bricks.slice(0, 3)
+    expectIssue(l, {
+      path: "bricks",
+      message: /2 practice bricks in total; it needs 4–8/,
+    })
+  })
+
+  it("rejects duplicate brick ids", () => {
+    const l = buttons()
+    l.bricks[2].id = "p1"
     expectIssue(l, { message: /"p1" is used more than once/ })
   })
 
   it("checks that correct answers point to real options", () => {
     const l = buttons()
-    l.loops[0].practice[0].correct = ["z"]
+    l.bricks[1].correct = ["z"]
     expectIssue(l, {
-      path: "loops[0].practice[0].correct",
-      message: /"z" isn't one of this step's option ids/,
+      path: "bricks[1].correct",
+      message: /"z" isn't one of this brick's option ids/,
     })
   })
 
   it("checks that sort items point to real groups", () => {
     const l = buttons()
-    l.loops[1].practice[0].items[0].group = "nope"
+    l.bricks[4].items[0].group = "nope"
     expectIssue(l, {
-      path: "loops[1].practice[0].items[0].group",
-      message: /"nope" isn't one of this step's group ids/,
+      path: "bricks[4].items[0].group",
+      message: /"nope" isn't one of this brick's group ids/,
     })
   })
 
   it("checks that template gaps and blanks match", () => {
     const l = compound()
-    l.loops[0].practice[1].template = "$1,000 × [[x]] = $1,050"
+    l.bricks[2].template = "$1,000 × [[x]] = $1,050"
     expectIssue(l, { message: /\[\[x\]\] has no matching entry/ })
     expectIssue(l, { message: /Blank "g" doesn't appear in the template/ })
   })
 
   it("requires a blank's accepted answer to be among its chips", () => {
     const l = compound()
-    l.loops[0].practice[1].blanks[0].choices = ["0.05", "1.5"]
+    l.bricks[2].blanks[0].choices = ["0.05", "1.5"]
     expectIssue(l, {
-      path: "loops[0].practice[1].blanks[0].choices",
+      path: "bricks[2].blanks[0].choices",
       message: /can't be answered/,
     })
   })
 
   it("checks that hotspot answers exist in the visual", () => {
     const l = buttons()
-    l.loops[0].practice[1].correct = ["missing"]
+    l.bricks[2].correct = ["missing"]
     expectIssue(l, {
-      path: "loops[0].practice[1].correct",
+      path: "bricks[2].correct",
       message: /isn't one of this visual's hotspot ids \(create, learn\)/,
     })
   })
 
   it("checks that code hotspots point to real lines", () => {
     const l = loadExample("map-vs-foreach.json")
-    l.loops[1].practice[1].visual.hotspots[2].line = 9
+    l.bricks[5].visual.hotspots[2].line = 9
     expectIssue(l, { message: /Line 9 doesn't exist; the code has 3 lines/ })
   })
 
   it("checks alternative orders list every item once", () => {
     const l = buttons()
-    l.loops[1].practice[1].alsoAccept = [["a", "b"]]
+    l.bricks[5].alsoAccept = [["a", "b"]]
     expectIssue(l, {
-      path: "loops[1].practice[1].alsoAccept[0]",
+      path: "bricks[5].alsoAccept[0]",
       message: /every item id exactly once/,
     })
   })
@@ -158,9 +185,9 @@ describe("structure rules", () => {
 
   it("rejects formulas KaTeX can't render", () => {
     const l = compound()
-    l.loops[0].concept.visual.tex = "\\frac{1}{"
+    l.bricks[0].visual.tex = "\\frac{1}{"
     expectIssue(l, {
-      path: "loops[0].concept.visual.tex",
+      path: "bricks[0].visual.tex",
       message: /doesn't render/,
     })
   })
@@ -173,7 +200,7 @@ describe("structure rules", () => {
 })
 
 describe("v1 rules", () => {
-  it("rejects number steps", () => {
+  it("rejects number bricks", () => {
     const l = compound()
     l.challenge = {
       id: "ch",
@@ -185,15 +212,15 @@ describe("v1 rules", () => {
     expectIssue(l, {
       path: "challenge",
       kind: "v1",
-      message: /Number steps aren't supported in v1/,
+      message: /Number bricks aren't supported in v1/,
     })
   })
 
   it("rejects blanks without word chips", () => {
     const l = compound()
-    delete l.loops[0].practice[1].blanks[0].choices
+    delete l.bricks[2].blanks[0].choices
     expectIssue(l, {
-      path: "loops[0].practice[1].blanks[0]",
+      path: "bricks[2].blanks[0]",
       kind: "v1",
       message: /add a "choices" word bank/,
     })
@@ -203,29 +230,29 @@ describe("v1 rules", () => {
 describe("teaching rules", () => {
   it("requires feedback on every wrong option", () => {
     const l = buttons()
-    delete l.loops[0].practice[0].options[1].feedback
+    delete l.bricks[1].options[1].feedback
     expectIssue(l, {
-      path: "loops[0].practice[0].options[1]",
+      path: "bricks[1].options[1]",
       message: /Wrong option "b" has no feedback/,
     })
   })
 
-  it("lets a lesson repeat one step type when that's what fits", () => {
+  it("lets a lesson repeat one brick type when that's what fits", () => {
     const l = compound()
-    l.loops[0].practice[1] = { ...l.loops[0].practice[0], id: "p2" }
+    l.bricks[2] = { ...l.bricks[1], id: "p2" }
     expect(validateLesson(l).ok).toBe(true)
   })
 
   it("keeps prompts to 40 words", () => {
     const l = buttons()
-    l.loops[0].practice[0].prompt = Array(45).fill("word").join(" ")
-    expectIssue(l, { path: "loops[0].practice[0].prompt", message: /45 words/ })
+    l.bricks[1].prompt = Array(45).fill("word").join(" ")
+    expectIssue(l, { path: "bricks[1].prompt", message: /45 words/ })
   })
 
   it("requires at least one wrong option", () => {
     const l = buttons()
-    l.loops[0].practice[0].correct = ["a", "b", "c"]
-    l.loops[0].practice[0].multiple = true
+    l.bricks[1].correct = ["a", "b", "c"]
+    l.bricks[1].multiple = true
     expectIssue(l, { message: /At least one option must be wrong/ })
   })
 
@@ -245,13 +272,13 @@ describe("safety rules", () => {
     ["<a href='javascript:alert(1)'>x</a>", /javascript: URLs/],
   ])("rejects %s in a visual", (html, message) => {
     const l = buttons()
-    l.loops[0].concept.visual.html = html
+    l.bricks[0].visual.html = html
     expectIssue(l, { kind: "safety", message })
   })
 
   it("limits each HTML visual to 20 KB", () => {
     const l = buttons()
-    l.loops[0].concept.visual.html = `<div>${"x".repeat(21 * 1024)}</div>`
+    l.bricks[0].visual.html = `<div>${"x".repeat(21 * 1024)}</div>`
     expectIssue(l, {
       kind: "safety",
       message: /keep each HTML visual under 20 KB/,

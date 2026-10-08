@@ -1,5 +1,5 @@
 {
-  "spec": "0.2",
+  "spec": "0.3",
   "title": "JavaScript map vs forEach",
   "summary": "Know when to use map and when to use forEach, and why it matters.",
   "objective": "Choose map when you need a new array and forEach when you only need to do something with each item.",
@@ -33,139 +33,133 @@
     "multiple": false,
     "explanation": "**forEach** runs a function for each item but returns `undefined`. It's built for doing something, not for producing a new array."
   },
-  "loops": [
+  "bricks": [
     {
-      "concept": {
-        "id": "c1",
-        "title": "map builds a new array",
-        "body": "**map** calls your function on every item and collects each return value into a **new array** of the same length. The original array isn't changed.",
-        "visual": {
-          "kind": "code",
-          "language": "javascript",
-          "code": "const prices = [10, 20];\nconst withTax = prices.map(p => p * 1.2);\n// withTax: [12, 24]\n// prices:  [10, 20]"
-        }
-      },
-      "practice": [
-        {
-          "id": "p1",
-          "type": "blank",
-          "prompt": "Complete the code so it returns a new array of doubled numbers.",
-          "format": "code",
-          "language": "javascript",
-          "caseSensitive": true,
-          "template": "const doubled = nums.[[m]](n => n * 2);",
-          "blanks": [
-            {
-              "id": "m",
-              "accept": ["map"],
-              "choices": ["map", "forEach", "filter"],
-              "mistakes": [
-                {
-                  "answer": "forEach",
-                  "feedback": "forEach returns undefined, so `doubled` would be undefined."
-                },
-                {
-                  "answer": "filter",
-                  "feedback": "filter keeps or drops items. It doesn't change them."
-                }
-              ]
-            }
-          ],
-          "explanation": "**map** returns a new array with each number doubled."
-        },
-        {
-          "id": "p2",
-          "type": "choice",
-          "prompt": "What does this log?",
-          "visual": {
-            "kind": "code",
-            "language": "javascript",
-            "code": "const names = ['ada', 'linus'];\nconst upper = names.map(n => n.toUpperCase());\nconsole.log(names);"
-          },
-          "options": [
-            { "id": "a", "text": "`['ada', 'linus']`" },
-            {
-              "id": "b",
-              "text": "`['ADA', 'LINUS']`",
-              "feedback": "That's `upper`. map leaves the original array alone."
-            },
-            {
-              "id": "c",
-              "text": "`undefined`",
-              "feedback": "`names` is still the original array."
-            }
-          ],
-          "correct": ["a"],
-          "multiple": false,
-          "hint": "Which variable is being logged?",
-          "explanation": "map returns a new array, so `names` is unchanged."
-        }
-      ]
+      "id": "c1",
+      "type": "concept",
+      "title": "map builds a new array",
+      "body": "**map** calls your function on every item and collects each return value into a **new array** of the same length. The original array isn't changed.",
+      "visual": {
+        "kind": "code",
+        "language": "javascript",
+        "code": "const prices = [10, 20];\nconst withTax = prices.map(p => p * 1.2);\n// withTax: [12, 24]\n// prices:  [10, 20]"
+      }
     },
     {
-      "concept": {
-        "id": "c2",
-        "title": "forEach is for side effects",
-        "body": "Use **forEach** when you want to *do* something with each item, like logging, saving, or sending, and don't need a result back. If you need a new array, use **map**.",
-        "term": {
-          "word": "Side effect",
-          "definition": "Something a function does beyond returning a value, like writing to the console or a database."
-        },
-        "visual": {
-          "kind": "code",
-          "language": "javascript",
-          "code": "errors.forEach(e => console.error(e));\n// logs each error, returns undefined"
+      "id": "p1",
+      "type": "blank",
+      "prompt": "Complete the code so it returns a new array of doubled numbers.",
+      "format": "code",
+      "language": "javascript",
+      "caseSensitive": true,
+      "template": "const doubled = nums.[[m]](n => n * 2);",
+      "blanks": [
+        {
+          "id": "m",
+          "accept": ["map"],
+          "choices": ["map", "forEach", "filter"],
+          "mistakes": [
+            {
+              "answer": "forEach",
+              "feedback": "forEach returns undefined, so `doubled` would be undefined."
+            },
+            {
+              "answer": "filter",
+              "feedback": "filter keeps or drops items. It doesn't change them."
+            }
+          ]
         }
+      ],
+      "explanation": "**map** returns a new array with each number doubled."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "What does this log?",
+      "visual": {
+        "kind": "code",
+        "language": "javascript",
+        "code": "const names = ['ada', 'linus'];\nconst upper = names.map(n => n.toUpperCase());\nconsole.log(names);"
       },
-      "practice": [
+      "options": [
+        { "id": "a", "text": "`['ada', 'linus']`" },
         {
-          "id": "p3",
-          "type": "sort",
-          "prompt": "Which method fits each task?",
-          "groups": [
-            { "id": "map", "label": "map" },
-            { "id": "each", "label": "forEach" }
-          ],
-          "items": [
-            {
-              "id": "a",
-              "text": "Turn prices into formatted strings",
-              "group": "map"
-            },
-            {
-              "id": "b",
-              "text": "Log each error to the console",
-              "group": "each"
-            },
-            {
-              "id": "c",
-              "text": "Get the length of every word",
-              "group": "map"
-            },
-            { "id": "d", "text": "Send an email to each user", "group": "each" }
-          ],
-          "explanation": "If you need the results as a new array, use map. If you're just doing something for each item, use forEach."
+          "id": "b",
+          "text": "`['ADA', 'LINUS']`",
+          "feedback": "That's `upper`. map leaves the original array alone."
         },
         {
-          "id": "p4",
-          "type": "hotspot",
-          "prompt": "`totals` should be an array, but it's `undefined`. Tap the line that causes it.",
-          "visual": {
-            "kind": "code",
-            "language": "javascript",
-            "code": "const orders = getOrders();\nconst totals = orders.forEach(o => o.price * o.qty);\nshowTotals(totals);",
-            "hotspots": [
-              { "id": "l1", "line": 1 },
-              { "id": "l2", "line": 2 },
-              { "id": "l3", "line": 3 }
-            ]
-          },
-          "correct": ["l2"],
-          "multiple": false,
-          "hint": "Which line uses a method that always returns undefined?",
-          "explanation": "Line 2 uses **forEach**, which returns `undefined`. Switching it to **map** makes `totals` an array of order totals."
+          "id": "c",
+          "text": "`undefined`",
+          "feedback": "`names` is still the original array."
         }
-      ]
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Which variable is being logged?",
+      "explanation": "map returns a new array, so `names` is unchanged."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "forEach is for side effects",
+      "body": "Use **forEach** when you want to *do* something with each item, like logging, saving, or sending, and don't need a result back. If you need a new array, use **map**.",
+      "term": {
+        "word": "Side effect",
+        "definition": "Something a function does beyond returning a value, like writing to the console or a database."
+      },
+      "visual": {
+        "kind": "code",
+        "language": "javascript",
+        "code": "errors.forEach(e => console.error(e));\n// logs each error, returns undefined"
+      }
+    },
+    {
+      "id": "p3",
+      "type": "sort",
+      "prompt": "Which method fits each task?",
+      "groups": [
+        { "id": "map", "label": "map" },
+        { "id": "each", "label": "forEach" }
+      ],
+      "items": [
+        {
+          "id": "a",
+          "text": "Turn prices into formatted strings",
+          "group": "map"
+        },
+        {
+          "id": "b",
+          "text": "Log each error to the console",
+          "group": "each"
+        },
+        {
+          "id": "c",
+          "text": "Get the length of every word",
+          "group": "map"
+        },
+        { "id": "d", "text": "Send an email to each user", "group": "each" }
+      ],
+      "explanation": "If you need the results as a new array, use map. If you're just doing something for each item, use forEach."
+    },
+    {
+      "id": "p4",
+      "type": "hotspot",
+      "prompt": "`totals` should be an array, but it's `undefined`. Tap the line that causes it.",
+      "visual": {
+        "kind": "code",
+        "language": "javascript",
+        "code": "const orders = getOrders();\nconst totals = orders.forEach(o => o.price * o.qty);\nshowTotals(totals);",
+        "hotspots": [
+          { "id": "l1", "line": 1 },
+          { "id": "l2", "line": 2 },
+          { "id": "l3", "line": 3 }
+        ]
+      },
+      "correct": ["l2"],
+      "multiple": false,
+      "hint": "Which line uses a method that always returns undefined?",
+      "explanation": "Line 2 uses **forEach**, which returns `undefined`. Switching it to **map** makes `totals` an array of order totals."
     }
   ],
   "challenge": {

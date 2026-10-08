@@ -88,7 +88,7 @@ describe("publishing", () => {
 
   it("rejects an invalid lesson with the spec's issues", async () => {
     const lesson = JSON.parse(buttons)
-    delete lesson.loops[0].practice[0].options[1].feedback
+    delete lesson.bricks[1].options[1].feedback
     const reply = await publishLesson(
       { text: JSON.stringify(lesson), client: "x" },
       deps
@@ -97,9 +97,7 @@ describe("publishing", () => {
     expect(reply.body).toMatchObject({
       ok: false,
       error: "invalid_lesson",
-      issues: [
-        expect.objectContaining({ path: "loops[0].practice[0].options[1]" }),
-      ],
+      issues: [expect.objectContaining({ path: "bricks[1].options[1]" })],
     })
   })
 
@@ -115,6 +113,29 @@ describe("publishing", () => {
       status: 422,
       body: { error: "unsupported_spec", skill: { updateAvailable: true } },
     })
+  })
+
+  it("upgrades a spec 0.2 lesson from an older skill", async () => {
+    const { bricks, ...rest } = JSON.parse(buttons)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const loops: { concept: any; practice: any[] }[] = []
+    for (const { type, ...brick } of bricks)
+      if (type === "concept") loops.push({ concept: brick, practice: [] })
+      else loops.at(-1)!.practice.push({ type, ...brick })
+    const reply = await publishLesson(
+      {
+        text: JSON.stringify({ ...rest, spec: "0.2", loops }),
+        client: "x",
+        skillVersion: "0.2.0",
+      },
+      deps
+    )
+    expect(reply).toMatchObject({
+      status: 201,
+      body: { spec: "0.3", skill: { updateAvailable: true } },
+    })
+    const stored = await deps.store.get(reply.body.id as string)
+    expect(stored?.lesson).toEqual(JSON.parse(buttons))
   })
 
   it("tells an older skill to update", async () => {

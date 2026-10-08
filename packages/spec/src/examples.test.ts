@@ -16,7 +16,7 @@ describe("example lessons", () => {
     ])
   })
 
-  it.each(files)("%s is a valid v0.2 lesson", (file) => {
+  it.each(files)("%s is a valid v0.3 lesson", (file) => {
     const result = validateLesson(readExample(file))
     if (!result.ok)
       throw new Error(`${file} has issues:\n${formatIssues(result.issues)}`)

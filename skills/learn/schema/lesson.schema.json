@@ -4,7 +4,7 @@
   "properties": {
     "spec": {
       "type": "string",
-      "const": "0.2"
+      "const": "0.3"
     },
     "title": {
       "type": "string",
@@ -65,18 +65,18 @@
       "additionalProperties": false
     },
     "hook": {
-      "$ref": "#/$defs/HookStep"
+      "$ref": "#/$defs/HookBrick"
     },
-    "loops": {
-      "minItems": 1,
-      "maxItems": 3,
+    "bricks": {
+      "minItems": 3,
+      "maxItems": 15,
       "type": "array",
       "items": {
-        "$ref": "#/$defs/Loop"
+        "$ref": "#/$defs/Brick"
       }
     },
     "challenge": {
-      "$ref": "#/$defs/Step"
+      "$ref": "#/$defs/QuestionBrick"
     },
     "wrapup": {
       "type": "object",
@@ -110,23 +110,23 @@
     "level",
     "estimatedMinutes",
     "hook",
-    "loops",
+    "bricks",
     "challenge",
     "wrapup"
   ],
   "additionalProperties": false,
   "$defs": {
-    "HookStep": {
+    "HookBrick": {
       "oneOf": [
         {
-          "$ref": "#/$defs/ChoiceStep"
+          "$ref": "#/$defs/ChoiceBrick"
         },
         {
-          "$ref": "#/$defs/CompareStep"
+          "$ref": "#/$defs/CompareBrick"
         }
       ]
     },
-    "ChoiceStep": {
+    "ChoiceBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -326,7 +326,7 @@
       ],
       "additionalProperties": false
     },
-    "CompareStep": {
+    "CompareBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -377,34 +377,51 @@
       ],
       "additionalProperties": false
     },
-    "Loop": {
-      "type": "object",
-      "properties": {
-        "concept": {
-          "$ref": "#/$defs/Concept"
+    "Brick": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ConceptBrick"
         },
-        "practice": {
-          "minItems": 2,
-          "maxItems": 4,
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Step"
-          }
+        {
+          "$ref": "#/$defs/ChoiceBrick"
+        },
+        {
+          "$ref": "#/$defs/CompareBrick"
+        },
+        {
+          "$ref": "#/$defs/OrderBrick"
+        },
+        {
+          "$ref": "#/$defs/SortBrick"
+        },
+        {
+          "$ref": "#/$defs/MatchBrick"
+        },
+        {
+          "$ref": "#/$defs/BlankBrick"
+        },
+        {
+          "$ref": "#/$defs/HotspotBrick"
+        },
+        {
+          "$ref": "#/$defs/ScenarioBrick"
+        },
+        {
+          "$ref": "#/$defs/NumberBrick"
         }
-      },
-      "required": [
-        "concept",
-        "practice"
-      ],
-      "additionalProperties": false
+      ]
     },
-    "Concept": {
+    "ConceptBrick": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
           "minLength": 1,
           "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "concept"
         },
         "title": {
           "type": "string",
@@ -439,43 +456,13 @@
       },
       "required": [
         "id",
+        "type",
         "title",
         "body"
       ],
       "additionalProperties": false
     },
-    "Step": {
-      "oneOf": [
-        {
-          "$ref": "#/$defs/ChoiceStep"
-        },
-        {
-          "$ref": "#/$defs/CompareStep"
-        },
-        {
-          "$ref": "#/$defs/OrderStep"
-        },
-        {
-          "$ref": "#/$defs/SortStep"
-        },
-        {
-          "$ref": "#/$defs/MatchStep"
-        },
-        {
-          "$ref": "#/$defs/BlankStep"
-        },
-        {
-          "$ref": "#/$defs/HotspotStep"
-        },
-        {
-          "$ref": "#/$defs/ScenarioStep"
-        },
-        {
-          "$ref": "#/$defs/NumberStep"
-        }
-      ]
-    },
-    "OrderStep": {
+    "OrderBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -557,7 +544,7 @@
       ],
       "additionalProperties": false
     },
-    "SortStep": {
+    "SortBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -659,7 +646,7 @@
       ],
       "additionalProperties": false
     },
-    "MatchStep": {
+    "MatchBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -729,7 +716,7 @@
       ],
       "additionalProperties": false
     },
-    "BlankStep": {
+    "BlankBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -860,7 +847,7 @@
       ],
       "additionalProperties": false
     },
-    "HotspotStep": {
+    "HotspotBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -918,7 +905,7 @@
       ],
       "additionalProperties": false
     },
-    "ScenarioStep": {
+    "ScenarioBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -1003,7 +990,7 @@
       ],
       "additionalProperties": false
     },
-    "NumberStep": {
+    "NumberBrick": {
       "type": "object",
       "properties": {
         "id": {
@@ -1070,7 +1057,38 @@
         "answer"
       ],
       "additionalProperties": false
+    },
+    "QuestionBrick": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ChoiceBrick"
+        },
+        {
+          "$ref": "#/$defs/CompareBrick"
+        },
+        {
+          "$ref": "#/$defs/OrderBrick"
+        },
+        {
+          "$ref": "#/$defs/SortBrick"
+        },
+        {
+          "$ref": "#/$defs/MatchBrick"
+        },
+        {
+          "$ref": "#/$defs/BlankBrick"
+        },
+        {
+          "$ref": "#/$defs/HotspotBrick"
+        },
+        {
+          "$ref": "#/$defs/ScenarioBrick"
+        },
+        {
+          "$ref": "#/$defs/NumberBrick"
+        }
+      ]
     }
   },
-  "title": "Lesson (spec 0.2)"
+  "title": "Lesson (spec 0.3)"
 }

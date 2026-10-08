@@ -2,7 +2,11 @@ import { readFileSync } from "node:fs"
 
 import { describe, expect, it } from "vitest"
 
-import { validateLesson, type Lesson, type Step } from "@workspace/spec"
+import {
+  validateLesson,
+  type Lesson,
+  type QuestionBrick,
+} from "@workspace/spec"
 
 import {
   checkAnswer,
@@ -40,38 +44,40 @@ const allLessons = [
   prd,
   lesson("compound-interest.json"),
 ]
-const allSteps = allLessons.flatMap((l) => [
+const allQuestions = allLessons.flatMap((l) => [
   l.hook,
-  ...l.loops.flatMap((x) => x.practice),
+  ...l.bricks.filter((b): b is QuestionBrick => b.type !== "concept"),
   l.challenge,
 ])
 
-const p = (l: Lesson, loop: number, i: number) => l.loops[loop]!.practice[i]!
+/** The i-th question brick after a lesson's nth concept brick. */
+const p = (l: Lesson, concept: number, i: number) => {
+  const at = l.bricks.filter((b) => b.type === "concept")[concept]!
+  return l.bricks[l.bricks.indexOf(at) + 1 + i] as QuestionBrick
+}
 
-describe("every step in every example", () => {
-  it.each(allSteps.map((s) => [s.id + ":" + s.type, s] as [string, Step]))(
-    "%s: its solution checks as correct",
-    (_, step) => {
-      expect(isReady(step, solution(step))).toBe(true)
-      expect(checkAnswer(step, solution(step)).correct).toBe(true)
-    }
-  )
+describe("every question in every example", () => {
+  it.each(
+    allQuestions.map((s) => [s.id + ":" + s.type, s] as [string, QuestionBrick])
+  )("%s: its solution checks as correct", (_, brick) => {
+    expect(isReady(brick, solution(brick))).toBe(true)
+    expect(checkAnswer(brick, solution(brick)).correct).toBe(true)
+  })
 
-  it.each(allSteps.map((s) => [s.id + ":" + s.type, s] as [string, Step]))(
-    "%s: the starting answer isn't already correct",
-    (_, step) => {
-      const start = initialAnswer(step, () => 0.42)
-      expect(isReady(step, start) && checkAnswer(step, start).correct).toBe(
-        false
-      )
-    }
-  )
+  it.each(
+    allQuestions.map((s) => [s.id + ":" + s.type, s] as [string, QuestionBrick])
+  )("%s: the starting answer isn't already correct", (_, brick) => {
+    const start = initialAnswer(brick, () => 0.42)
+    expect(isReady(brick, start) && checkAnswer(brick, start).correct).toBe(
+      false
+    )
+  })
 })
 
 describe("choice", () => {
-  const step = p(buttons, 0, 0)
+  const brick = p(buttons, 0, 0)
   it("uses the option's own feedback for a wrong pick", () => {
-    const r = checkAnswer(step, { kind: "select", ids: ["b"] })
+    const r = checkAnswer(brick, { kind: "select", ids: ["b"] })
     expect(r).toMatchObject({
       correct: false,
       feedback: expect.stringMatching(/pulls people away/),
@@ -83,7 +89,7 @@ describe("choice", () => {
     expect(r).toMatchObject({ correct: false, missKey: "missOne" })
   })
   it("clears the selection on retry", () => {
-    expect(retryAnswer(step, { kind: "select", ids: ["b"] })).toEqual({
+    expect(retryAnswer(brick, { kind: "select", ids: ["b"] })).toEqual({
       kind: "select",
       ids: [],
     })
@@ -103,16 +109,16 @@ describe("scenario", () => {
 })
 
 describe("sort", () => {
-  const step = p(buttons, 1, 0)
+  const brick = p(buttons, 1, 0)
   it("isn't ready until the pool is empty", () => {
-    expect(isReady(step, initialAnswer(step))).toBe(false)
+    expect(isReady(brick, initialAnswer(brick))).toBe(false)
   })
   it("counts items in the wrong group", () => {
     const answer: Answer = {
       kind: "zones",
       zones: { [POOL]: [], pri: ["a", "b"], sec: ["c"], ter: ["d", "e"] },
     }
-    expect(checkAnswer(step, answer)).toMatchObject({
+    expect(checkAnswer(brick, answer)).toMatchObject({
       correct: false,
       missKey: "sort",
       count: 1,
@@ -124,23 +130,26 @@ describe("sort", () => {
       kind: "zones",
       zones: { [POOL]: [], pri: ["a", "b"], sec: ["c"], ter: ["d", "e"] },
     }
-    expect(retryAnswer(step, answer)).toBe(answer)
+    expect(retryAnswer(brick, answer)).toBe(answer)
   })
 })
 
 describe("order", () => {
   it("accepts an alternative order", () => {
-    const step = { ...p(buttons, 1, 1), alsoAccept: [["b", "a", "c"]] } as Step
+    const brick = {
+      ...p(buttons, 1, 1),
+      alsoAccept: [["b", "a", "c"]],
+    } as QuestionBrick
     expect(
-      checkAnswer(step, { kind: "sequence", ids: ["b", "a", "c"] }).correct
+      checkAnswer(brick, { kind: "sequence", ids: ["b", "a", "c"] }).correct
     ).toBe(true)
   })
 })
 
 describe("match", () => {
-  const step = p(spanish, 0, 0)
+  const brick = p(spanish, 0, 0)
   it("counts mismatched pairs and marks both sides", () => {
-    const r = checkAnswer(step, {
+    const r = checkAnswer(brick, {
       kind: "pairs",
       links: { 0: 1, 1: 0, 2: 2, 3: 3 },
     })
@@ -154,9 +163,9 @@ describe("match", () => {
 })
 
 describe("blank", () => {
-  const step = p(spanish, 1, 0)
+  const brick = p(spanish, 1, 0)
   it("uses a decoy's mistake feedback", () => {
-    const r = checkAnswer(step, {
+    const r = checkAnswer(brick, {
       kind: "gaps",
       values: { c: "Dónde", g: "gracias" },
     })
@@ -174,7 +183,7 @@ describe("blank", () => {
   })
   it("empties only the wrong gaps on retry", () => {
     expect(
-      retryAnswer(step, { kind: "gaps", values: { c: "Qué", g: "gracias" } })
+      retryAnswer(brick, { kind: "gaps", values: { c: "Qué", g: "gracias" } })
     ).toEqual({ kind: "gaps", values: { c: "", g: "gracias" } })
   })
 })
@@ -190,10 +199,10 @@ describe("hotspot", () => {
 describe("flow", () => {
   it("plays intro, hook, each concept and its practice, challenge, fix slot, wrap-up", () => {
     const kinds = buildSequence(buttons).map((i) =>
-      i.kind === "step"
-        ? `${i.role}:${i.step.id}`
+      i.kind === "question"
+        ? `${i.role}:${i.brick.id}`
         : i.kind === "concept"
-          ? `concept:${i.concept.id}`
+          ? `concept:${i.brick.id}`
           : i.kind
     )
     expect(kinds).toEqual([
@@ -237,12 +246,12 @@ describe("flow", () => {
       )
     ).toBe(100)
   })
-  it("splits progress into one part per loop plus the challenge", () => {
+  it("splits progress into one part per concept plus the challenge", () => {
     const items = buildSequence(prd)
     const at = (kind: string, n = 0) =>
       items.findIndex(
         (i, k) =>
-          (i.kind === kind || (i.kind === "step" && i.role === kind)) &&
+          (i.kind === kind || (i.kind === "question" && i.role === kind)) &&
           items.slice(0, k).filter((j) => j.kind === kind).length === n
       )
     expect(partAt(items, 0, false)).toEqual({
@@ -253,12 +262,12 @@ describe("flow", () => {
     })
     // The warm-up starts part 1; the first concept comes next in the same part.
     expect(partAt(items, at("hook"), false).current).toBe(0)
-    const loop2 = at("concept", 1)
-    expect(partAt(items, loop2, false)).toMatchObject({
+    const concept2 = at("concept", 1)
+    expect(partAt(items, concept2, false)).toMatchObject({
       current: 1,
       fraction: 0,
     })
-    expect(partAt(items, loop2 + 1, false).fraction).toBeCloseTo(1 / 3)
+    expect(partAt(items, concept2 + 1, false).fraction).toBeCloseTo(1 / 3)
     expect(partAt(items, at("challenge"), false)).toMatchObject({
       current: 3,
       fraction: 0,

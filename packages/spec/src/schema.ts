@@ -1,10 +1,10 @@
 import { z } from "zod"
 
-// Lesson spec v0.2: the shape of a lesson file.
+// Lesson spec v0.3: the shape of a lesson file.
 // Structural limits that JSON Schema can express live here; cross-field and
 // teaching-quality rules live in rules.ts.
 
-export const SPEC_VERSION = "0.2" as const
+export const SPEC_VERSION = "0.3" as const
 
 const id = z.string().min(1).max(64)
 /** Markdown subset: **bold**, *italic*, `code`, and inline formulas as \( ... \). A $ is always a dollar sign. */
@@ -61,7 +61,8 @@ export const option = z
   })
   .meta({ id: "Option" })
 
-const stepBase = {
+/** What every question brick has. */
+const questionBase = {
   id,
   prompt: richText,
   visual: visual.optional(),
@@ -75,26 +76,26 @@ const textMistake = z.strictObject({
 })
 const numberMistake = z.strictObject({ answer: z.number(), feedback: richText })
 
-// ---------- the nine building blocks ----------
+// ---------- bricks: one concept brick and nine question bricks ----------
 
-export const choiceStep = z
+export const choiceBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("choice"),
     options: z.array(option).min(2).max(5),
     correct: z.array(id).min(1),
     multiple: z.boolean(),
   })
-  .meta({ id: "ChoiceStep" })
+  .meta({ id: "ChoiceBrick" })
 
-export const compareStep = z
+export const compareBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("compare"),
     options: z.array(option).length(2),
     correct: id,
   })
-  .meta({ id: "CompareStep" })
+  .meta({ id: "CompareBrick" })
 
 export const orderItem = z
   .strictObject({
@@ -108,20 +109,20 @@ export const orderItem = z
   })
   .meta({ id: "OrderItem" })
 
-export const orderStep = z
+export const orderBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("order"),
     /** Written in the correct order; the player shuffles them. */
     items: z.array(orderItem).min(3).max(6),
     /** Other valid orders, as arrays of item ids. */
     alsoAccept: z.array(z.array(id)).optional(),
   })
-  .meta({ id: "OrderStep" })
+  .meta({ id: "OrderBrick" })
 
-export const sortStep = z
+export const sortBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("sort"),
     groups: z
       .array(
@@ -145,11 +146,11 @@ export const sortStep = z
       .min(4)
       .max(8),
   })
-  .meta({ id: "SortStep" })
+  .meta({ id: "SortBrick" })
 
-export const matchStep = z
+export const matchBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("match"),
     pairs: z
       .array(z.strictObject({ left: richText, right: richText }))
@@ -158,7 +159,7 @@ export const matchStep = z
     leftLang: langCode.optional(),
     rightLang: langCode.optional(),
   })
-  .meta({ id: "MatchStep" })
+  .meta({ id: "MatchBrick" })
 
 export const blank = z
   .strictObject({
@@ -173,9 +174,9 @@ export const blank = z
   })
   .meta({ id: "Blank" })
 
-export const blankStep = z
+export const blankBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("blank"),
     /** Text or code with [[id]] gaps. */
     template: z.string().min(1),
@@ -185,22 +186,22 @@ export const blankStep = z
     caseSensitive: z.boolean().optional(),
     blanks: z.array(blank).min(1),
   })
-  .meta({ id: "BlankStep" })
+  .meta({ id: "BlankBrick" })
 
-export const hotspotStep = z
+export const hotspotBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("hotspot"),
     /** An html visual with data-hotspot elements, or a code visual with hotspots. */
     visual: z.discriminatedUnion("kind", [htmlVisual, codeVisual]),
     correct: z.array(id).min(1),
     multiple: z.boolean(),
   })
-  .meta({ id: "HotspotStep" })
+  .meta({ id: "HotspotBrick" })
 
-export const scenarioStep = z
+export const scenarioBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("scenario"),
     situation: richText,
     options: z
@@ -216,44 +217,25 @@ export const scenarioStep = z
       .min(2)
       .max(4),
   })
-  .meta({ id: "ScenarioStep" })
+  .meta({ id: "ScenarioBrick" })
 
 /** Defined in the spec, but not allowed in v1 lessons (numeric questions use choice). */
-export const numberStep = z
+export const numberBrick = z
   .strictObject({
-    ...stepBase,
+    ...questionBase,
     type: z.literal("number"),
     answer: z.number(),
     tolerance: z.number().nonnegative().optional(),
     unit: z.string().min(1).optional(),
     mistakes: z.array(numberMistake).optional(),
   })
-  .meta({ id: "NumberStep" })
+  .meta({ id: "NumberBrick" })
 
-export const step = z
-  .discriminatedUnion("type", [
-    choiceStep,
-    compareStep,
-    orderStep,
-    sortStep,
-    matchStep,
-    blankStep,
-    hotspotStep,
-    scenarioStep,
-    numberStep,
-  ])
-  .meta({ id: "Step" })
-
-/** The hook is a guess before any teaching, so it's always a choice or compare step. */
-export const hookStep = z
-  .discriminatedUnion("type", [choiceStep, compareStep])
-  .meta({ id: "HookStep" })
-
-// ---------- lesson ----------
-
-export const concept = z
+/** Theory: one short idea, shown before the questions that practise it. Not scored. */
+export const conceptBrick = z
   .strictObject({
     id,
+    type: z.literal("concept"),
     title: z.string().min(1).max(60),
     body: richText,
     visual: visual.optional(),
@@ -261,14 +243,33 @@ export const concept = z
       .strictObject({ word: z.string().min(1), definition: richText })
       .optional(),
   })
-  .meta({ id: "Concept" })
+  .meta({ id: "ConceptBrick" })
 
-export const loop = z
-  .strictObject({
-    concept,
-    practice: z.array(step).min(2).max(4),
-  })
-  .meta({ id: "Loop" })
+/** A brick that asks the learner something and checks the answer. */
+export const questionBrick = z
+  .discriminatedUnion("type", [
+    choiceBrick,
+    compareBrick,
+    orderBrick,
+    sortBrick,
+    matchBrick,
+    blankBrick,
+    hotspotBrick,
+    scenarioBrick,
+    numberBrick,
+  ])
+  .meta({ id: "QuestionBrick" })
+
+export const brick = z
+  .discriminatedUnion("type", [conceptBrick, ...questionBrick.options])
+  .meta({ id: "Brick" })
+
+/** The hook is a guess before any teaching, so it's always a choice or compare brick. */
+export const hookBrick = z
+  .discriminatedUnion("type", [choiceBrick, compareBrick])
+  .meta({ id: "HookBrick" })
+
+// ---------- lesson ----------
 
 export const lesson = z.strictObject({
   spec: z.literal(SPEC_VERSION),
@@ -283,9 +284,13 @@ export const lesson = z.strictObject({
   source: z
     .strictObject({ title: z.string().min(1), url: z.url().optional() })
     .optional(),
-  hook: hookStep,
-  loops: z.array(loop).min(1).max(3),
-  challenge: step,
+  hook: hookBrick,
+  /**
+   * The teaching part, in play order: each concept brick is followed by the 2–4 question bricks
+   * that practise it. The rhythm is checked in rules.ts.
+   */
+  bricks: z.array(brick).min(3).max(15),
+  challenge: questionBrick,
   wrapup: z.strictObject({
     takeaways: z.array(richText).min(2).max(4),
     next: z.string().min(1).optional(),
@@ -293,6 +298,7 @@ export const lesson = z.strictObject({
 })
 
 export type Lesson = z.infer<typeof lesson>
-export type Step = z.infer<typeof step>
+export type Brick = z.infer<typeof brick>
+export type QuestionBrick = z.infer<typeof questionBrick>
+export type ConceptBrick = z.infer<typeof conceptBrick>
 export type Visual = z.infer<typeof visual>
-export type Concept = z.infer<typeof concept>

@@ -5,12 +5,12 @@ description: Turn anything the user gives you (a topic, an article, notes, docs,
 
 # Learn: make one interactive lesson and publish it
 
-You write one lesson as a JSON file that follows the lesson spec (v0.2), check it, and publish it. The learner opens the link and plays it: short steps, instant feedback, Duolingo/Brilliant style. Links expire after 24 hours.
+You write one lesson as a JSON file that follows the lesson spec (v0.3), check it, and publish it. The learner opens the link and plays it: short bricks, instant feedback, Duolingo/Brilliant style. Links expire after 24 hours.
 
 ## Steps
 
 1. **Pick one core idea.** Read what the user gave you. A lesson teaches one idea in 5–10 minutes. If the input covers several ideas, pick the central one, and tell the user the rest would make good follow-up lessons.
-2. **Read the guides before writing.** Read `reference/teaching-guide.md` (how to teach well, which building block to use when, visuals) and `reference/lesson-format.md` (every field). Look at one or two files in `examples/` that are closest to the topic.
+2. **Read the guides before writing.** Read `reference/teaching-guide.md` (how to teach well, which brick to use when, visuals) and `reference/lesson-format.md` (every field). Look at one or two files in `examples/` that are closest to the topic.
 3. **Write the lesson file**, e.g. `lesson.json` in the current folder, following the format exactly. `schema/lesson.schema.json` is the formal JSON Schema.
 4. **Check it** and fix every issue it reports, then check again until it passes:
    ```bash
@@ -28,16 +28,16 @@ If `publish` prints that a newer version of the skill is available, tell the use
 ## Rules that matter most
 
 - **Accuracy over flourish.** Teach only what's true and supported by the user's input or well-established knowledge. Don't invent statistics, quotes, studies, or examples presented as real.
-- **One idea, interleaved.** Hook (a guess before any teaching) → 1–3 loops of one short concept card followed right away by 2–4 practice steps → one harder challenge → 2–4 takeaways.
-- **Exercises fit the content.** Pick each step's type by asking how a good teacher would test that point, not to fill a quota. Repeating a type is fine; a forced `order` or `match` isn't.
-- **Every wrong option teaches.** Each wrong option needs `feedback` that explains the misconception, and every step needs an `explanation`. Build wrong options from real, common mistakes.
-- **v1 limits:** no `number` steps (ask numeric questions as `choice` with mistake-based options), every `blank` uses word chips (`choices`), no images or photos, no typed answers.
+- **One idea, interleaved.** Hook (a guess before any teaching) → `bricks`: 1–3 short `concept` bricks, each followed right away by 2–4 question bricks that practise it → one harder challenge → 2–4 takeaways.
+- **Bricks fit the content.** Pick each question brick's type by asking how a good teacher would test that point, not to fill a quota. Repeating a type is fine; a forced `order` or `match` isn't.
+- **Every wrong option teaches.** Each wrong option needs `feedback` that explains the misconception, and every question brick needs an `explanation`. Build wrong options from real, common mistakes.
+- **v1 limits:** no `number` bricks (ask numeric questions as `choice` with mistake-based options), every `blank` uses word chips (`choices`), no images or photos, no typed answers.
 - **Visuals are plain HTML with the built-in UI kit** (Basecoat classes and Tailwind utilities). No scripts, event handlers, iframes, forms, or external URLs; the checker rejects them.
 - **Language:** write all learner-facing text in the lesson's `language`. Never translate code.
 
 ## Files
 
-- `reference/teaching-guide.md`: how to design the lesson, choose building blocks, write feedback, and build visuals
+- `reference/teaching-guide.md`: how to design the lesson, choose bricks, write feedback, and build visuals
 - `reference/lesson-format.md`: every field of the lesson file, with short examples
 - `schema/lesson.schema.json`: the formal JSON Schema (the checker also enforces cross-field rules it can't express)
 - `examples/*.json`: five complete, valid lessons (UI design, product management, finance, Spanish, JavaScript)

@@ -3,7 +3,10 @@
 import * as React from "react"
 import { CheckIcon, XIcon } from "lucide-react"
 
-import type { Step } from "@workspace/spec"
+import type {
+  ConceptBrick as ConceptBrickData,
+  QuestionBrick,
+} from "@workspace/spec"
 import { Kbd } from "@workspace/ui/components/kbd"
 import { Selectable } from "@workspace/ui/components/selectable"
 import { cn } from "@workspace/ui/lib/utils"
@@ -14,8 +17,8 @@ import { DropZone } from "./dnd"
 import { RichText } from "./rich-text"
 import { Visual } from "./visuals"
 
-export interface ExerciseProps {
-  step: Step
+export interface QuestionBrickProps {
+  brick: QuestionBrick
   answer: Answer
   setAnswer: (answer: Answer) => void
   marks: Record<string, Mark>
@@ -56,24 +59,47 @@ function KeyHint({ i, mark }: { i: number; mark?: Mark }) {
   )
 }
 
+// ---------- concept ----------
+
+/** Theory: one idea with an optional visual and a key term. Nothing to answer. */
+export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
+  return (
+    <>
+      <h2 className="text-2xl font-semibold text-balance">{brick.title}</h2>
+      {brick.visual ? <Visual visual={brick.visual} /> : null}
+      <p className="text-base">
+        <RichText text={brick.body} />
+      </p>
+      {brick.term ? (
+        <div className="flex items-baseline gap-3 rounded-lg bg-secondary px-4 py-3 text-secondary-foreground">
+          <strong className="font-semibold whitespace-nowrap">
+            {brick.term.word}
+          </strong>
+          <RichText text={brick.term.definition} />
+        </div>
+      ) : null}
+    </>
+  )
+}
+
 // ---------- choice, compare, scenario ----------
 
-export function OptionsExercise({
-  step,
+export function OptionsBrick({
+  brick,
   answer,
   setAnswer,
   marks,
   locked,
   order,
   showOutcomes,
-}: ExerciseProps & { order: string[]; showOutcomes: string[] }) {
+}: QuestionBrickProps & { order: string[]; showOutcomes: string[] }) {
   const { t } = usePlayer()
   const isOptions =
-    step.type === "choice" ||
-    step.type === "compare" ||
-    step.type === "scenario"
+    brick.type === "choice" ||
+    brick.type === "compare" ||
+    brick.type === "scenario"
   const selected = answer.kind === "select" ? answer.ids : []
-  const multiple = step.type === "choice" && step.multiple
+  const multiple = brick.type === "choice" && brick.multiple
   const toggle = (id: string) => {
     if (multiple)
       setAnswer({
@@ -87,7 +113,7 @@ export function OptionsExercise({
   const options = isOptions
     ? order
         .map((id) =>
-          (step.options as { id: string }[]).find((o) => o.id === id)!
+          (brick.options as { id: string }[]).find((o) => o.id === id)!
         )
         .filter(Boolean)
     : []
@@ -118,8 +144,8 @@ export function OptionsExercise({
   return (
     <div
       role="group"
-      aria-label={step.prompt}
-      className={cn("grid gap-3", step.type === "compare" && "sm:grid-cols-2")}
+      aria-label={brick.prompt}
+      className={cn("grid gap-3", brick.type === "compare" && "sm:grid-cols-2")}
     >
       {options.map((raw, i) => {
         const o = raw as {
@@ -129,7 +155,7 @@ export function OptionsExercise({
           lang?: string
           outcome?: string
         }
-        const isCompare = step.type === "compare"
+        const isCompare = brick.type === "compare"
         return (
           <Selectable
             key={o.id}
@@ -195,19 +221,19 @@ export function OptionsExercise({
 
 // ---------- hotspot ----------
 
-export function HotspotExercise({
-  step,
+export function HotspotBrick({
+  brick,
   answer,
   setAnswer,
   marks,
   locked,
-}: ExerciseProps) {
-  if (step.type !== "hotspot") return null
+}: QuestionBrickProps) {
+  if (brick.type !== "hotspot") return null
   const selected = answer.kind === "select" ? answer.ids : []
   const onToggle = (id: string) =>
     setAnswer({
       kind: "select",
-      ids: step.multiple
+      ids: brick.multiple
         ? selected.includes(id)
           ? selected.filter((x) => x !== id)
           : [...selected, id]
@@ -215,9 +241,9 @@ export function HotspotExercise({
     })
   return (
     <Visual
-      visual={step.visual}
+      visual={brick.visual}
       hotspots={{ selected, marks, onToggle, disabled: locked }}
-      label={step.prompt}
+      label={brick.prompt}
     />
   )
 }
@@ -242,16 +268,16 @@ function moveItem(
   return next
 }
 
-export function SortExercise({
-  step,
+export function SortBrick({
+  brick,
   answer,
   setAnswer,
   marks,
   locked,
-}: ExerciseProps) {
+}: QuestionBrickProps) {
   const { t } = usePlayer()
-  if (step.type !== "sort" || answer.kind !== "zones") return null
-  const byId = new Map(step.items.map((i) => [i.id, i]))
+  if (brick.type !== "sort" || answer.kind !== "zones") return null
+  const byId = new Map(brick.items.map((i) => [i.id, i]))
   const zoneItems = (zone: string) =>
     (answer.zones[zone] ?? []).map((id) => {
       const it = byId.get(id)!
@@ -283,10 +309,10 @@ export function SortExercise({
       <div
         className={cn(
           "grid gap-3",
-          step.groups.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"
+          brick.groups.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"
         )}
       >
-        {step.groups.map((g) => (
+        {brick.groups.map((g) => (
           <div key={g.id} className="flex min-w-0 flex-col gap-2">
             <div
               lang={g.lang}
@@ -310,15 +336,15 @@ export function SortExercise({
   )
 }
 
-export function OrderExercise({
-  step,
+export function OrderBrick({
+  brick,
   answer,
   setAnswer,
   marks,
   locked,
-}: ExerciseProps) {
-  if (step.type !== "order" || answer.kind !== "sequence") return null
-  const byId = new Map(step.items.map((i) => [i.id, i]))
+}: QuestionBrickProps) {
+  if (brick.type !== "order" || answer.kind !== "sequence") return null
+  const byId = new Map(brick.items.map((i) => [i.id, i]))
   const items = answer.ids.map((id) => {
     const it = byId.get(id)!
     return {
@@ -341,7 +367,7 @@ export function OrderExercise({
   return (
     <DropZone
       zoneId="order"
-      label={step.prompt}
+      label={brick.prompt}
       items={items}
       emptyText=""
       onMove={onMove}
@@ -354,16 +380,16 @@ export function OrderExercise({
 
 const PAIR_COLORS = ["#3b6cf6", "#d98b06", "#d6337a", "#0f9a9a", "#8b5cf6"]
 
-export function MatchExercise({
-  step,
+export function MatchBrick({
+  brick,
   answer,
   setAnswer,
   marks,
   locked,
   rightOrder,
-}: ExerciseProps & { rightOrder: number[] }) {
+}: QuestionBrickProps & { rightOrder: number[] }) {
   const [armed, setArmed] = React.useState<number | null>(null)
-  if (step.type !== "match" || answer.kind !== "pairs") return null
+  if (brick.type !== "match" || answer.kind !== "pairs") return null
   const links = answer.links
   const paired = Object.keys(links)
     .map(Number)
@@ -412,14 +438,14 @@ export function MatchExercise({
   return (
     <div className="grid grid-cols-2 gap-3">
       <div className="flex min-w-0 flex-col gap-2">
-        {step.pairs.map((p, i) => (
+        {brick.pairs.map((p, i) => (
           <Selectable
             key={i}
             isSelected={armed === i}
             onChange={() => pressLeft(i)}
             isDisabled={locked}
             data-status={marks[`L${i}`]}
-            lang={step.leftLang}
+            lang={brick.leftLang}
             className={chip}
           >
             {badge(pairNumber(i))}
@@ -437,11 +463,11 @@ export function MatchExercise({
               onChange={() => pressRight(j)}
               isDisabled={locked}
               data-status={marks[`R${j}`]}
-              lang={step.rightLang}
+              lang={brick.rightLang}
               className={chip}
             >
               {badge(owner === undefined ? -1 : pairNumber(owner))}
-              <RichText text={step.pairs[j]!.right} />
+              <RichText text={brick.pairs[j]!.right} />
             </Selectable>
           )
         })}
@@ -452,19 +478,19 @@ export function MatchExercise({
 
 // ---------- blank (word chips) ----------
 
-export function BlankExercise({
-  step,
+export function BlankBrick({
+  brick,
   answer,
   setAnswer,
   marks,
   locked,
   bank,
-}: ExerciseProps & { bank: string[] }) {
+}: QuestionBrickProps & { bank: string[] }) {
   const { t } = usePlayer()
   const [active, setActive] = React.useState<string | null>(null)
-  if (step.type !== "blank" || answer.kind !== "gaps") return null
+  if (brick.type !== "blank" || answer.kind !== "gaps") return null
   const values = answer.values
-  const gapIds = step.blanks.map((b) => b.id)
+  const gapIds = brick.blanks.map((b) => b.id)
   const firstEmpty = gapIds.find((id) => !values[id])
   const target = active ?? firstEmpty ?? gapIds[gapIds.length - 1]!
 
@@ -478,12 +504,12 @@ export function BlankExercise({
     setActive(id)
   }
 
-  const code = step.format === "code"
-  const parts = step.template.split(/(\[\[[^\]]+\]\])/)
+  const code = brick.format === "code"
+  const parts = brick.template.split(/(\[\[[^\]]+\]\])/)
   return (
     <div className="flex flex-col gap-4">
       <div
-        lang={step.lang}
+        lang={brick.lang}
         dir={code ? "ltr" : undefined}
         className={cn(
           "rounded-xl bg-card px-5 py-4 whitespace-pre-wrap shadow-xs ring-1 ring-foreground/10",
@@ -529,7 +555,7 @@ export function BlankExercise({
               isSelected={used}
               onChange={() => !used && place(word)}
               isDisabled={locked}
-              lang={step.lang}
+              lang={brick.lang}
               className={cn(
                 "rounded-md border bg-background px-3 py-1.5 shadow-xs hover:bg-muted dark:bg-input/30 dark:hover:bg-input/50 data-selected:opacity-45",
                 code ? "font-mono text-sm" : "text-base"

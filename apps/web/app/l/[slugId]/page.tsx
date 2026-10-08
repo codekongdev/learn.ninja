@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 
+import { upgradeLesson, type Lesson } from "@workspace/spec"
+
 import { LessonView } from "@/components/lesson-view"
 import { idFromParam } from "@/lib/publish/ids"
 import { getLessonStore } from "@/lib/publish/store"
@@ -13,7 +15,11 @@ type Props = {
 
 async function load(param: string) {
   const id = idFromParam(param)
-  return id ? getLessonStore().get(id) : null
+  const record = id ? await getLessonStore().get(id) : null
+  // Lessons published before spec 0.3 are still live for up to 24 hours.
+  return record
+    ? { ...record, lesson: upgradeLesson(record.lesson) as Lesson }
+    : null
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

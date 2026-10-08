@@ -1,33 +1,59 @@
-# Lesson format (spec 0.2)
+# Lesson format (spec 0.3)
 
-A lesson is one JSON file. Its structure has fixed slots, so the shape can't be broken: `hook`, `loops`, `challenge`, `wrapup`. `schema/lesson.schema.json` is the formal definition; the checker (`scripts/learn.mjs validate`) also enforces the cross-field rules listed at the end.
+A lesson is one JSON file with four slots: `hook`, `bricks`, `challenge`, `wrapup`. A brick is one screen: either a `concept` brick (theory) or a question brick (`choice`, `compare`, `hotspot`, `sort`, `order`, `match`, `blank`, `scenario`). `schema/lesson.schema.json` is the formal definition; the checker (`scripts/learn.mjs validate`) also enforces the cross-field rules listed at the end.
 
 ## Lesson
 
-| Field | Required | Description |
-| --- | --- | --- |
-| `spec` | yes | Always `"0.2"` |
-| `title` | yes | Up to 60 characters; also used in the link |
-| `summary` | yes | One sentence shown before starting, up to 160 characters |
-| `objective` | yes | What the learner can do afterwards |
-| `language` | yes | Language of all learner-facing text (BCP 47: `en`, `es`, `ar`, `pt-BR`…) |
-| `targetLanguage` | no | The language being taught, for language lessons |
-| `level` | yes | `beginner`, `intermediate`, or `advanced` |
-| `estimatedMinutes` | yes | 5–10 |
-| `topic` | no | A short label, e.g. "UI design" |
-| `source` | no | `{ "title": "…", "url": "https://…" }` credit for the material |
-| `hook` | yes | One `choice` or `compare` step; not scored |
-| `loops` | yes | 1–3 of `{ "concept": Concept, "practice": [2–4 steps] }`; 4–8 practice steps in total |
-| `challenge` | yes | One step of any type except `number` |
-| `wrapup` | yes | `{ "takeaways": [2–4 strings], "next": "suggested next lesson" }` (`next` is optional) |
+| Field              | Required | Description                                                                                                                                                         |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `spec`             | yes      | Always `"0.3"`                                                                                                                                                      |
+| `title`            | yes      | Up to 60 characters; also used in the link                                                                                                                          |
+| `summary`          | yes      | One sentence shown before starting, up to 160 characters                                                                                                            |
+| `objective`        | yes      | What the learner can do afterwards                                                                                                                                  |
+| `language`         | yes      | Language of all learner-facing text (BCP 47: `en`, `es`, `ar`, `pt-BR`…)                                                                                            |
+| `targetLanguage`   | no       | The language being taught, for language lessons                                                                                                                     |
+| `level`            | yes      | `beginner`, `intermediate`, or `advanced`                                                                                                                           |
+| `estimatedMinutes` | yes      | 5–10                                                                                                                                                                |
+| `topic`            | no       | A short label, e.g. "UI design"                                                                                                                                     |
+| `source`           | no       | `{ "title": "…", "url": "https://…" }` credit for the material                                                                                                      |
+| `hook`             | yes      | One `choice` or `compare` brick; not scored                                                                                                                         |
+| `bricks`           | yes      | The lesson in play order: 1–3 `concept` bricks, each followed by 2–4 question bricks that practise it; 4–8 question bricks in total. The first brick is a `concept` |
+| `challenge`        | yes      | One question brick of any type except `number`                                                                                                                      |
+| `wrapup`           | yes      | `{ "takeaways": [2–4 strings], "next": "suggested next lesson" }` (`next` is optional)                                                                              |
 
-## Concept
+```json
+"bricks": [
+  { "id": "c1", "type": "concept", … },
+  { "id": "p1", "type": "choice", … },
+  { "id": "p2", "type": "sort", … },
+  { "id": "c2", "type": "concept", … },
+  { "id": "p3", "type": "hotspot", … },
+  { "id": "p4", "type": "order", … }
+]
+```
 
-`{ "id", "title" (≤60 chars), "body" (rich text, ≤80 words), "visual"?, "term"?: { "word", "definition" } }`
+Brick ids are unique across the whole lesson, including the hook and the challenge.
 
-## Every step
+## Concept bricks
 
-`{ "id", "type", "prompt" (rich text, ≤40 words), "visual"?, "hint"?, "explanation" }` plus the fields for its type. Ids are unique across the whole lesson.
+`{ "id", "type": "concept", "title" (≤60 chars), "body" (rich text, ≤80 words), "visual"?, "term"?: { "word", "definition" } }`
+
+```json
+{
+  "id": "c1",
+  "type": "concept",
+  "title": "Buttons do, links go",
+  "body": "Ask whether the action **does** something or **goes** somewhere.",
+  "term": {
+    "word": "Link",
+    "definition": "An element with an address (href) that takes people somewhere."
+  }
+}
+```
+
+## Every question brick
+
+`{ "id", "type", "prompt" (rich text, ≤40 words), "visual"?, "hint"?, "explanation" }` plus the fields for its type.
 
 ## Visuals
 
@@ -37,13 +63,13 @@ A lesson is one JSON file. Its structure has fixed slots, so the shape can't be 
 { "kind": "math", "tex": "A = P(1 + r)^n" }
 ```
 
-`height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` steps.
+`height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
 
 ## Options
 
 Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedback"? (required on wrong options), "lang"? }`. Give each option text or a visual.
 
-## The building blocks
+## The question bricks
 
 ```json
 { "id": "p1", "type": "choice", "prompt": "…", "options": [ … 2–5 … ], "correct": ["a"], "multiple": false, "explanation": "…" }
@@ -79,15 +105,15 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
 ```
 
 - `blank` with `"format": "code"` takes a `language` and is usually `"caseSensitive": true`.
-- `blank` options: `numeric` and `tolerance` (for numbers in gaps), `strictAccents` (when accents change meaning, like *si* and *sí*).
-- `number` steps exist in the spec but aren't allowed in v1.
+- `blank` options: `numeric` and `tolerance` (for numbers in gaps), `strictAccents` (when accents change meaning, like _si_ and _sí_).
+- `number` bricks exist in the spec but aren't allowed in v1.
 
 ## Rules the checker enforces
 
-- Hook is `choice` or `compare`; 1–3 loops; 2–4 practice per loop; 4–8 practice in total.
+- Hook is `choice` or `compare`; the first brick is a `concept`; 1–3 concept bricks; 2–4 question bricks after each concept brick; 4–8 question bricks in `bricks` in total; the challenge is a question brick.
 - Unique ids; every reference points to something real (`correct`, `group`, `alsoAccept`, `[[gap]]` ids, hotspot ids, code hotspot lines).
-- Every wrong `choice`/`compare` option has `feedback`; every step has an `explanation`; a `choice` has at least one wrong option; a `scenario` has a `best` option.
+- Every wrong `choice`/`compare` option has `feedback`; every question brick has an `explanation`; a `choice` has at least one wrong option; a `scenario` has a `best` option.
 - Prompts ≤40 words; concept bodies ≤80 words.
-- No `number` steps; every `blank` has `choices` that include an accepted answer.
+- No `number` bricks; every `blank` has `choices` that include an accepted answer.
 - Formulas in `\( … \)` are balanced and render; language codes are valid BCP 47.
 - HTML visuals: no scripts, event handlers, iframes, forms, objects, embeds, `javascript:` links, or external URLs; each under 20 KB; the whole file under 500 KB.

@@ -61,11 +61,11 @@ describe("learn validate", () => {
   it("lists every issue for an invalid lesson", async () => {
     const t = setup([])
     const broken = JSON.parse(lesson)
-    delete broken.loops[0].practice[0].options[1].feedback
+    delete broken.bricks[1].options[1].feedback
     writeFileSync(join(t.cwd, "lesson.json"), JSON.stringify(broken))
     expect(await run(["validate", "lesson.json"], t.io)).toBe(1)
     expect(t.err.join("\n")).toMatch(
-      /1 issue to fix:\n- loops\[0\]\.practice\[0\]\.options\[1\]: Wrong option "b" has no feedback/
+      /1 issue to fix:\n- bricks\[1\]\.options\[1\]: Wrong option "b" has no feedback/
     )
   })
 })

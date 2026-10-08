@@ -5,7 +5,7 @@ export type ValidationResult =
   { ok: true; lesson: Lesson; issues: [] } | { ok: false; issues: Issue[] }
 
 /**
- * Check a lesson file (as JSON text or an already-parsed value) against spec v0.2 and the v1 rules.
+ * Check a lesson file (as JSON text or an already-parsed value) against the current spec and the v1 rules.
  * The schema runs first; the cross-field rules run only on a lesson that matches it.
  */
 export function validateLesson(input: string | unknown): ValidationResult {
@@ -50,7 +50,7 @@ export function validateLesson(input: string | unknown): ValidationResult {
     : { ok: true, lesson: parsed.data, issues: [] }
 }
 
-/** ["loops", 0, "practice", 1] → "loops[0].practice[1]" */
+/** ["bricks", 2, "options", 1] → "bricks[2].options[1]" */
 export function formatPath(path: PropertyKey[]): string {
   return path.reduce<string>(
     (out, key) =>

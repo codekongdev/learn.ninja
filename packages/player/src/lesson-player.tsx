@@ -3,7 +3,7 @@
 import * as React from "react"
 import { LightbulbIcon, PanelRightIcon } from "lucide-react"
 
-import type { Lesson, Step } from "@workspace/spec"
+import type { Lesson, QuestionBrick } from "@workspace/spec"
 import { Alert, AlertDescription } from "@workspace/ui/components/alert"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
@@ -26,13 +26,14 @@ import {
 } from "./check"
 import { PlayerProvider, usePlayer } from "./context"
 import {
-  BlankExercise,
-  HotspotExercise,
-  MatchExercise,
-  OptionsExercise,
-  OrderExercise,
-  SortExercise,
-} from "./exercises"
+  BlankBrick,
+  ConceptBrick,
+  HotspotBrick,
+  MatchBrick,
+  OptionsBrick,
+  OrderBrick,
+  SortBrick,
+} from "./bricks"
 import {
   buildSequence,
   outcomeFor,
@@ -141,14 +142,14 @@ export function LessonPlayer({
 
 type Phase = "answering" | "feedback" | "revealed"
 
-interface StepState {
+interface QuestionState {
   answer: Answer
   attempts: number
   usedHint: boolean
   hintOpen: boolean
   result: CheckResult | null
   phase: Phase
-  /** Display order for options and match columns, fixed for the life of the step. */
+  /** Display order for options and match columns, fixed for the life of the question. */
   optionOrder: string[]
   rightOrder: number[]
   bank: string[]
@@ -158,30 +159,32 @@ interface State {
   items: Item[]
   index: number
   results: Record<string, Outcome>
-  mistakes: Step[]
+  mistakes: QuestionBrick[]
   inFix: boolean
   fixQueued: boolean
-  step: StepState | null
+  question: QuestionState | null
 }
 
-function freshStep(item: Item | undefined): StepState | null {
-  if (!item || item.kind !== "step") return null
-  const step = item.step
+function freshQuestion(item: Item | undefined): QuestionState | null {
+  if (!item || item.kind !== "question") return null
+  const brick = item.brick
   const optionIds =
-    "options" in step ? (step.options as { id: string }[]).map((o) => o.id) : []
+    "options" in brick
+      ? (brick.options as { id: string }[]).map((o) => o.id)
+      : []
   return {
-    answer: initialAnswer(step),
+    answer: initialAnswer(brick),
     attempts: 0,
     usedHint: false,
     hintOpen: false,
     result: null,
     phase: "answering",
-    optionOrder: step.type === "compare" ? optionIds : shuffle(optionIds),
+    optionOrder: brick.type === "compare" ? optionIds : shuffle(optionIds),
     rightOrder:
-      step.type === "match" ? shuffle(step.pairs.map((_, i) => i)) : [],
+      brick.type === "match" ? shuffle(brick.pairs.map((_, i) => i)) : [],
     bank:
-      step.type === "blank"
-        ? shuffle([...new Set(step.blanks.flatMap((b) => b.choices ?? []))])
+      brick.type === "blank"
+        ? shuffle([...new Set(brick.blanks.flatMap((b) => b.choices ?? []))])
         : [],
   }
 }
@@ -195,7 +198,7 @@ function start(lesson: Lesson): State {
     mistakes: [],
     inFix: false,
     fixQueued: false,
-    step: null,
+    question: null,
   }
 }
 
@@ -226,13 +229,13 @@ function reducer(state: State, action: Action): State {
         ...state,
         index,
         inFix: state.inFix || nextItem?.kind === "fix",
-        step: freshStep(nextItem),
+        question: freshQuestion(nextItem),
       }
     }
     case "startFix": {
-      const retries: Item[] = state.mistakes.map((step) => ({
-        kind: "step",
-        step,
+      const retries: Item[] = state.mistakes.map((brick) => ({
+        kind: "question",
+        brick,
         role: "fix",
       }))
       const items = [
@@ -247,65 +250,75 @@ function reducer(state: State, action: Action): State {
         index,
         mistakes: [],
         fixQueued: true,
-        step: freshStep(items[index]),
+        question: freshQuestion(items[index]),
       }
     }
     case "answer":
-      return state.step
-        ? { ...state, step: { ...state.step, answer: action.answer } }
+      return state.question
+        ? { ...state, question: { ...state.question, answer: action.answer } }
         : state
     case "hint":
-      return state.step
-        ? { ...state, step: { ...state.step, usedHint: true, hintOpen: true } }
+      return state.question
+        ? {
+            ...state,
+            question: { ...state.question, usedHint: true, hintOpen: true },
+          }
         : state
     case "retry": {
-      if (!state.step || item?.kind !== "step") return state
+      if (!state.question || item?.kind !== "question") return state
       return {
         ...state,
-        step: {
-          ...state.step,
+        question: {
+          ...state.question,
           phase: "answering",
           result: null,
-          answer: retryAnswer(item.step, state.step.answer),
+          answer: retryAnswer(item.brick, state.question.answer),
         },
       }
     }
     case "check": {
-      if (!state.step || item?.kind !== "step") return state
-      const { step, role } = item
-      const s = state.step
-      const result = checkAnswer(step, s.answer)
+      if (!state.question || item?.kind !== "question") return state
+      const { brick, role } = item
+      const s = state.question
+      const result = checkAnswer(brick, s.answer)
       if (role === "hook")
-        return { ...state, step: { ...s, result, phase: "revealed" } }
+        return { ...state, question: { ...s, result, phase: "revealed" } }
       if (result.correct) {
         const results =
-          role === "fix" || step.id in state.results
+          role === "fix" || brick.id in state.results
             ? state.results
             : {
                 ...state.results,
-                [step.id]: outcomeFor(s.attempts, s.usedHint),
+                [brick.id]: outcomeFor(s.attempts, s.usedHint),
               }
-        return { ...state, results, step: { ...s, result, phase: "feedback" } }
+        return {
+          ...state,
+          results,
+          question: { ...s, result, phase: "feedback" },
+        }
       }
       const attempts = s.attempts + 1
       if (attempts < 2)
-        return { ...state, step: { ...s, attempts, result, phase: "feedback" } }
+        return {
+          ...state,
+          question: { ...s, attempts, result, phase: "feedback" },
+        }
       const results =
         role === "fix"
           ? state.results
-          : { ...state.results, [step.id]: "missed" as const }
+          : { ...state.results, [brick.id]: "missed" as const }
       const mistakes =
-        role === "fix" ? state.mistakes : [...state.mistakes, step]
+        role === "fix" ? state.mistakes : [...state.mistakes, brick]
       return {
         ...state,
         results,
         mistakes,
-        step: {
+        question: {
           ...s,
           attempts,
           result,
           phase: "revealed",
-          answer: solution(step),
+          answer: solution(brick),
         },
       }
     }
@@ -351,7 +364,7 @@ function Player({
   const parts = partAt(state.items, state.index, state.inFix)
   const seenConcepts = state.items
     .slice(0, state.index + 1)
-    .flatMap((i) => (i.kind === "concept" ? [i.concept] : []))
+    .flatMap((i) => (i.kind === "concept" ? [i.brick] : []))
 
   return (
     <>
@@ -396,7 +409,7 @@ function Player({
                 className={cn(
                   "mx-auto flex min-h-full w-full flex-col justify-center gap-8 px-4 py-16 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
                   columnWidth(item),
-                  item.kind === "step" && "pb-40"
+                  item.kind === "question" && "pb-40"
                 )}
               >
                 <div data-text-size={textSize} className="flex flex-col gap-6">
@@ -432,19 +445,19 @@ function Player({
   )
 }
 
-/** Questions and short screens read best narrow; visuals and side-by-side exercises need room. */
+/** Questions and short screens read best narrow; visuals and side-by-side bricks need room. */
 function columnWidth(item: Item): string {
   if (item.kind === "intro") return "max-w-sm"
   if (item.kind === "concept")
-    return item.concept.visual ? "max-w-2xl" : "max-w-lg"
-  if (item.kind !== "step") return "max-w-lg"
-  const { step } = item
+    return item.brick.visual ? "max-w-2xl" : "max-w-lg"
+  if (item.kind !== "question") return "max-w-lg"
+  const { brick } = item
   const wide =
-    Boolean(step.visual) ||
-    step.type === "compare" ||
-    step.type === "sort" ||
-    step.type === "match" ||
-    step.type === "hotspot"
+    Boolean(brick.visual) ||
+    brick.type === "compare" ||
+    brick.type === "sort" ||
+    brick.type === "match" ||
+    brick.type === "hotspot"
   return wide ? "max-w-2xl" : "max-w-lg"
 }
 
@@ -466,18 +479,18 @@ const Eyebrow = ({
 )
 
 /** Instructions under the prompt, only where the interaction isn't obvious (a single pick needs none). */
-function helperFor(step: Step, t: Strings): string {
-  switch (step.type) {
+function helperFor(brick: QuestionBrick, t: Strings): string {
+  switch (brick.type) {
     case "choice":
-      return step.multiple ? t.helper.choiceMany : ""
+      return brick.multiple ? t.helper.choiceMany : ""
     case "compare":
     case "scenario":
     case "number":
       return ""
     case "hotspot":
-      return step.multiple ? t.helper.choiceMany : ""
+      return brick.multiple ? t.helper.choiceMany : ""
     default:
-      return t.helper[step.type]
+      return t.helper[brick.type]
   }
 }
 
@@ -518,26 +531,8 @@ function Screen({
           </div>
         </>
       )
-    case "concept": {
-      const c = item.concept
-      return (
-        <>
-          <h2 className="text-2xl font-semibold text-balance">{c.title}</h2>
-          {c.visual ? <Visual visual={c.visual} /> : null}
-          <p className="text-base">
-            <RichText text={c.body} />
-          </p>
-          {c.term ? (
-            <div className="flex items-baseline gap-3 rounded-lg bg-secondary px-4 py-3 text-secondary-foreground">
-              <strong className="font-semibold whitespace-nowrap">
-                {c.term.word}
-              </strong>
-              <RichText text={c.term.definition} />
-            </div>
-          ) : null}
-        </>
-      )
-    }
+    case "concept":
+      return <ConceptBrick brick={item.brick} />
     case "fix":
       return (
         <div className="flex flex-col gap-2">
@@ -549,44 +544,50 @@ function Screen({
       )
     case "wrap":
       return <WrapUp lesson={lesson} results={state.results} />
-    case "step":
-      return <StepScreen item={item} state={state.step!} dispatch={dispatch} />
+    case "question":
+      return (
+        <QuestionScreen
+          item={item}
+          state={state.question!}
+          dispatch={dispatch}
+        />
+      )
   }
 }
 
-function StepScreen({
+function QuestionScreen({
   item,
   state,
   dispatch,
 }: {
-  item: Extract<Item, { kind: "step" }>
-  state: StepState
+  item: Extract<Item, { kind: "question" }>
+  state: QuestionState
   dispatch: React.Dispatch<Action>
 }) {
   const { t } = usePlayer()
-  const { step, role } = item
+  const { brick, role } = item
   const locked = state.phase !== "answering"
   // After a second miss, show the solution. The hook shows the learner's pick and the right answer.
   const marks: Record<string, Mark> =
     state.phase !== "revealed"
       ? (state.result?.marks ?? {})
       : role === "hook"
-        ? { ...solutionMarks(step), ...state.result?.marks }
-        : solutionMarks(step)
+        ? { ...solutionMarks(brick), ...state.result?.marks }
+        : solutionMarks(brick)
   const props = {
-    step,
+    brick,
     answer: state.answer,
     setAnswer: (answer: Answer) => dispatch({ type: "answer", answer }),
     marks,
     locked,
   }
-  const helper = helperFor(step, t)
+  const helper = helperFor(brick, t)
   const showOutcomes =
-    step.type === "scenario" && state.result
+    brick.type === "scenario" && state.result
       ? [
           ...(state.answer.kind === "select" ? state.answer.ids : []),
           ...(state.phase === "revealed"
-            ? step.options.filter((o) => o.quality === "best").map((o) => o.id)
+            ? brick.options.filter((o) => o.quality === "best").map((o) => o.id)
             : []),
         ]
       : []
@@ -594,43 +595,43 @@ function StepScreen({
   return (
     <>
       <h2 className="text-2xl font-semibold">
-        <RichText text={step.prompt} />
+        <RichText text={brick.prompt} />
       </h2>
-      {helper && helper !== step.prompt ? (
+      {helper && helper !== brick.prompt ? (
         <p className="-mt-4 text-sm text-muted-foreground">{helper}</p>
       ) : null}
-      {step.type === "scenario" ? (
+      {brick.type === "scenario" ? (
         <div className="rounded-e-lg border-s-2 border-primary bg-muted px-4 py-3 text-base">
-          <RichText text={step.situation} />
+          <RichText text={brick.situation} />
         </div>
       ) : null}
-      {step.visual && step.type !== "hotspot" ? (
-        <Visual visual={step.visual} />
+      {brick.visual && brick.type !== "hotspot" ? (
+        <Visual visual={brick.visual} />
       ) : null}
-      {step.type === "choice" ||
-      step.type === "compare" ||
-      step.type === "scenario" ? (
-        <OptionsExercise
+      {brick.type === "choice" ||
+      brick.type === "compare" ||
+      brick.type === "scenario" ? (
+        <OptionsBrick
           {...props}
           order={state.optionOrder}
           showOutcomes={showOutcomes}
         />
-      ) : step.type === "hotspot" ? (
-        <HotspotExercise {...props} />
-      ) : step.type === "sort" ? (
-        <SortExercise {...props} />
-      ) : step.type === "order" ? (
-        <OrderExercise {...props} />
-      ) : step.type === "match" ? (
-        <MatchExercise {...props} rightOrder={state.rightOrder} />
-      ) : step.type === "blank" ? (
-        <BlankExercise {...props} bank={state.bank} />
+      ) : brick.type === "hotspot" ? (
+        <HotspotBrick {...props} />
+      ) : brick.type === "sort" ? (
+        <SortBrick {...props} />
+      ) : brick.type === "order" ? (
+        <OrderBrick {...props} />
+      ) : brick.type === "match" ? (
+        <MatchBrick {...props} rightOrder={state.rightOrder} />
+      ) : brick.type === "blank" ? (
+        <BlankBrick {...props} bank={state.bank} />
       ) : null}
-      {state.hintOpen && step.hint ? (
+      {state.hintOpen && brick.hint ? (
         <Alert>
           <LightbulbIcon aria-hidden="true" />
           <AlertDescription className="text-base text-foreground">
-            <RichText text={step.hint} />
+            <RichText text={brick.hint} />
           </AlertDescription>
         </Alert>
       ) : null}
@@ -742,7 +743,7 @@ function ActionArea({
   let secondary: React.ReactNode = null
   // "Why?" reveals the explanation, so feedback stays one short line until the learner asks.
   const [why, setWhy] = React.useState(false)
-  React.useEffect(() => setWhy(false), [state.index, state.step?.attempts])
+  React.useEffect(() => setWhy(false), [state.index, state.question?.attempts])
   let explanation: string | null = null
   const helpButton = (label: string, onPress: () => void) => (
     <Button variant="outline" size="sm" onPress={onPress}>
@@ -762,32 +763,32 @@ function ActionArea({
       label: t.restart,
       onPress: () => dispatch({ type: "restart", lesson }),
     }
-  } else if (item.kind === "step" && state.step) {
-    const s = state.step
-    const { step, role } = item
+  } else if (item.kind === "question" && state.question) {
+    const s = state.question
+    const { brick, role } = item
     const r = s.result
-    const canHelp = Boolean(step.hint) && role !== "hook" && !s.usedHint
+    const canHelp = Boolean(brick.hint) && role !== "hook" && !s.usedHint
     const missText = (res: CheckResult) =>
       res.feedback ?? (res.missKey ? missMessage(res, t) : null)
     if (s.phase === "answering") {
       primary = {
         label: t.check,
         onPress: () => dispatch({ type: "check" }),
-        isDisabled: !isReady(step, s.answer),
+        isDisabled: !isReady(brick, s.answer),
       }
       if (canHelp)
         secondary = helpButton(t.getHelp, () => dispatch({ type: "hint" }))
     } else if (role === "hook" && r) {
       tone = "info"
       title = r.correct ? t.goodGuess : t.hookMiss
-      explanation = step.explanation
+      explanation = brick.explanation
     } else if (s.phase === "feedback" && r?.correct) {
       tone = "good"
       title =
         s.usedHint && s.attempts === 0
           ? t.correctWithHint
-          : t.praise[praiseIndex(step.id, t.praise.length)]!
-      explanation = step.explanation
+          : t.praise[praiseIndex(brick.id, t.praise.length)]!
+      explanation = brick.explanation
       primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r) {
       // A miss gets one short line: the option's own feedback, or a nudge to look again.
@@ -807,7 +808,7 @@ function ActionArea({
     } else if (s.phase === "revealed") {
       tone = "bad"
       title = t.answer
-      message = step.explanation
+      message = brick.explanation
     }
   }
 
@@ -878,7 +879,7 @@ function ActionArea({
       </p>
       {title ? (
         <div
-          key={`${state.index}-${state.step?.attempts ?? 0}-${tone}-${why}`}
+          key={`${state.index}-${state.question?.attempts ?? 0}-${tone}-${why}`}
           aria-hidden="true"
           data-text-size={textSize}
           className={cn(
@@ -896,7 +897,7 @@ function ActionArea({
   )
 }
 
-/** A stable pick from the praise lines for a step, so it doesn't change on re-render. */
+/** A stable pick from the praise lines for a question, so it doesn't change on re-render. */
 function praiseIndex(id: string, count: number): number {
   let h = 0
   for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0

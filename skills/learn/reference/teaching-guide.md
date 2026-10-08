@@ -5,41 +5,41 @@ How to turn the user's input into a lesson that's genuinely good to play. Read t
 ## 1. Choose one idea
 
 - A lesson teaches **one core idea** in **5–10 minutes**. Set `estimatedMinutes` honestly (5–10).
-- Write the `objective` as something the learner can *do* afterwards: "Give each view one clear primary action", not "Learn about buttons".
+- Write the `objective` as something the learner can _do_ afterwards: "Give each view one clear primary action", not "Learn about buttons".
 - If the input covers several ideas, pick the one everything else depends on. Mention the others to the user as follow-up lessons, and you can suggest one in `wrapup.next`.
 - Stay faithful to the source. If the input is an article, teach what it says; don't add claims it doesn't support.
 
 ## 2. Shape: interleaved, not "read then quiz"
 
 ```
-hook → loop 1 (concept → 2–4 practice) → loop 2 … (1–3 loops) → challenge → wrap-up
+hook → bricks: concept → 2–4 questions → concept → 2–4 questions … (1–3 concepts) → challenge → wrap-up
 ```
 
-- **Hook:** a `choice` or `compare` question asked *before* any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains. Its `explanation` should make the learner want to know why.
-- **Concept cards:** one idea each, 80 words at most. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
-- **Practice:** 2–4 steps right after each concept, 4–8 in total across the lesson. At least 2 practice steps per concept.
-- **Challenge:** one harder, applied step that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
+- **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains. Its `explanation` should make the learner want to know why.
+- **Concept bricks:** one idea each, 80 words at most. The first brick is always a concept. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
+- **Practice:** 2–4 question bricks right after each concept brick, 4–8 in total across the lesson.
+- **Challenge:** one harder, applied question brick that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
 - **Wrap-up:** 2–4 takeaways, each one sentence the learner could act on.
 
-## 3. Choose building blocks by fit
+## 3. Choose question bricks by fit
 
-Each exercise should ask the learner to do what they'd really do with this knowledge. Start from the question you'd ask a learner face to face, then pick the type that asks it most directly. There's no quota and no set order: a lesson can use two types or six, and can repeat a type as often as the content calls for. Never pick a type for variety's sake.
+Each question brick should ask the learner to do what they'd really do with this knowledge. Start from the question you'd ask a learner face to face, then pick the type that asks it most directly. There's no quota and no set order: a lesson can use two types or six, and can repeat a type as often as the content calls for. Never pick a type for variety's sake.
 
-| Type | Natural when the learner needs to… | Forced when… |
-| --- | --- | --- |
-| `choice` | Pick the right answer, cause, or next move | Never really; it's the safe default. Use `multiple: true` only when several answers are genuinely right. |
-| `compare` | Judge which of two real examples is better (two UIs, two sentences, two plans) | The two options are just a right and a wrong statement; that's a `choice`. |
-| `hotspot` | Find something inside a realistic artifact: a screen, a recipe, a contract, a line of code | The "artifact" is a list you built only so there's something to tap. |
-| `sort` | Classify things into categories people really use | The groups are invented for the exercise, or there are only two items per group. |
-| `order` | Sequence a real process where the order matters and mistakes have consequences | The order is arbitrary, or obvious from the wording. |
-| `match` | Pair things that come in pairs: terms and meanings, words and translations, symptoms and causes | It just re-tests the concept card's vocabulary with no thinking involved. |
-| `blank` | Recall exact wording that matters: code, a phrase in another language, a formula | It's a sentence from the concept card with a word removed; that's recall, not understanding. |
-| `scenario` | Make a call in a realistic situation where options have trade-offs | There's one obviously right answer; that's a `choice`. |
+| Type       | Natural when the learner needs to…                                                              | Forced when…                                                                                             |
+| ---------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `choice`   | Pick the right answer, cause, or next move                                                      | Never really; it's the safe default. Use `multiple: true` only when several answers are genuinely right. |
+| `compare`  | Judge which of two real examples is better (two UIs, two sentences, two plans)                  | The two options are just a right and a wrong statement; that's a `choice`.                               |
+| `hotspot`  | Find something inside a realistic artifact: a screen, a recipe, a contract, a line of code      | The "artifact" is a list you built only so there's something to tap.                                     |
+| `sort`     | Classify things into categories people really use                                               | The groups are invented for the brick, or there are only two items per group.                            |
+| `order`    | Sequence a real process where the order matters and mistakes have consequences                  | The order is arbitrary, or obvious from the wording.                                                     |
+| `match`    | Pair things that come in pairs: terms and meanings, words and translations, symptoms and causes | It just re-tests the concept brick's vocabulary with no thinking involved.                               |
+| `blank`    | Recall exact wording that matters: code, a phrase in another language, a formula                | It's a sentence from the concept brick with a word removed; that's recall, not understanding.            |
+| `scenario` | Make a call in a realistic situation where options have trade-offs                              | There's one obviously right answer; that's a `choice`.                                                   |
 
-Before you keep a step, ask:
+Before you keep a question brick, ask:
 
-- **Would a good teacher ask this, in this form?** If the honest version of the question is multiple choice, use `choice`, even if the previous step was a `choice` too.
-- **Does it ask something new?** Each step should test a different aspect or application of the idea, not restate the last one in another format.
+- **Would a good teacher ask this, in this form?** If the honest version of the question is multiple choice, use `choice`, even if the previous brick was a `choice` too.
+- **Does it ask something new?** Each brick should test a different aspect or application of the idea, not restate the last one in another format.
 - **Is the artifact real?** Hotspots, compares and scenarios work when they show something the learner will meet: a real screen, a real recipe step, a real decision.
 
 Mechanics of each type:
@@ -55,9 +55,9 @@ Mechanics of each type:
 
 ## 4. Feedback that teaches
 
-- **Every wrong option gets `feedback`** that explains *why* it's wrong, in a sentence or two. Name the misconception: "That's simple interest. Year 2 also earns interest on year 1's $50."
+- **Every wrong option gets `feedback`** that explains _why_ it's wrong, in a sentence or two. Name the misconception: "That's simple interest. Year 2 also earns interest on year 1's $50."
 - **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting.
-- **Every step gets an `explanation`** of why the right answer is right. It's shown after the learner answers.
+- **Every question brick gets an `explanation`** of why the right answer is right. It's shown after the learner answers.
 - **Blanks:** add a `mistakes` entry for each decoy chip, explaining it.
 - **Hints** (optional) nudge without giving the answer away: "What is the one thing this page exists to help people do?"
 - **Scenario outcomes** describe what happens next, so even a poor choice teaches something.
@@ -67,7 +67,7 @@ Mechanics of each type:
 - Prompts: 40 words at most, one clear task. Questions end with a question mark.
 - Plain, friendly, specific language. Short sentences. No filler ("In this lesson we will…").
 - Rich text supports `**bold**`, `*italic*`, `` `code` ``, and inline formulas `\( ... \)`. A `$` is always a plain dollar sign.
-- Don't reveal the answer in the prompt or the concept card's wording.
+- Don't reveal the answer in the prompt or the concept brick's wording.
 
 ## 6. Visuals
 
@@ -81,18 +81,18 @@ Visuals make lessons feel real. There are three kinds:
 
 HTML visuals use **Basecoat** (shadcn/ui's design system as plain HTML) plus **Tailwind utility classes** for layout. They match the player's look automatically.
 
-| Component | Markup |
-| --- | --- |
-| Button | `<button class="btn">Save</button>`; add `data-variant="secondary"`, `"outline"`, `"ghost"`, `"link"`, or `"destructive"`; `data-size="sm"`, `"lg"`, `"xs"` |
-| Input | `<input class="input" placeholder="Email">`, with `<label class="label">Email</label>` |
-| Textarea | `<textarea class="textarea"></textarea>` |
-| Checkbox | `<input type="checkbox" class="input" checked>` |
-| Switch | `<input type="checkbox" role="switch" class="input">` |
-| Badge | `<span class="badge">New</span>`; `data-variant="secondary"`, `"outline"`, `"destructive"` |
-| Alert | `<div class="alert"><h2>Heads up</h2><section>Your trial ends soon.</section></div>`; `data-variant="destructive"` |
-| Card | `<div class="card"><header><h2>Title</h2><p>Description</p></header><section>Body</section><footer>…</footer></div>` |
-| Table | `<table class="table">…</table>` |
-| Keyboard key | `<kbd class="kbd">⌘K</kbd>` |
+| Component    | Markup                                                                                                                                                      |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button       | `<button class="btn">Save</button>`; add `data-variant="secondary"`, `"outline"`, `"ghost"`, `"link"`, or `"destructive"`; `data-size="sm"`, `"lg"`, `"xs"` |
+| Input        | `<input class="input" placeholder="Email">`, with `<label class="label">Email</label>`                                                                      |
+| Textarea     | `<textarea class="textarea"></textarea>`                                                                                                                    |
+| Checkbox     | `<input type="checkbox" class="input" checked>`                                                                                                             |
+| Switch       | `<input type="checkbox" role="switch" class="input">`                                                                                                       |
+| Badge        | `<span class="badge">New</span>`; `data-variant="secondary"`, `"outline"`, `"destructive"`                                                                  |
+| Alert        | `<div class="alert"><h2>Heads up</h2><section>Your trial ends soon.</section></div>`; `data-variant="destructive"`                                          |
+| Card         | `<div class="card"><header><h2>Title</h2><p>Description</p></header><section>Body</section><footer>…</footer></div>`                                        |
+| Table        | `<table class="table">…</table>`                                                                                                                            |
+| Keyboard key | `<kbd class="kbd">⌘K</kbd>`                                                                                                                                 |
 
 - **Layout:** Tailwind utilities like `flex gap-2 flex-wrap`, `grid grid-cols-2 gap-4`, `p-4`, `rounded-lg`, `border`, `text-sm`, `font-medium`, `text-muted-foreground`, `bg-muted`.
 - **Theme colors:** use the theme's color names (`bg-primary`, `text-primary-foreground`, `bg-muted`, `border-border`, `text-destructive`) rather than fixed colors, so visuals work in light and dark mode.
@@ -104,16 +104,16 @@ HTML visuals use **Basecoat** (shadcn/ui's design system as plain HTML) plus **T
 ## 7. Languages
 
 - Write all learner-facing text in the lesson's `language` (a BCP 47 code such as `en`, `es`, `ar`, `pt-BR`).
-- **Language-learning lessons:** `language` is the language you're teaching *in* and `targetLanguage` is the one being learned. Mark every phrase in the target language with `lang`: on options, `order` and `sort` items, `sort` group labels, `blank` steps, and `leftLang` / `rightLang` on `match` pairs.
+- **Language-learning lessons:** `language` is the language you're teaching _in_ and `targetLanguage` is the one being learned. Mark every phrase in the target language with `lang`: on options, `order` and `sort` items, `sort` group labels, `blank` bricks, and `leftLang` / `rightLang` on `match` pairs.
 - **Never translate code**, identifiers, or program output, whatever the lesson's language.
 
 ## 8. v1 limits
 
-- No `number` steps. Ask numeric questions as `choice` with 3–4 options built from common slips (wrong formula, one step short, wrong unit), each with feedback.
+- No `number` bricks. Ask numeric questions as `choice` with 3–4 options built from common slips (wrong formula, one step short, wrong unit), each with feedback.
 - Every `blank` has `choices` (word chips); there's no free typing yet.
 - No images, audio, or free-text answers.
 
 ## 9. Before you publish
 
 - Run `validate` and fix every issue. The messages say exactly what to change.
-- Read the lesson once as a learner: is the hook intriguing? Does every exercise feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice?
+- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice?

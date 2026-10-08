@@ -11,8 +11,8 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `apps/web`: Next.js 16 app: bundled test lessons at `/lessons/{slug}`, published lessons at `/l/{slug}-{id}`, and the publish API (`POST /api/lessons`, `PUT /api/lessons/{id}`) in `lib/publish/`
 - `apps/storybook`: Storybook 10 (Vite) for the player and UI components; stories live next to components as `*.stories.tsx`
 - `packages/ui`: shadcn/ui components on React Aria (`--base aria`), shared Tailwind styles and theme
-- `packages/spec`: the lesson spec v0.2: Zod schema, exported JSON Schema, validation rules (single source of truth)
-- `packages/player`: React components for every lesson screen and building block
+- `packages/spec`: the lesson spec v0.3: Zod schema, exported JSON Schema, validation rules, and the 0.2 → 0.3 upgrade (single source of truth)
+- `packages/player`: React components for every lesson screen and brick
 - `packages/cli`: the `learn` command (validate, publish, schema) the skill runs; bundled into `skills/learn/scripts/learn.mjs`
 - `packages/eslint-config`, `packages/typescript-config`: shared configs
 - `skills/learn/`: the installable skill (`npx skills add Uxcel-Team/learn --skill learn -g`): SKILL.md, teaching guide, format reference, and generated copies of the schema, examples, and bundled CLI
@@ -28,6 +28,10 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `npm run skill:build -w @workspace/cli`: rebuild `skills/learn` (bundled CLI, schema, examples) after changing the spec, CLI, or examples; a test fails if it's stale
 - `npm run schema -w @workspace/spec`: re-export `packages/spec/schema/lesson.schema.json` after changing the spec (a test fails if it's stale)
 - Add shadcn components from `apps/web`: `npx shadcn@latest add <name>` (they land in `packages/ui`)
+
+## Vocabulary
+
+A lesson is made of **bricks**, one per screen: `concept` bricks (theory) and question bricks (`choice`, `compare`, `hotspot`, `sort`, `order`, `match`, `blank`, `scenario`). Say "brick", not "step" or "exercise", in code, docs, and the skill.
 
 ## Rules
 
@@ -51,9 +55,9 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 ## Storybook
 
 - Build and review components in Storybook first, then use them in the app.
-- Add a story for every new exercise type or screen, with its states (the Exercises stories use a `state` control: idle, wrong, correct, revealed).
+- Add a story for every new brick type or screen, with its states (the Bricks stories use a `state` control for question bricks: idle, wrong, correct, revealed).
 - Stories use the example lessons from `examples/` via `packages/player/src/stories/fixtures.tsx`; formulas and code are prepared before Storybook starts.
 
 ## v1 scope reminders
 
-No accounts, no saved progress, lessons expire after 24 hours, no typed answers (word chips instead), no `number` steps (multiple choice instead), no images. Multiple languages and right-to-left matter from day one.
+No accounts, no saved progress, lessons expire after 24 hours, no typed answers (word chips instead), no `number` bricks (multiple choice instead), no images. Multiple languages and right-to-left matter from day one.

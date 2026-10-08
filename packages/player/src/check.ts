@@ -1,6 +1,6 @@
-import type { Step } from "@workspace/spec"
+import type { QuestionBrick } from "@workspace/spec"
 
-// Pure answer logic for every building block: the starting answer, whether it's ready to check,
+// Pure answer logic for every question brick: the starting answer, whether it's ready to check,
 // checking it, the correct answer, and what to keep on a retry. No React here, so it's easy to test.
 
 export type Answer =
@@ -42,7 +42,7 @@ export function shuffle<T>(
   return a
 }
 
-/** Shuffle, but never hand back the original order (so ordering exercises aren't pre-solved). */
+/** Shuffle, but never hand back the original order (so ordering bricks aren't pre-solved). */
 function shuffleAway<T>(items: readonly T[], random: () => number): T[] {
   if (items.length < 2) return [...items]
   const s = shuffle(items, random)
@@ -50,10 +50,10 @@ function shuffleAway<T>(items: readonly T[], random: () => number): T[] {
 }
 
 export function initialAnswer(
-  step: Step,
+  brick: QuestionBrick,
   random: () => number = Math.random
 ): Answer {
-  switch (step.type) {
+  switch (brick.type) {
     case "sort":
       return {
         kind: "zones",
@@ -61,18 +61,18 @@ export function initialAnswer(
           [
             POOL,
             shuffle(
-              step.items.map((i) => i.id),
+              brick.items.map((i) => i.id),
               random
             ),
           ],
-          ...step.groups.map((g) => [g.id, [] as string[]]),
+          ...brick.groups.map((g) => [g.id, [] as string[]]),
         ]),
       }
     case "order":
       return {
         kind: "sequence",
         ids: shuffleAway(
-          step.items.map((i) => i.id),
+          brick.items.map((i) => i.id),
           random
         ),
       }
@@ -81,14 +81,14 @@ export function initialAnswer(
     case "blank":
       return {
         kind: "gaps",
-        values: Object.fromEntries(step.blanks.map((b) => [b.id, ""])),
+        values: Object.fromEntries(brick.blanks.map((b) => [b.id, ""])),
       }
     default:
       return { kind: "select", ids: [] }
   }
 }
 
-export function isReady(step: Step, answer: Answer): boolean {
+export function isReady(brick: QuestionBrick, answer: Answer): boolean {
   switch (answer.kind) {
     case "select":
       return answer.ids.length > 0
@@ -98,8 +98,8 @@ export function isReady(step: Step, answer: Answer): boolean {
       return true
     case "pairs":
       return (
-        step.type === "match" &&
-        Object.keys(answer.links).length === step.pairs.length
+        brick.type === "match" &&
+        Object.keys(answer.links).length === brick.pairs.length
       )
     case "gaps":
       return Object.values(answer.values).every((v) => v !== "")
@@ -109,12 +109,12 @@ export function isReady(step: Step, answer: Answer): boolean {
 const sameSet = (a: string[], b: string[]) =>
   a.length === b.length && a.every((x) => b.includes(x))
 
-export function checkAnswer(step: Step, answer: Answer): CheckResult {
-  switch (step.type) {
+export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
+  switch (brick.type) {
     case "choice":
     case "compare": {
       const picked = answer.kind === "select" ? answer.ids : []
-      const correct = step.type === "choice" ? step.correct : [step.correct]
+      const correct = brick.type === "choice" ? brick.correct : [brick.correct]
       const ok = sameSet(picked, correct)
       const marks: Record<string, Mark> = {}
       for (const id of picked)
@@ -122,7 +122,7 @@ export function checkAnswer(step: Step, answer: Answer): CheckResult {
       if (ok) return { correct: true, marks }
       const wrong = picked.find((id) => !correct.includes(id))
       const feedback = wrong
-        ? step.options.find((o) => o.id === wrong)?.feedback
+        ? brick.options.find((o) => o.id === wrong)?.feedback
         : undefined
       return feedback
         ? { correct: false, feedback, marks }
@@ -130,7 +130,7 @@ export function checkAnswer(step: Step, answer: Answer): CheckResult {
     }
     case "scenario": {
       const picked = answer.kind === "select" ? answer.ids[0] : undefined
-      const option = step.options.find((o) => o.id === picked)
+      const option = brick.options.find((o) => o.id === picked)
       if (!option) return { correct: false, marks: {} }
       const mark: Mark =
         option.quality === "best"
@@ -147,15 +147,15 @@ export function checkAnswer(step: Step, answer: Answer): CheckResult {
     }
     case "hotspot": {
       const picked = answer.kind === "select" ? answer.ids : []
-      const ok = sameSet(picked, step.correct)
+      const ok = sameSet(picked, brick.correct)
       const marks: Record<string, Mark> = {}
       for (const id of picked)
-        marks[id] = step.correct.includes(id) ? "correct" : "wrong"
+        marks[id] = brick.correct.includes(id) ? "correct" : "wrong"
       return ok
         ? { correct: true, marks }
         : {
             correct: false,
-            missKey: step.visual.kind === "code" ? "hotspotLine" : "hotspot",
+            missKey: brick.visual.kind === "code" ? "hotspotLine" : "hotspot",
             marks,
           }
     }
@@ -163,7 +163,7 @@ export function checkAnswer(step: Step, answer: Answer): CheckResult {
       const zones = answer.kind === "zones" ? answer.zones : {}
       const marks: Record<string, Mark> = {}
       let wrong = 0
-      for (const item of step.items) {
+      for (const item of brick.items) {
         const ok = (zones[item.group] ?? []).includes(item.id)
         marks[item.id] = ok ? "correct" : "wrong"
         if (!ok) wrong++
@@ -174,8 +174,8 @@ export function checkAnswer(step: Step, answer: Answer): CheckResult {
     }
     case "order": {
       const seq = answer.kind === "sequence" ? answer.ids : []
-      const target = step.items.map((i) => i.id)
-      const accepted = [target, ...(step.alsoAccept ?? [])]
+      const target = brick.items.map((i) => i.id)
+      const accepted = [target, ...(brick.alsoAccept ?? [])]
       const matched = accepted.find(
         (a) => a.join("\u0000") === seq.join("\u0000")
       )
@@ -192,7 +192,7 @@ export function checkAnswer(step: Step, answer: Answer): CheckResult {
       const links = answer.kind === "pairs" ? answer.links : {}
       const marks: Record<string, Mark> = {}
       let wrong = 0
-      step.pairs.forEach((_, i) => {
+      brick.pairs.forEach((_, i) => {
         const ok = links[i] === i
         marks[`L${i}`] = ok ? "correct" : "wrong"
         if (links[i] !== undefined)
@@ -208,10 +208,10 @@ export function checkAnswer(step: Step, answer: Answer): CheckResult {
       const marks: Record<string, Mark> = {}
       let feedback: string | undefined
       let anyWrong = false
-      for (const b of step.blanks) {
+      for (const b of brick.blanks) {
         const v = values[b.id] ?? ""
         const ok = b.accept.some((a) =>
-          step.caseSensitive
+          brick.caseSensitive
             ? a === v
             : a.toLocaleLowerCase() === v.toLocaleLowerCase()
         )
@@ -235,45 +235,45 @@ export function checkAnswer(step: Step, answer: Answer): CheckResult {
 }
 
 /** The answer to show after a second miss. */
-export function solution(step: Step): Answer {
-  switch (step.type) {
+export function solution(brick: QuestionBrick): Answer {
+  switch (brick.type) {
     case "choice":
-      return { kind: "select", ids: step.correct }
+      return { kind: "select", ids: brick.correct }
     case "compare":
-      return { kind: "select", ids: [step.correct] }
+      return { kind: "select", ids: [brick.correct] }
     case "scenario":
       return {
         kind: "select",
-        ids: step.options
+        ids: brick.options
           .filter((o) => o.quality === "best")
           .map((o) => o.id)
           .slice(0, 1),
       }
     case "hotspot":
-      return { kind: "select", ids: step.correct }
+      return { kind: "select", ids: brick.correct }
     case "sort":
       return {
         kind: "zones",
         zones: Object.fromEntries([
           [POOL, []],
-          ...step.groups.map((g) => [
+          ...brick.groups.map((g) => [
             g.id,
-            step.items.filter((i) => i.group === g.id).map((i) => i.id),
+            brick.items.filter((i) => i.group === g.id).map((i) => i.id),
           ]),
         ]),
       }
     case "order":
-      return { kind: "sequence", ids: step.items.map((i) => i.id) }
+      return { kind: "sequence", ids: brick.items.map((i) => i.id) }
     case "match":
       return {
         kind: "pairs",
-        links: Object.fromEntries(step.pairs.map((_, i) => [i, i])),
+        links: Object.fromEntries(brick.pairs.map((_, i) => [i, i])),
       }
     case "blank":
       return {
         kind: "gaps",
         values: Object.fromEntries(
-          step.blanks.map((b) => [b.id, b.accept[0]!])
+          brick.blanks.map((b) => [b.id, b.accept[0]!])
         ),
       }
     case "number":
@@ -282,19 +282,19 @@ export function solution(step: Step): Answer {
 }
 
 /** Marks that show the whole solution as correct. */
-export function solutionMarks(step: Step): Record<string, Mark> {
-  const answer = solution(step)
-  return checkAnswer(step, answer).marks
+export function solutionMarks(brick: QuestionBrick): Record<string, Mark> {
+  const answer = solution(brick)
+  return checkAnswer(brick, answer).marks
 }
 
 /**
  * What the learner keeps when they try again: selections are cleared (so they choose afresh),
  * while arrangements stay so they only fix what was wrong.
  */
-export function retryAnswer(step: Step, answer: Answer): Answer {
+export function retryAnswer(brick: QuestionBrick, answer: Answer): Answer {
   if (answer.kind === "select") return { kind: "select", ids: [] }
-  if (answer.kind === "gaps" && step.type === "blank") {
-    const result = checkAnswer(step, answer)
+  if (answer.kind === "gaps" && brick.type === "blank") {
+    const result = checkAnswer(brick, answer)
     return {
       kind: "gaps",
       values: Object.fromEntries(

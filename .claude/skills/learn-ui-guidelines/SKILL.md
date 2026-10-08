@@ -37,7 +37,7 @@ Every screen has visible layers in both themes, and especially in dark mode, whe
 
 ## Typography
 
-- Screens are a centered column: `max-w-sm` for the intro, `max-w-lg` for questions and concepts, `max-w-2xl` when there's a visual or a side-by-side exercise. Headings are `text-2xl font-semibold`; options and body copy in tight spaces are `text-sm font-medium`.
+- Screens are a centered column: `max-w-sm` for the intro, `max-w-lg` for questions and concepts, `max-w-2xl` when there's a visual or a side-by-side brick. Headings are `text-2xl font-semibold`; options and body copy in tight spaces are `text-sm font-medium`.
 - Use Tailwind's text scale only (`text-xs` to `text-4xl`). No pixel or arbitrary sizes.
 - Lesson content scales with the learner's text size setting: wrap it in an element with `data-text-size={textSize}`. The app frame (header, footer, buttons) never scales.
 - Two weights do most of the work: `font-medium` for labels and `font-semibold`/`font-bold` for headings. Supporting text is `text-muted-foreground`, never reduced opacity.

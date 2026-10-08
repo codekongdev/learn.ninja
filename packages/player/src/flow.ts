@@ -1,4 +1,4 @@
-import type { Concept, Lesson, Step } from "@workspace/spec"
+import type { ConceptBrick, Lesson, QuestionBrick } from "@workspace/spec"
 
 // The order a lesson plays in, and how the score is counted.
 
@@ -6,38 +6,36 @@ export type Role = "hook" | "practice" | "challenge" | "fix"
 
 export type Item =
   | { kind: "intro" }
-  | { kind: "concept"; concept: Concept; index: number; total: number }
-  | { kind: "step"; step: Step; role: Role }
+  | { kind: "concept"; brick: ConceptBrick }
+  | { kind: "question"; brick: QuestionBrick; role: Role }
   | { kind: "fix" }
   | { kind: "wrap" }
 
-/** Intro → hook → (concept → practice)… → challenge → fix-your-mistakes slot → wrap-up. */
+/** Intro → hook → the lesson's bricks → challenge → fix-your-mistakes slot → wrap-up. */
 export function buildSequence(lesson: Lesson): Item[] {
-  const items: Item[] = [
+  return [
     { kind: "intro" },
-    { kind: "step", step: lesson.hook, role: "hook" },
+    { kind: "question", brick: lesson.hook, role: "hook" },
+    ...lesson.bricks.map((brick): Item =>
+      brick.type === "concept"
+        ? { kind: "concept", brick }
+        : { kind: "question", brick, role: "practice" }
+    ),
+    { kind: "question", brick: lesson.challenge, role: "challenge" },
+    { kind: "fix" },
+    { kind: "wrap" },
   ]
-  lesson.loops.forEach((loop, i) => {
-    items.push({
-      kind: "concept",
-      concept: loop.concept,
-      index: i + 1,
-      total: lesson.loops.length,
-    })
-    for (const step of loop.practice)
-      items.push({ kind: "step", step, role: "practice" })
-  })
-  items.push({ kind: "step", step: lesson.challenge, role: "challenge" })
-  items.push({ kind: "fix" }, { kind: "wrap" })
-  return items
 }
 
-/** How a scored step went on its first pass. */
+/** How a scored question went on its first pass. */
 export type Outcome = "first" | "hint" | "second" | "missed"
 
-/** Practice and challenge steps count toward the score; the hook doesn't. */
-export function scoredSteps(lesson: Lesson): Step[] {
-  return [...lesson.loops.flatMap((l) => l.practice), lesson.challenge]
+/** Practice and challenge questions count toward the score; the hook and concepts don't. */
+export function scoredQuestions(lesson: Lesson): QuestionBrick[] {
+  return [
+    ...lesson.bricks.filter((b): b is QuestionBrick => b.type !== "concept"),
+    lesson.challenge,
+  ]
 }
 
 export type Summary = Record<Outcome, number> & { total: number }
@@ -47,14 +45,14 @@ export function summarize(
   results: Record<string, Outcome>
 ): Summary {
   const summary: Summary = { first: 0, hint: 0, second: 0, missed: 0, total: 0 }
-  for (const step of scoredSteps(lesson)) {
-    summary[results[step.id] ?? "missed"]++
+  for (const brick of scoredQuestions(lesson)) {
+    summary[results[brick.id] ?? "missed"]++
     summary.total++
   }
   return summary
 }
 
-/** The outcome to record for a step answered correctly. */
+/** The outcome to record for a question answered correctly. */
 export function outcomeFor(attempts: number, usedHint: boolean): Outcome {
   if (attempts > 0) return "second"
   return usedHint ? "hint" : "first"
@@ -73,7 +71,7 @@ export function progressAt(
   return Math.round(((index - 1) / Math.max(1, fixAt - 1)) * 100)
 }
 
-/** Where the learner is in the lesson's parts: one per loop (the warm-up belongs to the first), then the challenge. */
+/** Where the learner is in the lesson's parts: one per concept (the warm-up belongs to the first), then the challenge. */
 export interface PartProgress {
   count: number
   /** The part being played (0-based). */
@@ -90,9 +88,10 @@ export function partAt(
   inFix: boolean
 ): PartProgress {
   let part = 0
+  let concepts = 0
   const parts = items.map((item) => {
-    if (item.kind === "concept") part = item.index - 1
-    if (item.kind === "step" && item.role === "challenge") part = -2
+    if (item.kind === "concept") part = concepts++
+    if (item.kind === "question" && item.role === "challenge") part = -2
     if (item.kind === "intro" || item.kind === "fix" || item.kind === "wrap")
       return -1
     return part === -2 ? Infinity : part
