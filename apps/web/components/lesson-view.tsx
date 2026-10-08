@@ -18,7 +18,6 @@ export function LessonView(props: LessonPlayerProps) {
   return (
     <LessonPlayer
       docsHref="/docs"
-      createHref="/docs/quick-start"
       {...props}
       theme={mounted ? ((theme as Theme | undefined) ?? "system") : "system"}
       onThemeChange={setTheme}

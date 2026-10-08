@@ -224,7 +224,7 @@ export function LessonHeader({
         </Dialog>
       </div>
       <PartsProgress parts={parts} t={t} />
-      <div className="flex items-center justify-end gap-2 sm:flex-1">
+      <div className="flex items-center justify-end gap-1 sm:flex-1">
         {docsHref ? (
           <LinkButton
             href={docsHref}
@@ -269,7 +269,7 @@ function LessonTitle({
       <span className="inline-grid max-w-40 min-w-0 shrink items-center sm:max-w-80">
         <span
           aria-hidden="true"
-          className="invisible col-start-1 row-start-1 h-8 px-2.5 text-sm font-medium whitespace-pre"
+          className="invisible col-start-1 row-start-1 h-7 border border-transparent px-2.5 text-sm font-medium whitespace-pre"
         >
           {draft || " "}
         </span>
@@ -284,7 +284,7 @@ function LessonTitle({
             if (e.key === "Enter") commit()
             if (e.key === "Escape") setDraft(null)
           }}
-          className="col-start-1 row-start-1 h-8 w-full min-w-0 border-transparent bg-muted px-2.5 text-sm font-medium shadow-none md:text-sm dark:bg-muted"
+          className="col-start-1 row-start-1 h-7 w-full min-w-0 border-transparent bg-muted px-2.5 text-sm font-medium shadow-none md:text-sm dark:bg-muted"
         />
       </span>
     )
@@ -410,15 +410,15 @@ export function LessonFooter({
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium">
         <a
           href={homeHref}
-          className="flex shrink-0 items-center gap-2 rounded-md text-base font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="shrink-0 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          <LearnLogo className="size-6" />
-          <span className="max-sm:sr-only">{BRAND.name}</span>
+          <span className="max-sm:hidden">© {new Date().getFullYear()} </span>
+          {BRAND.name}
         </a>
         <span className="text-muted-foreground">{t.by}</span>
         <LinkButton
           variant="secondary"
-          size="xs"
+          size="sm"
           href={BRAND.makerUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -426,16 +426,7 @@ export function LessonFooter({
           <bdi dir="ltr">{BRAND.maker}</bdi>
         </LinkButton>
       </div>
-      <div className="flex items-center justify-end gap-2">
-        <span className="text-sm font-medium max-lg:hidden">
-          © {new Date().getFullYear()} {BRAND.name}
-        </span>
-        <span
-          aria-hidden="true"
-          className="text-muted-foreground max-lg:hidden"
-        >
-          ·
-        </span>
+      <div className="flex items-center justify-end gap-1">
         <SettingMenu
           label={t.textSize}
           icon={<TypeIcon />}
@@ -501,12 +492,14 @@ function SettingMenu<K extends string>({
 }) {
   return (
     <DropdownMenuTrigger>
-      <Button variant="ghost" size="xs" aria-label={`${label}: ${valueLabel}`}>
+      <Button variant="ghost" size="sm" aria-label={`${label}: ${valueLabel}`}>
         {icon}
         <span className="max-sm:sr-only">{valueLabel}</span>
       </Button>
       <DropdownMenu
         placement="top end"
+        // About nine rows; longer lists (languages) scroll inside.
+        maxHeight={320}
         className="w-auto min-w-40"
         selectionMode="single"
         disallowEmptySelection
@@ -517,8 +510,7 @@ function SettingMenu<K extends string>({
           if (key !== undefined) onChange(String(key) as K)
         }}
       >
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>{label}</DropdownMenuLabel>
+        <DropdownMenuGroup aria-label={label}>
           {options.map((o) => (
             <DropdownMenuItem key={o.id} id={o.id} textValue={o.label}>
               <span>

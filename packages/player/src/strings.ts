@@ -1,5 +1,7 @@
 // The player's own text (buttons, feedback titles, helper lines), translated by the player.
-// Lesson content stays in the lesson's language.
+// Lesson content stays in the lesson's language. One file per language lives in ./locales.
+
+import { STRINGS } from "./locales"
 
 export type Strings = {
   start: string
@@ -101,227 +103,57 @@ export type Strings = {
 export type TextSize = "sm" | "md" | "lg"
 export type Theme = "system" | "light" | "dark"
 
-const en: Strings = {
-  start: "Start lesson",
-  check: "Check answer",
-  continue: "Continue",
-  tryAgain: "Try again",
-  nudge: "Give it one more look. I think you can catch it.",
-  praise: ["There you go", "Nice work", "Exactly", "You got it", "Spot on"],
-  why: "Why?",
-  getHelp: "Get help",
-  hint: "Hint",
-  correct: "Correct!",
-  correctWithHint: "Correct, with a hint",
-  notQuite: "Not quite",
-  close: "Close, but not the best",
-  answer: "Here's the answer",
-  goodGuess: "Good guess!",
-  hookMiss: "Not quite, and that's fine",
-  hookNote: "This first one is a warm-up. It doesn't count toward your score.",
-  minutes: (n) => `${n} min`,
-  expires: (h) => `Expires in ${h}h`,
-  levels: {
-    beginner: "Beginner",
-    intermediate: "Intermediate",
-    advanced: "Advanced",
-  },
-  objective: "You'll be able to",
-  warmUp: "Warm-up guess",
-  concept: (i, n) => `Concept ${i} of ${n}`,
-  practice: "Practice",
-  challenge: "Challenge",
-  fixing: "Fixing mistakes",
-  keyTerm: "Key term",
-  helper: {
-    choiceOne: "Pick one.",
-    choiceMany: "Pick all that apply.",
-    compare: "Pick the better one.",
-    sort: "Drag each item into its group. With a keyboard, press Enter on an item's handle, then Tab to a group.",
-    order:
-      "Drag the items into order. With a keyboard, press Enter on a handle, then Tab to a new spot.",
-    match: "Tap an item, then tap its match.",
-    blank: "Tap a word to fill each gap.",
-    scenario: "Choose what you'd do.",
-  },
-  miss: {
-    missOne: "You're missing one.",
-    hotspot: "Not that one. Take another look.",
-    hotspotLine: "Not that line. Take another look.",
-    sort: (n) =>
-      n === 1
-        ? "1 item is in the wrong group."
-        : `${n} items are in the wrong group.`,
-    order: "Some items are out of order.",
-    match: (n) =>
-      n === 1 ? "1 pair doesn't match." : `${n} pairs don't match.`,
-    blank: "Check the highlighted gap.",
-  },
-  optionLabel: (l) => `Option ${l}`,
-  pool: "Items to sort",
-  allPlaced: "All placed",
-  dropHere: "Drop items here",
-  wordBank: "Word bank",
-  emptyGap: "Empty gap",
-  visual: "Visual",
-  showActions: "Show buttons",
-  hideActions: "Hide buttons",
-  fixTitle: "Let's fix your mistakes",
-  fixBody: (n) =>
-    n === 1
-      ? "One question is coming back. Give it another go before the wrap-up."
-      : `${n} questions are coming back. Give them another go before the wrap-up.`,
-  fixStart: "Start",
-  done: "Lesson complete!",
-  firstTry: "right on the first try",
-  withHint: "with a hint",
-  secondTry: "on the second try",
-  missed: "missed",
-  takeaways: "Key takeaways",
-  next: "Suggested next lesson",
-  restart: "Restart lesson",
-  progress: "Lesson progress",
-  restartTitle: "Restart this lesson?",
-  restartBody:
-    "You'll start again from the beginning. Your answers so far won't be kept.",
-  stay: "Keep learning",
-  home: "Learn home",
-  share: "Share",
-  docs: "Docs",
-  createLesson: "Create lesson",
-  renameLesson: "Rename lesson",
-  lessonName: "Lesson name",
-  lessonMenu: "Lesson menu",
-  part: (i, n) => `Part ${i} of ${n}`,
-  linkCopied: "Link copied",
-  theory: "Theory",
-  theoryEmpty: "Concepts show up here as you learn them.",
-  closeTheory: "Close theory",
-  by: "by",
-  textSize: "Text size",
-  defaultOption: "(default)",
-  sizes: { sm: "Small", md: "Medium", lg: "Large" },
-  sizesShort: { sm: "Sm", md: "Md", lg: "Lg" },
-  theme: "Theme",
-  themes: { system: "System", light: "Light", dark: "Dark" },
-  language: "Language",
-}
-
-const ar: Strings = {
-  start: "ابدأ الدرس",
-  check: "تحقّق من الإجابة",
-  continue: "متابعة",
-  tryAgain: "حاول مرة أخرى",
-  nudge: "ألقِ نظرة أخرى، أظنك ستجدها.",
-  praise: ["أحسنت", "عمل رائع", "بالضبط", "إجابة موفقة", "في الصميم"],
-  why: "لماذا؟",
-  getHelp: "احصل على مساعدة",
-  hint: "تلميح",
-  correct: "إجابة صحيحة!",
-  correctWithHint: "صحيحة، بمساعدة تلميح",
-  notQuite: "ليس تمامًا",
-  close: "قريب، لكنه ليس الأفضل",
-  answer: "إليك الإجابة",
-  goodGuess: "تخمين جيد!",
-  hookMiss: "ليس تمامًا، ولا بأس بذلك",
-  hookNote: "هذا سؤال تمهيدي، ولا يُحتسب في نتيجتك.",
-  minutes: (n) => `${n} دقائق`,
-  expires: (h) => `ينتهي خلال ${h} ساعة`,
-  levels: { beginner: "مبتدئ", intermediate: "متوسط", advanced: "متقدم" },
-  objective: "ستتمكن من",
-  warmUp: "تخمين تمهيدي",
-  concept: (i, n) => `المفهوم ${i} من ${n}`,
-  practice: "تدريب",
-  challenge: "تحدٍّ",
-  fixing: "تصحيح الأخطاء",
-  keyTerm: "مصطلح أساسي",
-  helper: {
-    choiceOne: "اختر إجابة واحدة.",
-    choiceMany: "اختر كل ما ينطبق.",
-    compare: "اختر الأفضل.",
-    sort: "اسحب كل عنصر إلى مجموعته. باستخدام لوحة المفاتيح، اضغط Enter على مقبض العنصر ثم Tab إلى المجموعة.",
-    order:
-      "اسحب العناصر لترتيبها. باستخدام لوحة المفاتيح، اضغط Enter على المقبض ثم Tab إلى موضع جديد.",
-    match: "اضغط على عنصر، ثم على ما يطابقه.",
-    blank: "اضغط على كلمة لملء كل فراغ.",
-    scenario: "اختر ما ستفعله.",
-  },
-  miss: {
-    missOne: "فاتك خيار.",
-    hotspot: "ليس هذا. أعد النظر.",
-    hotspotLine: "ليس هذا السطر. أعد النظر.",
-    sort: (n) => `${n} من العناصر في المجموعة الخطأ.`,
-    order: "بعض العناصر ليست في مكانها الصحيح.",
-    match: (n) => `${n} من الأزواج غير متطابقة.`,
-    blank: "راجع الفراغ المحدد.",
-  },
-  optionLabel: (l) => `الخيار ${l}`,
-  pool: "عناصر للتصنيف",
-  allPlaced: "تم وضع كل العناصر",
-  dropHere: "أفلت العناصر هنا",
-  wordBank: "بنك الكلمات",
-  emptyGap: "فراغ",
-  visual: "رسم توضيحي",
-  showActions: "إظهار الأزرار",
-  hideActions: "إخفاء الأزرار",
-  fixTitle: "لنصحّح أخطاءك",
-  fixBody: (n) => `سيعود ${n} من الأسئلة. جرّبها مرة أخرى قبل الختام.`,
-  fixStart: "ابدأ",
-  done: "أكملت الدرس!",
-  firstTry: "صحيحة من المحاولة الأولى",
-  withHint: "بمساعدة تلميح",
-  secondTry: "في المحاولة الثانية",
-  missed: "فاتتك",
-  takeaways: "أهم النقاط",
-  next: "الدرس التالي المقترح",
-  restart: "أعد الدرس",
-  progress: "تقدم الدرس",
-  restartTitle: "هل تريد إعادة هذا الدرس؟",
-  restartBody: "ستبدأ من جديد، ولن تُحفظ إجاباتك حتى الآن.",
-  stay: "تابع التعلم",
-  home: "الصفحة الرئيسية",
-  share: "مشاركة",
-  docs: "الدليل",
-  createLesson: "أنشئ درسًا",
-  renameLesson: "إعادة تسمية الدرس",
-  lessonName: "اسم الدرس",
-  lessonMenu: "قائمة الدرس",
-  part: (i, n) => `الجزء ${i} من ${n}`,
-  linkCopied: "تم نسخ الرابط",
-  theory: "النظرية",
-  theoryEmpty: "ستظهر المفاهيم هنا أثناء تعلّمك.",
-  closeTheory: "إغلاق النظرية",
-  by: "بواسطة",
-  textSize: "حجم النص",
-  defaultOption: "(افتراضي)",
-  sizes: { sm: "صغير", md: "متوسط", lg: "كبير" },
-  sizesShort: { sm: "صغير", md: "متوسط", lg: "كبير" },
-  theme: "المظهر",
-  themes: { system: "النظام", light: "فاتح", dark: "داكن" },
-  language: "اللغة",
-}
-
-const STRINGS: Record<string, Strings> = { en, ar }
-
-/** Languages the player's own text is translated into, with their names for the language menu. */
+/**
+ * Languages the player's own text is translated into: the code, the language's name in itself (for
+ * the language menu), and the locale React Aria ships its own strings under. React Aria has no
+ * Hindi, Indonesian, Vietnamese, or Thai, so its few announcements fall back to English there.
+ */
 export const UI_LANGUAGES = [
-  { code: "en", label: "English (US)" },
-  { code: "ar", label: "العربية" },
+  { code: "en", label: "English", aria: "en-US" },
+  { code: "es", label: "Español", aria: "es-ES" },
+  { code: "pt", label: "Português (Brasil)", aria: "pt-BR" },
+  { code: "fr", label: "Français", aria: "fr-FR" },
+  { code: "de", label: "Deutsch", aria: "de-DE" },
+  { code: "it", label: "Italiano", aria: "it-IT" },
+  { code: "nl", label: "Nederlands", aria: "nl-NL" },
+  { code: "pl", label: "Polski", aria: "pl-PL" },
+  { code: "ru", label: "Русский", aria: "ru-RU" },
+  { code: "uk", label: "Українська", aria: "uk-UA" },
+  { code: "tr", label: "Türkçe", aria: "tr-TR" },
+  { code: "ar", label: "العربية", aria: "ar-AE" },
+  { code: "he", label: "עברית", aria: "he-IL" },
+  { code: "hi", label: "हिन्दी", aria: "en-US" },
+  { code: "id", label: "Bahasa Indonesia", aria: "en-US" },
+  { code: "vi", label: "Tiếng Việt", aria: "en-US" },
+  { code: "th", label: "ไทย", aria: "en-US" },
+  { code: "ja", label: "日本語", aria: "ja-JP" },
+  { code: "ko", label: "한국어", aria: "ko-KR" },
+  { code: "zh", label: "中文（简体）", aria: "zh-CN" },
+  { code: "zh-tw", label: "中文（繁體）", aria: "zh-TW" },
 ] as const
+
+export type UiLanguage = (typeof UI_LANGUAGES)[number]["code"]
+
+/** The player's language for a code ("ar", "ar-EG", "zh-Hant-TW", "en-US"…): the base language, except Traditional Chinese. */
+function normalize(lang: string): UiLanguage | undefined {
+  const lower = lang.toLowerCase()
+  if (/^zh(-hant|-tw|-hk|-mo)/.test(lower)) return "zh-tw"
+  const base = lower.split("-")[0]
+  return UI_LANGUAGES.find((l) => l.code === base)?.code
+}
 
 /** The menu entry for a language code, or undefined when the player has no translation for it. */
 export function uiLanguageFor(lang: string) {
-  const base = lang.toLowerCase().split("-")[0]
-  return UI_LANGUAGES.find((l) => l.code === base)
+  const code = normalize(lang)
+  return UI_LANGUAGES.find((l) => l.code === code)
 }
 
-/** The player's text for a language code ("ar", "ar-EG", "en-US"…), falling back to English. */
+/** The player's text for a language code, falling back to English. */
 export function stringsFor(lang: string): Strings {
-  return STRINGS[lang.toLowerCase().split("-")[0]!] ?? en
+  return STRINGS[normalize(lang) ?? "en"]
 }
 
-/** React Aria's locale for a UI language. React Aria ships Arabic as ar-AE. */
+/** React Aria's locale for a UI language (its strings are keyed by full locale, Arabic as ar-AE). */
 export function ariaLocaleFor(lang: string): string {
-  const base = lang.toLowerCase().split("-")[0]
-  return base === "ar" ? "ar-AE" : lang
+  return uiLanguageFor(lang)?.aria ?? "en-US"
 }

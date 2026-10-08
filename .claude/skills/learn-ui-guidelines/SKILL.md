@@ -5,7 +5,7 @@ description: UI rules for the Learn app and lesson player. Use before building o
 
 # Learn UI guidelines
 
-The look comes from **shadcn's Vega style** (`aria-vega` in both `components.json` files). Colin's Figma frames are wireframes: follow their layout and content, but take component looks and sizes from shadcn, not from Figma. When Figma and Vega disagree on a component's look, Vega wins; when they disagree on layout, Figma wins.
+The look comes from **shadcn's Nova style** (`aria-nova` in both `components.json` files), with one tweak: the `sm` button keeps 14px text (Nova's own is 12.8px), the size Colin likes best at 28px tall. Colin's Figma frames are wireframes: follow their layout and content, but take component looks and sizes from shadcn, not from Figma. When Figma and Vega disagree on a component's look, Vega wins; when they disagree on layout, Figma wins.
 
 ## Components first
 
@@ -31,9 +31,9 @@ Every screen has visible layers in both themes. Windows are outlined, not filled
 
 ## Shapes and sizes
 
-- Radius: `rounded-md` for controls, `rounded-lg` for alerts and inner panels, `rounded-xl` for cards, `rounded-2xl` for windows, `rounded-full` only for pills, badges, progress, and avatars. No arbitrary radii.
+- Radius: `rounded-lg` for buttons, inputs, menus, alerts and inner panels (Nova's control shape), `rounded-md` for other controls (options, chips), `rounded-xl` for cards, `rounded-4xl` for the player's window, `rounded-full` only for pills, badges, progress, and avatars. No arbitrary radii.
 - Borders are 1px. No `border-[1.5px]` or 3D bottom shadows.
-- All buttons are `sm` (`icon-sm` for icon-only): the app frame and each screen's main action. The main action sits inline under the screen's content (not in a bottom bar) and shows an `Enter` `Kbd` hint, hidden on touch screens (`pointer-coarse:hidden`).
+- Button sizes: `sm` (28px, 14px text; `icon-sm` for icon-only) everywhere in the app frame, header and footer alike; `lg` (36px) only for the tray of actions under the lesson. The screen's main action lives in that tray and shows an `Enter` `Kbd` hint, hidden on touch screens (`pointer-coarse:hidden`).
 - One primary (filled) button per area. Everything else is `outline` or `ghost`.
 
 ## Typography
@@ -65,7 +65,7 @@ Every screen has visible layers in both themes. Windows are outlined, not filled
 ## Accessibility
 
 - Icon-only buttons need an `aria-label`. Progress and status changes are announced (`aria-live`, `valueLabel`).
-- Touch targets are at least 32px in the frame and 40px for main actions.
+- Touch targets: the frame's buttons are 28px tall but at least 32px wide; main actions in the tray are 36px.
 - Text and tinted backgrounds meet WCAG AA contrast in both themes.
 
 ## Copy
