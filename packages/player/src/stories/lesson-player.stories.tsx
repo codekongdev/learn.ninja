@@ -54,3 +54,15 @@ export const MapVsForEach: Story = {
   name: "map vs forEach",
   args: { lesson: lessons.coding },
 }
+/** The tray of buttons under the lesson closes with the notch or "?"; Enter still runs the main action. */
+export const TrayClosed: Story = {
+  args: { lesson: lessons.buttons },
+  // The player reads its preferences on mount, so the choice is saved before it renders.
+  loaders: [
+    () =>
+      localStorage.setItem(
+        "learn:preferences",
+        JSON.stringify({ textSize: "sm", tray: "closed" })
+      ),
+  ],
+}

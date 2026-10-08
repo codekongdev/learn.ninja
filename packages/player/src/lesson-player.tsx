@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { LightbulbIcon, PanelRightIcon } from "lucide-react"
 
 import type { Lesson, QuestionBrick } from "@workspace/spec"
@@ -83,6 +84,8 @@ export interface LessonPlayerProps {
   /** The app's color theme. Pass both to show the theme setting in the footer. */
   theme?: Theme
   onThemeChange?: (theme: Theme) => void
+  /** Called when the learner renames the lesson in the header. The player shows the new name either way. */
+  onRename?: (title: string) => void
 }
 
 export function LessonPlayer({
@@ -97,8 +100,14 @@ export function LessonPlayer({
   shareUrl,
   theme,
   onThemeChange,
+  onRename,
 }: LessonPlayerProps) {
+  // The title as shown, which a rename in the header changes.
+  const [title, setTitle] = React.useState(lesson.title)
+  React.useEffect(() => setTitle(lesson.title), [lesson.title])
+  const shown = React.useMemo(() => ({ ...lesson, title }), [lesson, title])
   const [prefs, setPrefs] = usePreferences()
+  const coarse = useCoarsePointer()
   // A choice made in the footer wins over the page's default for this session.
   const [chosen, setChosen] = React.useState<string>()
   const ui = chosen ?? uiLanguage ?? prefs.uiLanguage ?? lesson.language
@@ -114,8 +123,17 @@ export function LessonPlayer({
           className="flex h-full min-h-0 flex-col bg-background text-foreground"
         >
           <Player
-            lesson={lesson}
+            lesson={shown}
+            onRename={(next) => {
+              setTitle(next)
+              onRename?.(next)
+            }}
             textSize={prefs.textSize}
+            // Touch screens have no hotkeys to fall back on, so the tray stays open there.
+            trayOpen={coarse || prefs.tray !== "closed"}
+            onTrayToggle={() =>
+              setPrefs({ tray: prefs.tray === "closed" ? "open" : "closed" })
+            }
             expiresAt={expiresAt}
             homeHref={homeHref}
             docsHref={docsHref}
@@ -362,6 +380,9 @@ const SHOW_THEORY = false
 function Player({
   lesson,
   textSize,
+  trayOpen,
+  onTrayToggle,
+  onRename,
   expiresAt,
   homeHref,
   docsHref,
@@ -370,6 +391,9 @@ function Player({
 }: {
   lesson: Lesson
   textSize: TextSize
+  trayOpen: boolean
+  onTrayToggle: () => void
+  onRename: (title: string) => void
   expiresAt?: number
   homeHref: string
   docsHref?: string
@@ -395,6 +419,39 @@ function Player({
     mounted.current = true
   }, [state.index])
   const parts = partAt(state.items, state.index, state.inFix)
+  const coarse = useCoarsePointer()
+  // The tray holds the screen's buttons; "?" opens and closes it (Enter keeps working either way).
+  const [trayEl, setTrayEl] = React.useState<HTMLDivElement | null>(null)
+  const trayId = React.useId()
+  // The tray's natural height, and its height while the notch is being dragged.
+  const [trayHeight, setTrayHeight] = React.useState(0)
+  const [dragHeight, setDragHeight] = React.useState<number | null>(null)
+  // The same value in a ref: a quick flick can end before the state from its last move has rendered.
+  const dragRef = React.useRef<number | null>(null)
+  React.useEffect(() => {
+    if (!trayEl) return
+    const measure = () => setTrayHeight(trayEl.offsetHeight)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(trayEl)
+    return () => observer.disconnect()
+  }, [trayEl])
+  const shownHeight = dragHeight ?? (trayOpen ? trayHeight : 0)
+  const toggleTray = React.useRef(onTrayToggle)
+  toggleTray.current = onTrayToggle
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "?" || e.repeat || e.metaKey || e.ctrlKey || e.altKey)
+        return
+      const target = e.target as HTMLElement | null
+      if (target?.closest("input, textarea, select, [contenteditable=true]"))
+        return
+      e.preventDefault()
+      toggleTray.current()
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [])
   const seenConcepts = state.items
     .slice(0, state.index + 1)
     .flatMap((i) => (i.kind === "concept" ? [i.brick] : []))
@@ -413,10 +470,12 @@ function Player({
           setTheoryOpen(false)
           dispatch({ type: "restart", lesson })
         }}
+        onRename={onRename}
         t={t}
       />
       <div className="relative flex min-h-0 flex-1 gap-4 sm:px-8">
-        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y sm:rounded-2xl sm:border">
+        {/* The window: the content card on the tray's grey, so the card's corners stay round above it. */}
+        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-muted sm:rounded-4xl sm:border">
           <div className="relative flex min-w-0 flex-1 flex-col">
             {SHOW_THEORY ? (
               <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
@@ -436,36 +495,81 @@ function Player({
                 </Button>
               </div>
             ) : null}
-            <main
-              ref={scrollRef}
-              tabIndex={-1}
-              className="min-h-0 flex-1 overflow-y-auto outline-none"
-            >
-              <div
-                key={state.index}
-                className={cn(
-                  "mx-auto flex min-h-full w-full flex-col justify-center gap-8 px-4 py-16 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
-                  columnWidth(item),
-                  item.kind === "question" && "pb-40"
-                )}
+            {/* The card's border sits on the window's, so the top reads as one line and the bottom as the card on the tray. */}
+            <div className="relative flex min-h-0 flex-1 flex-col bg-background sm:-m-px sm:rounded-4xl sm:border">
+              <main
+                ref={scrollRef}
+                tabIndex={-1}
+                className="min-h-0 flex-1 overflow-y-auto outline-none"
               >
-                <div data-text-size={textSize} className="flex flex-col gap-6">
-                  <Screen
+                <div
+                  key={state.index}
+                  className={cn(
+                    "mx-auto flex min-h-full w-full flex-col justify-center gap-8 px-4 py-16 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
+                    columnWidth(item),
+                    item.kind === "question" && "pb-40"
+                  )}
+                >
+                  <div
+                    data-text-size={textSize}
+                    className="flex flex-col gap-6"
+                  >
+                    <Screen
+                      lesson={lesson}
+                      item={item}
+                      state={state}
+                      dispatch={dispatch}
+                    />
+                  </div>
+                  <ActionArea
                     lesson={lesson}
                     item={item}
                     state={state}
                     dispatch={dispatch}
+                    textSize={textSize}
+                    tray={{ el: trayEl, id: trayId }}
                   />
                 </div>
-                <ActionArea
-                  lesson={lesson}
-                  item={item}
-                  state={state}
-                  dispatch={dispatch}
-                  textSize={textSize}
+              </main>
+              {coarse ? null : (
+                <TrayNotch
+                  open={trayOpen}
+                  controls={trayId}
+                  onToggle={onTrayToggle}
+                  onDrag={(dy) => {
+                    const from = trayOpen ? trayHeight : 0
+                    dragRef.current =
+                      dy === null
+                        ? null
+                        : Math.min(trayHeight, Math.max(0, from - dy))
+                    setDragHeight(dragRef.current)
+                  }}
+                  onDrop={() => {
+                    const open = (dragRef.current ?? 0) > trayHeight / 2
+                    if (open !== trayOpen) onTrayToggle()
+                    dragRef.current = null
+                    setDragHeight(null)
+                  }}
+                  t={t}
                 />
-              </div>
-            </main>
+              )}
+            </div>
+            {/* The tray stays mounted so it can slide; closed, it's clipped to nothing and inert. */}
+            <div
+              className={cn(
+                "shrink-0 overflow-hidden",
+                dragHeight === null &&
+                  "transition-[height] duration-200 ease-out motion-reduce:transition-none"
+              )}
+              style={{ height: shownHeight }}
+              inert={!trayOpen && dragHeight === null}
+            >
+              <div
+                id={trayId}
+                ref={setTrayEl}
+                className="flex flex-wrap items-center justify-center gap-2 px-4 py-4"
+              />
+            </div>
           </div>
         </div>
         {SHOW_THEORY && theoryOpen ? (
@@ -757,12 +861,15 @@ export function ActionArea({
   state,
   dispatch,
   textSize,
+  tray,
 }: {
   lesson: Lesson
   item: Item
   state: State
   dispatch: React.Dispatch<Action>
   textSize: TextSize
+  /** The tray the buttons render into. `el` is null while it's closed: the buttons hide, Enter still works. */
+  tray?: { el: HTMLDivElement | null; id: string }
 }) {
   const { t, keyScope } = usePlayer()
   let tone: Tone = "neutral"
@@ -783,7 +890,7 @@ export function ActionArea({
   React.useEffect(() => setWhy(false), [state.index, state.question?.attempts])
   let explanation: string | null = null
   const helpButton = (label: string, onPress: () => void) => (
-    <Button variant="outline" size="sm" onPress={onPress}>
+    <Button variant="outline" size={tray ? "lg" : "sm"} onPress={onPress}>
       {label}
     </Button>
   )
@@ -898,30 +1005,39 @@ export function ActionArea({
     info: "border-border bg-popover text-popover-foreground",
   }
 
+  const buttons = (
+    <>
+      <Button
+        ref={primaryRef}
+        size={tray ? "lg" : "sm"}
+        variant={primary.variant ?? "default"}
+        onPress={primary.onPress}
+        isDisabled={primary.isDisabled}
+      >
+        {primary.label}
+        <Kbd
+          className={cn(
+            "pointer-coarse:hidden",
+            primary.variant === "warning" && "bg-yellow-950/10 text-yellow-950",
+            primary.variant === "success" && "bg-green-950/10 text-green-950"
+          )}
+        >
+          Enter
+        </Kbd>
+      </Button>
+      {secondary}
+    </>
+  )
+
   return (
     <>
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          ref={primaryRef}
-          size="sm"
-          variant={primary.variant ?? "default"}
-          onPress={primary.onPress}
-          isDisabled={primary.isDisabled}
-        >
-          {primary.label}
-          <Kbd
-            className={cn(
-              "pointer-coarse:hidden",
-              primary.variant === "warning" &&
-                "bg-yellow-950/10 text-yellow-950",
-              primary.variant === "success" && "bg-green-950/10 text-green-950"
-            )}
-          >
-            Enter
-          </Kbd>
-        </Button>
-        {secondary}
-      </div>
+      {tray ? (
+        tray.el ? (
+          createPortal(buttons, tray.el)
+        ) : null
+      ) : (
+        <div className="flex flex-wrap items-center gap-2">{buttons}</div>
+      )}
       <p aria-live="polite" className="sr-only">
         {title
           ? [title, message]
@@ -949,6 +1065,91 @@ export function ActionArea({
         </div>
       ) : null}
     </>
+  )
+}
+
+/** True on touch screens (no hover, no keyboard to speak of). False until mounted. */
+function useCoarsePointer(): boolean {
+  const [coarse, setCoarse] = React.useState(false)
+  React.useEffect(() => {
+    const query = matchMedia("(pointer: coarse)")
+    const update = () => setCoarse(query.matches)
+    update()
+    query.addEventListener("change", update)
+    return () => query.removeEventListener("change", update)
+  }, [])
+  return coarse
+}
+
+/** A short bar on the content's bottom edge: click, press, or drag it to close or open the tray. */
+function TrayNotch({
+  open,
+  controls,
+  onToggle,
+  onDrag,
+  onDrop,
+  t,
+}: {
+  open: boolean
+  controls: string
+  onToggle: () => void
+  /** How far the pointer has moved down since it grabbed the notch, or null once released. */
+  onDrag: (dy: number | null) => void
+  /** The pointer let go after a drag: settle the tray open or closed. */
+  onDrop: () => void
+  t: Strings
+}) {
+  const SLOP = 4
+  const start = React.useRef<number | null>(null)
+  const dragged = React.useRef(false)
+  const end = (e: React.PointerEvent) => {
+    if (start.current === null) return
+    start.current = null
+    e.currentTarget.releasePointerCapture(e.pointerId)
+    // Pointer capture keeps the pointer's release from reaching the button, so a plain tap toggles here.
+    if (dragged.current) onDrop()
+    else onToggle()
+  }
+  return (
+    // Capture-phase handlers: the button's own press handling stops pointer events from bubbling.
+    <div
+      className="flex shrink-0 justify-center"
+      style={{ touchAction: "none" }}
+      onPointerDownCapture={(e) => {
+        start.current = e.clientY
+        dragged.current = false
+        e.currentTarget.setPointerCapture(e.pointerId)
+      }}
+      onPointerMoveCapture={(e) => {
+        if (start.current === null) return
+        const dy = e.clientY - start.current
+        if (!dragged.current && Math.abs(dy) < SLOP) return
+        dragged.current = true
+        onDrag(dy)
+      }}
+      onPointerUpCapture={end}
+      onPointerCancelCapture={end}
+    >
+      <Button
+        variant="ghost"
+        size="sm"
+        aria-expanded={open}
+        aria-controls={open ? controls : undefined}
+        aria-label={open ? t.hideActions : t.showActions}
+        onPress={(e) => {
+          // Pointer presses are handled above; this is for Enter and Space.
+          if (e.pointerType === "keyboard" || e.pointerType === "virtual")
+            onToggle()
+        }}
+        // The hit area stays generous but invisible; only the bar reacts, like a grabber on iOS.
+        className="h-7 w-24 cursor-grab px-0 hover:bg-transparent active:translate-y-0 active:cursor-grabbing aria-expanded:bg-transparent dark:hover:bg-transparent"
+      >
+        <span
+          aria-hidden="true"
+          className="h-1.5 w-16 rounded-full bg-border transition-colors group-hover/button:bg-muted-foreground/60 group-active/button:bg-muted-foreground"
+        />
+      </Button>
+    </div>
   )
 }
 

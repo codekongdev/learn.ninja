@@ -18,6 +18,7 @@ import {
 
 import type { ConceptBrick } from "@workspace/spec"
 import { Button, LinkButton } from "@workspace/ui/components/button"
+import { Input } from "@workspace/ui/components/input"
 import {
   Dialog,
   DialogClose,
@@ -99,6 +100,8 @@ export interface Preferences {
   textSize: TextSize
   /** The viewer's chosen language for the player's own text. */
   uiLanguage?: string
+  /** Whether the tray of action buttons under the lesson is open (it is until closed). */
+  tray?: "open" | "closed"
 }
 
 const PREFERENCES_KEY = "learn:preferences"
@@ -154,6 +157,7 @@ export function LessonHeader({
   createHref,
   shareUrl,
   onRestart,
+  onRename,
   t,
 }: {
   title: string
@@ -164,6 +168,8 @@ export function LessonHeader({
   createHref?: string
   shareUrl?: string
   onRestart: () => void
+  /** Called with the new title when the learner renames the lesson in the header. */
+  onRename?: (title: string) => void
   t: Strings
 }) {
   const hours = useHoursLeft(expiresAt)
@@ -182,26 +188,28 @@ export function LessonHeader({
         <span aria-hidden="true" className="text-xs text-muted-foreground">
           /
         </span>
-        <DropdownMenuTrigger>
-          <Button variant="ghost" size="sm" className="min-w-0 shrink gap-3">
-            <span className="truncate">{title}</span>
-            <ChevronDownIcon />
-          </Button>
-          <DropdownMenu className="w-auto">
-            <DropdownMenuGroup>
-              {hours !== null ? (
-                <DropdownMenuLabel className="flex items-center gap-1.5">
-                  <ClockIcon className="size-3.5" aria-hidden="true" />
-                  {t.expires(hours)}
-                </DropdownMenuLabel>
-              ) : null}
-              <DropdownMenuItem onAction={() => setConfirmRestart(true)}>
-                <RotateCcwIcon />
-                {t.restart}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenu>
-        </DropdownMenuTrigger>
+        <div className="flex min-w-0 items-center">
+          <LessonTitle title={title} onRename={onRename} t={t} />
+          <DropdownMenuTrigger>
+            <Button variant="ghost" size="icon-sm" aria-label={t.lessonMenu}>
+              <ChevronDownIcon />
+            </Button>
+            <DropdownMenu className="w-auto">
+              <DropdownMenuGroup>
+                {hours !== null ? (
+                  <DropdownMenuLabel className="flex items-center gap-1.5">
+                    <ClockIcon className="size-3.5" aria-hidden="true" />
+                    {t.expires(hours)}
+                  </DropdownMenuLabel>
+                ) : null}
+                <DropdownMenuItem onAction={() => setConfirmRestart(true)}>
+                  <RotateCcwIcon />
+                  {t.restart}
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenu>
+          </DropdownMenuTrigger>
+        </div>
         <Dialog isOpen={confirmRestart} onOpenChange={setConfirmRestart}>
           <DialogHeader>
             <DialogTitle>{t.restartTitle}</DialogTitle>
@@ -235,6 +243,62 @@ export function LessonHeader({
         ) : null}
       </div>
     </header>
+  )
+}
+
+/** The lesson's title. Press it to edit; Enter or leaving the field saves, Escape cancels. */
+function LessonTitle({
+  title,
+  onRename,
+  t,
+}: {
+  title: string
+  onRename?: (title: string) => void
+  t: Strings
+}) {
+  const [draft, setDraft] = React.useState<string | null>(null)
+  const commit = () => {
+    const next = draft?.trim()
+    if (next && next !== title) onRename?.(next)
+    setDraft(null)
+  }
+  if (draft !== null)
+    return (
+      // Edited in place: the field takes the title's exact look and spot, and its width follows the
+      // text (the hidden copy underneath sets the size). Nothing moves when editing starts.
+      <span className="inline-grid max-w-40 min-w-0 shrink items-center sm:max-w-80">
+        <span
+          aria-hidden="true"
+          className="invisible col-start-1 row-start-1 h-8 px-2.5 text-sm font-medium whitespace-pre"
+        >
+          {draft || " "}
+        </span>
+        <Input
+          autoFocus
+          aria-label={t.lessonName}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onFocus={(e) => e.target.select()}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit()
+            if (e.key === "Escape") setDraft(null)
+          }}
+          className="col-start-1 row-start-1 h-8 w-full min-w-0 border-transparent bg-muted px-2.5 text-sm font-medium shadow-none md:text-sm dark:bg-muted"
+        />
+      </span>
+    )
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      aria-label={t.renameLesson}
+      onPress={() => setDraft(title)}
+      // Hugs the title up to a cap, then truncates (titles are at most 60 characters).
+      className="max-w-40 min-w-0 shrink sm:max-w-80"
+    >
+      <span className="truncate">{title}</span>
+    </Button>
   )
 }
 
@@ -354,7 +418,7 @@ export function LessonFooter({
         <span className="text-muted-foreground">{t.by}</span>
         <LinkButton
           variant="secondary"
-          size="sm"
+          size="xs"
           href={BRAND.makerUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -366,7 +430,10 @@ export function LessonFooter({
         <span className="text-sm font-medium max-lg:hidden">
           © {new Date().getFullYear()} {BRAND.name}
         </span>
-        <span aria-hidden="true" className="text-muted-foreground max-lg:hidden">
+        <span
+          aria-hidden="true"
+          className="text-muted-foreground max-lg:hidden"
+        >
           ·
         </span>
         <SettingMenu
@@ -434,7 +501,7 @@ function SettingMenu<K extends string>({
 }) {
   return (
     <DropdownMenuTrigger>
-      <Button variant="ghost" size="sm" aria-label={`${label}: ${valueLabel}`}>
+      <Button variant="ghost" size="xs" aria-label={`${label}: ${valueLabel}`}>
         {icon}
         <span className="max-sm:sr-only">{valueLabel}</span>
       </Button>

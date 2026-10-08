@@ -56,6 +56,9 @@ export type Strings = {
   emptyGap: string
   /** Name of an HTML visual with no alt text. */
   visual: string
+  /** The notch that opens and closes the tray of action buttons. */
+  showActions: string
+  hideActions: string
   fixTitle: string
   fixBody: (n: number) => string
   fixStart: string
@@ -75,6 +78,10 @@ export type Strings = {
   share: string
   docs: string
   createLesson: string
+  /** The title in the header: press to edit it. */
+  renameLesson: string
+  lessonName: string
+  lessonMenu: string
   part: (i: number, n: number) => string
   linkCopied: string
   theory: string
@@ -157,6 +164,8 @@ const en: Strings = {
   wordBank: "Word bank",
   emptyGap: "Empty gap",
   visual: "Visual",
+  showActions: "Show buttons",
+  hideActions: "Hide buttons",
   fixTitle: "Let's fix your mistakes",
   fixBody: (n) =>
     n === 1
@@ -180,6 +189,9 @@ const en: Strings = {
   share: "Share",
   docs: "Docs",
   createLesson: "Create lesson",
+  renameLesson: "Rename lesson",
+  lessonName: "Lesson name",
+  lessonMenu: "Lesson menu",
   part: (i, n) => `Part ${i} of ${n}`,
   linkCopied: "Link copied",
   theory: "Theory",
@@ -250,6 +262,8 @@ const ar: Strings = {
   wordBank: "بنك الكلمات",
   emptyGap: "فراغ",
   visual: "رسم توضيحي",
+  showActions: "إظهار الأزرار",
+  hideActions: "إخفاء الأزرار",
   fixTitle: "لنصحّح أخطاءك",
   fixBody: (n) => `سيعود ${n} من الأسئلة. جرّبها مرة أخرى قبل الختام.`,
   fixStart: "ابدأ",
@@ -269,6 +283,9 @@ const ar: Strings = {
   share: "مشاركة",
   docs: "الدليل",
   createLesson: "أنشئ درسًا",
+  renameLesson: "إعادة تسمية الدرس",
+  lessonName: "اسم الدرس",
+  lessonMenu: "قائمة الدرس",
   part: (i, n) => `الجزء ${i} من ${n}`,
   linkCopied: "تم نسخ الرابط",
   theory: "النظرية",
