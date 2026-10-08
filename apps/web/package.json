@@ -11,6 +11,7 @@
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
     "visuals:css": "node scripts/build-visuals-css.mjs",
+    "favicon": "node scripts/build-favicon.mjs",
     "predev": "npm run visuals:css",
     "prebuild": "npm run visuals:css",
     "test": "vitest run",
@@ -44,6 +45,7 @@
     "@workspace/typescript-config": "*",
     "basecoat-css": "^1.0.2",
     "eslint": "^10",
+    "sharp": "^0.35.5",
     "typescript": "^5",
     "unist-util-visit": "^5.1.0",
     "vitest": "^4.1.11"

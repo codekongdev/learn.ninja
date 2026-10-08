@@ -28,6 +28,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `npm run storybook`: Storybook at http://localhost:6006 (theme and language switches in the toolbar)
 - `npm run skill:build -w @workspace/cli`: rebuild `skills/learn` (bundled CLI, schema, examples) after changing the spec, CLI, or examples; a test fails if it's stale
 - `npm run schema -w @workspace/spec`: re-export `packages/spec/schema/lesson.schema.json` after changing the spec (a test fails if it's stale)
+- `npm run favicon -w web`: rebuild `apps/web/app/favicon.ico` from `app/icon.svg` after changing the icon
 - Add shadcn components from `apps/web`: `npx shadcn@latest add <name>` (they land in `packages/ui`)
 
 ## Vocabulary
