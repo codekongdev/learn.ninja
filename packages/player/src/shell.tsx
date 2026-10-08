@@ -18,6 +18,12 @@ import {
 
 import type { ConceptBrick } from "@workspace/spec"
 import { Button, LinkButton } from "@workspace/ui/components/button"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@workspace/ui/components/command"
 import { Input } from "@workspace/ui/components/input"
 import {
   Dialog,
@@ -34,6 +40,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
+import { Popover, PopoverTrigger } from "@workspace/ui/components/popover"
 import { Progress } from "@workspace/ui/components/progress"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -453,20 +460,61 @@ export function LessonFooter({
             onChange={onThemeChange}
           />
         ) : null}
-        <SettingMenu
-          label={t.language}
-          icon={<GlobeIcon />}
+        <LanguageMenu
           value={language.code}
           valueLabel={language.label}
-          options={UI_LANGUAGES.map((l) => ({
-            id: l.code,
-            label: l.label,
-            lang: l.code,
-          }))}
           onChange={(code) => onPrefs({ uiLanguage: code })}
+          t={t}
         />
       </div>
     </footer>
+  )
+}
+
+/** The language setting: a searchable list, since there are many languages to scroll through. */
+function LanguageMenu({
+  value,
+  valueLabel,
+  onChange,
+  t,
+}: {
+  value: string
+  valueLabel: string
+  onChange: (code: string) => void
+  t: Strings
+}) {
+  const [open, setOpen] = React.useState(false)
+  return (
+    <PopoverTrigger isOpen={open} onOpenChange={setOpen}>
+      <Button
+        variant="ghost"
+        size="sm"
+        aria-label={`${t.language}: ${valueLabel}`}
+      >
+        <GlobeIcon />
+        <span className="max-sm:sr-only">{valueLabel}</span>
+      </Button>
+      <Popover placement="top end" className="w-60 p-0">
+        <Command>
+          <CommandInput placeholder={t.language} />
+          <CommandList
+            aria-label={t.language}
+            selectionMode="single"
+            selectedKeys={[value]}
+            onAction={(key) => {
+              onChange(String(key))
+              setOpen(false)
+            }}
+          >
+            {UI_LANGUAGES.map((l) => (
+              <CommandItem key={l.code} id={l.code} textValue={l.label}>
+                <span lang={l.code}>{l.label}</span>
+              </CommandItem>
+            ))}
+          </CommandList>
+        </Command>
+      </Popover>
+    </PopoverTrigger>
   )
 }
 

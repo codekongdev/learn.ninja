@@ -2,9 +2,28 @@ import type { NextConfig } from "next"
 import optimizeLocales from "@react-aria/optimize-locales-plugin"
 import { createMDX } from "fumadocs-mdx/next"
 
-// Languages whose built-in React Aria strings we ship. React Aria stores Arabic as ar-AE:
-// listing another Arabic code (e.g. ar-EG) silently strips the Arabic strings.
-const LOCALES = ["en-US", "ar-AE"]
+// Languages whose built-in React Aria strings we ship: one per player language (UI_LANGUAGES in
+// packages/player/src/strings.ts). React Aria keys them by full locale, Arabic as ar-AE: a code it
+// doesn't know (e.g. ar-EG) silently strips that language's strings.
+const LOCALES = [
+  "en-US",
+  "es-ES",
+  "pt-BR",
+  "fr-FR",
+  "de-DE",
+  "it-IT",
+  "nl-NL",
+  "pl-PL",
+  "ru-RU",
+  "uk-UA",
+  "tr-TR",
+  "ar-AE",
+  "he-IL",
+  "ja-JP",
+  "ko-KR",
+  "zh-CN",
+  "zh-TW",
+]
 
 // Requests that don't accept HTML (curl, agents) get Markdown for the home page and docs.
 // The router's own RSC requests don't ask for HTML either, so they're left out.

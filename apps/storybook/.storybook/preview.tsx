@@ -3,8 +3,9 @@ import * as React from "react"
 
 import "katex/dist/katex.min.css"
 import "@workspace/ui/globals.css"
+import { UI_LANGUAGES } from "@workspace/player"
 
-// Toolbar switches: light/dark theme, and the player's own language (English, or Arabic right to left).
+// Toolbar switches: light/dark theme, and the player's own language (every language it speaks).
 // Stories read the language from context.globals.ui.
 
 const withTheme: Decorator = (Story, context) => {
@@ -39,10 +40,7 @@ const preview: Preview = {
       toolbar: {
         title: "Language",
         icon: "globe",
-        items: [
-          { value: "en", title: "English (left to right)" },
-          { value: "ar", title: "Arabic (right to left)" },
-        ],
+        items: UI_LANGUAGES.map((l) => ({ value: l.code, title: l.label })),
         dynamicTitle: true,
       },
     },
