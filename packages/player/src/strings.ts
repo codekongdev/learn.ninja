@@ -33,8 +33,6 @@ export type Strings = {
     choiceOne: string
     choiceMany: string
     compare: string
-    hotspot: string
-    hotspotLine: string
     sort: string
     order: string
     match: string
@@ -130,8 +128,6 @@ const en: Strings = {
     choiceOne: "Pick one.",
     choiceMany: "Pick all that apply.",
     compare: "Pick the better one.",
-    hotspot: "Tap the right part.",
-    hotspotLine: "Tap the right line.",
     sort: "Drag each item into its group. With a keyboard, press Enter on an item's handle, then Tab to a group.",
     order:
       "Drag the items into order. With a keyboard, press Enter on a handle, then Tab to a new spot.",
@@ -228,8 +224,6 @@ const ar: Strings = {
     choiceOne: "اختر إجابة واحدة.",
     choiceMany: "اختر كل ما ينطبق.",
     compare: "اختر الأفضل.",
-    hotspot: "اضغط على الجزء الصحيح.",
-    hotspotLine: "اضغط على السطر الصحيح.",
     sort: "اسحب كل عنصر إلى مجموعته. باستخدام لوحة المفاتيح، اضغط Enter على مقبض العنصر ثم Tab إلى المجموعة.",
     order:
       "اسحب العناصر لترتيبها. باستخدام لوحة المفاتيح، اضغط Enter على المقبض ثم Tab إلى موضع جديد.",

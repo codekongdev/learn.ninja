@@ -475,9 +475,7 @@ function helperFor(step: Step, t: Strings): string {
     case "number":
       return ""
     case "hotspot":
-      return step.visual.kind === "code"
-        ? t.helper.hotspotLine
-        : t.helper.hotspot
+      return step.multiple ? t.helper.choiceMany : ""
     default:
       return t.helper[step.type]
   }

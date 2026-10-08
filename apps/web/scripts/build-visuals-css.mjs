@@ -38,15 +38,6 @@ ${block(":root")}
 ${block(".dark")}
 
 html, body { background: transparent; color: var(--foreground); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
-
-/* Hotspot regions: the player wires up the taps from outside the sandbox */
-[data-hotspot] { cursor: pointer; outline: 2px dashed transparent; outline-offset: 4px; transition: outline-color 0.15s; }
-[data-hotspot]:hover { outline-color: var(--ring); }
-[data-hotspot]:focus-visible { outline: 2px solid var(--ring); }
-[data-hotspot].hs-on { outline: 2.5px solid var(--primary); }
-[data-hotspot].hs-good { outline: 2.5px solid #16a34a; }
-[data-hotspot].hs-bad { outline: 2.5px solid #eab308; }
-[data-hotspot].hs-locked { cursor: default; }
 `
 
 const inputPath = join(outDir, "lesson-visuals.css")

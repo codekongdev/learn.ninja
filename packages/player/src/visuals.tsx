@@ -100,67 +100,117 @@ function HtmlFrame({
     doc.documentElement.dir = dir
   }, [loaded, dark, dir])
 
-  // Hotspots: the player attaches the taps from outside the sandbox.
-  React.useEffect(() => {
-    const doc = ref.current?.contentDocument
-    if (!doc || !hotspotsRef.current) return
-    const targets = [...doc.querySelectorAll<HTMLElement>("[data-hotspot]")]
-    const cleanups = targets.map((el) => {
-      const id = el.dataset.hotspot!
-      el.tabIndex = 0
-      el.setAttribute("role", "button")
-      const toggle = (e: Event) => {
-        e.preventDefault()
-        const h = hotspotsRef.current
-        if (h && !h.disabled) h.onToggle(id)
-      }
-      const key = (e: KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === " ") toggle(e)
-      }
-      el.addEventListener("click", toggle)
-      el.addEventListener("keydown", key)
-      return () => {
-        el.removeEventListener("click", toggle)
-        el.removeEventListener("keydown", key)
-      }
-    })
-    return () => cleanups.forEach((c) => c())
-  }, [loaded])
-
-  React.useEffect(() => {
-    const doc = ref.current?.contentDocument
-    if (!doc || !hotspots) return
-    for (const el of doc.querySelectorAll<HTMLElement>("[data-hotspot]")) {
-      const id = el.dataset.hotspot!
-      const mark = hotspots.marks[id]
-      el.setAttribute("aria-pressed", String(hotspots.selected.includes(id)))
-      el.classList.toggle("hs-on", hotspots.selected.includes(id) && !mark)
-      el.classList.toggle("hs-good", mark === "correct")
-      el.classList.toggle("hs-bad", mark === "wrong")
-      el.classList.toggle("hs-locked", hotspots.disabled)
-    }
-  }, [loaded, hotspots])
-
+  // Hotspots: Safari won't run event listeners inside a sandbox without allow-scripts, so the taps
+  // land on buttons the player lays over each [data-hotspot] element instead. That also keeps focus
+  // in the page, so Enter still checks the answer.
   const interactive = Boolean(hotspots)
+  const [spots, setSpots] = React.useState<SpotBox[]>([])
+  React.useEffect(() => {
+    const doc = ref.current?.contentDocument
+    if (!doc?.body || !interactive) return
+    const elements = [...doc.querySelectorAll<HTMLElement>("[data-hotspot]")]
+    const measure = () =>
+      setSpots(
+        elements.map((el) => {
+          const r = el.getBoundingClientRect()
+          return {
+            id: el.dataset.hotspot!,
+            label:
+              el.getAttribute("aria-label") ||
+              el.textContent?.trim() ||
+              el.dataset.hotspot!,
+            top: r.top,
+            left: r.left,
+            width: r.width,
+            height: r.height,
+            radius: getComputedStyle(el).borderRadius,
+          }
+        })
+      )
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(doc.body)
+    elements.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [loaded, dark, dir, interactive])
+
   return (
     <div
       className="visual-stage overflow-hidden rounded-xl border bg-muted/40 bg-[radial-gradient(var(--border)_1px,transparent_1.2px)] [background-size:16px_16px]"
       inert={!interactive}
     >
-      <iframe
-        ref={ref}
-        title={label ?? "Example"}
-        sandbox="allow-same-origin"
-        srcDoc={srcDoc}
-        onLoad={() => setLoaded((n) => n + 1)}
-        tabIndex={interactive ? 0 : -1}
-        className={cn(
-          "block w-full border-0",
-          !interactive && "pointer-events-none"
-        )}
-        style={{ height: height ?? measured ?? 120 }}
-      />
+      <div className="relative">
+        <iframe
+          ref={ref}
+          title={label ?? "Example"}
+          sandbox="allow-same-origin"
+          srcDoc={srcDoc}
+          onLoad={() => setLoaded((n) => n + 1)}
+          tabIndex={-1}
+          inert
+          className="pointer-events-none block w-full border-0"
+          style={{ height: height ?? measured ?? 120 }}
+        />
+        {hotspots
+          ? spots.map((spot) => (
+              <HotspotButton key={spot.id} spot={spot} control={hotspots} />
+            ))
+          : null}
+      </div>
     </div>
+  )
+}
+
+/** Where a [data-hotspot] element sits inside the frame, measured from the player. */
+interface SpotBox {
+  id: string
+  label: string
+  top: number
+  left: number
+  width: number
+  height: number
+  radius: string
+}
+
+function HotspotButton({
+  spot,
+  control,
+}: {
+  spot: SpotBox
+  control: HotspotControl
+}) {
+  const mark = control.marks[spot.id]
+  const selected = control.selected.includes(spot.id)
+  return (
+    <Selectable
+      aria-label={spot.label}
+      isSelected={selected}
+      onChange={() => control.onToggle(spot.id)}
+      isDisabled={control.disabled}
+      data-status={mark}
+      className={cn(
+        "absolute cursor-pointer outline-2 outline-offset-4 transition-[outline-color] outline-solid",
+        mark === "correct"
+          ? "outline-green-600"
+          : mark === "wrong"
+            ? "outline-yellow-500"
+            : selected
+              ? "outline-primary"
+              : "outline-transparent",
+        !mark &&
+          !selected &&
+          !control.disabled &&
+          "hover:outline-ring hover:outline-dashed"
+      )}
+      // Measured positions inside the frame, so physical edges are right in both directions.
+      style={{
+        top: spot.top,
+        left: spot.left,
+        width: spot.width,
+        height: spot.height,
+        borderRadius: spot.radius,
+      }}
+    />
   )
 }
 
