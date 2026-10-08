@@ -79,26 +79,47 @@ Visuals make lessons feel real. There are three kinds:
 
 ### The built-in UI kit for HTML visuals
 
-HTML visuals use **Basecoat** (shadcn/ui's design system as plain HTML) plus **Tailwind utility classes** for layout. They match the player's look automatically.
+HTML visuals use **Basecoat** (shadcn/ui's design system as plain HTML, in shadcn's standard Vega style) plus **Tailwind utility classes** for layout. They match the player's look automatically.
 
-| Component    | Markup                                                                                                                                                      |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Button       | `<button class="btn">Save</button>`; add `data-variant="secondary"`, `"outline"`, `"ghost"`, `"link"`, or `"destructive"`; `data-size="sm"`, `"lg"`, `"xs"` |
-| Input        | `<input class="input" placeholder="Email">`, with `<label class="label">Email</label>`                                                                      |
-| Textarea     | `<textarea class="textarea"></textarea>`                                                                                                                    |
-| Checkbox     | `<input type="checkbox" class="input" checked>`                                                                                                             |
-| Switch       | `<input type="checkbox" role="switch" class="input">`                                                                                                       |
-| Badge        | `<span class="badge">New</span>`; `data-variant="secondary"`, `"outline"`, `"destructive"`                                                                  |
-| Alert        | `<div class="alert"><h2>Heads up</h2><section>Your trial ends soon.</section></div>`; `data-variant="destructive"`                                          |
-| Card         | `<div class="card"><header><h2>Title</h2><p>Description</p></header><section>Body</section><footer>…</footer></div>`                                        |
-| Table        | `<table class="table">…</table>`                                                                                                                            |
-| Keyboard key | `<kbd class="kbd">⌘K</kbd>`                                                                                                                                 |
+| Component       | Markup                                                                                                                                                                       |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button          | `<button class="btn">Save</button>`; add `data-variant="secondary"`, `"outline"`, `"ghost"`, `"link"`, or `"destructive"`; `data-size="sm"`, `"lg"`, `"xs"`                  |
+| Field           | `<div class="field"><label class="label" for="email">Email</label><input class="input" id="email"></div>`                                                                    |
+| Field error     | Add `data-invalid="true"` to the field and `aria-invalid="true"` to the input, then `<p role="alert">Enter a full email address.</p>`                                        |
+| Textarea        | `<textarea class="textarea"></textarea>`                                                                                                                                     |
+| Checkbox        | `<label class="label"><input type="checkbox" class="input" checked> Remember me</label>`                                                                                     |
+| Switch          | `<input type="checkbox" role="switch" class="input">`                                                                                                                        |
+| Radio           | `<input type="radio" name="plan" class="input" checked>`, one per option, each in a `label`                                                                                  |
+| Select (closed) | `<select class="select"><option>Canada</option></select>`                                                                                                                    |
+| Slider          | `<input type="range" class="input" value="40">`                                                                                                                              |
+| Progress        | `<div class="progress"><span class="w-3/5"></span></div>`                                                                                                                    |
+| Tabs            | `<div class="tabs"><nav role="tablist"><button role="tab" aria-selected="true">Account</button><button role="tab">Password</button></nav><div role="tabpanel">…</div></div>` |
+| Accordion       | `<section class="accordion"><details open><summary>Is it free?</summary><section><p>Yes.</p></section></details></section>`                                                  |
+| Badge           | `<span class="badge">New</span>`; `data-variant="secondary"`, `"outline"`, `"destructive"`                                                                                   |
+| Alert           | `<div class="alert"><h2>Heads up</h2><section>Your trial ends soon.</section></div>`; `data-variant="destructive"`                                                           |
+| Card            | `<div class="card"><header><h2>Title</h2><p>Description</p></header><section>Body</section><footer>…</footer></div>`                                                         |
+| Table           | `<table class="table">…</table>`                                                                                                                                             |
+| Avatar          | `<span class="avatar"><span>CP</span></span>`                                                                                                                                |
+| Skeleton        | `<div class="skeleton h-4 w-40"></div>`                                                                                                                                      |
+| Empty state     | `<div class="empty"><header><h3>No projects yet</h3><p>Create one to get started.</p></header><section><button class="btn">New project</button></section></div>`             |
+| Keyboard key    | `<kbd class="kbd">⌘K</kbd>`                                                                                                                                                  |
+
+Overlays render in place, sized to fit the visual, so you can show them open:
+
+| Overlay     | Markup                                                                                                                                                                                                                             |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dialog      | `<dialog class="dialog" open><div><header><h2>Rename project</h2><p>…</p></header><section>…</section><footer>buttons</footer></div></dialog>`; `class="alert-dialog"` for a confirmation                                          |
+| Toast       | `<div class="toaster"><div class="toast" role="status"><div class="toast-content"><section><h2>Saved</h2><p>…</p></section><footer>…</footer></div></div></div>`                                                                   |
+| Open menu   | `<div class="dropdown-menu"><button class="btn" data-variant="outline">Options</button><div data-popover aria-hidden="false"><div role="menu"><div role="menuitem">Edit</div><hr role="separator">…</div></div></div>`             |
+| Open select | `<div class="select"><button class="btn" data-variant="outline">Apple</button><div data-popover aria-hidden="false"><div role="listbox"><div role="option" data-value="apple" aria-selected="true">Apple</div>…</div></div></div>` |
+| Popover     | `<div class="popover"><button class="btn">Share</button><div data-popover aria-hidden="false">…</div></div>`; opens below, or above with `data-side="top"`                                                                         |
+| Tooltip     | `data-tooltip="Copy link"` on any element; shows above it, or below with `data-side="bottom"`                                                                                                                                      |
 
 - **Layout:** Tailwind utilities like `flex gap-2 flex-wrap`, `grid grid-cols-2 gap-4`, `p-4`, `rounded-lg`, `border`, `text-sm`, `font-medium`, `text-muted-foreground`, `bg-muted`.
 - **Theme colors:** use the theme's color names (`bg-primary`, `text-primary-foreground`, `bg-muted`, `border-border`, `text-destructive`) rather than fixed colors, so visuals work in light and dark mode.
 - **Right-to-left:** use direction-aware spacing (`ms-2`, `me-2`, `ps-4`, `pe-4`, `start-0`, `end-0`), not left/right ones.
 - **Keep visuals small and focused:** show just enough to make the point. Each visual must be under 20 KB.
-- **Not allowed** (the checker rejects them): `<script>`, event handlers like `onclick`, `<iframe>`, `<form>`, `<object>`, `<embed>`, `javascript:` links, and anything loaded from an external URL (images, fonts, stylesheets). Interactive components (dropdowns, tabs, dialogs) can be shown in a fixed state but can't be operated.
+- **Not allowed** (the checker rejects them): `<script>`, event handlers like `onclick`, `<iframe>`, `<form>`, `<object>`, `<embed>`, `javascript:` links, and anything loaded from an external URL (images, fonts, stylesheets). A visual is a still picture: components show the state you write (open, checked, selected, invalid) and can't be operated.
 - **No images or photos in v1.** Draw what you need with HTML/CSS or inline SVG.
 - **Charts in inline SVG:** color strokes and text with theme classes (`stroke-primary`, `stroke-muted-foreground`, `fill-muted-foreground`, `stroke-border`) so they work in both themes, and add `direction='ltr'` to the `<svg>` so axis labels don't flip when the player is right to left (SVG ignores `dir`).
 

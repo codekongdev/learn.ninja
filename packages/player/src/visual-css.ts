@@ -38,8 +38,8 @@ function tailwindStylesheet(id: string): {
   return { content: stylesheets.get(file)!, base: tailwindDir(), path: file }
 }
 
-/** Class names used in a lesson's HTML visuals. */
-export function visualClasses(lesson: Lesson): string[] {
+/** Class names used in a lesson's HTML visuals (or in any `html` fields, like the Storybook UI kit). */
+export function visualClasses(lesson: Lesson | object): string[] {
   const classes = new Set<string>()
   walkStrings(lesson, (value, key) => {
     if (key !== "html" || typeof value !== "string") return

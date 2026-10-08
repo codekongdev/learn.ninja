@@ -1,5 +1,6 @@
 // Prepares the example lessons for Storybook (KaTeX formulas, Shiki highlighting), the same way the
-// web app does on the server, and writes src/stories/prepared.generated.json.
+// web app does on the server, plus the Tailwind classes of the visual kit story, and writes
+// src/stories/prepared.generated.json.
 // Run: npm run stories:prepare -w @workspace/player
 import { readdirSync, readFileSync, writeFileSync } from "node:fs"
 
@@ -8,6 +9,7 @@ import { validateLesson } from "@workspace/spec"
 import { prepareLesson } from "../src/prepare"
 import { visualClasses, visualsCssFor } from "../src/visual-css"
 import type { Prepared } from "../src/prepared"
+import { visualKit } from "../src/stories/visual-kit"
 
 const dir = new URL("../../../examples/", import.meta.url)
 const merged: Prepared = { math: {}, code: {}, visualsCss: "" }
@@ -21,6 +23,7 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   Object.assign(merged.code, prepared.code)
   for (const c of visualClasses(result.lesson)) classes.add(c)
 }
+for (const c of visualClasses(visualKit)) classes.add(c)
 merged.visualsCss = await visualsCssFor([...classes])
 
 const out = new URL("../src/stories/prepared.generated.json", import.meta.url)
