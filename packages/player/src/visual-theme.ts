@@ -2,6 +2,8 @@
 // shared theme tokens. Copied from packages/ui/src/styles/globals.css; a test fails if they drift apart.
 export const VISUAL_THEME = `@theme inline {
     --font-heading: var(--font-sans);
+    --color-surface-foreground: var(--surface-foreground);
+    --color-surface: var(--surface);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

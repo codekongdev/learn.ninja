@@ -397,7 +397,7 @@ function Player({
         t={t}
       />
       <div className="relative flex min-h-0 flex-1 gap-4 sm:px-8">
-        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-card sm:rounded-xl sm:border-0 sm:shadow-xs sm:ring-1 sm:ring-foreground/10">
+        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-surface text-surface-foreground sm:rounded-2xl sm:border-0">
           <div className="relative flex min-w-0 flex-1 flex-col">
             {SHOW_THEORY ? (
               <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">

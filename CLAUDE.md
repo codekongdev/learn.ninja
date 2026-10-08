@@ -37,7 +37,7 @@ A lesson is made of **bricks**, one per screen: `concept` bricks (theory) and qu
 ## Rules
 
 - Read the `learn-ui-guidelines` skill (`.claude/skills/learn-ui-guidelines/SKILL.md`) before any UI work: surfaces and dark-mode layers, sizes, typography, states, and the check-before-done list.
-- The UI follows shadcn's Vega style (`aria-vega` in both `components.json` files). Build from shadcn components and their shapes (`rounded-md` controls, `rounded-lg` alerts, `rounded-xl` cards, `shadow-xs`, 1px borders) instead of hand-rolled styles. Add missing pieces with `npx shadcn@latest add` rather than copying their classes.
+- The UI follows shadcn's Vega style (`aria-vega` in both `components.json` files). Build from shadcn components and their shapes (`rounded-md` controls, `rounded-lg` alerts, `rounded-xl` cards, `rounded-2xl` borderless `bg-surface` windows, `shadow-xs`, 1px borders) instead of hand-rolled styles. Add missing pieces with `npx shadcn@latest add` rather than copying their classes.
 - Player screens import UI only from `@workspace/ui/components/*`, never from `react-aria-components` or `@base-ui/react` directly. The drag-and-drop module in `packages/player` is the one exception. This keeps a future library switch cheap.
 - Build with webpack (`next dev/build --webpack`, already in the scripts). React Aria's locale-trimming plugin doesn't support Turbopack.
 - React Aria stores Arabic strings as `ar-AE`. Use that code in `apps/web/next.config.ts`; any other Arabic code silently strips them.

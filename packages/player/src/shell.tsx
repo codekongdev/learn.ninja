@@ -476,7 +476,7 @@ export function TheoryPanel({
     <aside
       id={id}
       aria-label={t.theory}
-      className="absolute inset-0 z-20 flex flex-col overflow-hidden border-y bg-card motion-safe:animate-in motion-safe:fade-in-0 sm:inset-x-8 sm:rounded-xl sm:border-0 sm:shadow-xs sm:ring-1 sm:ring-foreground/10 lg:static lg:w-[360px] lg:shrink-0"
+      className="absolute inset-0 z-20 flex flex-col overflow-hidden border-y bg-surface text-surface-foreground motion-safe:animate-in motion-safe:fade-in-0 sm:inset-x-8 sm:rounded-2xl sm:border-0 lg:static lg:w-[360px] lg:shrink-0"
     >
       <div className="flex items-center justify-between gap-2 px-6 pt-6 pb-4">
         <h2 className="text-xl font-semibold">{t.theory}</h2>

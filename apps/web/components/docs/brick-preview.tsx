@@ -41,7 +41,7 @@ export async function BrickPreview({
           brickId={brickId}
           prepared={prepared}
           checked={checked}
-          className="shadow-none ring-0"
+          className="rounded-none bg-transparent shadow-none ring-0"
         />
       }
       code={json}

@@ -20,7 +20,8 @@ Every screen has visible layers in both themes, and especially in dark mode, whe
 | Layer | Use | Classes |
 | --- | --- | --- |
 | Page | App background, header, footer | `bg-background` |
-| Card | Lesson card, Theory card, content cards | `bg-card rounded-xl shadow-xs ring-1 ring-foreground/10` (or the `Card` component) |
+| Window | The player's lesson card and Theory panel, the docs preview window | `bg-surface text-surface-foreground rounded-2xl`, no border, ring, or shadow (like shadcn's code blocks) |
+| Card | Content cards on the site and inside a brick | `bg-card rounded-xl shadow-xs ring-1 ring-foreground/10` (or the `Card` component) |
 | Control on a card | Options, chips, drag items, filled gaps | `rounded-md border bg-background shadow-xs dark:bg-input/30`, hover `bg-muted` / `dark:bg-input/50` |
 | Floating | Menus, dialogs | `bg-popover` (the components handle it) |
 
@@ -30,7 +31,7 @@ Every screen has visible layers in both themes, and especially in dark mode, whe
 
 ## Shapes and sizes
 
-- Radius: `rounded-md` for controls, `rounded-lg` for alerts and inner panels, `rounded-xl` for cards, `rounded-full` only for pills, badges, progress, and avatars. No arbitrary radii.
+- Radius: `rounded-md` for controls, `rounded-lg` for alerts and inner panels, `rounded-xl` for cards, `rounded-2xl` for windows, `rounded-full` only for pills, badges, progress, and avatars. No arbitrary radii.
 - Borders are 1px. No `border-[1.5px]` or 3D bottom shadows.
 - All buttons are `sm` (`icon-sm` for icon-only): the app frame and each screen's main action. The main action sits inline under the screen's content (not in a bottom bar) and shows an `Enter` `Kbd` hint, hidden on touch screens (`pointer-coarse:hidden`).
 - One primary (filled) button per area. Everything else is `outline` or `ghost`.
