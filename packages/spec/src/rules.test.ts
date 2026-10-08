@@ -31,6 +31,28 @@ function expectIssue(
 const buttons = () => loadExample("button-hierarchy.json")
 const compound = () => loadExample("compound-interest.json")
 
+describe("visuals", () => {
+  it("wants alt text on a concept's HTML visual", () => {
+    const lesson = buttons()
+    delete lesson.bricks[0].visual.alt
+    expectIssue(lesson, { path: "bricks[0].visual", message: /no "alt"/ })
+  })
+
+  it("wants alt text on a question's HTML visual", () => {
+    const lesson = compound()
+    delete lesson.bricks[6].visual.alt
+    expectIssue(lesson, { path: "bricks[6].visual", message: /no "alt"/ })
+  })
+
+  it("doesn't need alt text on a hotspot visual or an option's visual", () => {
+    const lesson = buttons()
+    expect(lesson.bricks[2].type).toBe("hotspot")
+    expect(lesson.bricks[2].visual.alt).toBeUndefined()
+    expect(lesson.hook.options[0].visual.alt).toBeUndefined()
+    expect(validateLesson(lesson).ok).toBe(true)
+  })
+})
+
 describe("schema", () => {
   it("rejects text that isn't JSON", () => {
     expect(validateLesson("{ not json")).toMatchObject({

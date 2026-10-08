@@ -54,6 +54,8 @@ export type Strings = {
   dropHere: string
   wordBank: string
   emptyGap: string
+  /** Name of an HTML visual with no alt text. */
+  visual: string
   fixTitle: string
   fixBody: (n: number) => string
   fixStart: string
@@ -154,6 +156,7 @@ const en: Strings = {
   dropHere: "Drop items here",
   wordBank: "Word bank",
   emptyGap: "Empty gap",
+  visual: "Visual",
   fixTitle: "Let's fix your mistakes",
   fixBody: (n) =>
     n === 1
@@ -246,6 +249,7 @@ const ar: Strings = {
   dropHere: "أفلت العناصر هنا",
   wordBank: "بنك الكلمات",
   emptyGap: "فراغ",
+  visual: "رسم توضيحي",
   fixTitle: "لنصحّح أخطاءك",
   fixBody: (n) => `سيعود ${n} من الأسئلة. جرّبها مرة أخرى قبل الختام.`,
   fixStart: "ابدأ",

@@ -18,6 +18,8 @@ export const htmlVisual = z
   .strictObject({
     kind: z.literal("html"),
     html: z.string().min(1),
+    /** One sentence saying what the visual shows, for screen readers. Required on concept and question visuals (rules.ts). */
+    alt: z.string().min(1).max(200).optional(),
     css: z.string().optional(),
     height: z.int().positive().optional(),
   })

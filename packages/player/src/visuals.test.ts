@@ -14,7 +14,7 @@ const decode = (s: string) =>
     .replace(/&#x27;/g, "'")
     .replace(/&amp;/g, "&")
 
-function frameFor(visual: { html: string; css?: string }) {
+function frameFor(visual: { html: string; alt?: string; css?: string }) {
   const markup = renderToStaticMarkup(
     createElement(Visual, { visual: { kind: "html", ...visual } })
   )
@@ -29,6 +29,13 @@ describe("HTML visual frame", () => {
     expect(VISUAL_SANDBOX).toBe("allow-same-origin")
     expect(markup).toContain(`sandbox="${VISUAL_SANDBOX}"`)
     expect(markup).not.toContain("allow-scripts")
+  })
+
+  it("reads as an image named by its alt text", () => {
+    const { markup } = frameFor({ html: "<b>Hi</b>", alt: "A bold hi." })
+    expect(markup).toContain('role="img"')
+    expect(markup).toContain('aria-label="A bold hi."')
+    expect(markup).toContain('title="A bold hi."')
   })
 
   it("keeps the lesson's CSS inside its style tag", () => {

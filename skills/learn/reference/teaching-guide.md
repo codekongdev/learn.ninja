@@ -73,7 +73,7 @@ Mechanics of each type:
 
 Visuals make lessons feel real. There are three kinds:
 
-- **`html`**: UI examples, diagrams, simple charts, layouts. It runs in a sandbox with no scripts.
+- **`html`**: UI examples, diagrams, simple charts, layouts. It runs in a sandbox with no scripts. Give it an `alt`: one sentence saying what it shows, as you'd describe it to someone who can't see it ("Two buttons: a filled Place order and an outlined Back to cart").
 - **`code`**: code with syntax highlighting. Give the `language` (e.g. `javascript`, `python`, `css`).
 - **`math`**: a formula on its own line, in TeX: `{ "kind": "math", "tex": "A = P(1 + r)^n" }`.
 

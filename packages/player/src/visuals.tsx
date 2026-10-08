@@ -31,6 +31,7 @@ export function Visual({
     return (
       <HtmlFrame
         html={visual.html}
+        alt={visual.alt}
         css={visual.css}
         height={visual.height}
         hotspots={hotspots}
@@ -63,18 +64,20 @@ const inStyle = (css: string) => css.replace(/<\//g, "<\\/")
 
 function HtmlFrame({
   html,
+  alt,
   css,
   height,
   hotspots,
   label,
 }: {
   html: string
+  alt?: string
   css?: string
   height?: number
   hotspots?: HotspotControl
   label?: string
 }) {
-  const { visualsCss, dir, prepared } = usePlayer()
+  const { visualsCss, dir, prepared, t } = usePlayer()
   const dark = useIsDark()
   const ref = React.useRef<HTMLIFrameElement>(null)
   const [measured, setMeasured] = React.useState<number | null>(null)
@@ -145,14 +148,17 @@ function HtmlFrame({
   }, [loaded, dark, dir, interactive])
 
   return (
+    // The frame is inert (nothing inside is read), so the stage itself is the image screen readers get.
     <div
+      role={interactive ? undefined : "img"}
+      aria-label={interactive ? undefined : (alt ?? label ?? t.visual)}
       className="visual-stage overflow-hidden rounded-xl border bg-muted/40 bg-[radial-gradient(var(--border)_1px,transparent_1.2px)] [background-size:16px_16px]"
       inert={!interactive}
     >
       <div className="relative">
         <iframe
           ref={ref}
-          title={label ?? "Example"}
+          title={alt ?? label ?? t.visual}
           sandbox={VISUAL_SANDBOX}
           srcDoc={srcDoc}
           onLoad={() => setLoaded((n) => n + 1)}

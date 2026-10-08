@@ -136,6 +136,24 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
     }
   }
 
+  // A brick's HTML visual is a picture to a screen reader, so it needs alt text. (Hotspot visuals
+  // are read through their tappable regions; option and item visuals through their captions.)
+  const withVisuals = [
+    ...lesson.bricks.flatMap((b, i) =>
+      b.type === "concept" ? [{ brick: b, path: `bricks[${i}]` }] : []
+    ),
+    ...questions.filter((q) => q.brick.type !== "hotspot"),
+  ]
+  for (const { brick, path } of withVisuals) {
+    const v = brick.visual
+    if (v?.kind === "html" && !v.alt)
+      add(
+        "teaching",
+        `${path}.visual`,
+        `This HTML visual has no "alt". Add one sentence saying what it shows, for people using a screen reader.`
+      )
+  }
+
   lesson.bricks.forEach((brick, i) => {
     if (brick.type !== "concept") return
     const words = countWords(brick.body)

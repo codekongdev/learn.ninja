@@ -58,12 +58,12 @@ Brick ids are unique across the whole lesson, including the hook and the challen
 ## Visuals
 
 ```json
-{ "kind": "html", "html": "<div class='flex gap-2'><button class='btn'>Save</button></div>", "css": "optional extra CSS", "height": 200 }
+{ "kind": "html", "html": "<div class='flex gap-2'><button class='btn'>Save</button></div>", "alt": "A single filled Save button.", "css": "optional extra CSS", "height": 200 }
 { "kind": "code", "language": "javascript", "code": "const x = 1;\nconsole.log(x);", "highlight": [2], "hotspots": [{ "id": "l2", "line": 2 }] }
 { "kind": "math", "tex": "A = P(1 + r)^n" }
 ```
 
-`height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
+`alt` is one sentence saying what the visual shows, for screen readers; it's required on a concept's or question's HTML visual (hotspot visuals are read through their regions, option and item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
 
 ## Options
 
@@ -116,4 +116,4 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
 - Prompts ≤40 words; concept bodies ≤80 words.
 - No `number` bricks; every `blank` has `choices` that include an accepted answer.
 - Formulas in `\( … \)` are balanced and render; language codes are valid BCP 47.
-- HTML visuals: no scripts, event handlers, iframes, forms, objects, embeds, `javascript:` links, or external URLs; each under 20 KB; the whole file under 500 KB.
+- HTML visuals: no scripts, event handlers, iframes, forms, objects, embeds, `javascript:` links, or external URLs; each under 20 KB; the whole file under 500 KB. A concept's or question's HTML visual has `alt`.

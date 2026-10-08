@@ -43,7 +43,8 @@
       },
       "visual": {
         "kind": "html",
-        "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Place order</button><button class='btn' data-variant='outline'>Back to cart</button></div>"
+        "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Place order</button><button class='btn' data-variant='outline'>Back to cart</button></div>",
+        "alt": "Two buttons: a filled Place order and an outlined Back to cart."
       }
     },
     {
@@ -51,7 +52,10 @@
       "type": "choice",
       "prompt": "On a checkout page, which action should be primary?",
       "options": [
-        { "id": "a", "text": "Place order" },
+        {
+          "id": "a",
+          "text": "Place order"
+        },
         {
           "id": "b",
           "text": "Continue shopping",
@@ -63,7 +67,9 @@
           "feedback": "Only some people need it, so it shouldn't compete with the main action."
         }
       ],
-      "correct": ["a"],
+      "correct": [
+        "a"
+      ],
       "multiple": false,
       "hint": "What is the one thing this page exists to help people do?",
       "explanation": "Checkout exists to complete the purchase, so **Place order** is the primary action."
@@ -76,7 +82,9 @@
         "kind": "html",
         "html": "<div class='flex gap-2 flex-wrap'><button data-hotspot='create' class='btn'>Create account</button><button data-hotspot='learn' class='btn'>Learn more</button></div>"
       },
-      "correct": ["learn"],
+      "correct": [
+        "learn"
+      ],
       "multiple": false,
       "explanation": "**Learn more** is optional, so it should be secondary or tertiary. **Create account** is the main goal."
     },
@@ -87,7 +95,8 @@
       "body": "**Secondary** buttons (usually outlined) are for useful alternatives. **Tertiary** buttons (text only) are for low-priority actions like Cancel or Learn more. Less important means less visual weight.",
       "visual": {
         "kind": "html",
-        "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Primary</button><button class='btn' data-variant='outline'>Secondary</button><button class='btn' data-variant='ghost'>Tertiary</button></div>"
+        "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Primary</button><button class='btn' data-variant='outline'>Secondary</button><button class='btn' data-variant='ghost'>Tertiary</button></div>",
+        "alt": "Three buttons side by side: filled Primary, outlined Secondary, and text-only Tertiary."
       }
     },
     {
@@ -95,16 +104,45 @@
       "type": "sort",
       "prompt": "In a document editor, sort each action by how much emphasis it needs.",
       "groups": [
-        { "id": "pri", "label": "Primary" },
-        { "id": "sec", "label": "Secondary" },
-        { "id": "ter", "label": "Tertiary" }
+        {
+          "id": "pri",
+          "label": "Primary"
+        },
+        {
+          "id": "sec",
+          "label": "Secondary"
+        },
+        {
+          "id": "ter",
+          "label": "Tertiary"
+        }
       ],
       "items": [
-        { "id": "a", "text": "Publish", "group": "pri" },
-        { "id": "b", "text": "Preview", "group": "sec" },
-        { "id": "c", "text": "Save draft", "group": "sec" },
-        { "id": "d", "text": "Cancel", "group": "ter" },
-        { "id": "e", "text": "Formatting help", "group": "ter" }
+        {
+          "id": "a",
+          "text": "Publish",
+          "group": "pri"
+        },
+        {
+          "id": "b",
+          "text": "Preview",
+          "group": "sec"
+        },
+        {
+          "id": "c",
+          "text": "Save draft",
+          "group": "sec"
+        },
+        {
+          "id": "d",
+          "text": "Cancel",
+          "group": "ter"
+        },
+        {
+          "id": "e",
+          "text": "Formatting help",
+          "group": "ter"
+        }
       ],
       "explanation": "Publishing is the goal. Preview and Save draft are useful alternatives. Cancel and help are rarely needed."
     },
@@ -177,7 +215,10 @@
           "feedback": "This flips the hierarchy: the main action is the weakest button, and Cancel gets all the weight."
         }
       ],
-      "correct": ["a", "c"],
+      "correct": [
+        "a",
+        "c"
+      ],
       "multiple": true,
       "explanation": "A good footer has one filled button for the main action and lighter styles for the rest. That works with two buttons or three."
     }

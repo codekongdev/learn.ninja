@@ -209,6 +209,11 @@
           "type": "string",
           "minLength": 1
         },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
         "css": {
           "type": "string"
         },

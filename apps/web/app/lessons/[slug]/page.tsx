@@ -6,10 +6,9 @@ import { prepareLesson } from "@workspace/player/prepare"
 import { LessonView } from "@/components/lesson-view"
 import { getLesson, LESSON_SLUGS } from "@/lib/lessons"
 
-type Props = {
-  params: Promise<{ slug: string }>
-  searchParams: Promise<{ ui?: string }>
-}
+// Prerendered at build time. Nothing here reads the request, so the Tailwind compile in
+// prepareLesson() runs once per lesson, not per visit.
+type Props = { params: Promise<{ slug: string }> }
 
 export function generateStaticParams() {
   return LESSON_SLUGS.map((slug) => ({ slug }))
@@ -20,15 +19,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return lesson ? { title: lesson.title, description: lesson.summary } : {}
 }
 
-export default async function LessonPage({ params, searchParams }: Props) {
+export default async function LessonPage({ params }: Props) {
   const lesson = getLesson((await params).slug)
   if (!lesson) notFound()
-  // ?ui=ar shows the player's own text in Arabic, right to left (for testing).
-  const { ui } = await searchParams
   const prepared = await prepareLesson(lesson)
   return (
     <div className="h-svh">
-      <LessonView lesson={lesson} prepared={prepared} uiLanguage={ui} />
+      <LessonView lesson={lesson} prepared={prepared} />
     </div>
   )
 }
