@@ -10,6 +10,15 @@ import { mathKey } from "./prepared"
 
 const TOKEN = /\\\(([\s\S]+?)\\\)|`([^`]+)`|\*\*([^*]+)\*\*|\*([^*]+)\*/g
 
+/** The same text without its markers, for places that need a plain string (like a live region). */
+export function plainText(text: string): string {
+  return text.replace(
+    TOKEN,
+    (_, math?: string, code?: string, bold?: string, italic?: string) =>
+      math?.trim() ?? code ?? bold ?? italic ?? ""
+  )
+}
+
 export function RichText({
   text,
   lang,

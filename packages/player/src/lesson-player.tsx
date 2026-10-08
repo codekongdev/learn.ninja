@@ -45,7 +45,7 @@ import {
 } from "./flow"
 import { Mascot } from "./mascot"
 import { emptyPrepared, type Prepared } from "./prepared"
-import { RichText } from "./rich-text"
+import { plainText, RichText } from "./rich-text"
 import {
   LessonFooter,
   LessonHeader,
@@ -892,7 +892,12 @@ export function ActionArea({
         {secondary}
       </div>
       <p aria-live="polite" className="sr-only">
-        {title ? [title, message].filter(Boolean).join(" ") : ""}
+        {title
+          ? [title, message]
+              .filter((x): x is string => Boolean(x))
+              .map(plainText)
+              .join(" ")
+          : ""}
       </p>
       {title ? (
         <div
@@ -904,7 +909,9 @@ export function ActionArea({
             toneClass[tone]
           )}
         >
-          <p className="font-semibold">{title}</p>
+          <p className="font-semibold">
+            <RichText text={title} />
+          </p>
           {message ? (
             <RichText text={message} className="mt-1 block text-sm" />
           ) : null}
