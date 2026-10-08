@@ -342,7 +342,7 @@ function PartsProgress({ parts, t }: { parts: PartProgress; t: Strings }) {
             valueLabel={t.part(i + 1, parts.count)}
             style={enter(i).style}
             className={cn(
-              "w-16 min-w-0 shrink-0 transition-all duration-500 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-track]]:h-3",
+              "w-16 min-w-0 shrink-0 transition-all duration-500 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-track]]:h-2.5",
               enter(i).className
             )}
           />
@@ -352,7 +352,7 @@ function PartsProgress({ parts, t }: { parts: PartProgress; t: Strings }) {
             aria-hidden="true"
             style={enter(i).style}
             className={cn(
-              "h-3 w-3 shrink-0 rounded-full transition-colors duration-500 sm:w-[18px]",
+              "h-2.5 w-2.5 shrink-0 rounded-full transition-colors duration-500 sm:w-5",
               i < parts.current || parts.done ? "bg-primary" : "bg-muted",
               enter(i).className
             )}
