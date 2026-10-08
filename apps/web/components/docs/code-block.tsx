@@ -24,18 +24,22 @@ export function CodeBlock({
       <pre ref={ref} className={cn(className, "pe-12")} {...props}>
         {children}
       </pre>
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        aria-label={copied ? "Copied" : "Copy code"}
-        className="absolute end-2 top-2 bg-card/80 backdrop-blur-sm"
-        onPress={async () => {
-          await navigator.clipboard.writeText(ref.current?.textContent ?? "")
-          setCopied(true)
-        }}
-      >
-        {copied ? <CheckIcon /> : <CopyIcon />}
-      </Button>
+      {/* Centered on the first line of code: pre text is 0.875em with 1.5 leading and 0.75em padding.
+          The block's own background hides code that scrolls underneath. */}
+      <div className="absolute end-0 top-[calc(1.3125em-1rem)] rounded-md bg-muted pe-1.5">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={copied ? "Copied" : "Copy code"}
+          className="text-muted-foreground hover:bg-foreground/10 dark:hover:bg-foreground/10"
+          onPress={async () => {
+            await navigator.clipboard.writeText(ref.current?.textContent ?? "")
+            setCopied(true)
+          }}
+        >
+          {copied ? <CheckIcon /> : <CopyIcon />}
+        </Button>
+      </div>
     </div>
   )
 }
