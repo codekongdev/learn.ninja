@@ -91,7 +91,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <SiteHeader end={<HeaderCopyPrompt />} />
+      <SiteHeader action={<HeaderCopyPrompt afterHero />} />
       <main className="flex-1">
         <Hero />
         <Demo lesson={compound.lesson} prepared={compound.prepared} />

@@ -20,7 +20,7 @@ export function SiteFooter() {
     <footer className="border-t">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-1.5 text-sm font-medium">
+          <div className="flex items-baseline gap-1.5 text-sm font-medium">
             <Wordmark />
             <span className="text-muted-foreground">by</span>
             <LinkButton
@@ -34,7 +34,7 @@ export function SiteFooter() {
             </LinkButton>
           </div>
           <p className="text-sm text-muted-foreground">
-            Interactive lessons, made by your agent. Free, no account.
+            Interactive learning with your agent.
           </p>
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">

@@ -1,23 +1,34 @@
+import { cn } from "@workspace/ui/lib/utils"
+
 import { ButtonLink } from "./button-link"
 import { Wordmark } from "./wordmark"
 
-/** The bar at the top of every page. `start` and `end` add page-specific controls (the docs menu, the home page's copy button). */
+/**
+ * The bar at the top of every page. `start` adds page-specific controls before the
+ * wordmark (the docs menu), `action` a button after it (copy prompt).
+ */
 export function SiteHeader({
   start,
-  end,
+  action,
 }: {
   start?: React.ReactNode
-  end?: React.ReactNode
+  action?: React.ReactNode
 }) {
   return (
     <header className="sticky top-0 z-40 bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/70">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-2 px-4 sm:px-6">
         {start}
-        <Wordmark />
-        <ButtonLink href="/docs" variant="ghost" size="sm" className="ms-auto">
+        <Wordmark className="me-2" />
+        {action}
+        {/* On phones the docs menu (`start`) stands in for this link. */}
+        <ButtonLink
+          href="/docs"
+          variant="ghost"
+          size="sm"
+          className={cn("ms-auto", start && "max-sm:hidden")}
+        >
           Docs
         </ButtonLink>
-        {end}
       </div>
     </header>
   )

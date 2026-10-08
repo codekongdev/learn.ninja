@@ -11,11 +11,11 @@ export function Wordmark({ className }: { className?: string }) {
     <Link
       href="/"
       className={cn(
-        "flex items-center gap-2 rounded-md text-base font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        "flex items-baseline gap-2 rounded-md text-base font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
         className
       )}
     >
-      <LearnLogo className="size-6" />
+      <LearnLogo className="size-6 self-center" />
       {SITE.name}
     </Link>
   )
