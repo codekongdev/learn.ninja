@@ -15,12 +15,12 @@ The look comes from **shadcn's Vega style** (`aria-vega` in both `components.jso
 
 ## Surfaces and elevation
 
-Every screen has visible layers in both themes, and especially in dark mode, where nothing should sit flat on pure black.
+Every screen has visible layers in both themes. Windows are outlined, not filled, so their content stays clean; cards and controls inside them are filled, so in dark mode nothing interactive sits flat on pure black.
 
 | Layer | Use | Classes |
 | --- | --- | --- |
 | Page | App background, header, footer | `bg-background` |
-| Window | The player's lesson card and Theory panel, the docs preview window | `bg-surface text-surface-foreground rounded-2xl`, no border, ring, or shadow (like shadcn's code blocks) |
+| Window | The player's lesson card and Theory panel, the docs preview window | `rounded-2xl border` on the page background, no fill or shadow (like shadcn's component previews). A window that overlays content (the Theory panel on phones) adds `bg-background` |
 | Card | Content cards on the site and inside a brick | `bg-card rounded-xl shadow-xs ring-1 ring-foreground/10` (or the `Card` component) |
 | Control on a card | Options, chips, drag items, filled gaps | `rounded-md border bg-background shadow-xs dark:bg-input/30`, hover `bg-muted` / `dark:bg-input/50` |
 | Floating | Menus, dialogs | `bg-popover` (the components handle it) |

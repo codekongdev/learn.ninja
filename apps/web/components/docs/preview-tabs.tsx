@@ -27,13 +27,13 @@ export function PreviewTabs({
       </TabsList>
       <TabsContent
         id="preview"
-        className="overflow-hidden rounded-2xl bg-surface text-surface-foreground"
+        className="overflow-hidden rounded-2xl border"
       >
         {preview}
       </TabsContent>
       <TabsContent
         id="json"
-        className="relative overflow-hidden rounded-2xl bg-surface text-surface-foreground"
+        className="relative overflow-hidden rounded-2xl border"
       >
         <CopyButton
           text={codeText}
