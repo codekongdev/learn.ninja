@@ -61,11 +61,11 @@ describe("learn validate", () => {
   it("lists every issue for an invalid lesson", async () => {
     const t = setup([])
     const broken = JSON.parse(lesson)
-    delete broken.loops[0].practice[0].options[1].feedback
+    delete broken.bricks[1].options[1].feedback
     writeFileSync(join(t.cwd, "lesson.json"), JSON.stringify(broken))
     expect(await run(["validate", "lesson.json"], t.io)).toBe(1)
     expect(t.err.join("\n")).toMatch(
-      /1 issue to fix:\n- loops\[0\]\.practice\[0\]\.options\[1\]: Wrong option "b" has no feedback/
+      /1 issue to fix:\n- bricks\[1\]\.options\[1\]: Wrong option "b" has no feedback/
     )
   })
 })
@@ -146,7 +146,7 @@ describe("learn publish", () => {
     reply.body.skill = {
       latest: "9.9.9",
       updateAvailable: true,
-      updateCommand: "npx skills add cmicpace/learn --skill learn -g",
+      updateCommand: "npx skills add Uxcel-Team/learn --skill learn -g",
     } as never
     t = setup([reply])
     await run(["publish", "lesson.json"], t.io)
