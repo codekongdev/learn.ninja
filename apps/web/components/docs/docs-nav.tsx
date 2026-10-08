@@ -22,7 +22,7 @@ export function DocsNav({
 }) {
   const pathname = usePathname()
   return (
-    <nav aria-label="Docs" className="flex flex-col gap-0.5 text-sm">
+    <nav aria-label="Docs" className="flex flex-col text-sm">
       {tree.children.map((node, i) => (
         <NavNode
           key={node.$id ?? i}
@@ -76,12 +76,18 @@ function NavNode({
       href={node.url}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={cn(
-        "flex h-8 items-center rounded-md px-2 font-medium text-foreground/80 outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
-        active && "bg-muted text-foreground"
-      )}
+      className="group flex py-px outline-none"
     >
-      {node.name}
+      {/* Sized to the label like ui.shadcn.com's docs sidebar; the link
+          around it keeps the full row clickable. */}
+      <span
+        className={cn(
+          "flex h-[30px] items-center rounded-md border border-transparent px-2 text-[0.8rem] font-medium text-foreground/80 group-hover:bg-accent group-hover:text-foreground group-focus-visible:ring-3 group-focus-visible:ring-ring/50",
+          active && "border-accent bg-accent text-foreground"
+        )}
+      >
+        {node.name}
+      </span>
     </Link>
   )
 }
