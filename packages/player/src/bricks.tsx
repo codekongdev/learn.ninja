@@ -65,18 +65,22 @@ function KeyHint({ i, mark }: { i: number; mark?: Mark }) {
 export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
   return (
     <>
-      <h2 className="text-2xl font-semibold text-balance">{brick.title}</h2>
+      <div className="flex flex-col gap-3">
+        <h2 className="text-2xl font-semibold tracking-tight text-balance">
+          {brick.title}
+        </h2>
+        <p className="text-base leading-relaxed text-pretty">
+          <RichText text={brick.body} />
+        </p>
+      </div>
       {brick.visual ? <Visual visual={brick.visual} /> : null}
-      <p className="text-base">
-        <RichText text={brick.body} />
-      </p>
       {brick.term ? (
-        <div className="flex items-baseline gap-3 rounded-lg bg-secondary px-4 py-3 text-secondary-foreground">
-          <strong className="font-semibold whitespace-nowrap">
-            {brick.term.word}
-          </strong>
-          <RichText text={brick.term.definition} />
-        </div>
+        <dl className="flex flex-col gap-1 border-s-2 border-primary ps-4">
+          <dt className="text-sm font-semibold">{brick.term.word}</dt>
+          <dd className="text-sm text-muted-foreground">
+            <RichText text={brick.term.definition} />
+          </dd>
+        </dl>
       ) : null}
     </>
   )

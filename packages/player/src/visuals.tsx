@@ -305,13 +305,15 @@ function CodeBlock({
 
 // ---------- math: rendered by KaTeX on the server ----------
 
+// KaTeX's display mode adds 1em above and below the formula; the box's padding is enough. KaTeX's
+// stylesheet is unlayered, so it beats Tailwind's utilities layer without the !.
 function MathBlock({ tex }: { tex: string }) {
   const { prepared } = usePlayer()
   const html = prepared.math[mathKey(tex, true)]
   return (
     <div
       dir="ltr"
-      className="flex justify-center overflow-x-auto rounded-xl border bg-muted/40 px-4 py-5 text-lg"
+      className="flex justify-center overflow-x-auto rounded-xl border bg-muted/40 px-4 py-6 text-xl [&_.katex-display]:m-0!"
     >
       {html ? (
         <div dangerouslySetInnerHTML={{ __html: html }} />
