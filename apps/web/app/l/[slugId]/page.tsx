@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { notFound } from "next/navigation"
 
 import { LessonView } from "@/components/lesson-view"
 import { loadPublished } from "@/lib/published"
@@ -26,7 +27,7 @@ export default async function PublishedLessonPage({
   searchParams,
 }: Props) {
   const record = await loadPublished((await params).slugId)
-  if (!record) return <Unavailable />
+  if (!record) notFound()
   const { ui } = await searchParams
   return (
     <div className="h-svh">
@@ -37,19 +38,5 @@ export default async function PublishedLessonPage({
         expiresAt={record.expiresAt}
       />
     </div>
-  )
-}
-
-function Unavailable() {
-  return (
-    <main className="mx-auto flex min-h-svh max-w-md flex-col justify-center gap-3 px-6">
-      <h1 className="text-2xl font-bold tracking-tight">
-        This lesson isn&apos;t available
-      </h1>
-      <p className="text-muted-foreground">
-        Lessons expire 24 hours after they&apos;re published. Ask whoever shared
-        it to publish it again for a new link.
-      </p>
-    </main>
   )
 }

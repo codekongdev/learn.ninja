@@ -58,7 +58,15 @@ export function BrickDemo({
   const item = state.items[state.index]!
   return (
     <DirectionProvider locale={ariaLocaleFor(ui)}>
-      <PlayerProvider value={{ prepared, t: stringsFor(ui), dir, visualsCss }}>
+      <PlayerProvider
+        value={{
+          prepared,
+          t: stringsFor(ui),
+          dir,
+          visualsCss,
+          keyScope: scope,
+        }}
+      >
         <div
           ref={scope}
           dir={dir}
@@ -90,7 +98,6 @@ export function BrickDemo({
                 state={state}
                 dispatch={dispatch}
                 textSize={textSize}
-                keyScope={scope}
               />
             ) : null}
           </div>

@@ -11,6 +11,8 @@ interface PlayerContextValue {
   dir: "ltr" | "rtl"
   /** URL of the stylesheet lesson visuals load inside their sandbox (Basecoat + Tailwind). */
   visualsCss: string
+  /** Only take keyboard shortcuts (Enter, number keys) from inside this element, for several demos on one page. */
+  keyScope?: React.RefObject<HTMLElement | null>
 }
 
 const PlayerContext = React.createContext<PlayerContextValue>({

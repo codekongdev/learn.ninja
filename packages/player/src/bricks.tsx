@@ -106,7 +106,7 @@ export function OptionsBrick({
   order,
   showOutcomes,
 }: QuestionBrickProps & { order: string[]; showOutcomes: string[] }) {
-  const { t } = usePlayer()
+  const { t, keyScope } = usePlayer()
   const isOptions =
     brick.type === "choice" ||
     brick.type === "compare" ||
@@ -141,6 +141,7 @@ export function OptionsBrick({
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return
       const target = e.target as HTMLElement | null
+      if (keyScope && !keyScope.current?.contains(target)) return
       if (target?.closest("input, textarea, select, [contenteditable=true]"))
         return
       const n = Number(e.key)
@@ -150,7 +151,7 @@ export function OptionsBrick({
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [ids, locked])
+  }, [ids, locked, keyScope])
 
   if (!isOptions) return null
   const cards = hasOptionCards(brick)
@@ -560,11 +561,14 @@ export function BlankBrick({
         aria-label={t.wordBank}
         className="flex flex-wrap gap-2"
       >
-        {bank.map((word) => {
-          const used = Object.values(values).includes(word)
+        {bank.map((word, i) => {
+          // A word listed twice in the bank (two gaps accept it) has two chips: used in order.
+          const placed = Object.values(values).filter((v) => v === word).length
+          const nth = bank.slice(0, i).filter((w) => w === word).length
+          const used = placed > nth
           return (
             <Selectable
-              key={word}
+              key={`${word}-${nth}`}
               isSelected={used}
               onChange={() => !used && place(word)}
               isDisabled={locked}

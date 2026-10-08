@@ -194,14 +194,20 @@ export function freshQuestion(
             random
           )
         : [],
-    bank:
-      brick.type === "blank"
-        ? shuffle(
-            [...new Set(brick.blanks.flatMap((b) => b.choices ?? []))],
-            random
-          )
-        : [],
+    bank: brick.type === "blank" ? shuffle(wordBank(brick), random) : [],
   }
+}
+
+/**
+ * The word chips for a blank brick: every choice once, except a word that more than one gap accepts,
+ * which gets a chip per such gap (otherwise the second gap could never be filled).
+ */
+export function wordBank(brick: Extract<QuestionBrick, { type: "blank" }>) {
+  const words = [...new Set(brick.blanks.flatMap((b) => b.choices ?? []))]
+  return words.flatMap((word) => {
+    const needed = brick.blanks.filter((b) => b.accept.includes(word)).length
+    return Array<string>(Math.max(1, needed)).fill(word)
+  })
 }
 
 function start(lesson: Lesson): State {
@@ -269,8 +275,16 @@ export function reducer(state: State, action: Action): State {
       }
     }
     case "answer":
+      // A change to the answer clears the marks kept from the last check.
       return state.question
-        ? { ...state, question: { ...state.question, answer: action.answer } }
+        ? {
+            ...state,
+            question: {
+              ...state.question,
+              answer: action.answer,
+              result: null,
+            },
+          }
         : state
     case "hint":
       return state.question
@@ -280,13 +294,13 @@ export function reducer(state: State, action: Action): State {
           }
         : state
     case "retry": {
+      // The last check's marks stay until the answer changes, so the learner can see what to fix.
       if (!state.question || item?.kind !== "question") return state
       return {
         ...state,
         question: {
           ...state.question,
           phase: "answering",
-          result: null,
           answer: retryAnswer(item.brick, state.question.answer),
         },
       }
@@ -373,8 +387,12 @@ function Player({
   const theoryId = React.useId()
   const item = state.items[state.index]!
   const scrollRef = React.useRef<HTMLElement>(null)
+  // Each new screen starts at the top and takes focus, so keyboard and screen-reader users land on it.
+  const mounted = React.useRef(false)
   React.useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 })
+    if (mounted.current) scrollRef.current?.focus({ preventScroll: true })
+    mounted.current = true
   }, [state.index])
   const parts = partAt(state.items, state.index, state.inFix)
   const seenConcepts = state.items
@@ -418,7 +436,11 @@ function Player({
                 </Button>
               </div>
             ) : null}
-            <main ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+            <main
+              ref={scrollRef}
+              tabIndex={-1}
+              className="min-h-0 flex-1 overflow-y-auto outline-none"
+            >
               <div
                 key={state.index}
                 className={cn(
@@ -735,17 +757,14 @@ export function ActionArea({
   state,
   dispatch,
   textSize,
-  keyScope,
 }: {
   lesson: Lesson
   item: Item
   state: State
   dispatch: React.Dispatch<Action>
   textSize: TextSize
-  /** Only take Enter from inside this element (for several demos on one page). Omit to listen page-wide. */
-  keyScope?: React.RefObject<HTMLElement | null>
 }) {
-  const { t } = usePlayer()
+  const { t, keyScope } = usePlayer()
   let tone: Tone = "neutral"
   let title: string | null = null
   let message: string | null = null
@@ -861,6 +880,16 @@ export function ActionArea({
     return () => window.removeEventListener("keydown", onKey, { capture: true })
   }, [keyScope])
 
+  // Once feedback appears, focus moves to its button (Continue or Try again). Not on mount: a demo
+  // that loads already checked must not pull the page to itself.
+  const primaryRef = React.useRef<HTMLButtonElement>(null)
+  const hadFeedback = React.useRef(Boolean(title))
+  React.useEffect(() => {
+    const has = Boolean(title)
+    if (has && !hadFeedback.current) primaryRef.current?.focus()
+    hadFeedback.current = has
+  }, [title])
+
   const toneClass: Record<Tone, string> = {
     neutral: "",
     good: "border-green-500 bg-green-100 text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-200",
@@ -873,11 +902,11 @@ export function ActionArea({
     <>
       <div className="flex flex-wrap items-center gap-2">
         <Button
+          ref={primaryRef}
           size="sm"
           variant={primary.variant ?? "default"}
           onPress={primary.onPress}
           isDisabled={primary.isDisabled}
-          autoFocus={Boolean(title)}
         >
           {primary.label}
           <Kbd

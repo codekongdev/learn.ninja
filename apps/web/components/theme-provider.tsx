@@ -15,7 +15,8 @@ function ThemeProvider({
       disableTransitionOnChange
       {...props}
     >
-      <ThemeHotkey />
+      {/* D flips the theme while developing; learners shouldn't trip over it. */}
+      {process.env.NODE_ENV === "development" ? <ThemeHotkey /> : null}
       {children}
     </NextThemesProvider>
   )
