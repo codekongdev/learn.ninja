@@ -53,7 +53,7 @@ import {
 const SHOW_MAKER = false
 
 export const BRAND = {
-  name: "Learn.ninja",
+  name: "learn.ninja",
   maker: "@cmicpace",
   makerUrl: "https://x.com/cmicpace",
 }

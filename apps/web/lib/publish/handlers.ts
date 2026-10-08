@@ -30,8 +30,7 @@ export const ACCEPTED_SPECS: string[] = [SPEC_VERSION, "0.2"]
 
 /** The current skill version. Bump it when the skill changes; older skills are told to update. */
 export const LATEST_SKILL_VERSION = "0.3.0"
-export const SKILL_UPDATE_COMMAND =
-  "npx skills add Uxcel-Team/learn --skill learn -g"
+export const SKILL_UPDATE_COMMAND = "npx skills add https://learn.ninja -g"
 
 export interface Deps {
   store: LessonStore

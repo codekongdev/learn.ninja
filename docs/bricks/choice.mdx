@@ -1,0 +1,34 @@
+---
+title: Choice
+description: Pick one answer, or every answer that applies.
+---
+
+<BrickPreview lesson="button-hierarchy" brick="p1" />
+
+The most common question brick. Two to five options, with one or more correct.
+
+## When to use it
+
+- Facts, rules, and predictions ("What does this log?").
+- Numeric questions: v1 has no number input, so ask them as a choice whose wrong options come from real mistakes.
+- Set `multiple: true` for "pick all that apply".
+
+## Fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `options` | yes | 2–5 options, each with `text` or a `visual` |
+| `correct` | yes | Ids of the correct options |
+| `multiple` | yes | `true` to allow several picks, `false` for one |
+
+Every wrong option needs `feedback` that explains the misconception.
+
+## More examples
+
+Pick all that apply:
+
+<BrickPreview lesson="writing-a-prd" brick="p2" />
+
+With code:
+
+<BrickPreview lesson="map-vs-foreach" brick="p2" />

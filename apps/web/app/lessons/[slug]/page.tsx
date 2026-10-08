@@ -17,9 +17,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const lesson = getLesson((await params).slug)
-  return lesson
-    ? { title: `${lesson.title} · Learn`, description: lesson.summary }
-    : {}
+  return lesson ? { title: lesson.title, description: lesson.summary } : {}
 }
 
 export default async function LessonPage({ params, searchParams }: Props) {

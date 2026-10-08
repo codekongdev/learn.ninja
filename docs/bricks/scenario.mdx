@@ -1,0 +1,26 @@
+---
+title: Scenario
+description: A realistic situation; choose what you'd do.
+---
+
+<BrickPreview lesson="button-hierarchy" brick="ch" />
+
+A scenario brick sets up a situation and offers choices that are best, okay, or poor. After you choose, you see what happens next.
+
+## When to use it
+
+- Applying the idea to a realistic case, often as the lesson's final challenge.
+- When there's a range of reasonable answers rather than one right fact.
+
+## Fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `situation` | yes | The setup, in rich text |
+| `options` | yes | Each with `text`, a `quality` (`best`, `okay`, or `poor`), and the `outcome` |
+
+At least one option must be `best`.
+
+## More examples
+
+<BrickPreview lesson="writing-a-prd" brick="ch" />

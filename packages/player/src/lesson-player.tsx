@@ -142,7 +142,7 @@ export function LessonPlayer({
 
 type Phase = "answering" | "feedback" | "revealed"
 
-interface QuestionState {
+export interface QuestionState {
   answer: Answer
   attempts: number
   usedHint: boolean
@@ -155,7 +155,7 @@ interface QuestionState {
   bank: string[]
 }
 
-interface State {
+export interface State {
   items: Item[]
   index: number
   results: Record<string, Outcome>
@@ -165,7 +165,11 @@ interface State {
   question: QuestionState | null
 }
 
-function freshQuestion(item: Item | undefined): QuestionState | null {
+/** `random` is for a fixed order, e.g. a demo rendered on the server that must match on the client. */
+export function freshQuestion(
+  item: Item | undefined,
+  random: () => number = Math.random
+): QuestionState | null {
   if (!item || item.kind !== "question") return null
   const brick = item.brick
   const optionIds =
@@ -173,18 +177,27 @@ function freshQuestion(item: Item | undefined): QuestionState | null {
       ? (brick.options as { id: string }[]).map((o) => o.id)
       : []
   return {
-    answer: initialAnswer(brick),
+    answer: initialAnswer(brick, random),
     attempts: 0,
     usedHint: false,
     hintOpen: false,
     result: null,
     phase: "answering",
-    optionOrder: brick.type === "compare" ? optionIds : shuffle(optionIds),
+    optionOrder:
+      brick.type === "compare" ? optionIds : shuffle(optionIds, random),
     rightOrder:
-      brick.type === "match" ? shuffle(brick.pairs.map((_, i) => i)) : [],
+      brick.type === "match"
+        ? shuffle(
+            brick.pairs.map((_, i) => i),
+            random
+          )
+        : [],
     bank:
       brick.type === "blank"
-        ? shuffle([...new Set(brick.blanks.flatMap((b) => b.choices ?? []))])
+        ? shuffle(
+            [...new Set(brick.blanks.flatMap((b) => b.choices ?? []))],
+            random
+          )
         : [],
   }
 }
@@ -202,7 +215,7 @@ function start(lesson: Lesson): State {
   }
 }
 
-type Action =
+export type Action =
   | { type: "next" }
   | { type: "restart"; lesson: Lesson }
   | { type: "answer"; answer: Answer }
@@ -211,7 +224,7 @@ type Action =
   | { type: "retry" }
   | { type: "startFix" }
 
-function reducer(state: State, action: Action): State {
+export function reducer(state: State, action: Action): State {
   const item = state.items[state.index]
   switch (action.type) {
     case "restart":
@@ -494,7 +507,7 @@ function helperFor(brick: QuestionBrick, t: Strings): string {
   }
 }
 
-function Screen({
+export function Screen({
   lesson,
   item,
   state,
@@ -714,18 +727,21 @@ function WrapUp({
 type Tone = "neutral" | "good" | "bad" | "warn" | "info"
 
 /** The screen's main action (with Enter as its shortcut), and the feedback after checking. */
-function ActionArea({
+export function ActionArea({
   lesson,
   item,
   state,
   dispatch,
   textSize,
+  keyScope,
 }: {
   lesson: Lesson
   item: Item
   state: State
   dispatch: React.Dispatch<Action>
   textSize: TextSize
+  /** Only take Enter from inside this element (for several demos on one page). Omit to listen page-wide. */
+  keyScope?: React.RefObject<HTMLElement | null>
 }) {
   const { t } = usePlayer()
   let tone: Tone = "neutral"
@@ -825,6 +841,7 @@ function ActionArea({
       if (e.key !== "Enter" || e.repeat || e.defaultPrevented) return
       if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
       const target = e.target as HTMLElement | null
+      if (keyScope && !keyScope.current?.contains(target)) return
       const onOption = target?.closest("[data-slot=selectable]")
       if (
         !onOption &&
@@ -840,7 +857,7 @@ function ActionArea({
     }
     window.addEventListener("keydown", onKey, { capture: true })
     return () => window.removeEventListener("keydown", onKey, { capture: true })
-  }, [])
+  }, [keyScope])
 
   const toneClass: Record<Tone, string> = {
     neutral: "",

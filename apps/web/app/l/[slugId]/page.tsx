@@ -26,11 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const record = await load((await params).slugId)
   return record
     ? {
-        title: `${record.lesson.title} · Learn`,
+        title: record.lesson.title,
         description: record.lesson.summary,
         robots: { index: false },
       }
-    : { title: "Lesson unavailable · Learn" }
+    : { title: "Lesson unavailable" }
 }
 
 export default async function PublishedLessonPage({
