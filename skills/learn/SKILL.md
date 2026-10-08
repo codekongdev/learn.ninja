@@ -10,7 +10,7 @@ You write one lesson as a JSON file that follows the lesson spec (v0.3), check i
 ## Steps
 
 1. **Pick one core idea.** Read what the user gave you. A lesson teaches one idea in 5–10 minutes. If the input covers several ideas, pick the central one, and tell the user the rest would make good follow-up lessons.
-2. **Read the guides before writing.** Read `reference/teaching-guide.md` (how to teach well, which brick to use when, visuals) and `reference/lesson-format.md` (every field). Look at one or two files in `examples/` that are closest to the topic.
+2. **Read the guides before writing.** Read `reference/teaching-guide.md` (how to teach well, which brick to use when, visuals) and `reference/lesson-format.md` (every field). Then read `topics/index.md`: if a topic pack fits the subject (math, languages…), read its guide too. Packs add subject-specific advice; where one disagrees with this file or the teaching guide, this file and the teaching guide win. Look at one or two files in `examples/` that are closest to the topic.
 3. **Write the lesson file**, e.g. `lesson.json` in the current folder, following the format exactly. `schema/lesson.schema.json` is the formal JSON Schema.
 4. **Check it** and fix every issue it reports, then check again until it passes:
    ```bash
@@ -39,6 +39,7 @@ If `publish` prints that a newer version of the skill is available, tell the use
 
 - `reference/teaching-guide.md`: how to design the lesson, choose bricks, write feedback, and build visuals
 - `reference/lesson-format.md`: every field of the lesson file, with short examples
+- `topics/index.md`: the topic packs, with when to use each; `topics/{name}/guide.md` is each pack's guide
 - `schema/lesson.schema.json`: the formal JSON Schema (the checker also enforces cross-field rules it can't express)
 - `examples/*.json`: five complete, valid lessons (UI design, product management, finance, Spanish, JavaScript)
 - `scripts/learn.mjs`: the checker and publisher (`validate`, `publish`, `schema`; add `--json` for machine-readable output)

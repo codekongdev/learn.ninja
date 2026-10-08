@@ -1,0 +1,4 @@
+# The skill's core (the steps, teaching guide, and lesson format) needs a maintainer's review.
+# Topic packs in skills/learn/topics/ are open to everyone.
+/skills/learn/SKILL.md @Uxcel-Team/learn-core
+/skills/learn/reference/ @Uxcel-Team/learn-core

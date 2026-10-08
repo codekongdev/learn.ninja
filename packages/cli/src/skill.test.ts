@@ -59,3 +59,59 @@ describe("skills/learn", () => {
     )
   })
 })
+
+// Topic packs are open to contributions, so these checks keep a pack from breaking the skill or bloating it.
+const MAX_PACK_WORDS = 1200
+const packs = readdirSync(new URL("skills/learn/topics", root), {
+  withFileTypes: true,
+})
+  .filter((e) => e.isDirectory())
+  .map((e) => e.name)
+
+describe.each(packs)("topic pack %s", (name) => {
+  const guide = read(`skills/learn/topics/${name}/guide.md`)
+  const frontmatter = /^---\n([\s\S]*?)\n---\n/.exec(guide)?.[1] ?? ""
+  const field = (key: string) =>
+    new RegExp(`^${key}: *(.*)$`, "m").exec(frontmatter)?.[1]?.trim() ?? ""
+
+  it("has a name matching its folder, and a description", () => {
+    expect(field("name")).toBe(name)
+    expect(field("description")).not.toBe("")
+    // The header is YAML (the docs parse it), so a ": " in a value breaks it.
+    expect(frontmatter, 'use no ": " inside a value').not.toMatch(/^\w+: .*: /m)
+  })
+
+  it("names example lessons that exist", () => {
+    for (const x of field("examples")
+      .split(",")
+      .filter((x) => x.trim()))
+      expect(
+        readdirSync(new URL("skills/learn/examples", root)),
+        `${name}: no example lesson ${x.trim()}`
+      ).toContain(`${x.trim()}.json`)
+  })
+
+  it(`stays under ${MAX_PACK_WORDS} words`, () => {
+    expect(guide.split(/\s+/).length).toBeLessThanOrEqual(MAX_PACK_WORDS)
+  })
+
+  it("is listed in topics/index.md", () => {
+    const index = read("skills/learn/topics/index.md")
+    expect(index).toContain(`| \`${name}\` | ${field("description")} |`)
+  })
+
+  it("has a docs page", () => {
+    expect(read(`docs/skills/${name}.mdx`)).toContain(
+      `<include>../../skills/learn/topics/${name}/guide.md</include>`
+    )
+  })
+})
+
+it("topics/index.md lists only packs that exist", () => {
+  const listed = [
+    ...read("skills/learn/topics/index.md").matchAll(
+      /`topics\/([^/]+)\/guide\.md`/g
+    ),
+  ].map((m) => m[1])
+  expect(listed.sort()).toEqual([...packs].sort())
+})
