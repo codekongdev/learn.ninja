@@ -27,6 +27,7 @@ export const metadata: Metadata = {
   description: SITE.description,
   applicationName: SITE.name,
   openGraph: { siteName: SITE.name, type: "website" },
+  twitter: { card: "summary_large_image" },
   alternates: {
     types: {
       "text/markdown": "/index.md",

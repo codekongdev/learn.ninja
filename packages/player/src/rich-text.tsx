@@ -3,21 +3,13 @@
 import * as React from "react"
 
 import { usePlayer } from "./context"
+import { TOKEN } from "./plain-text"
 import { mathKey } from "./prepared"
 
 // Renders the spec's rich-text subset: **bold**, *italic*, `code`, and \( formulas \).
 // A $ is always a plain dollar sign.
 
-const TOKEN = /\\\(([\s\S]+?)\\\)|`([^`]+)`|\*\*([^*]+)\*\*|\*([^*]+)\*/g
-
-/** The same text without its markers, for places that need a plain string (like a live region). */
-export function plainText(text: string): string {
-  return text.replace(
-    TOKEN,
-    (_, math?: string, code?: string, bold?: string, italic?: string) =>
-      math?.trim() ?? code ?? bold ?? italic ?? ""
-  )
-}
+export { plainText } from "./plain-text"
 
 export function RichText({
   text,

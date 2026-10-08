@@ -15,6 +15,24 @@ const NOT_HTML = {
   missing: [{ type: "header" as const, key: "rsc" }],
 }
 
+// Lesson pages show LLM-written HTML in sandboxed frames (see HtmlFrame in packages/player). A srcdoc
+// frame inherits the page's policy, so this is what stops a visual from loading or navigating to
+// anything off-site, whatever the publish-time checks missed. Scripts stay 'unsafe-inline' because
+// Next.js streams its own inline scripts; the sandbox already blocks scripts inside visuals.
+const DEV = process.env.NODE_ENV === "development"
+const LESSON_CSP = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${DEV ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  `connect-src 'self'${DEV ? " ws: wss:" : ""}`,
+  "frame-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join("; ")
+
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui", "@workspace/player", "@workspace/spec"],
   // prepareLesson() reads Tailwind's own stylesheets at runtime to compile each lesson's visuals CSS,
@@ -53,10 +71,16 @@ const nextConfig: NextConfig = {
     }
   },
   async headers() {
-    return ["/", "/docs", "/docs/:path*"].map((source) => ({
-      source,
-      headers: [{ key: "Vary", value: "Accept" }],
-    }))
+    return [
+      ...["/", "/docs", "/docs/:path*"].map((source) => ({
+        source,
+        headers: [{ key: "Vary", value: "Accept" }],
+      })),
+      ...["/l/:path*", "/lessons/:path*"].map((source) => ({
+        source,
+        headers: [{ key: "Content-Security-Policy", value: LESSON_CSP }],
+      })),
+    ]
   },
   async redirects() {
     return [

@@ -1,10 +1,7 @@
 import type { Metadata } from "next"
 
-import { upgradeLesson, type Lesson } from "@workspace/spec"
-
 import { LessonView } from "@/components/lesson-view"
-import { idFromParam } from "@/lib/publish/ids"
-import { getLessonStore } from "@/lib/publish/store"
+import { loadPublished } from "@/lib/published"
 
 // A published lesson, at /l/{slug}-{id}. Lessons expire 24 hours after they're published.
 
@@ -13,17 +10,8 @@ type Props = {
   searchParams: Promise<{ ui?: string }>
 }
 
-async function load(param: string) {
-  const id = idFromParam(param)
-  const record = id ? await getLessonStore().get(id) : null
-  // Lessons published before spec 0.3 are still live for up to 24 hours.
-  return record
-    ? { ...record, lesson: upgradeLesson(record.lesson) as Lesson }
-    : null
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const record = await load((await params).slugId)
+  const record = await loadPublished((await params).slugId)
   return record
     ? {
         title: record.lesson.title,
@@ -37,7 +25,7 @@ export default async function PublishedLessonPage({
   params,
   searchParams,
 }: Props) {
-  const record = await load((await params).slugId)
+  const record = await loadPublished((await params).slugId)
   if (!record) return <Unavailable />
   const { ui } = await searchParams
   return (

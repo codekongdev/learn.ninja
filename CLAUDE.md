@@ -45,6 +45,7 @@ A lesson is made of **bricks**, one per screen: `concept` bricks (theory) and qu
 - Focus styles use `focus-visible:` classes; `tailwindcss-react-aria-components` makes them follow React Aria's keyboard detection. Don't remove that plugin from `packages/ui/src/styles/globals.css`.
 - Use logical CSS (`ms-*`, `me-*`, `ps-*`, `pe-*`, `start-*`, `end-*`), never left/right, so right-to-left works.
 - Lesson visuals are LLM-written HTML shown in a sandboxed iframe with Basecoat and no scripts. Never let lesson content run code.
+- Lesson routes (`/l/*`, `/lessons/*`) send a Content-Security-Policy from `next.config.ts` that only allows same-origin resources; visual frames inherit it, so it's what stops a visual loading anything off-site when the publish-time checks miss something. The frame's sandbox is pinned by `packages/player/src/visuals.test.ts`; never add `allow-scripts`.
 - Never commit secrets. Real values go in `.env.local` (git-ignored); document variable names in `.env.example`.
 
 ## Site and docs

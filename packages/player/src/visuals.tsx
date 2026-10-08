@@ -52,6 +52,15 @@ export function Visual({
 
 // ---------- HTML: a sandboxed iframe with no scripts ----------
 
+/**
+ * The frame's sandbox. Only allow-same-origin, so the player can measure the document and find its
+ * hotspots. Never add allow-scripts: with both flags, lesson HTML could run code with the site's origin.
+ */
+export const VISUAL_SANDBOX = "allow-same-origin"
+
+/** Keeps CSS inside its <style>: "</" would otherwise end the tag and inject markup. A CSS "\/" still means "/". */
+const inStyle = (css: string) => css.replace(/<\//g, "<\\/")
+
 function HtmlFrame({
   html,
   css,
@@ -77,7 +86,7 @@ function HtmlFrame({
   const srcDoc = React.useMemo(
     () =>
       // Without an explicit height the body keeps its natural size, so the player can measure it.
-      `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="${visualsCss}"><style>${prepared.visualsCss}</style><style>html,body{background:transparent}body{margin:0;padding:16px;display:flex;justify-content:center;align-items:center;box-sizing:border-box${height ? ";min-height:100vh" : ""}}${css ?? ""}</style></head><body>${html}</body></html>`,
+      `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="${visualsCss}"><style>${inStyle(prepared.visualsCss)}</style><style>html,body{background:transparent}body{margin:0;padding:16px;display:flex;justify-content:center;align-items:center;box-sizing:border-box${height ? ";min-height:100vh" : ""}}${inStyle(css ?? "")}</style></head><body>${html}</body></html>`,
     [html, css, visualsCss, height, prepared.visualsCss]
   )
 
@@ -144,7 +153,7 @@ function HtmlFrame({
         <iframe
           ref={ref}
           title={label ?? "Example"}
-          sandbox="allow-same-origin"
+          sandbox={VISUAL_SANDBOX}
           srcDoc={srcDoc}
           onLoad={() => setLoaded((n) => n + 1)}
           tabIndex={-1}
