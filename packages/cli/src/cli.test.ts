@@ -146,7 +146,7 @@ describe("learn publish", () => {
     reply.body.skill = {
       latest: "9.9.9",
       updateAvailable: true,
-      updateCommand: "npx skills add cmicpace/learn --skill learn -g",
+      updateCommand: "npx skills add Uxcel-Team/learn --skill learn -g",
     } as never
     t = setup([reply])
     await run(["publish", "lesson.json"], t.io)

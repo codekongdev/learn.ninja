@@ -15,7 +15,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `packages/player`: React components for every lesson screen and building block
 - `packages/cli`: the `learn` command (validate, publish, schema) the skill runs; bundled into `skills/learn/scripts/learn.mjs`
 - `packages/eslint-config`, `packages/typescript-config`: shared configs
-- `skills/learn/`: the installable skill (`npx skills add cmicpace/learn --skill learn -g`): SKILL.md, teaching guide, format reference, and generated copies of the schema, examples, and bundled CLI
+- `skills/learn/`: the installable skill (`npx skills add Uxcel-Team/learn --skill learn -g`): SKILL.md, teaching guide, format reference, and generated copies of the schema, examples, and bundled CLI
 - `examples/`: the five test lessons as JSON, used as fixtures
 - `spikes/`: throwaway test builds, git-ignored; never import from here
 

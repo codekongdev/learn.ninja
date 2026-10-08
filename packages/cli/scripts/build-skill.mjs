@@ -1,5 +1,5 @@
 /* global console */
-// Assembles skills/learn for distribution (`npx skills add cmicpace/learn --skill learn`):
+// Assembles skills/learn for distribution (`npx skills add Uxcel-Team/learn --skill learn`):
 // bundles the CLI into one dependency-free file and copies in the JSON Schema and example lessons.
 // Run: npm run skill:build -w @workspace/cli (a test fails if skills/learn is out of date).
 import {

@@ -24,7 +24,7 @@ Storybook runs at http://localhost:6006, with every exercise type in every state
 Install it in your agent (Claude Code, Cursor, Codex…), then ask it to make a lesson from anything:
 
 ```bash
-npx skills add cmicpace/learn --skill learn -g
+npx skills add Uxcel-Team/learn --skill learn -g
 ```
 
 The skill writes a lesson file, checks it, and publishes it with `node <skill>/scripts/learn.mjs publish lesson.json`. Set `LEARN_API_URL` to publish somewhere other than the default server (e.g. `http://localhost:3000`).
