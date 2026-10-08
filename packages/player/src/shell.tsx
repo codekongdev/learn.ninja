@@ -322,6 +322,7 @@ function ShareButton({
 // ---------- footer ----------
 
 export function LessonFooter({
+  homeHref,
   t,
   prefs,
   onPrefs,
@@ -329,6 +330,7 @@ export function LessonFooter({
   theme,
   onThemeChange,
 }: {
+  homeHref: string
   t: Strings
   prefs: Preferences
   onPrefs: (patch: Partial<Preferences>) => void
@@ -342,10 +344,14 @@ export function LessonFooter({
   return (
     <footer className="flex h-14 shrink-0 items-center gap-2 px-4 pb-[env(safe-area-inset-bottom,0px)] sm:h-16 sm:px-8">
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium">
-        <span className="truncate">
-          <span className="max-sm:hidden">© {new Date().getFullYear()} </span>
-          {BRAND.name} {t.by}
-        </span>
+        <a
+          href={homeHref}
+          className="flex shrink-0 items-center gap-2 rounded-md text-base font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          <LearnLogo className="size-6" />
+          <span className="max-sm:sr-only">{BRAND.name}</span>
+        </a>
+        <span className="text-muted-foreground">{t.by}</span>
         <LinkButton
           variant="secondary"
           size="sm"
@@ -357,6 +363,12 @@ export function LessonFooter({
         </LinkButton>
       </div>
       <div className="flex items-center justify-end gap-2">
+        <span className="text-sm font-medium max-lg:hidden">
+          © {new Date().getFullYear()} {BRAND.name}
+        </span>
+        <span aria-hidden="true" className="text-muted-foreground max-lg:hidden">
+          ·
+        </span>
         <SettingMenu
           label={t.textSize}
           icon={<TypeIcon />}

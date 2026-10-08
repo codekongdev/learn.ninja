@@ -20,7 +20,19 @@ export function SiteFooter() {
     <footer className="border-t">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex flex-col gap-2">
-          <Wordmark />
+          <div className="flex items-center gap-1.5 text-sm font-medium">
+            <Wordmark />
+            <span className="text-muted-foreground">by</span>
+            <LinkButton
+              variant="secondary"
+              size="sm"
+              href={SITE.makerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <bdi dir="ltr">{SITE.maker}</bdi>
+            </LinkButton>
+          </div>
           <p className="text-sm text-muted-foreground">
             Interactive lessons, made by your agent. Free, no account.
           </p>
@@ -38,20 +50,9 @@ export function SiteFooter() {
         </nav>
       </div>
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 pb-10 sm:px-6">
-        <div className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
-          <span className="truncate">
-            © {new Date().getFullYear()} {SITE.name} by
-          </span>
-          <LinkButton
-            variant="secondary"
-            size="sm"
-            href={SITE.makerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <bdi dir="ltr">{SITE.maker}</bdi>
-          </LinkButton>
-        </div>
+        <p className="truncate text-sm text-muted-foreground">
+          © {new Date().getFullYear()} {SITE.name}
+        </p>
         <ThemeToggle />
       </div>
     </footer>

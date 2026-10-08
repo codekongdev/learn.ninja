@@ -123,6 +123,7 @@ export function LessonPlayer({
             shareUrl={shareUrl}
           />
           <LessonFooter
+            homeHref={homeHref}
             t={t}
             prefs={prefs}
             onPrefs={(patch) => {
