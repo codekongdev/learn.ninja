@@ -82,6 +82,8 @@ export type Strings = {
   closeTheory: string
   by: string
   textSize: string
+  /** Marks the option a setting starts on, after its name in the menu. */
+  defaultOption: string
   sizes: Record<TextSize, string>
   sizesShort: Record<TextSize, string>
   theme: string
@@ -186,6 +188,7 @@ const en: Strings = {
   closeTheory: "Close theory",
   by: "by",
   textSize: "Text size",
+  defaultOption: "(default)",
   sizes: { sm: "Small", md: "Medium", lg: "Large" },
   sizesShort: { sm: "Sm", md: "Md", lg: "Lg" },
   theme: "Theme",
@@ -275,6 +278,7 @@ const ar: Strings = {
   closeTheory: "إغلاق النظرية",
   by: "بواسطة",
   textSize: "حجم النص",
+  defaultOption: "(افتراضي)",
   sizes: { sm: "صغير", md: "متوسط", lg: "كبير" },
   sizesShort: { sm: "صغير", md: "متوسط", lg: "كبير" },
   theme: "المظهر",

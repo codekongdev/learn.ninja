@@ -376,8 +376,6 @@ export function LessonFooter({
             icon={<ThemeIcon />}
             value={theme ?? "system"}
             valueLabel={t.themes[theme ?? "system"]}
-            defaultValue="system"
-            defaultLabel={t.defaultOption}
             options={(["system", "light", "dark"] as const).map((id) => ({
               id,
               label: t.themes[id],
@@ -444,10 +442,12 @@ function SettingMenu<K extends string>({
           <DropdownMenuLabel>{label}</DropdownMenuLabel>
           {options.map((o) => (
             <DropdownMenuItem key={o.id} id={o.id} textValue={o.label}>
-              <span lang={o.lang}>{o.label}</span>
-              {o.id === defaultValue ? (
-                <span className="text-muted-foreground">{defaultLabel}</span>
-              ) : null}
+              <span>
+                <span lang={o.lang}>{o.label}</span>
+                {o.id === defaultValue ? (
+                  <span className="text-muted-foreground"> {defaultLabel}</span>
+                ) : null}
+              </span>
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
