@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Turn anything into a short interactive lesson with your AI agent.",
 }
 
-const INSTALL = "npx skills add Uxcel-Team/learn --skill learn -g"
+const INSTALL = "npx skills add cmicpace/learn --skill learn -g"
 
 export default function CreatePage() {
   return (

@@ -1,9 +1,7 @@
 import { prepareLesson } from "@workspace/player/prepare"
 import {
-  canUpgrade,
   LIMITS,
   SPEC_VERSION,
-  upgradeLesson,
   validateLesson,
   type Issue,
 } from "@workspace/spec"
@@ -25,13 +23,13 @@ import {
 
 // The publish API's logic, independent of Next.js so it can be tested directly.
 
-/** Spec versions the server accepts. Older skills keep working while they're listed here; older files are upgraded first. */
-export const ACCEPTED_SPECS: string[] = [SPEC_VERSION, "0.2"]
+/** Spec versions the server accepts. Older skills keep working while they're listed here. */
+export const ACCEPTED_SPECS = [SPEC_VERSION]
 
 /** The current skill version. Bump it when the skill changes; older skills are told to update. */
-export const LATEST_SKILL_VERSION = "0.3.0"
+export const LATEST_SKILL_VERSION = "0.2.0"
 export const SKILL_UPDATE_COMMAND =
-  "npx skills add Uxcel-Team/learn --skill learn -g"
+  "npx skills add cmicpace/learn --skill learn -g"
 
 export interface Deps {
   store: LessonStore
@@ -91,14 +89,16 @@ function checkLessonText(text: string, skillVersion?: string | null) {
       },
     }
   }
-  let data: unknown
+  let spec: unknown
   try {
-    data = JSON.parse(text)
+    spec = (JSON.parse(text) as { spec?: unknown }).spec
   } catch {
     // validateLesson reports the JSON error below.
   }
-  const spec = (data as { spec?: unknown } | undefined)?.spec
-  if (typeof spec === "string" && !ACCEPTED_SPECS.includes(spec)) {
+  if (
+    typeof spec === "string" &&
+    !ACCEPTED_SPECS.includes(spec as typeof SPEC_VERSION)
+  ) {
     return {
       error: {
         status: 422,
@@ -116,7 +116,7 @@ function checkLessonText(text: string, skillVersion?: string | null) {
       },
     }
   }
-  const result = validateLesson(canUpgrade(data) ? upgradeLesson(data) : text)
+  const result = validateLesson(text)
   if (!result.ok) {
     return {
       error: {
