@@ -8,6 +8,8 @@ export const SITE = {
   description:
     "Give your AI agent an article, notes, docs, a transcript, or code. It writes one short, interactive lesson and gives you a link to share. Free, no account.",
   repo: "https://github.com/Uxcel-Team/learn",
+  maker: "@cmicpace",
+  makerUrl: "https://x.com/cmicpace",
 }
 
 export const INSTALL_COMMAND = "npx skills add https://learn.ninja -g"

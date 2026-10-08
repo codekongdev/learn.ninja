@@ -49,9 +49,6 @@ import {
 // The frame around every lesson screen: header (home, title menu, progress, Share), footer (credit and
 // viewer settings), and the Theory panel. Layout follows the Figma frame "Learn" (node 2004:15459).
 
-/** The "by @cmicpace" credit in the footer, hidden for now. */
-const SHOW_MAKER = false
-
 export const BRAND = {
   name: "learn.ninja",
   maker: "@cmicpace",
@@ -347,20 +344,17 @@ export function LessonFooter({
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium">
         <span className="truncate">
           <span className="max-sm:hidden">© {new Date().getFullYear()} </span>
-          {BRAND.name}
-          {SHOW_MAKER ? ` ${t.by}` : null}
+          {BRAND.name} {t.by}
         </span>
-        {SHOW_MAKER ? (
-          <LinkButton
-            variant="secondary"
-            size="sm"
-            href={BRAND.makerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <bdi dir="ltr">{BRAND.maker}</bdi>
-          </LinkButton>
-        ) : null}
+        <LinkButton
+          variant="secondary"
+          size="sm"
+          href={BRAND.makerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <bdi dir="ltr">{BRAND.maker}</bdi>
+        </LinkButton>
       </div>
       <div className="flex items-center justify-end gap-2">
         <SettingMenu

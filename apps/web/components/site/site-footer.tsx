@@ -1,5 +1,7 @@
 import Link from "next/link"
 
+import { LinkButton } from "@workspace/ui/components/button"
+
 import { SITE } from "@/lib/site"
 
 import { ThemeToggle } from "./theme-toggle"
@@ -36,9 +38,20 @@ export function SiteFooter() {
         </nav>
       </div>
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 pb-10 sm:px-6">
-        <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {SITE.name}
-        </p>
+        <div className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
+          <span className="truncate">
+            © {new Date().getFullYear()} {SITE.name} by
+          </span>
+          <LinkButton
+            variant="secondary"
+            size="sm"
+            href={SITE.makerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <bdi dir="ltr">{SITE.maker}</bdi>
+          </LinkButton>
+        </div>
         <ThemeToggle />
       </div>
     </footer>
