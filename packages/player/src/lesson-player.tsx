@@ -314,6 +314,9 @@ function reducer(state: State, action: Action): State {
 
 // ---------- player ----------
 
+/** The Theory button and panel are hidden while the feature is being redesigned. */
+const SHOW_THEORY = false
+
 function Player({
   lesson,
   textSize,
@@ -336,7 +339,8 @@ function Player({
   const [theoryOpen, setTheoryOpen] = React.useState(false)
   // Theory starts open where there's room for it beside the lesson.
   React.useEffect(() => {
-    if (matchMedia("(min-width: 64rem)").matches) setTheoryOpen(true)
+    if (SHOW_THEORY && matchMedia("(min-width: 64rem)").matches)
+      setTheoryOpen(true)
   }, [])
   const theoryId = React.useId()
   const item = state.items[state.index]!
@@ -368,22 +372,24 @@ function Player({
       <div className="relative flex min-h-0 flex-1 gap-4 sm:px-8">
         <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-card sm:rounded-xl sm:border-0 sm:shadow-xs sm:ring-1 sm:ring-foreground/10">
           <div className="relative flex min-w-0 flex-1 flex-col">
-            <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
-              <Button
-                variant="outline"
-                size="sm"
-                aria-expanded={theoryOpen}
-                aria-controls={theoryOpen ? theoryId : undefined}
-                onPress={() => setTheoryOpen((open) => !open)}
-              >
-                {t.theory}
-                {theoryOpen ? (
-                  <PanelRightFilledIcon className="rtl:-scale-x-100" />
-                ) : (
-                  <PanelRightIcon className="rtl:-scale-x-100" />
-                )}
-              </Button>
-            </div>
+            {SHOW_THEORY ? (
+              <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-expanded={theoryOpen}
+                  aria-controls={theoryOpen ? theoryId : undefined}
+                  onPress={() => setTheoryOpen((open) => !open)}
+                >
+                  {t.theory}
+                  {theoryOpen ? (
+                    <PanelRightFilledIcon className="rtl:-scale-x-100" />
+                  ) : (
+                    <PanelRightIcon className="rtl:-scale-x-100" />
+                  )}
+                </Button>
+              </div>
+            ) : null}
             <main ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
               <div
                 key={state.index}
@@ -412,7 +418,7 @@ function Player({
             </main>
           </div>
         </div>
-        {theoryOpen ? (
+        {SHOW_THEORY && theoryOpen ? (
           <TheoryPanel
             id={theoryId}
             concepts={seenConcepts}
