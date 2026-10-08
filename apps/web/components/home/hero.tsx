@@ -4,7 +4,7 @@ import { AGENT_PROMPT, HERO_CTA_ID } from "@/lib/site"
 
 export function Hero() {
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col items-center gap-16 px-4 pt-20 pb-12 sm:px-6 sm:pt-28">
+    <section className="mx-auto flex w-full max-w-3xl flex-col items-center gap-16 px-4 py-20 sm:px-6 sm:py-28">
       <div className="flex max-w-3xl flex-col items-center gap-6 text-center">
         <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl sm:leading-[1.05]">
           Interactive{" "}

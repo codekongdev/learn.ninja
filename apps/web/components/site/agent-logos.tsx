@@ -3,7 +3,7 @@ import { AGENTS } from "@/lib/site"
 /** A slowly scrolling row of agent logos, drawn as masks so they take the text color. */
 export function AgentLogos() {
   return (
-    <div className="flex w-full min-w-0 flex-col items-center gap-5">
+    <div className="flex w-full min-w-0 flex-col items-center gap-8">
       <p className="text-center text-xs font-medium tracking-widest text-balance text-muted-foreground uppercase">
         Works with any agent that supports skills
       </p>

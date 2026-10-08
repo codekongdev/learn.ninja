@@ -1,6 +1,6 @@
 import { CheckIcon, LockIcon } from "lucide-react"
 
-import { BrickDemo, LearnLogo, type Prepared } from "@workspace/player"
+import { LearnLogo, LessonPlayer, type Prepared } from "@workspace/player"
 import type { Lesson } from "@workspace/spec"
 
 import { Section } from "./section"
@@ -17,6 +17,7 @@ export function Demo({
 }) {
   return (
     <Section
+      wide
       eyebrow="How it works"
       title="Ask for a lesson. Get a link."
       intro="Your agent picks the one idea worth teaching, writes the lesson, checks it, and publishes it. Try the question below."
@@ -25,18 +26,28 @@ export function Demo({
         <Chat />
         <div className="flex min-w-0 flex-col overflow-hidden rounded-xl bg-muted/50 ring-1 ring-foreground/10">
           <div className="flex items-center gap-2 border-b px-3 py-2">
+            {/* macOS's traffic lights, as an illustration: the one place fixed colours are right. */}
             <div aria-hidden="true" className="flex gap-1.5">
-              <span className="size-2.5 rounded-full bg-foreground/15" />
-              <span className="size-2.5 rounded-full bg-foreground/15" />
-              <span className="size-2.5 rounded-full bg-foreground/15" />
+              <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+              <span className="size-2.5 rounded-full bg-[#febc2e]" />
+              <span className="size-2.5 rounded-full bg-[#28c840]" />
             </div>
             <div className="mx-auto flex min-w-0 items-center gap-1.5 rounded-md bg-background px-3 py-1 text-xs text-muted-foreground shadow-xs ring-1 ring-foreground/5">
               <LockIcon aria-hidden="true" className="size-3 shrink-0" />
               <span className="truncate">{LINK}</span>
             </div>
           </div>
-          <div className="p-3 sm:p-4">
-            <BrickDemo lesson={lesson} brickId="p1" prepared={prepared} />
+          {/* The real player's window, opened on a question: no header or footer, no scrolling, no text
+              selection. Shortcuts stay inside it; the page has other demos. */}
+          <div className="h-[560px] min-h-0 p-3 select-none sm:p-4 [&_main]:overflow-hidden">
+            <LessonPlayer
+              lesson={lesson}
+              prepared={prepared}
+              uiLanguage={lesson.language}
+              startAt="p5"
+              scopeKeys
+              chrome={false}
+            />
           </div>
         </div>
       </div>
@@ -78,12 +89,6 @@ function Chat() {
             </span>
           </div>
         </div>
-        <p className="text-muted-foreground">
-          It takes about 7 minutes. Want it harder, or in another language?
-        </p>
-      </div>
-      <div className="mt-2 rounded-lg border bg-background px-3 py-2.5 text-sm text-muted-foreground dark:bg-input/30">
-        Message…
       </div>
     </div>
   )

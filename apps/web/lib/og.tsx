@@ -13,9 +13,9 @@ export const OG_SIZE = { width: 1200, height: 630 }
 
 // The dark theme's tokens, as fixed colors (next/og can't read CSS variables).
 const C = {
-  page: "#0a0a0a",
-  window: "#111113",
-  card: "#18181b",
+  page: "#151515",
+  window: "#1f1f1f",
+  card: "#262626",
   border: "#2e2e33",
   borderStrong: "#3f3f46",
   foreground: "#fafafa",

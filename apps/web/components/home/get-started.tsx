@@ -4,7 +4,7 @@ import { AGENT_PROMPT } from "@/lib/site"
 
 export function GetStarted() {
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6 sm:pb-28">
+    <section className="mx-auto w-full max-w-3xl px-4 pb-20 sm:px-6 sm:pb-28">
       <div className="flex flex-col items-center gap-6 rounded-xl bg-card px-6 py-16 text-center shadow-xs ring-1 ring-foreground/10">
         <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
           Get started

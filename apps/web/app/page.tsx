@@ -2,6 +2,7 @@ import { prepareLesson } from "@workspace/player/prepare"
 
 import { BrickTabs, type BrickTab } from "@/components/home/brick-tabs"
 import { Demo } from "@/components/home/demo"
+import { Divider } from "@/components/home/divider"
 import { Examples } from "@/components/home/examples"
 import { Faq } from "@/components/home/faq"
 import { FromAnything, Points, WrongAnswers } from "@/components/home/features"
@@ -18,15 +19,15 @@ const TABS: (Omit<BrickTab, "lesson" | "prepared"> & { slug: string })[] = [
   {
     type: "choice",
     label: "Choice",
-    slug: "map-vs-foreach",
-    brickId: "p2",
+    slug: "compound-interest",
+    brickId: "p5",
     blurb: "Pick one answer, or all that apply.",
   },
   {
     type: "compare",
     label: "Compare",
-    slug: "compound-interest",
-    brickId: "p4",
+    slug: "button-hierarchy",
+    brickId: "hook",
     blurb: "Two options side by side: pick the better one.",
   },
   {
@@ -67,7 +68,7 @@ const TABS: (Omit<BrickTab, "lesson" | "prepared"> & { slug: string })[] = [
   {
     type: "scenario",
     label: "Scenario",
-    slug: "writing-a-prd",
+    slug: "map-vs-foreach",
     brickId: "ch",
     blurb: "A realistic situation: choose what you'd do.",
   },
@@ -94,8 +95,11 @@ export default async function HomePage() {
       <SiteHeader action={<HeaderCopyPrompt afterHero />} />
       <main className="flex-1">
         <Hero />
+        <Divider />
         <Demo lesson={compound.lesson} prepared={compound.prepared} />
+        <Divider />
         <Section
+          wide
           id="bricks"
           eyebrow="Bricks"
           title="A lesson, not a summary"
@@ -104,10 +108,15 @@ export default async function HomePage() {
           <BrickTabs tabs={tabs} />
           <Points />
         </Section>
+        <Divider />
         <WrongAnswers lesson={buttons.lesson} prepared={buttons.prepared} />
+        <Divider />
         <FromAnything lesson={bySlug("writing-a-prd").lesson} />
+        <Divider />
         <Examples lessons={lessons} />
+        <Divider />
         <Faq />
+        <Divider />
         <GetStarted />
       </main>
       <SiteFooter />

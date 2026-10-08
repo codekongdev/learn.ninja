@@ -12,7 +12,11 @@ import { CopyButton } from "./copy-button"
  * A small "Copy prompt for agent" for the header. With `afterHero` (the home page) it
  * shows only once the hero's own button has scrolled under the header.
  */
-export function HeaderCopyPrompt({ afterHero = false }: { afterHero?: boolean }) {
+export function HeaderCopyPrompt({
+  afterHero = false,
+}: {
+  afterHero?: boolean
+}) {
   const [shown, setShown] = React.useState(!afterHero)
 
   React.useEffect(() => {

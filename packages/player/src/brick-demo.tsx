@@ -18,6 +18,7 @@ import {
   type State,
 } from "./lesson-player"
 import { emptyPrepared, type Prepared } from "./prepared"
+import { seeded } from "./random"
 import { ariaLocaleFor, stringsFor, type TextSize } from "./strings"
 
 export interface BrickDemoProps {
@@ -113,14 +114,6 @@ function findBrick(lesson: Lesson, id: string): Brick {
   )
   if (!brick) throw new Error(`No brick "${id}" in "${lesson.title}".`)
   return brick
-}
-
-/** A small seeded random source (Park–Miller), so a demo shuffles the same way every time. */
-function seeded(key: string): () => number {
-  let s = 7
-  for (const c of key) s = (s * 31 + c.charCodeAt(0)) % 2147483647
-  s = s || 1
-  return () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646
 }
 
 function begin(brick: Brick, checked?: Answer): State {

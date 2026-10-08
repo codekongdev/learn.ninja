@@ -4,6 +4,7 @@ import { ArrowUpRightIcon } from "lucide-react"
 import type { Lesson } from "@workspace/spec"
 import { Badge } from "@workspace/ui/components/badge"
 
+import { RhythmStrip } from "./brick-icons"
 import { Section } from "./section"
 
 /** The example lessons, each opening in the real player. */
@@ -14,6 +15,7 @@ export function Examples({
 }) {
   return (
     <Section
+      wide
       id="examples"
       eyebrow="Examples"
       title="Try a lesson"
@@ -33,9 +35,9 @@ export function Examples({
                   className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:text-foreground motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5 rtl:-scale-x-100"
                 />
               </div>
-              <p className="flex-1 text-sm text-muted-foreground">
-                {lesson.summary}
-              </p>
+              <div className="flex-1">
+                <RhythmStrip lesson={lesson} />
+              </div>
               <div className="flex flex-wrap gap-2">
                 {lesson.topic ? (
                   <Badge variant="outline">{lesson.topic}</Badge>

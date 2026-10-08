@@ -10,60 +10,53 @@ import {
   ShapesIcon,
 } from "lucide-react"
 
-import { BrickDemo, type Prepared } from "@workspace/player"
+import { XIcon } from "lucide-react"
+
+import type { Prepared } from "@workspace/player"
 import type { Lesson } from "@workspace/spec"
 import { Badge } from "@workspace/ui/components/badge"
+import { Kbd } from "@workspace/ui/components/kbd"
 
 import { AgentPrompts, Eyebrow } from "./section"
 
 const POINTS = [
-  {
-    icon: LightbulbIcon,
-    title: "Feedback on every answer",
-    body: "Each wrong option explains the mistake behind it. Miss twice and you see the answer and why.",
-  },
-  {
-    icon: ShapesIcon,
-    title: "Visuals, formulas, and code",
-    body: "Diagrams drawn in HTML, real formulas, and highlighted code, right in the lesson.",
-  },
-  {
-    icon: LanguagesIcon,
-    title: "Any language",
-    body: "Lessons in the learner's language, including right-to-left languages like Arabic.",
-  },
-  {
-    icon: PencilIcon,
-    title: "Edit by asking",
-    body: "“Make it harder.” Your agent changes the lesson and the link stays the same.",
-  },
+  { icon: LightbulbIcon, title: "Every answer explained" },
+  { icon: ShapesIcon, title: "Visuals, formulas, code" },
+  { icon: LanguagesIcon, title: "Any language" },
+  { icon: PencilIcon, title: "Edit by asking" },
 ]
 
-/** Four short selling points under the brick tabs. */
+/** Four selling points under the brick tiles: an icon and a few words each. */
 export function Points() {
   return (
     <ul className="grid gap-px overflow-hidden rounded-xl bg-border ring-1 ring-foreground/10 sm:grid-cols-2 lg:grid-cols-4">
-      {POINTS.map(({ icon: Icon, title, body }) => (
-        <li key={title} className="flex flex-col gap-2 bg-card p-6">
+      {POINTS.map(({ icon: Icon, title }) => (
+        <li
+          key={title}
+          className="flex items-center gap-3 bg-card px-5 py-4 text-sm font-medium"
+        >
           <Icon aria-hidden="true" className="size-5 text-muted-foreground" />
-          <h3 className="font-semibold">{title}</h3>
-          <p className="text-sm text-muted-foreground">{body}</p>
+          {title}
         </li>
       ))}
     </ul>
   )
 }
 
-/** "Every wrong answer teaches": a brick already checked with a wrong pick. */
+/** "Every wrong answer teaches": the moment after a miss, zoomed in. The copy comes from a real lesson. */
 export function WrongAnswers({
   lesson,
-  prepared,
 }: {
   lesson: Lesson
-  prepared: Prepared
+  prepared?: Prepared
 }) {
+  const brick = lesson.bricks.find((b) => b.id === "p1")
+  const option =
+    brick?.type === "choice"
+      ? brick.options.find((o) => o.id === "b" && o.feedback)
+      : undefined
   return (
-    <section className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-10 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:gap-16">
+    <section className="mx-auto grid w-full max-w-5xl grid-cols-[minmax(0,1fr)] items-center gap-10 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:gap-16">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
           <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
@@ -83,12 +76,23 @@ export function WrongAnswers({
           ]}
         />
       </div>
-      <BrickDemo
-        lesson={lesson}
-        brickId="p1"
-        prepared={prepared}
-        checked={{ kind: "select", ids: ["b"] }}
-      />
+      <div
+        aria-hidden="true"
+        className="relative mx-auto flex w-full max-w-md flex-col gap-4 rounded-2xl bg-muted/40 p-6 sm:p-10"
+      >
+        <div
+          data-status="wrong"
+          className="flex min-h-14 items-center gap-3 rounded-lg border border-yellow-500 bg-yellow-500/10 px-5 py-4 text-base font-medium shadow-xs"
+        >
+          {option?.text}
+          <Kbd className="ms-auto shrink-0 bg-yellow-500 text-yellow-950">
+            <XIcon />
+          </Kbd>
+        </div>
+        <div className="w-fit max-w-sm rounded-xl border border-yellow-500 bg-yellow-100 px-5 py-4 text-base font-semibold text-yellow-900 shadow-xs dark:border-yellow-600 dark:bg-yellow-950 dark:text-yellow-100">
+          {option?.feedback}
+        </div>
+      </div>
     </section>
   )
 }
@@ -104,7 +108,7 @@ const INPUTS = [
 /** "From anything you're reading": inputs on one side, a lesson's intro on the other. */
 export function FromAnything({ lesson }: { lesson: Lesson }) {
   return (
-    <section className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-10 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:gap-16">
+    <section className="mx-auto grid w-full max-w-5xl grid-cols-[minmax(0,1fr)] items-center gap-10 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:gap-16">
       <div className="flex flex-col gap-6 lg:order-2">
         <div className="flex flex-col gap-3">
           <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">

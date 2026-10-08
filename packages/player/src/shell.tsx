@@ -158,6 +158,7 @@ export function useHoursLeft(expiresAt?: number): number | null {
 export function LessonHeader({
   title,
   parts,
+  showParts = true,
   expiresAt,
   homeHref,
   docsHref,
@@ -169,6 +170,8 @@ export function LessonHeader({
 }: {
   title: string
   parts: PartProgress
+  /** False on the title screen: the bar appears with the first question. */
+  showParts?: boolean
   expiresAt?: number
   homeHref: string
   docsHref?: string
@@ -183,7 +186,7 @@ export function LessonHeader({
   const [confirmRestart, setConfirmRestart] = React.useState(false)
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 px-4 sm:h-16 sm:px-8">
-      <div className="flex min-w-0 flex-1 items-center gap-1">
+      <div className="flex min-w-0 flex-1 items-center">
         <LinkButton
           href={homeHref}
           variant="ghost"
@@ -192,7 +195,9 @@ export function LessonHeader({
         >
           <LearnLogo className="size-5.5" />
         </LinkButton>
-        <span aria-hidden="true" className="text-xs text-muted-foreground">
+        {/* The mark sits 3px inside its box and the title text 10px inside its button, so the slash's
+            margins are uneven on purpose: the visible gaps come out the same on both sides. */}
+        <span aria-hidden="true" className="ms-2 text-xs text-muted-foreground">
           /
         </span>
         <div className="flex min-w-0 items-center">
@@ -230,7 +235,12 @@ export function LessonHeader({
           </DialogFooter>
         </Dialog>
       </div>
-      <PartsProgress parts={parts} t={t} />
+      {showParts ? (
+        <PartsProgress parts={parts} t={t} />
+      ) : (
+        // Holds the middle of the header so the buttons don't shift when the bar appears.
+        <div aria-hidden="true" className="min-w-0 sm:flex-1" />
+      )}
       <div className="flex items-center justify-end gap-1 sm:flex-1">
         {docsHref ? (
           <LinkButton
@@ -273,10 +283,12 @@ function LessonTitle({
     return (
       // Edited in place: the field takes the title's exact look and spot, and its width follows the
       // text (the hidden copy underneath sets the size). Nothing moves when editing starts.
-      <span className="inline-grid max-w-40 min-w-0 shrink items-center sm:max-w-80">
+      // The field floats over an invisible copy of the text, so only the text sets the width: an
+      // input in the flow would widen the box to its own default size on short titles.
+      <span className="relative inline-block max-w-40 min-w-0 shrink sm:max-w-80">
         <span
           aria-hidden="true"
-          className="invisible col-start-1 row-start-1 h-7 border border-transparent px-2.5 text-sm font-medium whitespace-pre"
+          className="invisible block h-7 border border-transparent px-2.5 text-sm font-medium whitespace-pre"
         >
           {draft || " "}
         </span>
@@ -291,7 +303,7 @@ function LessonTitle({
             if (e.key === "Enter") commit()
             if (e.key === "Escape") setDraft(null)
           }}
-          className="col-start-1 row-start-1 h-7 w-full min-w-0 border-transparent bg-muted px-2.5 text-sm font-medium shadow-none md:text-sm dark:bg-muted"
+          className="absolute inset-0 h-7 w-full min-w-0 border-transparent bg-muted px-2.5 text-sm font-medium shadow-none md:text-sm dark:bg-muted"
         />
       </span>
     )
@@ -309,8 +321,16 @@ function LessonTitle({
   )
 }
 
-/** One segment per part: finished parts and upcoming parts are short pills, the current part is a full bar. */
+/**
+ * One segment per part: finished parts and upcoming parts are short pills, the current part is a full bar.
+ * It mounts when the lesson starts, so each segment slides in, one after the other.
+ */
 function PartsProgress({ parts, t }: { parts: PartProgress; t: Strings }) {
+  const enter = (i: number) => ({
+    className:
+      "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-both motion-safe:duration-500",
+    style: { animationDelay: `${i * 90}ms` },
+  })
   return (
     <div className="flex min-w-0 items-center gap-1.5 sm:flex-1 sm:gap-2">
       {Array.from({ length: parts.count }, (_, i) =>
@@ -320,15 +340,21 @@ function PartsProgress({ parts, t }: { parts: PartProgress; t: Strings }) {
             value={Math.round(parts.fraction * 100)}
             aria-label={t.progress}
             valueLabel={t.part(i + 1, parts.count)}
-            className="w-16 min-w-0 shrink-0 transition-all duration-500 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-track]]:h-3"
+            style={enter(i).style}
+            className={cn(
+              "w-16 min-w-0 shrink-0 transition-all duration-500 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-track]]:h-3",
+              enter(i).className
+            )}
           />
         ) : (
           <span
             key={i}
             aria-hidden="true"
+            style={enter(i).style}
             className={cn(
               "h-3 w-3 shrink-0 rounded-full transition-colors duration-500 sm:w-[18px]",
-              i < parts.current || parts.done ? "bg-primary" : "bg-muted"
+              i < parts.current || parts.done ? "bg-primary" : "bg-muted",
+              enter(i).className
             )}
           />
         )
@@ -413,7 +439,7 @@ export function LessonFooter({
   const ThemeIcon =
     theme === "dark" ? MoonIcon : theme === "light" ? SunIcon : MonitorIcon
   return (
-    <footer className="flex h-14 shrink-0 items-center gap-2 px-4 pb-[env(safe-area-inset-bottom,0px)] sm:h-16 sm:px-8">
+    <footer className="flex h-12 shrink-0 items-center gap-2 px-4 pb-[env(safe-area-inset-bottom,0px)] sm:px-8">
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium">
         <a
           href={homeHref}

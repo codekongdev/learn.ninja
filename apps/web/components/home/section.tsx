@@ -8,6 +8,7 @@ export function Section({
   intro,
   children,
   className,
+  wide = false,
 }: {
   id?: string
   eyebrow?: string
@@ -15,12 +16,15 @@ export function Section({
   intro?: React.ReactNode
   children?: React.ReactNode
   className?: string
+  /** The body (not the heading) spreads past the page's column: demos, tiles, grids. */
+  wide?: boolean
 }) {
   return (
     <section
       id={id}
       className={cn(
-        "mx-auto flex w-full max-w-6xl scroll-mt-20 flex-col gap-10 px-4 py-20 sm:px-6 sm:py-28",
+        "mx-auto flex w-full scroll-mt-20 flex-col gap-10 px-4 py-20 sm:px-6 sm:py-28",
+        wide ? "max-w-6xl" : "max-w-3xl",
         className
       )}
     >

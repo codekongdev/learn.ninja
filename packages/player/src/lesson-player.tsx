@@ -47,6 +47,7 @@ import {
 } from "./flow"
 import { Mascot } from "./mascot"
 import { emptyPrepared, type Prepared } from "./prepared"
+import { seeded } from "./random"
 import { plainText, RichText } from "./rich-text"
 import {
   LessonFooter,
@@ -86,6 +87,12 @@ export interface LessonPlayerProps {
   onThemeChange?: (theme: Theme) => void
   /** Called when the learner renames the lesson in the header. The player shows the new name either way. */
   onRename?: (title: string) => void
+  /** For demos: open on this brick instead of the intro, shuffled the same way on the server and in the browser. */
+  startAt?: string
+  /** For demos on a page with other players: only take keyboard shortcuts from inside this player. */
+  scopeKeys?: boolean
+  /** For product shots: just the lesson window, without the header and footer. */
+  chrome?: boolean
 }
 
 export function LessonPlayer({
@@ -101,7 +108,11 @@ export function LessonPlayer({
   theme,
   onThemeChange,
   onRename,
+  startAt,
+  scopeKeys = false,
+  chrome = true,
 }: LessonPlayerProps) {
+  const root = React.useRef<HTMLDivElement>(null)
   // The title as shown, which a rename in the header changes.
   const [title, setTitle] = React.useState(lesson.title)
   React.useEffect(() => setTitle(lesson.title), [lesson.title])
@@ -116,14 +127,24 @@ export function LessonPlayer({
   const dir = /^(ar|he|fa|ur)\b/i.test(ui) ? "rtl" : "ltr"
   return (
     <DirectionProvider locale={locale}>
-      <PlayerProvider value={{ prepared, t, dir, visualsCss }}>
+      <PlayerProvider
+        value={{
+          prepared,
+          t,
+          dir,
+          visualsCss,
+          keyScope: scopeKeys ? root : undefined,
+        }}
+      >
         <div
+          ref={root}
           dir={dir}
           lang={ui}
           className="flex h-full min-h-0 flex-col bg-background text-foreground"
         >
           <Player
             lesson={shown}
+            startAt={startAt}
             onRename={(next) => {
               setTitle(next)
               onRename?.(next)
@@ -139,19 +160,22 @@ export function LessonPlayer({
             docsHref={docsHref}
             createHref={createHref}
             shareUrl={shareUrl}
+            chrome={chrome}
           />
-          <LessonFooter
-            homeHref={homeHref}
-            t={t}
-            prefs={prefs}
-            onPrefs={(patch) => {
-              if (patch.uiLanguage) setChosen(patch.uiLanguage)
-              setPrefs(patch)
-            }}
-            uiLanguage={ui}
-            theme={theme}
-            onThemeChange={onThemeChange}
-          />
+          {chrome ? (
+            <LessonFooter
+              homeHref={homeHref}
+              t={t}
+              prefs={prefs}
+              onPrefs={(patch) => {
+                if (patch.uiLanguage) setChosen(patch.uiLanguage)
+                setPrefs(patch)
+              }}
+              uiLanguage={ui}
+              theme={theme}
+              onThemeChange={onThemeChange}
+            />
+          ) : null}
         </div>
       </PlayerProvider>
     </DirectionProvider>
@@ -228,16 +252,21 @@ export function wordBank(brick: Extract<QuestionBrick, { type: "blank" }>) {
   })
 }
 
-function start(lesson: Lesson): State {
+function start(lesson: Lesson, startAt?: string): State {
   const items = buildSequence(lesson)
+  // A demo opens on one brick; its shuffle is seeded so the server and the browser agree.
+  const at = startAt
+    ? items.findIndex((i) => "brick" in i && i.brick.id === startAt)
+    : -1
+  const index = at < 0 ? 0 : at
   return {
     items,
-    index: 0,
+    index,
     results: {},
     mistakes: [],
     inFix: false,
     fixQueued: false,
-    question: null,
+    question: at < 0 ? null : freshQuestion(items[index], seeded(startAt!)),
   }
 }
 
@@ -383,6 +412,8 @@ function Player({
   trayOpen,
   onTrayToggle,
   onRename,
+  startAt,
+  chrome = true,
   expiresAt,
   homeHref,
   docsHref,
@@ -394,14 +425,18 @@ function Player({
   trayOpen: boolean
   onTrayToggle: () => void
   onRename: (title: string) => void
+  startAt?: string
+  chrome?: boolean
   expiresAt?: number
   homeHref: string
   docsHref?: string
   createHref?: string
   shareUrl?: string
 }) {
-  const { t } = usePlayer()
-  const [state, dispatch] = React.useReducer(reducer, lesson, start)
+  const { t, keyScope } = usePlayer()
+  const [state, dispatch] = React.useReducer(reducer, lesson, (l) =>
+    start(l, startAt)
+  )
   const [theoryOpen, setTheoryOpen] = React.useState(false)
   // Theory starts open where there's room for it beside the lesson.
   React.useEffect(() => {
@@ -412,11 +447,13 @@ function Player({
   const item = state.items[state.index]!
   const scrollRef = React.useRef<HTMLElement>(null)
   // Each new screen starts at the top and takes focus, so keyboard and screen-reader users land on it.
-  const mounted = React.useRef(false)
+  // Not on mount (a demo on a page must not pull focus), and robust to React running effects twice.
+  const shownIndex = React.useRef(state.index)
   React.useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 })
-    if (mounted.current) scrollRef.current?.focus({ preventScroll: true })
-    mounted.current = true
+    if (shownIndex.current !== state.index)
+      scrollRef.current?.focus({ preventScroll: true })
+    shownIndex.current = state.index
   }, [state.index])
   const parts = partAt(state.items, state.index, state.inFix)
   const coarse = useCoarsePointer()
@@ -444,6 +481,7 @@ function Player({
       if (e.key !== "?" || e.repeat || e.metaKey || e.ctrlKey || e.altKey)
         return
       const target = e.target as HTMLElement | null
+      if (keyScope && !keyScope.current?.contains(target)) return
       if (target?.closest("input, textarea, select, [contenteditable=true]"))
         return
       e.preventDefault()
@@ -451,31 +489,45 @@ function Player({
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [])
+  }, [keyScope])
   const seenConcepts = state.items
     .slice(0, state.index + 1)
     .flatMap((i) => (i.kind === "concept" ? [i.brick] : []))
 
   return (
     <>
-      <LessonHeader
-        title={lesson.title}
-        parts={parts}
-        expiresAt={expiresAt}
-        homeHref={homeHref}
-        docsHref={docsHref}
-        createHref={createHref}
-        shareUrl={shareUrl}
-        onRestart={() => {
-          setTheoryOpen(false)
-          dispatch({ type: "restart", lesson })
-        }}
-        onRename={onRename}
-        t={t}
-      />
-      <div className="relative flex min-h-0 flex-1 gap-4 sm:px-8">
+      {chrome ? (
+        <LessonHeader
+          title={lesson.title}
+          parts={parts}
+          showParts={item.kind !== "intro"}
+          expiresAt={expiresAt}
+          homeHref={homeHref}
+          docsHref={docsHref}
+          createHref={createHref}
+          shareUrl={shareUrl}
+          onRestart={() => {
+            setTheoryOpen(false)
+            dispatch({ type: "restart", lesson })
+          }}
+          onRename={onRename}
+          t={t}
+        />
+      ) : null}
+      <div
+        className={cn(
+          "relative flex min-h-0 flex-1 gap-4 sm:px-8",
+          !chrome && "sm:px-0"
+        )}
+      >
         {/* The window: the content card on the tray's grey, so the card's corners stay round above it. */}
-        <div className="relative flex min-w-0 flex-1 overflow-hidden border-y bg-muted sm:rounded-4xl sm:border">
+        <div
+          className={cn(
+            "relative flex min-w-0 flex-1 overflow-hidden border-y bg-muted sm:rounded-4xl sm:border",
+            // In a product shot the mock browser frames the window; its own border would double up.
+            !chrome && "border-0"
+          )}
+        >
           <div className="relative flex min-w-0 flex-1 flex-col">
             {SHOW_THEORY ? (
               <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
@@ -505,7 +557,7 @@ function Player({
                 <div
                   key={state.index}
                   className={cn(
-                    "mx-auto flex min-h-full w-full flex-col justify-center gap-8 px-4 py-16 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
+                    "mx-auto flex min-h-full w-full flex-col justify-center-safe gap-8 px-4 py-16 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
                     columnWidth(item),
                     item.kind === "question" && "pb-40"
                   )}
@@ -735,7 +787,7 @@ function QuestionScreen({
 
   return (
     <>
-      <h2 className="text-2xl font-semibold">
+      <h2 className="text-xl font-semibold">
         <RichText text={brick.prompt} />
       </h2>
       {helper && helper !== brick.prompt ? (

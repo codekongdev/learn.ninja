@@ -187,8 +187,11 @@ export function OptionsBrick({
           >
             {cards ? (
               <>
-                <span className="flex items-center gap-2 px-1 text-sm font-medium text-muted-foreground">
-                  {t.optionLabel(String(i + 1))}
+                {/* The key badge numbers the card; the words are for screen readers. */}
+                <span className="flex items-center px-1">
+                  <span className="sr-only">
+                    {t.optionLabel(String(i + 1))}
+                  </span>
                   <KeyHint i={i} mark={marks[o.id]} />
                 </span>
                 {o.visual ? (

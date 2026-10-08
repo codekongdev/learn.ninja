@@ -25,10 +25,7 @@ export function PreviewTabs({
         <TabsTrigger id="preview">Preview</TabsTrigger>
         <TabsTrigger id="json">JSON</TabsTrigger>
       </TabsList>
-      <TabsContent
-        id="preview"
-        className="overflow-hidden rounded-2xl border"
-      >
+      <TabsContent id="preview" className="overflow-hidden rounded-2xl border">
         {preview}
       </TabsContent>
       <TabsContent
