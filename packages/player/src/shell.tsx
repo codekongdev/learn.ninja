@@ -11,7 +11,6 @@ import {
   MoonIcon,
   RotateCcwIcon,
   ShareIcon,
-  SmileIcon,
   SunIcon,
   TypeIcon,
   XIcon,
@@ -54,6 +53,27 @@ export const BRAND = {
   name: "Learn.ninja",
   maker: "@cmicpace",
   makerUrl: "https://x.com/cmicpace",
+}
+
+/** The working Learn logo: an outlined face with a cap, a smile, and tall oval eyes. */
+export function LearnLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+    >
+      <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
+        <path d="M7.01 24.83A26 26 0 0 1 56.99 24.83Q32 15.17 7.01 24.83Z" />
+        <path d="M56.99 39.17Q32 48.83 7.01 39.17A26 26 0 0 0 56.99 39.17Z" />
+      </g>
+      <g fill="currentColor">
+        <ellipse cx="25" cy="32" rx="2.9" ry="4.6" />
+        <ellipse cx="39" cy="32" rx="2.9" ry="4.6" />
+      </g>
+    </svg>
+  )
 }
 
 /** Lucide's PanelRight with the panel filled in, for showing the Theory panel is open. */
@@ -157,7 +177,7 @@ export function LessonHeader({
           size="icon-sm"
           aria-label={t.home}
         >
-          <SmileIcon />
+          <LearnLogo className="size-5.5" />
         </LinkButton>
         <span aria-hidden="true" className="text-xs text-muted-foreground">
           /
@@ -342,6 +362,8 @@ export function LessonFooter({
           icon={<TypeIcon />}
           value={prefs.textSize}
           valueLabel={t.sizesShort[prefs.textSize]}
+          defaultValue="sm"
+          defaultLabel={t.defaultOption}
           options={(["sm", "md", "lg"] as const).map((id) => ({
             id,
             label: t.sizes[id],
@@ -354,6 +376,8 @@ export function LessonFooter({
             icon={<ThemeIcon />}
             value={theme ?? "system"}
             valueLabel={t.themes[theme ?? "system"]}
+            defaultValue="system"
+            defaultLabel={t.defaultOption}
             options={(["system", "light", "dark"] as const).map((id) => ({
               id,
               label: t.themes[id],
@@ -383,6 +407,8 @@ function SettingMenu<K extends string>({
   icon,
   value,
   valueLabel,
+  defaultValue,
+  defaultLabel,
   options,
   onChange,
 }: {
@@ -390,6 +416,9 @@ function SettingMenu<K extends string>({
   icon: React.ReactNode
   value: K
   valueLabel: string
+  /** The option used until the viewer picks one, marked with defaultLabel. */
+  defaultValue?: K
+  defaultLabel?: string
   options: { id: K; label: string; lang?: string }[]
   onChange: (value: K) => void
 }) {
@@ -416,6 +445,9 @@ function SettingMenu<K extends string>({
           {options.map((o) => (
             <DropdownMenuItem key={o.id} id={o.id} textValue={o.label}>
               <span lang={o.lang}>{o.label}</span>
+              {o.id === defaultValue ? (
+                <span className="text-muted-foreground">{defaultLabel}</span>
+              ) : null}
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
