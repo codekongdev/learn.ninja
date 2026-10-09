@@ -87,8 +87,18 @@ export function SiteFooter({ className }: { className?: string }) {
       </div>
 
       <div className="flex items-center justify-between gap-4">
-        <p className="truncate text-sm text-muted-foreground">
-          © {new Date().getFullYear()} {SITE.name}
+        <p className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+          <span className="truncate">
+            © {new Date().getFullYear()} {SITE.name}
+          </span>
+          <span aria-hidden="true">·</span>
+          <Link href="/privacy" className={LINK_CLASS}>
+            Privacy
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/terms" className={LINK_CLASS}>
+            Terms
+          </Link>
         </p>
         <LinkButton
           variant="ghost"

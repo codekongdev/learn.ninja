@@ -8,6 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE.url },
     { url: `${SITE.url}/docs` },
     { url: `${SITE.url}/contributors` },
+    { url: `${SITE.url}/privacy` },
+    { url: `${SITE.url}/terms` },
     ...LESSON_SLUGS.map((slug) => ({ url: `${SITE.url}/lessons/${slug}` })),
     { url: `${SITE.url}/llms.txt` },
   ]
