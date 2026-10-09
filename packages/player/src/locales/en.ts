@@ -26,11 +26,10 @@ export const en: Strings = {
     choiceOne: "Pick one.",
     choiceMany: "Pick all that apply.",
     compare: "Pick the better one.",
-    sort: "Drag each item into its group. With a keyboard, press Enter on an item's handle, then Tab to a group.",
-    order:
-      "Drag the items into order. With a keyboard, press Enter on a handle, then Tab to a new spot.",
-    match: "Tap an item, then tap its match.",
-    blank: "Tap a word to fill each gap.",
+    sort: "Drag each item into its group.",
+    order: "Drag the items into order.",
+    match: "Match each pair.",
+    blank: "Fill each gap.",
     scenario: "Choose what you'd do.",
   },
   miss: {

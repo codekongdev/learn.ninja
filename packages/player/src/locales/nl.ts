@@ -32,11 +32,10 @@ export const nl: Strings = {
     choiceOne: "Kies er één.",
     choiceMany: "Kies alles wat van toepassing is.",
     compare: "Kies de beste.",
-    sort: "Sleep elk item naar zijn groep. Met het toetsenbord: Enter op de greep van een item, dan Tab naar een groep.",
-    order:
-      "Sleep de items in de juiste volgorde. Met het toetsenbord: Enter op een greep, dan Tab naar de nieuwe plek.",
-    match: "Tik op een item en dan op wat erbij hoort.",
-    blank: "Tik op een woord om elk gat te vullen.",
+    sort: "Sleep elk item naar zijn groep.",
+    order: "Sleep de items in de juiste volgorde.",
+    match: "Koppel elk paar.",
+    blank: "Vul elk gat in.",
     scenario: "Kies wat jij zou doen.",
   },
   miss: {

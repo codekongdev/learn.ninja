@@ -26,11 +26,10 @@ export const vi: Strings = {
     choiceOne: "Chọn một.",
     choiceMany: "Chọn tất cả đáp án đúng.",
     compare: "Chọn phương án tốt hơn.",
-    sort: "Kéo từng mục vào nhóm của nó. Với bàn phím: nhấn Enter trên tay cầm của mục, rồi Tab đến một nhóm.",
-    order:
-      "Kéo các mục vào đúng thứ tự. Với bàn phím: nhấn Enter trên tay cầm, rồi Tab đến vị trí mới.",
-    match: "Chạm vào một mục, rồi chạm vào cặp của nó.",
-    blank: "Chạm vào một từ để điền vào mỗi chỗ trống.",
+    sort: "Kéo từng mục vào nhóm của nó.",
+    order: "Kéo các mục vào đúng thứ tự.",
+    match: "Ghép từng cặp.",
+    blank: "Điền vào mỗi chỗ trống.",
     scenario: "Chọn điều bạn sẽ làm.",
   },
   miss: {

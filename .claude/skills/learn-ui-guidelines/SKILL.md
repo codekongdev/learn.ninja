@@ -27,6 +27,7 @@ Every screen has visible layers in both themes. Windows are outlined, not filled
 
 - Never paint a card with `bg-background`; that merges it into the page in dark mode.
 - Selected controls use `border-primary` plus `bg-muted`, with `dark:data-selected:bg-muted` so the dark tint doesn't hide the selection.
+- The exception is a selected hotspot: it sits over a lesson visual, where a `primary` outline blends into the drawing's own lines, so it uses a blue `outline-chart-2` with a light `bg-chart-2/15` tint.
 - Shadows stay at `shadow-xs`. Use rings and borders for separation, not heavier shadows.
 
 ## Shapes and sizes

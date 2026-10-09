@@ -30,11 +30,10 @@ export const pt: Strings = {
     choiceOne: "Escolha uma.",
     choiceMany: "Escolha todas que se aplicam.",
     compare: "Escolha a melhor.",
-    sort: "Arraste cada item para o seu grupo. No teclado, pressione Enter na alça de um item e depois Tab até um grupo.",
-    order:
-      "Arraste os itens para ordená-los. No teclado, pressione Enter em uma alça e depois Tab até a nova posição.",
-    match: "Toque em um item e depois no seu par.",
-    blank: "Toque em uma palavra para preencher cada lacuna.",
+    sort: "Arraste cada item para o seu grupo.",
+    order: "Arraste os itens para ordená-los.",
+    match: "Ligue cada par.",
+    blank: "Preencha cada lacuna.",
     scenario: "Escolha o que você faria.",
   },
   miss: {

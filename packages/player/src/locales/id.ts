@@ -26,11 +26,10 @@ export const id: Strings = {
     choiceOne: "Pilih satu.",
     choiceMany: "Pilih semua yang sesuai.",
     compare: "Pilih yang lebih baik.",
-    sort: "Seret setiap item ke kelompoknya. Dengan keyboard: tekan Enter pada pegangan item, lalu Tab ke sebuah kelompok.",
-    order:
-      "Seret item ke urutan yang benar. Dengan keyboard: tekan Enter pada pegangan, lalu Tab ke posisi baru.",
-    match: "Ketuk satu item, lalu pasangannya.",
-    blank: "Ketuk kata untuk mengisi setiap bagian kosong.",
+    sort: "Seret setiap item ke kelompoknya.",
+    order: "Seret item ke urutan yang benar.",
+    match: "Cocokkan setiap pasangan.",
+    blank: "Isi setiap bagian kosong.",
     scenario: "Pilih yang akan kamu lakukan.",
   },
   miss: {

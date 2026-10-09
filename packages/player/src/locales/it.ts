@@ -31,11 +31,10 @@ export const it: Strings = {
     choiceOne: "Scegline una.",
     choiceMany: "Scegli tutte quelle giuste.",
     compare: "Scegli la migliore.",
-    sort: "Trascina ogni elemento nel suo gruppo. Da tastiera, premi Invio sulla maniglia di un elemento, poi Tab fino a un gruppo.",
-    order:
-      "Trascina gli elementi in ordine. Da tastiera, premi Invio su una maniglia, poi Tab fino alla nuova posizione.",
-    match: "Tocca un elemento, poi il suo abbinamento.",
-    blank: "Tocca una parola per riempire ogni spazio.",
+    sort: "Trascina ogni elemento nel suo gruppo.",
+    order: "Trascina gli elementi in ordine.",
+    match: "Abbina ogni coppia.",
+    blank: "Riempi ogni spazio.",
     scenario: "Scegli cosa faresti.",
   },
   miss: {

@@ -31,11 +31,10 @@ export const pl: Strings = {
     choiceOne: "Wybierz jedną.",
     choiceMany: "Wybierz wszystkie pasujące.",
     compare: "Wybierz lepszą.",
-    sort: "Przeciągnij każdy element do jego grupy. Na klawiaturze: Enter na uchwycie elementu, potem Tab do grupy.",
-    order:
-      "Ułóż elementy w kolejności, przeciągając je. Na klawiaturze: Enter na uchwycie, potem Tab do nowego miejsca.",
-    match: "Dotknij elementu, a potem jego pary.",
-    blank: "Dotknij słowa, aby wypełnić każdą lukę.",
+    sort: "Przeciągnij każdy element do jego grupy.",
+    order: "Ułóż elementy w kolejności, przeciągając je.",
+    match: "Połącz pary.",
+    blank: "Uzupełnij każdą lukę.",
     scenario: "Wybierz, co byś zrobił(a).",
   },
   miss: {

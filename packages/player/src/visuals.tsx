@@ -211,7 +211,8 @@ function HotspotButton({
           : mark === "wrong"
             ? "outline-yellow-500"
             : selected
-              ? "outline-primary"
+              ? // Blue, not primary: a neutral outline vanishes against a drawing's own black or white lines.
+                "bg-chart-2/15 outline-chart-2"
               : "outline-transparent",
         !mark &&
           !selected &&

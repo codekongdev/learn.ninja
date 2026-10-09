@@ -30,11 +30,10 @@ export const es: Strings = {
     choiceOne: "Elige una.",
     choiceMany: "Elige todas las que correspondan.",
     compare: "Elige la mejor.",
-    sort: "Arrastra cada elemento a su grupo. Con el teclado, pulsa Enter en el asa de un elemento y luego Tab hasta un grupo.",
-    order:
-      "Arrastra los elementos para ordenarlos. Con el teclado, pulsa Enter en un asa y luego Tab hasta la nueva posición.",
-    match: "Toca un elemento y luego su pareja.",
-    blank: "Toca una palabra para rellenar cada hueco.",
+    sort: "Arrastra cada elemento a su grupo.",
+    order: "Arrastra los elementos para ordenarlos.",
+    match: "Une cada pareja.",
+    blank: "Rellena cada hueco.",
     scenario: "Elige qué harías.",
   },
   miss: {

@@ -31,11 +31,10 @@ export const fr: Strings = {
     choiceOne: "Choisis-en une.",
     choiceMany: "Choisis toutes celles qui s'appliquent.",
     compare: "Choisis la meilleure.",
-    sort: "Glisse chaque élément dans son groupe. Au clavier, appuie sur Entrée sur la poignée d'un élément, puis sur Tab jusqu'à un groupe.",
-    order:
-      "Glisse les éléments dans l'ordre. Au clavier, appuie sur Entrée sur une poignée, puis sur Tab jusqu'à la nouvelle place.",
-    match: "Touche un élément, puis celui qui lui correspond.",
-    blank: "Touche un mot pour remplir chaque trou.",
+    sort: "Glisse chaque élément dans son groupe.",
+    order: "Glisse les éléments dans l'ordre.",
+    match: "Associe chaque paire.",
+    blank: "Remplis chaque trou.",
     scenario: "Choisis ce que tu ferais.",
   },
   miss: {

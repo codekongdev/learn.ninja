@@ -27,11 +27,10 @@ export const tr: Strings = {
     choiceOne: "Birini seç.",
     choiceMany: "Uygun olanların hepsini seç.",
     compare: "Daha iyi olanı seç.",
-    sort: "Her öğeyi grubuna sürükle. Klavyeyle: öğenin tutamacında Enter, sonra bir gruba kadar Tab.",
-    order:
-      "Öğeleri sürükleyerek sırala. Klavyeyle: tutamaçta Enter, sonra yeni yere kadar Tab.",
-    match: "Bir öğeye, sonra eşine dokun.",
-    blank: "Her boşluğu doldurmak için bir kelimeye dokun.",
+    sort: "Her öğeyi grubuna sürükle.",
+    order: "Öğeleri sürükleyerek sırala.",
+    match: "Her çifti eşleştir.",
+    blank: "Her boşluğu doldur.",
     scenario: "Ne yapacağını seç.",
   },
   miss: {
