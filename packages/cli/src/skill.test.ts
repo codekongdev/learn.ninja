@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process"
+import { createHash } from "node:crypto"
 import { readdirSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 
@@ -60,16 +61,19 @@ describe("skills/learn", () => {
   })
 })
 
-// Topic packs are open to contributions, so these checks keep a pack from breaking the skill or bloating it.
-const MAX_PACK_WORDS = 1200
-const packs = readdirSync(new URL("skills/learn/topics", root), {
+// Subjects are open to contributions, so these checks keep one from breaking the skill or bloating it.
+const MAX_SUBJECT_WORDS = 1200
+const subjects = readdirSync(new URL("skills/learn/subjects", root), {
   withFileTypes: true,
 })
   .filter((e) => e.isDirectory())
   .map((e) => e.name)
+const versions: Record<string, { version: string; hash: string }> = JSON.parse(
+  read("skills/learn/subjects/versions.json")
+)
 
-describe.each(packs)("topic pack %s", (name) => {
-  const guide = read(`skills/learn/topics/${name}/guide.md`)
+describe.each(subjects)("subject %s", (name) => {
+  const guide = read(`skills/learn/subjects/${name}/guide.md`)
   const frontmatter = /^---\n([\s\S]*?)\n---\n/.exec(guide)?.[1] ?? ""
   const field = (key: string) =>
     new RegExp(`^${key}: *(.*)$`, "m").exec(frontmatter)?.[1]?.trim() ?? ""
@@ -91,27 +95,54 @@ describe.each(packs)("topic pack %s", (name) => {
       ).toContain(`${x.trim()}.json`)
   })
 
-  it(`stays under ${MAX_PACK_WORDS} words`, () => {
-    expect(guide.split(/\s+/).length).toBeLessThanOrEqual(MAX_PACK_WORDS)
+  it(`stays under ${MAX_SUBJECT_WORDS} words`, () => {
+    expect(guide.split(/\s+/).length).toBeLessThanOrEqual(MAX_SUBJECT_WORDS)
   })
 
-  it("is listed in topics/index.md", () => {
-    const index = read("skills/learn/topics/index.md")
-    expect(index).toContain(`| \`${name}\` | ${field("description")} |`)
+  it("is listed in subjects/index.md", () => {
+    const index = read("skills/learn/subjects/index.md")
+    expect(index).toContain(
+      `| \`${name}\` | ${field("description")} | \`subjects/${name}/guide.md\` | ${field("version")} |`
+    )
+  })
+
+  // Each subject is versioned on its own, so improvements to a guide can be tracked.
+  it("has a semver version and a changelog entry for it", () => {
+    expect(field("version")).toMatch(/^\d+\.\d+\.\d+$/)
+    expect(read(`skills/learn/subjects/${name}/CHANGELOG.md`)).toContain(
+      `## ${field("version")}`
+    )
+  })
+
+  it("bumped its version since the last build, if it changed", () => {
+    const recorded = versions[name]
+    if (!recorded) throw new Error(`${name}: run skill:build`)
+    const hash = createHash("sha256").update(guide).digest("hex").slice(0, 16)
+    if (recorded.hash !== hash)
+      expect(
+        recorded.version,
+        `${name}/guide.md changed: bump its version, describe the change in its CHANGELOG.md, and run skill:build`
+      ).not.toBe(field("version"))
+    expect(recorded.version, `${name}: run skill:build`).toBe(field("version"))
+    expect(recorded.hash, `${name}: run skill:build`).toBe(hash)
   })
 
   it("has a docs page", () => {
     expect(read(`docs/skills/${name}.mdx`)).toContain(
-      `<include>../../skills/learn/topics/${name}/guide.md</include>`
+      `<include>../../skills/learn/subjects/${name}/guide.md</include>`
     )
   })
 })
 
-it("topics/index.md lists only packs that exist", () => {
+it("subjects/index.md lists only subjects that exist", () => {
   const listed = [
-    ...read("skills/learn/topics/index.md").matchAll(
-      /`topics\/([^/]+)\/guide\.md`/g
+    ...read("skills/learn/subjects/index.md").matchAll(
+      /`subjects\/([^/]+)\/guide\.md`/g
     ),
   ].map((m) => m[1])
-  expect(listed.sort()).toEqual([...packs].sort())
+  expect(listed.sort()).toEqual([...subjects].sort())
+})
+
+it("subjects/versions.json records only subjects that exist", () => {
+  expect(Object.keys(versions).sort()).toEqual([...subjects].sort())
 })

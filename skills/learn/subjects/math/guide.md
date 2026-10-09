@@ -2,6 +2,7 @@
 name: math
 description: Arithmetic, fractions, percentages, algebra, geometry, probability, statistics, and everyday money math. Use when the learner calculates, simplifies, solves, or reasons with numbers and formulas.
 examples: compound-interest
+version: 1.0.0
 ---
 
 # Math

@@ -2,6 +2,7 @@
 name: languages
 description: Learning a foreign language, from vocabulary and phrases to grammar and when to use each. Use when the lesson teaches a language other than the one it's written in.
 examples: spanish-greetings
+version: 1.0.0
 ---
 
 # Languages
