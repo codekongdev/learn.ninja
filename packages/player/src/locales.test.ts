@@ -40,7 +40,6 @@ describe("locales", () => {
           expect(text, `${code} ${key}`).toMatch(/\S/)
       }
     }
-    expect(STRINGS[code].praise).toHaveLength(en.praise.length)
   })
 
   it("resolves regional and script variants", () => {

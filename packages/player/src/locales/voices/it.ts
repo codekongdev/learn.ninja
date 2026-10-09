@@ -1,0 +1,148 @@
+import type { Voices } from "../../voices"
+
+export const it: Voices = {
+  normal: {
+    praise: [
+      "Ecco",
+      "Ottimo lavoro",
+      "Esatto",
+      "Ci sei",
+      "Perfetto",
+      "Proprio quella",
+      "Ben visto",
+      "Giusto così",
+    ],
+    correctWithHint: [
+      "Corretto, con un suggerimento",
+      "Con un suggerimento, ma ci sei",
+      "Suggerimento usato, risposta trovata",
+      "Ben ragionato",
+    ],
+    goodGuess: [
+      "Bella intuizione!",
+      "Buon istinto",
+      "Ben pensato",
+      "Ottimo intuito",
+    ],
+    hookMiss: [
+      "Non proprio, e va bene così",
+      "Non stavolta, e va bene così",
+      "Bel tentativo. Vediamo perché",
+      "Non proprio. Presto vedrai perché",
+    ],
+    nudge: [
+      "Dai un'altra occhiata. Credo che tu possa trovarla.",
+      "Non proprio. Guarda ancora.",
+      "Quasi. Riprova.",
+      "Un'altra occhiata dovrebbe bastare.",
+    ],
+    close: [
+      "Vicino, ma non la migliore",
+      "Quasi. Ce n'è una migliore",
+      "Buona, ma non la migliore",
+      "Vicino. Un'opzione va meglio",
+    ],
+    answer: [
+      "Ecco la risposta",
+      "Ecco come funziona",
+      "Vediamo la risposta",
+      "Questa era difficile. Eccola",
+    ],
+  },
+  caffeinated: {
+    praise: [
+      "Sì, sì, sì!",
+      "Boom, centrato",
+      "Veloce e giusto",
+      "Zac, corretto",
+      "Oh, eccola",
+      "In pieno, avanti",
+      "Ooh, pulitissimo",
+      "Sei inarrestabile",
+    ],
+    correctWithHint: [
+      "Giusto, e il suggerimento vale",
+      "Suggerimento, poi boom",
+      "Col suggerimento, ma giusto",
+      "Il suggerimento ha fatto il suo, e tu pure",
+    ],
+    goodGuess: [
+      "Wow, bella intuizione!",
+      "Indovinato",
+      "Istinto perfetto",
+      "Fortuna o genio?",
+    ],
+    hookMiss: [
+      "No, nessun problema, avanti",
+      "Mancato, niente di grave",
+      "Sbagliato, ma ci sta",
+      "Ah, non era quella. Avanti",
+    ],
+    nudge: [
+      "Ooh, vicinissimo. Svelto, un'altra occhiata",
+      "Non è quella. Ancora, ancora",
+      "Quasi. Un altro giro, via",
+      "Ops. Un'altra occhiata?",
+    ],
+    close: [
+      "Vicino, ma non è la migliore",
+      "Ooh, quasi. Ce n'è una migliore",
+      "Vicinissimo, una la batte",
+      "Bella scelta, non la migliore",
+    ],
+    answer: [
+      "Ok ok, eccola",
+      "Bene, ora della risposta",
+      "Niente stress, eccola",
+      "Ok, ecco come va",
+    ],
+  },
+  unhinged: {
+    praise: [
+      "Aah! È giusta. È davvero giusta",
+      "Oh mamma, oh mamma, ce l'hai fatta",
+      "Non ci credo che abbia funzionato",
+      "Uff. Pensavo fosse la fine",
+      "È giusta. Niente panico",
+      "Ho smesso di tremare. È giusta",
+      "Ce l'hai fatta e non è esploso niente",
+      "Giusta. Il mio cuore non regge",
+    ],
+    correctWithHint: [
+      "Il suggerimento ci ha salvato",
+      "Uff, suggerimento e fatto. Tremo",
+      "Serviva aiuto, e va bene così",
+      "Il suggerimento ha funzionato. Davvero",
+    ],
+    goodGuess: [
+      "Aah! Come facevi a saperlo?",
+      "Aspetta, lo sapevi e basta?",
+      "Quell'intuizione era troppo giusta",
+      "Come? Mi stai spiando?",
+    ],
+    hookMiss: [
+      "Aah! Va bene. Va benissimo",
+      "Sbagliato, ma è solo un tentativo. Respira",
+      "Nessuno ha visto niente. Avanti",
+      "Non preoccuparti, mi preoccupo io per te",
+    ],
+    nudge: [
+      "Aah! Non quella. Guarda ancora",
+      "Oh no, oh no. Un'altra occhiata?",
+      "Ok, respiro profondo. Guarda ancora",
+      "Non è quella, ma si può ancora sistemare",
+    ],
+    close: [
+      "Così vicino. Perché sempre così vicino?",
+      "Quasi. È quasi peggio",
+      "Ce n'è una migliore, lo giuro",
+      "Vicino. I miei nervi non reggono",
+    ],
+    answer: [
+      "Ok, ok, niente panico. Eccola",
+      "Eccola. Non ne parliamo mai più",
+      "Presto, prima che sparisca",
+      "Uff. Ok. Ecco come funziona",
+    ],
+  },
+}

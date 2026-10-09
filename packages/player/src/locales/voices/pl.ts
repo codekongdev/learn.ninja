@@ -1,0 +1,148 @@
+import type { Voices } from "../../voices"
+
+export const pl: Voices = {
+  normal: {
+    praise: [
+      "O to chodzi",
+      "Dobra robota",
+      "Dokładnie",
+      "Masz to",
+      "W punkt",
+      "Właśnie ta",
+      "Dobre oko",
+      "Zgadza się",
+    ],
+    correctWithHint: [
+      "Dobrze, z podpowiedzią",
+      "Z podpowiedzią, ale jest",
+      "Podpowiedź użyta, odpowiedź znaleziona",
+      "Ładnie rozwiązane",
+    ],
+    goodGuess: [
+      "Dobry strzał!",
+      "Niezła intuicja",
+      "Dobry wybór",
+      "Celny strzał",
+    ],
+    hookMiss: [
+      "Nie do końca, i to nic",
+      "Nie tym razem, i to nic",
+      "Dobra próba. Sprawdźmy dlaczego",
+      "Nie do końca. Zaraz zobaczysz dlaczego",
+    ],
+    nudge: [
+      "Spójrz jeszcze raz. Myślę, że to znajdziesz.",
+      "Nie do końca. Przyjrzyj się jeszcze raz.",
+      "Prawie. Spróbuj jeszcze raz.",
+      "Jeszcze jedno spojrzenie powinno wystarczyć.",
+    ],
+    close: [
+      "Blisko, ale to nie najlepsza",
+      "Prawie. Jest lepsza",
+      "Dobra, ale nie najlepsza",
+      "Blisko. Jedna opcja pasuje lepiej",
+    ],
+    answer: [
+      "Oto odpowiedź",
+      "Tak to działa",
+      "Spójrzmy na odpowiedź",
+      "To było trudne. Oto odpowiedź",
+    ],
+  },
+  caffeinated: {
+    praise: [
+      "Tak, tak, tak!",
+      "Bum, trafione",
+      "Szybko i dobrze",
+      "Bach, poprawnie",
+      "O, to jest to",
+      "W dziesiątkę, dalej",
+      "Ooh, czysto",
+      "Nie do zatrzymania",
+    ],
+    correctWithHint: [
+      "Jest, a podpowiedź też się liczy",
+      "Podpowiedź, a potem bum",
+      "Z podpowiedzią i nadal dobrze",
+      "Podpowiedź zadziałała, ty też",
+    ],
+    goodGuess: [
+      "Wow, dobry strzał!",
+      "Trafiony, zatopiony",
+      "Instynkt w punkt",
+      "Szczęście czy geniusz?",
+    ],
+    hookMiss: [
+      "Nie, spoko, lecimy dalej",
+      "Pudło, nic się nie stało",
+      "Zły strzał, fajny strzał",
+      "Ha, nie to. Jedziemy dalej",
+    ],
+    nudge: [
+      "Ooh, tak blisko. Szybko, spójrz jeszcze raz",
+      "Nie to. Jeszcze, jeszcze",
+      "Prawie. Jeszcze jedno podejście",
+      "Ups. Jeszcze jedno spojrzenie?",
+    ],
+    close: [
+      "Blisko, ale nie najlepsza",
+      "Ooh, prawie. Jest lepsza",
+      "Tak blisko, jedna jest lepsza",
+      "Dobry wybór, nie najlepszy wybór",
+    ],
+    answer: [
+      "Dobra, dobra, oto ona",
+      "No to czas na odpowiedź",
+      "Bez stresu, oto ona",
+      "Okej, to idzie tak",
+    ],
+  },
+  unhinged: {
+    praise: [
+      "Aaa! Dobrze. Naprawdę dobrze",
+      "O rany, o rany, udało się",
+      "Nie wierzę, że to zadziałało",
+      "Uff. Myślałem, że już po nas",
+      "Dobrze. Tylko bez paniki",
+      "Oko przestało mi drgać. Dobrze",
+      "Udało się i nic nie wybuchło",
+      "Dobrze. Moje serce tego nie wytrzyma",
+    ],
+    correctWithHint: [
+      "Podpowiedź nas uratowała",
+      "Uff, podpowiedź i gotowe. Cały drżę",
+      "Potrzebna była pomoc i to nic",
+      "Podpowiedź zadziałała. Naprawdę",
+    ],
+    goodGuess: [
+      "Aaa! Jak to możliwe?",
+      "Czekaj, tak po prostu wiesz?",
+      "Ten strzał był aż za dobry",
+      "Jak? Obserwujesz mnie?",
+    ],
+    hookMiss: [
+      "Aaa! Jest dobrze. Jest całkiem dobrze",
+      "Źle, ale to tylko strzał. Oddychaj",
+      "Nikt tego nie widział. Dalej",
+      "Spokojnie, ja się martwię za ciebie",
+    ],
+    nudge: [
+      "Aaa! Nie ta. Spójrz jeszcze raz",
+      "O nie, o nie. Jeszcze jedno spojrzenie?",
+      "Dobra, głęboki wdech. Spójrz jeszcze raz",
+      "Nie to, ale da się to jeszcze naprawić",
+    ],
+    close: [
+      "Tak blisko. Czemu zawsze tak blisko?",
+      "Prawie. To prawie gorsze",
+      "Jest lepsza, przysięgam",
+      "Blisko. Moje nerwy tego nie zniosą",
+    ],
+    answer: [
+      "Dobra, dobra, bez paniki. Oto ona",
+      "Oto ona. Nigdy więcej o tym nie mówmy",
+      "Szybko, zanim zniknie",
+      "Uff. Dobra. Tak to działa",
+    ],
+  },
+}

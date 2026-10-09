@@ -1,0 +1,148 @@
+import type { Voices } from "../../voices"
+
+export const id: Voices = {
+  normal: {
+    praise: [
+      "Nah, itu dia",
+      "Kerja bagus",
+      "Tepat",
+      "Kamu benar",
+      "Pas sekali",
+      "Itu jawabannya",
+      "Jeli sekali",
+      "Mantap",
+    ],
+    correctWithHint: [
+      "Benar, dengan petunjuk",
+      "Berhasil dengan petunjuk",
+      "Pakai petunjuk, jawaban ketemu",
+      "Dipikirkan dengan baik",
+    ],
+    goodGuess: [
+      "Tebakan bagus!",
+      "Insting yang bagus",
+      "Pilihan tepat",
+      "Tebakan jitu",
+    ],
+    hookMiss: [
+      "Belum tepat, dan tidak apa-apa",
+      "Bukan kali ini, dan tidak apa-apa",
+      "Usaha bagus. Ayo cari tahu kenapa",
+      "Belum tepat. Nanti kamu lihat kenapa",
+    ],
+    nudge: [
+      "Lihat sekali lagi. Kamu pasti bisa menemukannya.",
+      "Belum tepat. Coba lihat lagi.",
+      "Hampir. Coba sekali lagi.",
+      "Sekali lihat lagi pasti ketemu.",
+    ],
+    close: [
+      "Hampir, tapi bukan yang terbaik",
+      "Nyaris. Ada yang lebih baik",
+      "Bagus, tapi bukan yang terbaik",
+      "Hampir. Ada pilihan yang lebih pas",
+    ],
+    answer: [
+      "Ini jawabannya",
+      "Begini cara kerjanya",
+      "Ayo lihat jawabannya",
+      "Yang ini sulit. Ini dia",
+    ],
+  },
+  caffeinated: {
+    praise: [
+      "Ya, ya, ya!",
+      "Bum, kena",
+      "Cepat dan benar",
+      "Zing, benar",
+      "Oh, itu dia",
+      "Tepat sasaran, lanjut",
+      "Wah, mantap",
+      "Kamu lagi on fire",
+    ],
+    correctWithHint: [
+      "Benar, dan petunjuknya juga dihitung",
+      "Petunjuk, lalu bum",
+      "Pakai petunjuk, tetap benar",
+      "Petunjuknya berhasil, kamu juga",
+    ],
+    goodGuess: [
+      "Wah, tebakan bagus!",
+      "Tebakanmu kena",
+      "Insting tajam",
+      "Hoki atau jenius?",
+    ],
+    hookMiss: [
+      "Bukan, tapi santai, lanjut terus",
+      "Meleset, bukan masalah",
+      "Tebakan salah, tapi seru",
+      "Ha, bukan itu. Lanjut",
+    ],
+    nudge: [
+      "Ooh, nyaris. Cepat, lihat sekali lagi",
+      "Bukan itu. Lagi, lagi",
+      "Hampir. Gas sekali lagi",
+      "Ups. Lihat lagi?",
+    ],
+    close: [
+      "Dekat, tapi bukan yang paling oke",
+      "Ooh, nyaris. Ada yang lebih baik",
+      "Dekat banget, ada yang lebih unggul",
+      "Pilihan bagus, bukan yang terbaik",
+    ],
+    answer: [
+      "Oke oke, ini dia",
+      "Baik, waktunya jawaban",
+      "Santai, jawabannya di sini",
+      "Oke, begini jalannya",
+    ],
+  },
+  unhinged: {
+    praise: [
+      "Waduh! Benar. Beneran benar",
+      "Ya ampun, ya ampun, kamu berhasil",
+      "Aku tak percaya itu berhasil",
+      "Fiuh. Kukira kita tamat",
+      "Benar. Semua jangan panik",
+      "Mataku berhenti berkedut. Benar",
+      "Kamu berhasil dan tak ada yang meledak",
+      "Benar. Jantungku tak kuat",
+    ],
+    correctWithHint: [
+      "Petunjuknya menyelamatkan kita berdua",
+      "Fiuh, petunjuk lalu beres. Aku gemetar",
+      "Kita butuh bantuan, dan itu tidak apa-apa",
+      "Petunjuknya berhasil. Beneran berhasil",
+    ],
+    goodGuess: [
+      "Waduh! Kok kamu tahu?",
+      "Tunggu, kamu langsung tahu?",
+      "Tebakan itu terlalu benar",
+      "Kok bisa? Kamu mengawasiku?",
+    ],
+    hookMiss: [
+      "Waduh! Tidak apa-apa. Sungguh tidak apa-apa",
+      "Salah, tapi cuma tebakan. Tarik napas",
+      "Tak ada yang lihat. Lanjut",
+      "Jangan khawatir, biar aku yang khawatir",
+    ],
+    nudge: [
+      "Waduh! Bukan yang itu. Lihat lagi",
+      "Aduh, aduh. Lihat sekali lagi?",
+      "Oke, tarik napas. Lihat lagi",
+      "Bukan, tapi masih bisa diperbaiki",
+    ],
+    close: [
+      "Dekat sekali. Kenapa selalu dekat sekali?",
+      "Nyaris. Itu malah lebih parah",
+      "Ada yang lebih baik, sumpah",
+      "Hampir. Sarafku tak kuat dengan hampir",
+    ],
+    answer: [
+      "Oke, oke, jangan panik. Ini dia",
+      "Ini dia. Jangan pernah bahas ini lagi",
+      "Cepat, sebelum hilang",
+      "Fiuh. Oke. Begini cara kerjanya",
+    ],
+  },
+}

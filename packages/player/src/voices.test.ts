@@ -1,31 +1,36 @@
 import { describe, expect, it } from "vitest"
 
-import { en } from "./locales/en"
-import { stringsFor } from "./strings"
+import { UI_LANGUAGES } from "./strings"
 import { createLinePicker, voiceLines } from "./voices"
 
+const MOMENTS = [
+  "praise",
+  "correctWithHint",
+  "goodGuess",
+  "hookMiss",
+  "nudge",
+  "close",
+  "answer",
+] as const
+
 describe("voices", () => {
-  it("has every line for every character in English", () => {
-    for (const level of ["off", "normal", "caffeinated", "unhinged"] as const)
-      for (const moment of [
-        "praise",
-        "correctWithHint",
-        "goodGuess",
-        "hookMiss",
-        "nudge",
-        "close",
-        "answer",
-      ] as const) {
-        const lines = voiceLines("en", level, moment, en)
-        expect(lines.length, `${level} ${moment}`).toBeGreaterThan(1)
-        for (const line of lines) expect(line).toMatch(/\S/)
-      }
+  it("has every line for every character in every language, as many as English", () => {
+    for (const { code } of UI_LANGUAGES)
+      for (const level of ["off", "normal", "caffeinated", "unhinged"] as const)
+        for (const moment of MOMENTS) {
+          const lines = voiceLines(code, level, moment)
+          const english = voiceLines("en", level, moment)
+          const at = `${code} ${level} ${moment}`
+          expect(lines.length, at).toBe(english.length)
+          expect(new Set(lines).size, `${at} has no repeats`).toBe(lines.length)
+          for (const line of lines) expect(line, at).toMatch(/\S/)
+        }
   })
 
-  it("falls back to a language's own lines until its voices are translated", () => {
-    const t = stringsFor("de")
-    expect(voiceLines("de", "unhinged", "answer", t)).toEqual([t.answer])
-    expect(voiceLines("de", "normal", "praise", t)).toEqual(t.praise)
+  it("uses English for a language the player doesn't have", () => {
+    expect(voiceLines("xx", "unhinged", "answer")).toEqual(
+      voiceLines("en", "unhinged", "answer")
+    )
   })
 
   it("plays every line once before repeating, and never twice in a row", () => {

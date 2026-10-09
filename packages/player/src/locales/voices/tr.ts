@@ -1,0 +1,148 @@
+import type { Voices } from "../../voices"
+
+export const tr: Voices = {
+  normal: {
+    praise: [
+      "İşte bu",
+      "Harika iş",
+      "Aynen",
+      "Buldun",
+      "Tam isabet",
+      "Doğrusu bu",
+      "İyi yakaladın",
+      "Çok iyi",
+    ],
+    correctWithHint: [
+      "Doğru, ipucuyla",
+      "İpucuyla oldu",
+      "İpucu kullanıldı, cevap bulundu",
+      "Güzel çözdün",
+    ],
+    goodGuess: [
+      "İyi tahmin!",
+      "Sezgilerin güçlü",
+      "İyi karar",
+      "Keskin tahmin",
+    ],
+    hookMiss: [
+      "Pek sayılmaz, ama sorun değil",
+      "Bu sefer olmadı, sorun değil",
+      "İyi deneme. Hadi nedenini görelim",
+      "Pek sayılmaz. Nedenini birazdan göreceksin",
+    ],
+    nudge: [
+      "Bir daha bak. Bence bulacaksın.",
+      "Pek sayılmaz. Bir daha bak.",
+      "Az kaldı. Bir daha dene.",
+      "Bir kez daha bakınca olacak.",
+    ],
+    close: [
+      "Yakın, ama en iyisi değil",
+      "Az kaldı. Daha iyisi var",
+      "İyi, ama en iyisi değil",
+      "Yakın. Bir seçenek daha uygun",
+    ],
+    answer: [
+      "İşte cevap",
+      "Şöyle işliyor",
+      "Cevaba bir bakalım",
+      "Bu biraz zordu. İşte cevap",
+    ],
+  },
+  caffeinated: {
+    praise: [
+      "Evet, evet, evet!",
+      "Bum, tam isabet",
+      "Hızlı ve doğru",
+      "Vınn, doğru",
+      "Ooo, işte bu",
+      "Tamamdır, sıradaki",
+      "Ooh, tertemiz",
+      "Alev alevsin",
+    ],
+    correctWithHint: [
+      "Oldu, ipucu da sayılır",
+      "İpucu, sonra bum",
+      "İpucuyla ama yine doğru",
+      "İpucu işini yaptı, sen de",
+    ],
+    goodGuess: [
+      "Vay, iyi tahmin!",
+      "Bildin",
+      "Sezgi tam yerinde",
+      "Şans mı, dahilik mi?",
+    ],
+    hookMiss: [
+      "Olmadı, hiç sorun değil, devam",
+      "Kaçtı, dert değil",
+      "Yanlış tahmin, eğlenceli tahmin",
+      "Ha, o değil. Devam",
+    ],
+    nudge: [
+      "Ooh, çok yakın. Çabuk, bir daha bak",
+      "O değil. Bir daha, bir daha",
+      "Az kaldı. Bir hamle daha",
+      "Hop. Bir daha bakar mısın?",
+    ],
+    close: [
+      "Yakın, ama en iyisi o değil",
+      "Ooh, az kaldı. Daha iyisi var",
+      "Çok yakın, biri daha iyi",
+      "İyi seçim, ama en iyisi değil",
+    ],
+    answer: [
+      "Tamam tamam, işte burada",
+      "Hadi, cevap zamanı",
+      "Stres yok, işte cevap",
+      "Tamam, şöyle işliyor",
+    ],
+  },
+  unhinged: {
+    praise: [
+      "Aah! Doğru. Gerçekten doğru",
+      "Aman aman, başardın",
+      "Bunun işe yaradığına inanamıyorum",
+      "Of. Mahvolduk sanmıştım",
+      "Doğru. Kimse panik yapmasın",
+      "Gözümün seğirmesi durdu. Doğru",
+      "Başardın ve hiçbir şey patlamadı",
+      "Doğru. Kalbim bunu kaldıramaz",
+    ],
+    correctWithHint: [
+      "İpucu ikimizi de kurtardı",
+      "Of, ipucu ve bitti. Titriyorum",
+      "Yardım lazımdı, bunda sorun yok",
+      "İpucu işe yaradı. Gerçekten yaradı",
+    ],
+    goodGuess: [
+      "Aah! Nereden bildin?",
+      "Dur, öylece bildin mi?",
+      "Bu tahmin fazla doğru",
+      "Nasıl? Beni mi izliyorsun?",
+    ],
+    hookMiss: [
+      "Aah! Sorun yok. Hiç sorun yok",
+      "Yanlış, ama sadece tahmin. Nefes al",
+      "Kimse görmedi. Devam",
+      "Merak etme, senin yerine ben endişelenirim",
+    ],
+    nudge: [
+      "Aah! O değil. Bir daha bak",
+      "Eyvah, eyvah. Bir daha bakar mısın?",
+      "Tamam, derin nefes. Bir daha bak",
+      "O değil, ama hâlâ düzeltebilirsin",
+    ],
+    close: [
+      "Çok yakın. Neden hep çok yakın?",
+      "Az kaldı. Bu daha da kötü",
+      "Daha iyisi var, inan bana",
+      "Yakın. Sinirlerim buna dayanamıyor",
+    ],
+    answer: [
+      "Tamam, tamam, panik yok. İşte burada",
+      "İşte burada. Bunu bir daha hiç konuşmayalım",
+      "Çabuk, kaybolmadan önce",
+      "Of. Tamam. Şöyle işliyor",
+    ],
+  },
+}

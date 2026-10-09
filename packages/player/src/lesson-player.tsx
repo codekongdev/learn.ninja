@@ -1123,7 +1123,7 @@ export function ActionArea({
     const say = (moment: Moment) =>
       pickLine(
         `${state.index}-${s.attempts}-${s.phase}-${moment}-${level}`,
-        voiceLines(lang, level, moment, t)
+        voiceLines(lang, level, moment)
       )
     const canHelp = Boolean(brick.hint) && role !== "hook" && !s.usedHint
     const missText = (res: CheckResult) =>

@@ -8,18 +8,9 @@ export type Strings = {
   check: string
   continue: string
   tryAgain: string
-  nudge: string
-  praise: string[]
   why: string
   getHelp: string
   hint: string
-  correct: string
-  correctWithHint: string
-  notQuite: string
-  close: string
-  answer: string
-  goodGuess: string
-  hookMiss: string
   hookNote: string
   minutes: (n: number) => string
   expires: (hours: number) => string
