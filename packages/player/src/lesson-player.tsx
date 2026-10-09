@@ -1219,7 +1219,7 @@ function TrayNotch({
             onToggle()
         }}
         // The hit area stays generous but invisible; only the bar reacts, like a grabber on iOS.
-        className="h-7 w-24 cursor-grab px-0 hover:bg-transparent active:translate-y-0 active:cursor-grabbing aria-expanded:bg-transparent dark:hover:bg-transparent"
+        className="h-7 w-24 cursor-ns-resize px-0 hover:bg-transparent active:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent"
       >
         <span
           aria-hidden="true"
