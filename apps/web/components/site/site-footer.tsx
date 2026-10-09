@@ -12,14 +12,14 @@ const COLUMNS = [
     title: "Product",
     links: [
       { href: "/docs", label: "Docs" },
-      { href: "/docs/install", label: "Install" },
-      { href: "/docs/bricks", label: "Bricks" },
+      { href: "/docs#install", label: "Install" },
+      { href: "/docs#subjects", label: "Subjects" },
     ],
   },
   {
     title: "Developers",
     links: [
-      { href: "/docs/reference/api", label: "API" },
+      { href: "/docs#api", label: "API" },
       { href: "/llms.txt", label: "llms.txt" },
     ],
   },

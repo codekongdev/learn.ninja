@@ -17,7 +17,8 @@ export default function DocsLayout({
         action={<HeaderCopyPrompt />}
       />
       <div className="mx-auto flex w-full max-w-5xl flex-1 gap-10 px-4 sm:px-6">
-        <aside className="sticky top-14 hidden h-[calc(100svh-3.5rem)] w-40 shrink-0 overflow-y-auto py-8 [scrollbar-width:none] lg:block [&::-webkit-scrollbar]:hidden">
+        {/* Padded like the page so the first link lines up with the top of the body. */}
+        <aside className="sticky top-14 hidden h-[calc(100svh-3.5rem)] w-40 shrink-0 overflow-y-auto py-8 [scrollbar-width:none] sm:py-10 lg:block [&::-webkit-scrollbar]:hidden">
           <DocsNav sections={sections} />
         </aside>
         <div className="min-w-0 flex-1">{children}</div>

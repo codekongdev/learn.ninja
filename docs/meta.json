@@ -4,14 +4,10 @@
   "pages": [
     "---Getting started---",
     "index",
-    "install",
-    "quick-start",
     "---Lessons---",
     "...lessons",
-    "---Bricks---",
-    "bricks",
     "---Subjects---",
-    "...subjects",
+    "subjects",
     "---Reference---",
     "...reference"
   ]

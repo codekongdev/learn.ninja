@@ -19,7 +19,7 @@ export function GetStarted() {
           <CopyButton text={AGENT_PROMPT} size="lg">
             Copy prompt for agent
           </CopyButton>
-          <ButtonLink href="/docs/install" variant="outline" size="lg">
+          <ButtonLink href="/docs#install" variant="outline" size="lg">
             Install guide
           </ButtonLink>
         </div>

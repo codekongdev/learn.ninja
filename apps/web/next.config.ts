@@ -102,15 +102,71 @@ const nextConfig: NextConfig = {
     ]
   },
   async redirects() {
+    // The docs are one page: each old page is an anchor on it. Only browsers are redirected; agents
+    // asking for text still get each file's Markdown through the rewrites above.
+    const HTML = {
+      has: [{ type: "header" as const, key: "accept", value: ".*text/html.*" }],
+    }
+    const section = (from: string, anchor: string) => [
+      {
+        source: from,
+        destination: `/docs#${anchor}`,
+        permanent: true,
+        ...HTML,
+      },
+    ]
+    // Pages that were cut; their Markdown moved too.
+    const moved = (from: string, to: string, anchor: string) => [
+      { source: from, destination: `/docs#${anchor}`, permanent: true },
+      { source: `${from}.md`, destination: `${to}.md`, permanent: true },
+    ]
     return [
-      { source: "/create", destination: "/docs/quick-start", permanent: false },
-      // The brick pages became one page; "Skills" became "Subjects".
-      { source: "/docs/bricks/:slug.md", destination: "/docs/bricks.md", permanent: true },
-      { source: "/docs/bricks/index", destination: "/docs/bricks", permanent: true },
-      { source: "/docs/bricks/:slug", destination: "/docs/bricks#:slug", permanent: true },
-      { source: "/docs/skills", destination: "/docs/subjects", permanent: true },
-      { source: "/docs/skills.md", destination: "/docs/subjects.md", permanent: true },
-      { source: "/docs/skills/:path*", destination: "/docs/subjects/:path*", permanent: true },
+      { source: "/create", destination: "/docs", permanent: false },
+      ...section("/docs/lessons/lesson-format", "lesson-format"),
+      ...section("/docs/subjects", "subjects"),
+      ...section("/docs/reference/cli", "cli"),
+      ...section("/docs/reference/api", "api"),
+      ...section("/docs/reference/json-schema", "json-schema"),
+      ...moved("/docs/install", "/docs", "install"),
+      ...moved("/docs/quick-start", "/docs", "introduction"),
+      ...moved("/docs/reference/agents", "/docs", "plain-text"),
+      ...moved(
+        "/docs/lessons/how-lessons-work",
+        "/docs/lessons/lesson-format",
+        "lesson-format"
+      ),
+      ...moved("/docs/lessons/sharing", "/docs/reference/api", "api"),
+      ...moved(
+        "/docs/bricks",
+        "/docs/lessons/lesson-format",
+        "the-question-bricks"
+      ),
+      ...moved("/docs/skills", "/docs/subjects", "subjects"),
+      ...moved(
+        "/docs/subjects/write-a-subject",
+        "/docs/subjects",
+        "add-a-subject"
+      ),
+      {
+        source: "/docs/bricks/:path+",
+        destination: "/docs#the-question-bricks",
+        permanent: true,
+      },
+      {
+        source: "/docs/skills/:path+",
+        destination: "/docs#subjects",
+        permanent: true,
+      },
+      {
+        source: "/docs/subjects/:path+.md",
+        destination: "/docs/subjects.md",
+        permanent: true,
+      },
+      {
+        source: "/docs/subjects/:path+",
+        destination: "/docs#subjects",
+        permanent: true,
+      },
     ]
   },
   // Builds use webpack (next dev/build --webpack): the locale plugin doesn't support Turbopack.

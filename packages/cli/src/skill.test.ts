@@ -127,10 +127,8 @@ describe.each(subjects)("subject %s", (name) => {
     expect(recorded.hash, `${name}: run skill:build`).toBe(hash)
   })
 
-  it("has a docs page", () => {
-    expect(read(`docs/subjects/${name}.mdx`)).toContain(
-      `<include>../../skills/learn/subjects/${name}/guide.md</include>`
-    )
+  it("is listed on the docs' subjects page", () => {
+    expect(read("docs/subjects.md")).toContain(`subjects/${name}/guide.md`)
   })
 })
 

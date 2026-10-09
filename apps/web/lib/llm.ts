@@ -3,7 +3,7 @@ import type { InferPageType } from "fumadocs-core/source"
 import { FAQ } from "@/lib/faq"
 import { getLesson } from "@/lib/lessons"
 import { AGENTS, INSTALL_COMMAND, SITE } from "@/lib/site"
-import { docsNavSections } from "@/lib/docs-nav"
+import { docsPages } from "@/lib/docs-nav"
 import { source } from "@/lib/source"
 
 // Plain-text versions of the site for agents: /docs/{page}.md, /llms.txt, /llms-full.txt, /index.md.
@@ -35,14 +35,6 @@ function brickMarkdown(slug: string, id: string): string {
     : undefined
   if (!brick) return ""
   return ["```json", JSON.stringify(brick, null, 2), "```"].join("\n")
-}
-
-/** The docs pages in sidebar order. */
-function docsPages(): Page[] {
-  const order = docsNavSections().flatMap((s) => s.pages.map((p) => p.url))
-  return source
-    .getPages()
-    .sort((a, b) => order.indexOf(a.url) - order.indexOf(b.url))
 }
 
 export function docsIndex(): string {

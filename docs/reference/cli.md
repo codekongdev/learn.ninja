@@ -43,7 +43,7 @@ Prints the path to the lesson JSON Schema bundled with the skill.
 node scripts/learn.mjs schema
 ```
 
-## Options
+## Command options
 
 | Option | Description |
 | --- | --- |
