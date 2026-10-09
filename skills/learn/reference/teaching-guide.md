@@ -42,6 +42,7 @@ Before you keep a question brick, ask:
 - **Would a good teacher ask this, in this form?** If the honest version of the question is multiple choice, use `choice`, even if the previous brick was a `choice` too.
 - **Does it ask something new?** Each brick should test a different aspect or application of the idea, not restate the last one in another format.
 - **Is the artifact real?** Hotspots, compares and scenarios work when they show something the learner will meet: a real screen, a real recipe step, a real decision.
+- **Can it be answered from what's on its own screen?** A concept brick's visual is gone once the question appears. If the question is about a picture, a chart, or something that moves (a turning wheel, a growing shape, an animation), show it in the question's `visual` or in its options. Never make learners replay a visual or imagine a motion in their head to answer.
 
 Mechanics of each type:
 
@@ -140,4 +141,4 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 ## 9. Before you publish
 
 - Run `validate` and fix every issue. The messages say exactly what to change.
-- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Is every term, fact, and method each question needs taught in an earlier concept brick, not only in feedback, a hint, or an explanation? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`.
+- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Can each question be answered from what's on its own screen? Is the challenge harder than the practice? Is every term, fact, and method each question needs taught in an earlier concept brick, not only in feedback, a hint, or an explanation? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`.
