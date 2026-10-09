@@ -23,6 +23,8 @@ const meta = {
           homeHref="#"
           docsHref="#"
           createHref="#"
+          privacyHref="#"
+          termsHref="#"
           theme={globals.theme === "dark" ? "dark" : "light"}
           onThemeChange={(theme) =>
             updateGlobals({
@@ -54,15 +56,27 @@ export const MapVsForEach: Story = {
   name: "map vs forEach",
   args: { lesson: lessons.coding },
 }
-/** The tray of buttons under the lesson closes with the notch or "?"; Enter still runs the main action. */
+// The player reads its preferences on mount, so these stories save a choice before it renders.
+const withPrefs = (prefs: object) => [
+  () =>
+    localStorage.setItem(
+      "learn:preferences",
+      JSON.stringify({ textSize: "sm", ...prefs })
+    ),
+]
+
+/** The tray of buttons under the lesson closes with the notch; Enter still runs the main action. */
 export const TrayClosed: Story = {
   args: { lesson: lessons.buttons },
-  // The player reads its preferences on mount, so the choice is saved before it renders.
-  loaders: [
-    () =>
-      localStorage.setItem(
-        "learn:preferences",
-        JSON.stringify({ textSize: "sm", tray: "closed" })
-      ),
-  ],
+  loaders: withPrefs({ tray: "closed" }),
+}
+/** The ninja setting at its top stop: bigger moves, and two reactions to every answer. */
+export const NinjaUnhinged: Story = {
+  args: { lesson: lessons.buttons },
+  loaders: withPrefs({ ninja: "unhinged" }),
+}
+/** The ninja setting off: no ninja, and the feedback toast starts at the card's edge. */
+export const NinjaOff: Story = {
+  args: { lesson: lessons.buttons },
+  loaders: withPrefs({ ninja: "off" }),
 }

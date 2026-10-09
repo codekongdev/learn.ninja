@@ -33,7 +33,7 @@ Every screen has visible layers in both themes. Windows are outlined, not filled
 
 - Radius: `rounded-lg` for buttons, inputs, menus, alerts and inner panels (Nova's control shape), `rounded-md` for other controls (options, chips), `rounded-xl` for cards, `rounded-4xl` for the player's window, `rounded-full` only for pills, badges, progress, and avatars. No arbitrary radii.
 - Borders are 1px. No `border-[1.5px]` or 3D bottom shadows.
-- Button sizes: `sm` (28px, 14px text; `icon-sm` for icon-only) everywhere in the app frame, header and footer alike; `lg` (36px) only for the tray of actions under the lesson. The screen's main action lives in that tray and shows an `Enter` `Kbd` hint, hidden on touch screens (`pointer-coarse:hidden`).
+- Button sizes: `sm` (28px, 14px text; `icon-sm` for icon-only) everywhere in the app frame, header and footer alike; `lg` (36px) only in the tray under the lesson, where every button (the screen's actions and the player settings) is also a pill: `TRAY_BUTTON` from `packages/player/src/shell.tsx` adds `rounded-full px-4`. The screen's main action lives in that tray; Enter runs it, listed in the footer's shortcuts dialog rather than as a `Kbd` on the button.
 - One primary (filled) button per area. Everything else is `outline` or `ghost`.
 
 ## Typography
@@ -59,7 +59,7 @@ Every screen has visible layers in both themes. Windows are outlined, not filled
 ## States and interaction
 
 - Every interactive element has hover, `focus-visible` (the 3px ring from the components), pressed, and selected or disabled states as needed. Prefer explaining why something can't happen over a disabled button.
-- Keyboard first: Enter runs the main action (start, check, continue) and number keys pick answer options, each shown with a `Kbd` hint. Avoid pointer-only interactions.
+- Keyboard first: Enter runs the main action (start, check, continue) and number keys pick answer options (shown with a `Kbd` on each option). The footer's shortcuts dialog (`?`) lists them. Avoid pointer-only interactions.
 - Motion goes behind `motion-safe:` and stays short (fades and small slides, about 150 to 300ms).
 
 ## Accessibility

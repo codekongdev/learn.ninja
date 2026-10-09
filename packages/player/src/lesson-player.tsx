@@ -9,7 +9,6 @@ import { Alert, AlertDescription } from "@workspace/ui/components/alert"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
-import { Kbd } from "@workspace/ui/components/kbd"
 import { DirectionProvider } from "@workspace/ui/components/direction"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -50,15 +49,20 @@ import { emptyPrepared, type Prepared } from "./prepared"
 import { seeded } from "./random"
 import { plainText, RichText } from "./rich-text"
 import {
+  AppSettings,
   LessonFooter,
   LessonHeader,
   PanelRightFilledIcon,
+  PlayerSettings,
   TheoryPanel,
+  TRAY_BUTTON,
   usePreferences,
+  type Preferences,
 } from "./shell"
 import {
   ariaLocaleFor,
   stringsFor,
+  type NinjaLevel,
   type Strings,
   type TextSize,
   type Theme,
@@ -77,9 +81,12 @@ export interface LessonPlayerProps {
   visualsCss?: string
   /** Where the logo in the header goes. */
   homeHref?: string
-  /** Header links to the docs and to making a lesson. Omit either to hide its button. */
+  /** The Docs link in the footer, and the Create button in the header. Omit either to hide it. */
   docsHref?: string
   createHref?: string
+  /** Footer links to the legal pages. Omit either to hide it. */
+  privacyHref?: string
+  termsHref?: string
   /** The link Share copies. Defaults to the current page. */
   shareUrl?: string
   /** The app's color theme. Pass both to show the theme setting in the footer. */
@@ -104,6 +111,8 @@ export function LessonPlayer({
   homeHref = "/",
   docsHref,
   createHref,
+  privacyHref,
+  termsHref,
   shareUrl,
   theme,
   onThemeChange,
@@ -119,6 +128,8 @@ export function LessonPlayer({
   const shown = React.useMemo(() => ({ ...lesson, title }), [lesson, title])
   const [prefs, setPrefs] = usePreferences()
   const coarse = useCoarsePointer()
+  // The keyboard shortcuts dialog lives in the footer; "?" (handled in the player) opens it too.
+  const [shortcutsOpen, setShortcutsOpen] = React.useState(false)
   // A choice made in the footer wins over the page's default for this session.
   const [chosen, setChosen] = React.useState<string>()
   const ui = chosen ?? uiLanguage ?? prefs.uiLanguage ?? lesson.language
@@ -149,7 +160,21 @@ export function LessonPlayer({
               setTitle(next)
               onRename?.(next)
             }}
-            textSize={prefs.textSize}
+            prefs={prefs}
+            onPrefs={setPrefs}
+            onShortcuts={() => setShortcutsOpen((open) => !open)}
+            headerSettings={
+              <AppSettings
+                theme={theme}
+                onThemeChange={onThemeChange}
+                uiLanguage={ui}
+                onPrefs={(patch) => {
+                  if (patch.uiLanguage) setChosen(patch.uiLanguage)
+                  setPrefs(patch)
+                }}
+                t={t}
+              />
+            }
             // Touch screens have no hotkeys to fall back on, so the tray stays open there.
             trayOpen={coarse || prefs.tray !== "closed"}
             onTrayToggle={() =>
@@ -157,7 +182,6 @@ export function LessonPlayer({
             }
             expiresAt={expiresAt}
             homeHref={homeHref}
-            docsHref={docsHref}
             createHref={createHref}
             shareUrl={shareUrl}
             chrome={chrome}
@@ -165,15 +189,12 @@ export function LessonPlayer({
           {chrome ? (
             <LessonFooter
               homeHref={homeHref}
+              privacyHref={privacyHref}
+              termsHref={termsHref}
+              docsHref={docsHref}
               t={t}
-              prefs={prefs}
-              onPrefs={(patch) => {
-                if (patch.uiLanguage) setChosen(patch.uiLanguage)
-                setPrefs(patch)
-              }}
-              uiLanguage={ui}
-              theme={theme}
-              onThemeChange={onThemeChange}
+              shortcutsOpen={shortcutsOpen}
+              onShortcutsChange={setShortcutsOpen}
             />
           ) : null}
         </div>
@@ -408,7 +429,10 @@ const SHOW_THEORY = false
 
 function Player({
   lesson,
-  textSize,
+  prefs,
+  onPrefs,
+  onShortcuts,
+  headerSettings,
   trayOpen,
   onTrayToggle,
   onRename,
@@ -416,12 +440,16 @@ function Player({
   chrome = true,
   expiresAt,
   homeHref,
-  docsHref,
   createHref,
   shareUrl,
 }: {
   lesson: Lesson
-  textSize: TextSize
+  prefs: Preferences
+  onPrefs: (patch: Partial<Preferences>) => void
+  /** "?" was pressed: show (or hide) the keyboard shortcuts. */
+  onShortcuts: () => void
+  /** The app's settings, shown in the header. */
+  headerSettings?: React.ReactNode
   trayOpen: boolean
   onTrayToggle: () => void
   onRename: (title: string) => void
@@ -429,11 +457,12 @@ function Player({
   chrome?: boolean
   expiresAt?: number
   homeHref: string
-  docsHref?: string
   createHref?: string
   shareUrl?: string
 }) {
   const { t, keyScope } = usePlayer()
+  const { textSize } = prefs
+  const ninja: NinjaLevel = prefs.ninja ?? "normal"
   const [state, dispatch] = React.useReducer(reducer, lesson, (l) =>
     start(l, startAt)
   )
@@ -457,8 +486,12 @@ function Player({
   }, [state.index])
   const parts = partAt(state.items, state.index, state.inFix)
   const coarse = useCoarsePointer()
-  // The tray holds the screen's buttons; "?" opens and closes it (Enter keeps working either way).
+  // The tray holds the screen's buttons in the middle and the player's settings at the end. The notch
+  // opens and closes it (Enter keeps working either way); the buttons render into `actionsEl`.
   const [trayEl, setTrayEl] = React.useState<HTMLDivElement | null>(null)
+  const [actionsEl, setActionsEl] = React.useState<HTMLDivElement | null>(
+    null
+  )
   const trayId = React.useId()
   // The tray's natural height, and its height while the notch is being dragged.
   const [trayHeight, setTrayHeight] = React.useState(0)
@@ -474,8 +507,9 @@ function Player({
     return () => observer.disconnect()
   }, [trayEl])
   const shownHeight = dragHeight ?? (trayOpen ? trayHeight : 0)
-  const toggleTray = React.useRef(onTrayToggle)
-  toggleTray.current = onTrayToggle
+  // "?" shows the keyboard shortcuts, as it does on most of the web.
+  const shortcuts = React.useRef(onShortcuts)
+  shortcuts.current = onShortcuts
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "?" || e.repeat || e.metaKey || e.ctrlKey || e.altKey)
@@ -485,7 +519,7 @@ function Player({
       if (target?.closest("input, textarea, select, [contenteditable=true]"))
         return
       e.preventDefault()
-      toggleTray.current()
+      shortcuts.current()
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
@@ -513,9 +547,9 @@ function Player({
           showParts={item.kind !== "intro"}
           expiresAt={expiresAt}
           homeHref={homeHref}
-          docsHref={docsHref}
           createHref={createHref}
           shareUrl={shareUrl}
+          settings={headerSettings}
           onRestart={() => {
             setTheoryOpen(false)
             dispatch({ type: "restart", lesson })
@@ -595,16 +629,20 @@ function Player({
                     state={state}
                     dispatch={dispatch}
                     textSize={textSize}
-                    tray={{ el: trayEl, id: trayId }}
+                    tray={{ el: actionsEl, id: trayId }}
+                    ninja={ninja !== "off"}
                   />
                 </div>
               </main>
-              <NinjaStage
-                area={cardRef}
-                screen={state.index}
-                cue={cue}
-                celebrate={item.kind === "wrap"}
-              />
+              {ninja !== "off" ? (
+                <NinjaStage
+                  area={cardRef}
+                  screen={state.index}
+                  cue={cue}
+                  celebrate={item.kind === "wrap"}
+                  level={ninja}
+                />
+              ) : null}
               {coarse ? null : (
                 <TrayNotch
                   open={trayOpen}
@@ -641,8 +679,30 @@ function Player({
               <div
                 id={trayId}
                 ref={setTrayEl}
-                className="flex flex-wrap items-center justify-center gap-2 px-4 py-4"
-              />
+                className="flex items-center gap-2 px-4 py-4"
+              >
+                {/* Equal sides keep the actions in the middle (they give way when a phone is too narrow). */}
+                <div className="flex flex-1 items-center gap-1">
+                  <PlayerSettings
+                    side="start"
+                    prefs={prefs}
+                    onPrefs={onPrefs}
+                    t={t}
+                  />
+                </div>
+                <div
+                  ref={setActionsEl}
+                  className="flex flex-wrap items-center justify-center gap-2"
+                />
+                <div className="flex flex-1 items-center justify-end gap-1">
+                  <PlayerSettings
+                    side="end"
+                    prefs={prefs}
+                    onPrefs={onPrefs}
+                    t={t}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -929,7 +989,7 @@ function WrapUp({
 
 type Tone = "neutral" | "good" | "bad" | "warn" | "info"
 
-/** The screen's main action (with Enter as its shortcut), and the feedback after checking. */
+/** The screen's main action (Enter runs it; the shortcuts dialog says so), and the feedback after checking. */
 export function ActionArea({
   lesson,
   item,
@@ -937,6 +997,7 @@ export function ActionArea({
   dispatch,
   textSize,
   tray,
+  ninja = true,
 }: {
   lesson: Lesson
   item: Item
@@ -945,6 +1006,8 @@ export function ActionArea({
   textSize: TextSize
   /** The tray the buttons render into. `el` is null while it's closed: the buttons hide, Enter still works. */
   tray?: { el: HTMLDivElement | null; id: string }
+  /** Whether the ninja is in the card's corner, so the feedback toast leaves him room. */
+  ninja?: boolean
 }) {
   const { t, keyScope } = usePlayer()
   let tone: Tone = "neutral"
@@ -965,7 +1028,12 @@ export function ActionArea({
   React.useEffect(() => setWhy(false), [state.index, state.question?.attempts])
   let explanation: string | null = null
   const helpButton = (label: string, onPress: () => void) => (
-    <Button variant="outline" size={tray ? "lg" : "sm"} onPress={onPress}>
+    <Button
+      variant="outline"
+      size={tray ? "lg" : "sm"}
+      className={cn(tray && TRAY_BUTTON)}
+      onPress={onPress}
+    >
       {label}
     </Button>
   )
@@ -1085,20 +1153,12 @@ export function ActionArea({
       <Button
         ref={primaryRef}
         size={tray ? "lg" : "sm"}
+        className={cn(tray && TRAY_BUTTON)}
         variant={primary.variant ?? "default"}
         onPress={primary.onPress}
         isDisabled={primary.isDisabled}
       >
         {primary.label}
-        <Kbd
-          className={cn(
-            "pointer-coarse:hidden",
-            primary.variant === "warning" && "bg-yellow-950/10 text-yellow-950",
-            primary.variant === "success" && "bg-green-950/10 text-green-950"
-          )}
-        >
-          Enter
-        </Kbd>
       </Button>
       {secondary}
     </>
@@ -1129,7 +1189,7 @@ export function ActionArea({
           className={cn(
             "absolute end-4 bottom-4 z-10 rounded-xl border px-5 py-4 shadow-xs motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:bottom-6 sm:w-fit sm:max-w-80",
             // In the player the ninja sits in the corner, so the toast starts beside him, like something he says.
-            tray ? "start-18 sm:start-20" : "start-4 sm:start-6",
+            tray && ninja ? "start-18 sm:start-20" : "start-4 sm:start-6",
             toneClass[tone]
           )}
         >

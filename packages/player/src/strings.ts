@@ -98,10 +98,28 @@ export type Strings = {
   theme: string
   themes: Record<Theme, string>
   language: string
+  /** The sound setting in the tray: its name, and its state while muted. */
+  sound: string
+  muted: string
+  /** The ninja setting: how big his reactions are. */
+  ninja: string
+  ninjaLevels: Record<NinjaLevel, string>
+  /** The keyboard shortcuts dialog, opened from the footer or with "?". */
+  shortcuts: string
+  shortcutMain: string
+  shortcutPick: string
+  shortcutHelp: string
+  /** The gear menu in the header (theme, language, docs). */
+  settings: string
+  /** Footer links to the legal pages. */
+  privacy: string
+  terms: string
 }
 
 export type TextSize = "sm" | "md" | "lg"
 export type Theme = "system" | "light" | "dark"
+/** How much the ninja reacts: hidden, as usual, livelier, or over the top. */
+export type NinjaLevel = "off" | "normal" | "caffeinated" | "unhinged"
 
 /**
  * Languages the player's own text is translated into: the code, the language's name in itself (for

@@ -4,6 +4,8 @@ import * as React from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
+import type { NinjaLevel } from "./strings"
+
 // The ninja: the logo as a character. He is the same mark as the header logo with two extra eye
 // layers (happy arcs, sad arcs) that stay hidden until a mood class asks for them. Everything he
 // does is eye and head transforms, so he still reads as the logo at 22px. Styles live in
@@ -26,6 +28,22 @@ export type NinjaMood =
   | "wide"
   | "half"
   | "closed"
+  // Caffeinated
+  | "hop"
+  | "jitter"
+  | "pop"
+  | "rattle"
+  | "headshake"
+  // Unhinged
+  | "flip"
+  | "doublespin"
+  | "inflate"
+  | "headbang"
+  | "faint"
+  | "tremble"
+
+/** The ninja settings he can be seen at (the player leaves him out when it's off). */
+export type NinjaEnergy = Exclude<NinjaLevel, "off">
 
 export const Ninja = React.forwardRef<
   SVGSVGElement,
@@ -78,52 +96,181 @@ export const Ninja = React.forwardRef<
 /** One beat of a reaction: a mood, how long to hold it, and where to look meanwhile. */
 type Beat = [mood: NinjaMood, ms: number, lookX?: number, lookY?: number]
 
-/** Several ways to be pleased and several ways to be sorry, so the same answer never feels canned. */
-export const REACTIONS: Record<"happy" | "sad", Record<string, Beat[]>> = {
-  happy: {
-    smile: [["happy", 1300]],
-    cheer: [["cheer", 1100]],
-    wiggle: [["wiggle", 1000]],
-    sparkle: [
-      ["wide", 320],
-      ["sparkle", 1000],
-    ],
-    nod: [["nod", 1100]],
-    spin: [
-      ["spin", 850],
-      ["happy", 900],
-    ],
+type Reactions = Record<"happy" | "sad", Record<string, Beat[]>>
+
+/**
+ * Each setting is a different character. Normal is small and warm. Caffeinated is quick and
+ * twitchy. Unhinged is theatrical. At every level he's sorry with the learner, never at them: the
+ * sad moves are all self-directed. Several variants per mood, so the same answer never feels canned.
+ */
+export const REACTIONS: Record<NinjaEnergy, Reactions> = {
+  normal: {
+    happy: {
+      smile: [["happy", 1300]],
+      cheer: [["cheer", 1100]],
+      wiggle: [["wiggle", 1000]],
+      sparkle: [
+        ["wide", 320],
+        ["sparkle", 1000],
+      ],
+      nod: [["nod", 1100]],
+      spin: [
+        ["spin", 850],
+        ["happy", 900],
+      ],
+    },
+    sad: {
+      oops: [["oops", 1300]],
+      droop: [["droop", 1500]],
+      sigh: [["sigh", 1500]],
+      shake: [
+        ["shake", 600],
+        ["half", 700],
+      ],
+      lookaway: [
+        ["lookaway", 1100],
+        ["half", 500, 0, 0],
+      ],
+      wince: [
+        ["closed", 500],
+        ["half", 900],
+      ],
+    },
   },
-  // Gentle on purpose: he's sorry with the learner, never at them.
-  sad: {
-    oops: [["oops", 1300]],
-    droop: [["droop", 1500]],
-    sigh: [["sigh", 1500]],
-    shake: [
-      ["shake", 600],
-      ["half", 700],
-    ],
-    lookaway: [
-      ["lookaway", 1100],
-      ["half", 500, 0, 0],
-    ],
-    wince: [
-      ["closed", 500],
-      ["half", 900],
-    ],
+  caffeinated: {
+    happy: {
+      // Two quick hops.
+      hop: [
+        ["hop", 700],
+        ["happy", 500],
+      ],
+      // Can't sit still.
+      jitter: [
+        ["jitter", 600],
+        ["happy", 500],
+      ],
+      // Eyes pop, then a grin.
+      pop: [
+        ["pop", 450],
+        ["happy", 700],
+      ],
+      // Eyes dart everywhere.
+      dart: [
+        ["happy", 220, -5, 0],
+        ["happy", 220, 5, 0],
+        ["happy", 260, 0, -2],
+        ["happy", 450, 0, 0],
+      ],
+    },
+    sad: {
+      // A fast rattle, then squints.
+      rattle: [
+        ["rattle", 550],
+        ["half", 600],
+      ],
+      // A gasp: wide, then a squint.
+      gasp: [
+        ["wide", 350],
+        ["half", 800],
+      ],
+      // Shakes his head, then slumps.
+      slump: [
+        ["headshake", 800],
+        ["droop", 900],
+      ],
+    },
+  },
+  unhinged: {
+    happy: {
+      // A full flip off the ground.
+      flip: [
+        ["flip", 900],
+        ["happy", 500],
+      ],
+      // Two spins, dizzy, grin.
+      doublespin: [
+        ["doublespin", 1100],
+        ["wide", 300],
+        ["happy", 500],
+      ],
+      // Swells up with pride.
+      inflate: [
+        ["inflate", 900],
+        ["happy", 400],
+      ],
+      headbang: [
+        ["headbang", 1000],
+        ["happy", 400],
+      ],
+    },
+    sad: {
+      // Tips over, lies there, gets up.
+      faint: [["faint", 1700]],
+      // Rattle, spin, slump.
+      meltdown: [
+        ["rattle", 550],
+        ["doublespin", 1100],
+        ["droop", 900],
+      ],
+      // A silent scream: wide eyes and a violent tremble.
+      scream: [
+        ["tremble", 800],
+        ["half", 700],
+      ],
+    },
   },
 }
 
-/** A stable pick from a set for a seed, skipping the variant played last time. */
-export function pickReaction(
-  kind: "happy" | "sad",
-  seed: string,
-  last?: string
-): string {
-  const names = Object.keys(REACTIONS[kind]).filter((n) => n !== last)
+/** How far the keyframes go at each setting (as --ninja-energy). The bigger sets are already big. */
+export const NINJA_ENERGY: Record<NinjaEnergy, number> = {
+  normal: 1,
+  caffeinated: 1.3,
+  unhinged: 1.6,
+}
+
+/** Things he does on his own while waiting, at the livelier settings. */
+export const ANTICS: Record<NinjaEnergy, Beat[][]> = {
+  normal: [],
+  caffeinated: [REACTIONS.caffeinated.happy.hop!, REACTIONS.caffeinated.happy.dart!],
+  unhinged: [
+    REACTIONS.unhinged.happy.flip!,
+    REACTIONS.unhinged.happy.doublespin!,
+    REACTIONS.unhinged.happy.headbang!,
+    REACTIONS.unhinged.happy.inflate!,
+  ],
+}
+
+/** How often the antics come (ms), at random in this range. */
+const ANTIC_EVERY: Record<NinjaEnergy, [number, number]> = {
+  normal: [0, 0],
+  caffeinated: [7000, 14000],
+  unhinged: [9000, 16000],
+}
+
+/** A stable pick from a list for a seed, skipping the one played last time. */
+export function pickFrom(names: string[], seed: string, last?: string): string {
+  const pool = names.filter((n) => n !== last)
   let h = 0
   for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0
-  return names[h % names.length]!
+  return pool[h % pool.length]!
+}
+
+/** The reaction to play for an answer at a setting. Unhinged gets two in a row. */
+export function reactionFor(
+  kind: "happy" | "sad",
+  seed: string,
+  level: NinjaEnergy,
+  last?: string
+): { name: string; beats: Beat[] } {
+  const set = REACTIONS[level][kind]
+  const names = Object.keys(set)
+  const name = pickFrom(names, seed, last)
+  let beats = set[name]!
+  if (level === "unhinged") {
+    const encore = pickFrom(names, `${seed}!`, name)
+    beats = [...beats, ...set[encore]!]
+  }
+  return { name, beats }
 }
 
 const MOOD_CLASSES = (
@@ -143,6 +290,17 @@ const MOOD_CLASSES = (
     "wide",
     "half",
     "closed",
+    "hop",
+    "jitter",
+    "pop",
+    "rattle",
+    "headshake",
+    "flip",
+    "doublespin",
+    "inflate",
+    "headbang",
+    "faint",
+    "tremble",
   ] satisfies NinjaMood[]
 ).map((m) => `e-${m}`)
 
@@ -176,11 +334,13 @@ export function reducedMotion(): boolean {
 
 /**
  * Keeps him alive: his eyes wander every second or two, he blinks at random (sometimes twice),
- * and he follows the pointer while it's over `area`. Nothing moves when the viewer prefers reduced motion.
+ * and he follows the pointer while it's over `area`. At the livelier settings he also pulls a stunt
+ * now and then. Nothing moves when the viewer prefers reduced motion.
  */
 export function useNinjaLife(
   svg: React.RefObject<SVGSVGElement | null>,
-  area: React.RefObject<HTMLElement | null>
+  area: React.RefObject<HTMLElement | null>,
+  level: NinjaEnergy = "normal"
 ): NinjaLife {
   const held = React.useRef(false)
   const pointer = React.useRef(false)
@@ -190,6 +350,25 @@ export function useNinjaLife(
       svg.current?.style.setProperty("--ey", `${y.toFixed(2)}px`)
     },
     [svg]
+  )
+  const play = React.useCallback(
+    async (beats: Beat[]) => {
+      const el = svg.current
+      if (!el) return
+      held.current = true
+      for (const [mood, ms, x, y] of beats) {
+        if (!svg.current) return
+        setMood(el, mood)
+        if (x !== undefined) look(x, y ?? 0)
+        await sleep(reducedMotion() ? Math.min(ms, 600) : ms)
+      }
+      if (svg.current) {
+        setMood(el, "idle")
+        look(0, 0)
+      }
+      held.current = false
+    },
+    [svg, look]
   )
   React.useEffect(() => {
     const el = svg.current
@@ -237,41 +416,43 @@ export function useNinjaLife(
       pointer.current = false
       if (!held.current) look(0, 0)
     }
+    const stunts = ANTICS[level]
+    const antic = () => {
+      if (!held.current && stunts.length)
+        void play(stunts[Math.floor(Math.random() * stunts.length)]!)
+      later(antic, rnd(...ANTIC_EVERY[level]))
+    }
+    // Unhinged gets the shakes now and then: a fine tremor for a couple of seconds.
+    const tremor = () => {
+      if (!held.current) {
+        el.classList.add("is-tweaking")
+        later(() => el.classList.remove("is-tweaking"), rnd(1500, 3000))
+      }
+      later(tremor, rnd(6000, 12000))
+    }
     later(blink, rnd(2000, 4000))
     later(wander, 600)
+    if (stunts.length) later(antic, rnd(...ANTIC_EVERY[level]))
+    if (level === "unhinged") later(tremor, rnd(2500, 6000))
     box.addEventListener("pointermove", move)
     box.addEventListener("pointerleave", leave)
     return () => {
       on = false
       timers.forEach(clearTimeout)
+      el.classList.remove("is-tweaking")
       box.removeEventListener("pointermove", move)
       box.removeEventListener("pointerleave", leave)
     }
-  }, [svg, area, look])
+  }, [svg, area, look, play, level])
   return React.useMemo<NinjaLife>(
     () => ({
       hold: (on) => {
         held.current = on
       },
       look,
-      play: async (beats) => {
-        const el = svg.current
-        if (!el) return
-        held.current = true
-        for (const [mood, ms, x, y] of beats) {
-          if (!svg.current) return
-          setMood(el, mood)
-          if (x !== undefined) look(x, y ?? 0)
-          await sleep(reducedMotion() ? Math.min(ms, 600) : ms)
-        }
-        if (svg.current) {
-          setMood(el, "idle")
-          look(0, 0)
-        }
-        held.current = false
-      },
+      play,
     }),
-    [svg, look]
+    [look, play]
   )
 }
 
@@ -295,6 +476,7 @@ export function NinjaStage({
   screen,
   cue,
   celebrate,
+  level = "normal",
 }: {
   /** The lesson card: he's positioned inside it and follows the pointer over it. */
   area: React.RefObject<HTMLDivElement | null>
@@ -304,10 +486,12 @@ export function NinjaStage({
   cue: NinjaCue | null
   /** True on the wrap-up: he cheers once he's landed. */
   celebrate?: boolean
+  /** Which character he is. The player leaves him out entirely when the setting is off. */
+  level?: NinjaEnergy
 }) {
   const float = React.useRef<HTMLDivElement>(null)
   const svg = React.useRef<SVGSVGElement>(null)
-  const life = useNinjaLife(svg, area)
+  const life = useNinjaLife(svg, area, level)
   const [placed, setPlaced] = React.useState(false)
   // Where he is: in the slot (measured) or in the corner (classes).
   const [slot, setSlot] = React.useState<{
@@ -351,9 +535,15 @@ export function NinjaStage({
           mark.classList.remove("is-enter")
           life.hold(false)
         }, 1660)
+        // Undo everything if the effect is cut short (React runs it twice in development), or
+        // the entrance class stays on him and blocks every later whole-body move.
         return () => {
           clearTimeout(t1)
           clearTimeout(t2)
+          mark.classList.remove("is-enter")
+          setMood(mark, "idle")
+          life.hold(false)
+          lastScreen.current = null
         }
       }
       return
@@ -397,17 +587,22 @@ export function NinjaStage({
   const lastName = React.useRef<string | undefined>(undefined)
   React.useEffect(() => {
     if (!cue) return
-    const name = pickReaction(cue.kind, cue.key, lastName.current)
+    const { name, beats } = reactionFor(
+      cue.kind,
+      cue.key,
+      level,
+      lastName.current
+    )
     lastName.current = name
     let cancelled = false
     ;(async () => {
       await leaping.current
-      if (!cancelled) await life.play(REACTIONS[cue.kind][name]!)
+      if (!cancelled) await life.play(beats)
     })()
     return () => {
       cancelled = true
     }
-  }, [cue?.key, cue?.kind, life])
+  }, [cue?.key, cue?.kind, level, life])
 
   // The wrap-up: a cheer once he's landed on his slot.
   React.useEffect(() => {
@@ -432,14 +627,17 @@ export function NinjaStage({
         !slot && "start-4 bottom-4 size-10 sm:start-6 sm:bottom-6"
       )}
       style={
-        slot
-          ? {
-              left: slot.left,
-              top: slot.top,
-              width: slot.size,
-              height: slot.size,
-            }
-          : undefined
+        {
+          "--ninja-energy": NINJA_ENERGY[level],
+          ...(slot
+            ? {
+                left: slot.left,
+                top: slot.top,
+                width: slot.size,
+                height: slot.size,
+              }
+            : null),
+        } as React.CSSProperties
       }
     >
       <Ninja ref={svg} className="size-full" />

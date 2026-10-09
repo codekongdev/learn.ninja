@@ -7,23 +7,21 @@ import {
   ChevronDownIcon,
   ClockIcon,
   GlobeIcon,
+  KeyboardIcon,
   MonitorIcon,
   MoonIcon,
   RotateCcwIcon,
+  SettingsIcon,
   ShareIcon,
   SunIcon,
   TypeIcon,
+  Volume2Icon,
+  VolumeXIcon,
   XIcon,
 } from "lucide-react"
 
 import type { ConceptBrick } from "@workspace/spec"
 import { Button, LinkButton } from "@workspace/ui/components/button"
-import {
-  Command,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@workspace/ui/components/command"
 import { Input } from "@workspace/ui/components/input"
 import {
   Dialog,
@@ -38,24 +36,37 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
+import { Kbd } from "@workspace/ui/components/kbd"
 import { Popover, PopoverTrigger } from "@workspace/ui/components/popover"
 import { Progress } from "@workspace/ui/components/progress"
+import { Slider } from "@workspace/ui/components/slider"
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { PartProgress } from "./flow"
+import { Ninja, type NinjaMood } from "./ninja"
 import { RichText } from "./rich-text"
 import {
   UI_LANGUAGES,
   uiLanguageFor,
+  type NinjaLevel,
   type Strings,
   type TextSize,
   type Theme,
 } from "./strings"
 
-// The frame around every lesson screen: header (home, title menu, progress, Share), footer (credit and
-// viewer settings), and the Theory panel. Layout follows the Figma frame "Learn" (node 2004:15459).
+// The frame around every lesson screen: header (home, title menu, progress, Share), the player's
+// settings at the end of the tray, footer (credit and app settings), and the Theory panel. Layout
+// follows the Figma frame "Learn" (node 2004:15459).
+//
+// Three kinds of controls, each in its own place: the header is about this lesson (title, progress,
+// share, restart) plus a gear menu for the app (theme, language); the tray is about how you play
+// (the screen's actions in the middle, the ninja at the start where he lives, text size at the end);
+// the footer holds the credit, the legal and docs links, and the keyboard shortcuts.
 
 export const BRAND = {
   name: "learn.ninja",
@@ -109,6 +120,10 @@ export interface Preferences {
   uiLanguage?: string
   /** Whether the tray of action buttons under the lesson is open (it is until closed). */
   tray?: "open" | "closed"
+  /** Sound effects (on until muted). */
+  sound?: "on" | "off"
+  /** How much the ninja reacts (normal until changed). */
+  ninja?: NinjaLevel
 }
 
 const PREFERENCES_KEY = "learn:preferences"
@@ -161,9 +176,9 @@ export function LessonHeader({
   showParts = true,
   expiresAt,
   homeHref,
-  docsHref,
   createHref,
   shareUrl,
+  settings,
   onRestart,
   onRename,
   t,
@@ -174,9 +189,10 @@ export function LessonHeader({
   showParts?: boolean
   expiresAt?: number
   homeHref: string
-  docsHref?: string
   createHref?: string
   shareUrl?: string
+  /** The app's settings menu, shown before Share. */
+  settings?: React.ReactNode
   onRestart: () => void
   /** Called with the new title when the learner renames the lesson in the header. */
   onRename?: (title: string) => void
@@ -242,16 +258,7 @@ export function LessonHeader({
         <div aria-hidden="true" className="min-w-0 sm:flex-1" />
       )}
       <div className="flex items-center justify-end gap-1 sm:flex-1">
-        {docsHref ? (
-          <LinkButton
-            href={docsHref}
-            variant="ghost"
-            size="sm"
-            className="max-sm:hidden"
-          >
-            {t.docs}
-          </LinkButton>
-        ) : null}
+        {settings}
         <ShareButton title={title} url={shareUrl} t={t} />
         {createHref ? (
           <LinkButton href={createHref} size="sm" className="max-sm:hidden">
@@ -420,24 +427,28 @@ function ShareButton({
 
 export function LessonFooter({
   homeHref,
+  privacyHref,
+  termsHref,
+  docsHref,
   t,
-  prefs,
-  onPrefs,
-  uiLanguage,
-  theme,
-  onThemeChange,
+  shortcutsOpen,
+  onShortcutsChange,
 }: {
   homeHref: string
+  /** The legal pages and the docs. Omit any to hide its link. */
+  privacyHref?: string
+  termsHref?: string
+  docsHref?: string
   t: Strings
-  prefs: Preferences
-  onPrefs: (patch: Partial<Preferences>) => void
-  uiLanguage: string
-  theme?: Theme
-  onThemeChange?: (theme: Theme) => void
+  /** The keyboard shortcuts dialog, which "?" also opens. */
+  shortcutsOpen: boolean
+  onShortcutsChange: (open: boolean) => void
 }) {
-  const language = uiLanguageFor(uiLanguage) ?? UI_LANGUAGES[0]
-  const ThemeIcon =
-    theme === "dark" ? MoonIcon : theme === "light" ? SunIcon : MonitorIcon
+  const links = [
+    [docsHref, t.docs],
+    [privacyHref, t.privacy],
+    [termsHref, t.terms],
+  ].filter((l): l is [string, string] => Boolean(l[0]))
   return (
     <footer className="flex h-12 shrink-0 items-center gap-2 px-4 pb-[env(safe-area-inset-bottom,0px)] sm:px-8">
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium">
@@ -448,48 +459,35 @@ export function LessonFooter({
           <span className="max-sm:hidden">© {new Date().getFullYear()} </span>
           {BRAND.name}
         </a>
-        <span className="text-muted-foreground">{t.by}</span>
-        <LinkButton
-          variant="secondary"
-          size="sm"
-          href={BRAND.makerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <bdi dir="ltr">{BRAND.maker}</bdi>
-        </LinkButton>
+        {links.map(([href, label]) => (
+          <React.Fragment key={href}>
+            <span aria-hidden="true" className="text-muted-foreground">
+              ·
+            </span>
+            <a
+              href={href}
+              className="shrink-0 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {label}
+            </a>
+          </React.Fragment>
+        ))}
       </div>
       <div className="flex items-center justify-end gap-1">
-        <SettingMenu
-          label={t.textSize}
-          icon={<TypeIcon />}
-          value={prefs.textSize}
-          valueLabel={t.sizesShort[prefs.textSize]}
-          defaultValue="sm"
-          defaultLabel={t.defaultOption}
-          options={(["sm", "md", "lg"] as const).map((id) => ({
-            id,
-            label: t.sizes[id],
-          }))}
-          onChange={(textSize) => onPrefs({ textSize })}
-        />
-        {onThemeChange ? (
-          <SettingMenu
-            label={t.theme}
-            icon={<ThemeIcon />}
-            value={theme ?? "system"}
-            valueLabel={t.themes[theme ?? "system"]}
-            options={(["system", "light", "dark"] as const).map((id) => ({
-              id,
-              label: t.themes[id],
-            }))}
-            onChange={onThemeChange}
-          />
-        ) : null}
-        <LanguageMenu
-          value={language.code}
-          valueLabel={language.label}
-          onChange={(code) => onPrefs({ uiLanguage: code })}
+        {/* Touch screens have no keys to list. */}
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-label={t.shortcuts}
+          className="pointer-coarse:hidden"
+          onPress={() => onShortcutsChange(true)}
+        >
+          <KeyboardIcon />
+          <Kbd>?</Kbd>
+        </Button>
+        <ShortcutsDialog
+          isOpen={shortcutsOpen}
+          onOpenChange={onShortcutsChange}
           t={t}
         />
       </div>
@@ -497,48 +495,266 @@ export function LessonFooter({
   )
 }
 
-/** The language setting: a searchable list, since there are many languages to scroll through. */
-function LanguageMenu({
+/** The app's settings behind a gear in the header: theme and language as submenus. */
+export function AppSettings({
+  theme,
+  onThemeChange,
+  uiLanguage,
+  onPrefs,
+  t,
+}: {
+  theme?: Theme
+  onThemeChange?: (theme: Theme) => void
+  uiLanguage: string
+  onPrefs: (patch: Partial<Preferences>) => void
+  t: Strings
+}) {
+  const language = uiLanguageFor(uiLanguage) ?? UI_LANGUAGES[0]
+  const ThemeIcon =
+    theme === "dark" ? MoonIcon : theme === "light" ? SunIcon : MonitorIcon
+  const single = (onPick: (key: string) => void) => ({
+    selectionMode: "single" as const,
+    disallowEmptySelection: true,
+    onSelectionChange: (keys: "all" | Iterable<unknown>) => {
+      if (keys === "all") return
+      const [key] = keys
+      if (key !== undefined) onPick(String(key))
+    },
+  })
+  return (
+    <DropdownMenuTrigger>
+      <Button variant="ghost" size="icon-sm" aria-label={t.settings}>
+        <SettingsIcon />
+      </Button>
+      <DropdownMenu placement="bottom end" className="w-auto min-w-44">
+        <DropdownMenuGroup aria-label={t.settings}>
+          {onThemeChange ? (
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger textValue={t.theme}>
+                <ThemeIcon />
+                {t.theme}
+                <span className="text-muted-foreground">
+                  {t.themes[theme ?? "system"]}
+                </span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent
+                aria-label={t.theme}
+                selectedKeys={[theme ?? "system"]}
+                {...single((key) => onThemeChange(key as Theme))}
+              >
+                {(["system", "light", "dark"] as const).map((id) => (
+                  <DropdownMenuItem key={id} id={id} textValue={t.themes[id]}>
+                    {t.themes[id]}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          ) : null}
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger textValue={t.language}>
+              <GlobeIcon />
+              {t.language}
+              <span className="text-muted-foreground">
+                {language.label}
+              </span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent
+              aria-label={t.language}
+              // About nine rows; the rest scrolls.
+              maxHeight={320}
+              selectedKeys={[language.code]}
+              {...single((code) => onPrefs({ uiLanguage: code }))}
+            >
+              {UI_LANGUAGES.map((l) => (
+                <DropdownMenuItem key={l.code} id={l.code} textValue={l.label}>
+                  <span lang={l.code}>{l.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
+      </DropdownMenu>
+    </DropdownMenuTrigger>
+  )
+}
+
+/** The keys the player answers to. Opened from the footer or with "?". */
+function ShortcutsDialog({
+  isOpen,
+  onOpenChange,
+  t,
+}: {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+  t: Strings
+}) {
+  const rows: [keys: string[], label: string][] = [
+    [["Enter"], t.shortcutMain],
+    [["1", "9"], t.shortcutPick],
+    [["?"], t.shortcutHelp],
+  ]
+  return (
+    <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
+      <DialogHeader>
+        <DialogTitle>{t.shortcuts}</DialogTitle>
+      </DialogHeader>
+      <ul className="flex flex-col divide-y">
+        {rows.map(([keys, label]) => (
+          <li
+            key={label}
+            className="flex items-center justify-between gap-4 py-2 text-sm"
+          >
+            <span>{label}</span>
+            <span className="flex shrink-0 items-center gap-1">
+              {keys.map((key, i) => (
+                <React.Fragment key={key}>
+                  {i > 0 ? (
+                    <span className="text-xs text-muted-foreground">–</span>
+                  ) : null}
+                  <Kbd className="bg-muted text-foreground">{key}</Kbd>
+                </React.Fragment>
+              ))}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Dialog>
+  )
+}
+
+// ---------- player settings (the end of the tray) ----------
+
+/** Every button in the tray is `lg` and a pill, with room for the round ends. */
+export const TRAY_BUTTON = "rounded-full px-4"
+
+/** Sound effects aren't in yet; the setting is ready for when they are. */
+const SHOW_SOUND = false
+
+export const NINJA_LEVELS = [
+  "off",
+  "normal",
+  "caffeinated",
+  "unhinged",
+] as const satisfies readonly NinjaLevel[]
+
+/** The signature move the preview plays when you land on each level. */
+const NINJA_PREVIEW: Record<NinjaLevel, NinjaMood> = {
+  off: "closed",
+  normal: "happy",
+  caffeinated: "hop",
+  unhinged: "flip",
+}
+
+/**
+ * Settings that change how the lesson plays, in the tray. The ninja's sits at the start, under the
+ * corner he lives in; text size and sound sit at the end.
+ */
+export function PlayerSettings({
+  side,
+  prefs,
+  onPrefs,
+  t,
+}: {
+  side: "start" | "end"
+  prefs: Preferences
+  onPrefs: (patch: Partial<Preferences>) => void
+  t: Strings
+}) {
+  const sound = prefs.sound ?? "on"
+  const ninja = prefs.ninja ?? "normal"
+  if (side === "start")
+    return (
+      <NinjaSetting
+        value={ninja}
+        onChange={(ninja) => onPrefs({ ninja })}
+        t={t}
+      />
+    )
+  return (
+    <>
+      <SettingMenu
+        label={t.textSize}
+        icon={<TypeIcon />}
+        value={prefs.textSize}
+        valueLabel={t.sizesShort[prefs.textSize]}
+        defaultValue="sm"
+        defaultLabel={t.defaultOption}
+        options={(["sm", "md", "lg"] as const).map((id) => ({
+          id,
+          label: t.sizes[id],
+        }))}
+        onChange={(textSize) => onPrefs({ textSize })}
+        size="lg"
+        className={TRAY_BUTTON}
+      />
+      {SHOW_SOUND ? (
+        <Button
+          variant="ghost"
+          size="lg"
+          className={TRAY_BUTTON}
+          aria-label={`${t.sound}: ${sound === "on" ? t.sound : t.muted}`}
+          onPress={() => onPrefs({ sound: sound === "on" ? "off" : "on" })}
+        >
+          {sound === "on" ? <Volume2Icon /> : <VolumeXIcon />}
+          <span className="max-sm:sr-only">
+            {sound === "on" ? t.sound : t.muted}
+          </span>
+        </Button>
+      ) : null}
+    </>
+  )
+}
+
+/** The ninja's level: a slider with four stops, from hidden to over the top, with him previewing each. */
+function NinjaSetting({
   value,
-  valueLabel,
   onChange,
   t,
 }: {
-  value: string
-  valueLabel: string
-  onChange: (code: string) => void
+  value: NinjaLevel
+  onChange: (level: NinjaLevel) => void
   t: Strings
 }) {
-  const [open, setOpen] = React.useState(false)
+  const index = NINJA_LEVELS.indexOf(value)
   return (
-    <PopoverTrigger isOpen={open} onOpenChange={setOpen}>
+    <PopoverTrigger>
       <Button
         variant="ghost"
-        size="sm"
-        aria-label={`${t.language}: ${valueLabel}`}
+        size="lg"
+        className={TRAY_BUTTON}
+        aria-label={`${t.ninja}: ${t.ninjaLevels[value]}`}
       >
-        <GlobeIcon />
-        <span className="max-sm:sr-only">{valueLabel}</span>
+        <Ninja mood={value === "off" ? "closed" : "idle"} />
+        <span className="max-sm:sr-only">{t.ninjaLevels[value]}</span>
       </Button>
-      <Popover placement="top end" className="w-60 p-0">
-        <Command>
-          <CommandInput placeholder={t.language} />
-          <CommandList
-            aria-label={t.language}
-            selectionMode="single"
-            selectedKeys={[value]}
-            onAction={(key) => {
-              onChange(String(key))
-              setOpen(false)
+      <Popover placement="top start" className="w-64 gap-4 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-medium">{t.ninja}</span>
+          {/* Announced on change, since the slider itself only says the stop's number. */}
+          <span aria-live="polite" className="text-muted-foreground">
+            {t.ninjaLevels[value]}
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <Ninja
+            mood={NINJA_PREVIEW[value]}
+            className={cn(
+              "size-10 shrink-0 transition-opacity",
+              value === "off" && "opacity-30"
+            )}
+          />
+          <Slider
+            aria-label={t.ninja}
+            minValue={0}
+            maxValue={NINJA_LEVELS.length - 1}
+            step={1}
+            value={index}
+            onChange={(v) => {
+              const next = NINJA_LEVELS[Array.isArray(v) ? v[0]! : v]
+              if (next && next !== value) onChange(next)
             }}
-          >
-            {UI_LANGUAGES.map((l) => (
-              <CommandItem key={l.code} id={l.code} textValue={l.label}>
-                <span lang={l.code}>{l.label}</span>
-              </CommandItem>
-            ))}
-          </CommandList>
-        </Command>
+          />
+        </div>
       </Popover>
     </PopoverTrigger>
   )
@@ -553,6 +769,9 @@ function SettingMenu<K extends string>({
   defaultLabel,
   options,
   onChange,
+  placement = "top end",
+  size = "sm",
+  className,
 }: {
   label: string
   icon: React.ReactNode
@@ -563,15 +782,24 @@ function SettingMenu<K extends string>({
   defaultLabel?: string
   options: { id: K; label: string; lang?: string }[]
   onChange: (value: K) => void
+  /** Up from the tray, down from the header. */
+  placement?: "top end" | "bottom end"
+  size?: "sm" | "lg"
+  className?: string
 }) {
   return (
     <DropdownMenuTrigger>
-      <Button variant="ghost" size="sm" aria-label={`${label}: ${valueLabel}`}>
+      <Button
+        variant="ghost"
+        size={size}
+        className={className}
+        aria-label={`${label}: ${valueLabel}`}
+      >
         {icon}
         <span className="max-sm:sr-only">{valueLabel}</span>
       </Button>
       <DropdownMenu
-        placement="top end"
+        placement={placement}
         // About nine rows; longer lists (languages) scroll inside.
         maxHeight={320}
         className="w-auto min-w-40"

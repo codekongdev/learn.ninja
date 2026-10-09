@@ -18,6 +18,8 @@ export function LessonView(props: LessonPlayerProps) {
   return (
     <LessonPlayer
       docsHref="/docs"
+      privacyHref="/privacy"
+      termsHref="/terms"
       {...props}
       theme={mounted ? ((theme as Theme | undefined) ?? "system") : "system"}
       onThemeChange={setTheme}

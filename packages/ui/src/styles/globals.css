@@ -140,7 +140,13 @@
 }
 
 /* The ninja (packages/player/src/ninja.tsx): the logo as a character. Moods are `e-*` classes on the
-   svg; the eyes point where --ex/--ey say. Everything is eye and head transforms on the logo's own paths. */
+   svg; the eyes point where --ex/--ey say. Everything is eye and head transforms on the logo's own paths.
+   --ninja-energy (set by the player from the ninja setting) scales how far every move goes. */
+.ninja {
+  --e: var(--ninja-energy, 1);
+  /* His rolls and bounces swing the head past the mark's own box; don't clip them. */
+  overflow: visible;
+}
 .ninja * {
   transform-box: fill-box;
   transform-origin: center;
@@ -169,24 +175,24 @@
 .ninja.e-shake .ninja-open ellipse {
   transform: scale(1.06, 0.06);
 }
-.ninja.e-half .ninja-open ellipse {
+.ninja:is(.e-half, .e-rattle, .e-headshake) .ninja-open ellipse {
   transform: scale(1.02, 0.45);
 }
-.ninja.e-wide .ninja-open ellipse {
+.ninja:is(.e-wide, .e-pop, .e-tremble) .ninja-open ellipse {
   transform: scale(1.22, 1.28);
 }
-.ninja:is(.e-happy, .e-cheer, .e-wiggle, .e-nod, .e-sparkle, .e-spin, .e-droop, .e-sigh) .ninja-open {
+.ninja:is(.e-happy, .e-cheer, .e-wiggle, .e-nod, .e-sparkle, .e-spin, .e-droop, .e-sigh, .e-hop, .e-jitter, .e-flip, .e-doublespin, .e-inflate, .e-headbang, .e-faint) .ninja-open {
   opacity: 0;
 }
-.ninja:is(.e-happy, .e-cheer, .e-wiggle, .e-nod, .e-sparkle, .e-spin) .ninja-happy,
-.ninja:is(.e-droop, .e-sigh) .ninja-sad {
+.ninja:is(.e-happy, .e-cheer, .e-wiggle, .e-nod, .e-sparkle, .e-spin, .e-hop, .e-jitter, .e-flip, .e-doublespin, .e-inflate, .e-headbang) .ninja-happy,
+.ninja:is(.e-droop, .e-sigh, .e-faint) .ninja-sad {
   opacity: 1;
 }
 .ninja.e-droop .ninja-head {
-  transform: translateY(2.5px);
+  transform: translateY(calc(2.5px * var(--e)));
 }
 .ninja.e-oops .ninja-head {
-  transform: rotate(-9deg);
+  transform: rotate(calc(-9deg * var(--e)));
 }
 .ninja.e-oops .ninja-open ellipse:first-child {
   transform: scale(1, 0.5);
@@ -202,6 +208,10 @@
   transform: scale(1, 0.7);
 }
 @media (prefers-reduced-motion: no-preference) {
+  /* The intro's entrance: two bounces with a small squash on each landing. First, so a mood's own move wins over it. */
+  .ninja.is-enter { animation: ninja-enter 1.25s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  /* Unhinged gets the shakes for a few seconds at a time; whole-body moves below take over from it. */
+  .ninja.is-tweaking { animation: ninja-tweak 0.14s steps(1) infinite; }
   .ninja.e-sigh .ninja-head { animation: ninja-sigh 1.3s ease; }
   .ninja.e-shake .ninja-head { animation: ninja-shake 0.5s ease; }
   .ninja.e-cheer { animation: ninja-cheer 0.7s cubic-bezier(0.3, 1.6, 0.5, 1); }
@@ -209,37 +219,102 @@
   .ninja.e-nod .ninja-head { animation: ninja-nod 0.9s ease; }
   .ninja.e-sparkle { animation: ninja-sparkle 0.8s cubic-bezier(0.3, 1.5, 0.5, 1); }
   .ninja.e-spin .ninja-head { animation: ninja-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-  /* The intro's entrance: two bounces with a small squash on each landing. */
-  .ninja.is-enter { animation: ninja-enter 1.25s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  /* Caffeinated: quick and twitchy. */
+  .ninja.e-hop { animation: ninja-hop 0.7s cubic-bezier(0.3, 1.4, 0.5, 1); }
+  .ninja.e-jitter .ninja-head { animation: ninja-jitter 0.6s linear; }
+  .ninja.e-pop { animation: ninja-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1); }
+  .ninja.e-rattle .ninja-head { animation: ninja-rattle 0.55s linear; }
+  .ninja.e-headshake .ninja-head { animation: ninja-headshake 0.8s ease-in-out; }
+  /* Unhinged: theatrical. */
+  .ninja.e-flip { animation: ninja-flip 0.9s cubic-bezier(0.3, 0.6, 0.3, 1); }
+  .ninja.e-doublespin .ninja-head { animation: ninja-doublespin 1.1s cubic-bezier(0.4, 0, 0.2, 1); }
+  .ninja.e-inflate { animation: ninja-inflate 0.9s cubic-bezier(0.3, 1.5, 0.5, 1); }
+  .ninja.e-headbang .ninja-head { animation: ninja-headbang 1s ease-in-out; }
+  .ninja.e-faint .ninja-head { animation: ninja-faint 1.7s cubic-bezier(0.4, 0, 0.2, 1); }
+  .ninja.e-tremble .ninja-head { animation: ninja-tremble 0.8s linear; }
 }
 @keyframes ninja-sigh {
-  30% { transform: translateY(-1.5px) scale(1.02, 0.98); }
-  100% { transform: translateY(2px); }
+  30% { transform: translateY(calc(-1.5px * var(--e))) scale(1.02, 0.98); }
+  100% { transform: translateY(calc(2px * var(--e))); }
 }
 @keyframes ninja-shake {
-  20% { transform: translateX(-2.2px); }
-  40% { transform: translateX(2.2px); }
-  60% { transform: translateX(-1.6px); }
-  80% { transform: translateX(1.2px); }
+  20% { transform: translateX(calc(-2.2px * var(--e))); }
+  40% { transform: translateX(calc(2.2px * var(--e))); }
+  60% { transform: translateX(calc(-1.6px * var(--e))); }
+  80% { transform: translateX(calc(1.2px * var(--e))); }
 }
 @keyframes ninja-cheer {
-  30% { transform: translateY(-16%) scale(1.04, 0.96); }
+  30% { transform: translateY(calc(-16% * var(--e))) scale(1.04, 0.96); }
   60% { transform: translateY(0) scale(0.98, 1.03); }
 }
 @keyframes ninja-wiggle {
-  20% { transform: rotate(-9deg); }
-  45% { transform: rotate(8deg); }
-  70% { transform: rotate(-4deg); }
+  20% { transform: rotate(calc(-9deg * var(--e))); }
+  45% { transform: rotate(calc(8deg * var(--e))); }
+  70% { transform: rotate(calc(-4deg * var(--e))); }
 }
 @keyframes ninja-nod {
-  25% { transform: translateY(2px) rotate(2deg); }
-  55% { transform: translateY(-1px) rotate(-1deg); }
+  25% { transform: translateY(calc(2px * var(--e))) rotate(calc(2deg * var(--e))); }
+  55% { transform: translateY(calc(-1px * var(--e))) rotate(calc(-1deg * var(--e))); }
 }
 @keyframes ninja-sparkle {
-  30% { transform: scale(1.12); }
+  30% { transform: scale(calc(1 + 0.12 * var(--e))); }
 }
 @keyframes ninja-spin {
   to { transform: rotate(360deg); }
+}
+@keyframes ninja-tweak {
+  0% { transform: translate(-1.2%, 0.6%) rotate(-0.8deg); }
+  25% { transform: translate(1%, -0.8%) rotate(0.6deg); }
+  50% { transform: translate(-0.6%, -1%) rotate(0.9deg); }
+  75% { transform: translate(1.2%, 0.8%) rotate(-0.5deg); }
+}
+@keyframes ninja-hop {
+  20% { transform: translateY(calc(-22% * var(--e))) scale(0.96, 1.06); }
+  40% { transform: translateY(0) scale(1.06, 0.94); }
+  60% { transform: translateY(calc(-14% * var(--e))) scale(0.98, 1.03); }
+  80% { transform: translateY(0) scale(1.03, 0.97); }
+}
+@keyframes ninja-jitter {
+  10%, 50%, 90% { transform: translate(calc(-1.4px * var(--e)), calc(0.6px * var(--e))) rotate(calc(-3deg * var(--e))); }
+  30%, 70% { transform: translate(calc(1.4px * var(--e)), calc(-0.6px * var(--e))) rotate(calc(3deg * var(--e))); }
+}
+@keyframes ninja-pop {
+  40% { transform: scale(calc(1 + 0.18 * var(--e))); }
+}
+@keyframes ninja-rattle {
+  10%, 30%, 50%, 70%, 90% { transform: translateX(calc(-2px * var(--e))); }
+  20%, 40%, 60%, 80% { transform: translateX(calc(2px * var(--e))); }
+}
+@keyframes ninja-headshake {
+  25% { transform: rotate(calc(-12deg * var(--e))); }
+  50% { transform: rotate(calc(10deg * var(--e))); }
+  75% { transform: rotate(calc(-6deg * var(--e))); }
+}
+@keyframes ninja-flip {
+  0% { transform: translateY(0) rotate(0) scale(1.08, 0.92); }
+  15% { transform: translateY(calc(-30% * var(--e))) rotate(60deg) scale(0.96, 1.06); }
+  50% { transform: translateY(calc(-55% * var(--e))) rotate(200deg) scale(1); }
+  85% { transform: translateY(0) rotate(360deg) scale(1.1, 0.9); }
+  100% { transform: translateY(0) rotate(360deg) scale(1); }
+}
+@keyframes ninja-doublespin {
+  to { transform: rotate(720deg); }
+}
+@keyframes ninja-inflate {
+  40% { transform: scale(calc(1 + 0.3 * var(--e))); }
+  70% { transform: scale(calc(1 + 0.24 * var(--e))); }
+}
+@keyframes ninja-headbang {
+  15%, 45%, 75% { transform: translateY(calc(2px * var(--e))) rotate(calc(16deg * var(--e))); }
+  30%, 60%, 90% { transform: translateY(calc(-1px * var(--e))) rotate(calc(-10deg * var(--e))); }
+}
+@keyframes ninja-faint {
+  25%, 70% { transform: translate(calc(4px * var(--e)), calc(6px * var(--e))) rotate(80deg); }
+  85% { transform: translate(0, calc(-2px * var(--e))) rotate(-6deg); }
+}
+@keyframes ninja-tremble {
+  10%, 30%, 50%, 70%, 90% { transform: translate(calc(-1.5px * var(--e)), calc(-1px * var(--e))); }
+  20%, 40%, 60%, 80% { transform: translate(calc(1.5px * var(--e)), calc(1px * var(--e))); }
 }
 @keyframes ninja-enter {
   0% { opacity: 0; transform: translateY(34px) scale(0.9); }
