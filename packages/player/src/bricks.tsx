@@ -505,7 +505,7 @@ export function MatchBrick({
     </span>
   )
   const chip =
-    "flex w-full items-center gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-start text-base shadow-xs hover:bg-muted data-selected:border-primary data-selected:bg-muted dark:bg-input/30 dark:hover:bg-input/50 dark:data-selected:bg-muted " +
+    "flex w-full items-center gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-start text-sm font-medium shadow-xs hover:bg-muted data-selected:border-primary data-selected:bg-muted dark:bg-input/30 dark:hover:bg-input/50 dark:data-selected:bg-muted " +
     markStyles
 
   return (
@@ -634,7 +634,7 @@ export function BlankBrick({
               lang={brick.lang}
               className={cn(
                 "rounded-md border bg-background px-3 py-1.5 shadow-xs hover:bg-muted dark:bg-input/30 dark:hover:bg-input/50 data-selected:opacity-45",
-                code ? "font-mono text-sm" : "text-base"
+                code ? "font-mono text-sm" : "text-sm font-medium"
               )}
             >
               {word}
