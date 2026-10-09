@@ -45,7 +45,7 @@ import {
   type Outcome,
   type Role,
 } from "./flow"
-import { Mascot } from "./mascot"
+import { Aura, hueFor, NinjaStage, type NinjaCue } from "./ninja"
 import { emptyPrepared, type Prepared } from "./prepared"
 import { seeded } from "./random"
 import { plainText, RichText } from "./rich-text"
@@ -493,6 +493,16 @@ function Player({
   const seenConcepts = state.items
     .slice(0, state.index + 1)
     .flatMap((i) => (i.kind === "concept" ? [i.brick] : []))
+  // The ninja lives on the card and reacts to each check: pleased when it's right, sorry when it's not.
+  const cardRef = React.useRef<HTMLDivElement>(null)
+  const q = state.question
+  const cue: NinjaCue | null =
+    item.kind === "question" && q?.result && q.phase !== "answering"
+      ? {
+          kind: q.result.correct ? "happy" : "sad",
+          key: `${state.index}-${q.attempts}-${q.phase}`,
+        }
+      : null
 
   return (
     <>
@@ -548,7 +558,13 @@ function Player({
               </div>
             ) : null}
             {/* The card's border sits on the window's, so the top reads as one line and the bottom as the card on the tray. */}
-            <div className="relative flex min-h-0 flex-1 flex-col bg-background sm:-m-px sm:rounded-4xl sm:border">
+            <div
+              ref={cardRef}
+              className="relative isolate flex min-h-0 flex-1 flex-col bg-background sm:-m-px sm:rounded-4xl sm:border"
+            >
+              {item.kind === "intro" ? (
+                <Aura hue={hueFor(lesson.topic ?? lesson.title)} />
+              ) : null}
               <main
                 ref={scrollRef}
                 tabIndex={-1}
@@ -583,6 +599,12 @@ function Player({
                   />
                 </div>
               </main>
+              <NinjaStage
+                area={cardRef}
+                screen={state.index}
+                cue={cue}
+                celebrate={item.kind === "wrap"}
+              />
               {coarse ? null : (
                 <TrayNotch
                   open={trayOpen}
@@ -640,7 +662,7 @@ function Player({
 
 /** Questions and short screens read best narrow; visuals and side-by-side bricks need room. */
 function columnWidth(item: Item): string {
-  if (item.kind === "intro") return "max-w-sm"
+  if (item.kind === "intro") return "max-w-md"
   if (item.kind === "concept")
     return item.brick.visual ? "max-w-2xl" : "max-w-lg"
   if (item.kind !== "question") return "max-w-lg"
@@ -702,27 +724,27 @@ export function Screen({
   switch (item.kind) {
     case "intro":
       return (
-        <>
+        // The ninja stands in the slot above the title (NinjaStage puts him there), in the lesson's light.
+        <div className="flex flex-col items-center gap-5 text-center">
+          <div data-ninja-slot aria-hidden="true" className="size-22" />
           <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-2">
-              <h1 className="text-2xl font-semibold text-balance">
-                {lesson.title}
-              </h1>
-              <p className="text-sm font-medium text-muted-foreground">
-                {lesson.summary}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {lesson.topic ? (
-                <Badge variant="outline">{lesson.topic}</Badge>
-              ) : null}
-              <Badge variant="outline">
-                {t.minutes(lesson.estimatedMinutes)}
-              </Badge>
-              <Badge variant="outline">{t.levels[lesson.level]}</Badge>
-            </div>
+            <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+              {lesson.title}
+            </h1>
+            <p className="text-base font-medium text-pretty text-muted-foreground">
+              {lesson.summary}
+            </p>
           </div>
-        </>
+          <div className="flex flex-wrap justify-center gap-2">
+            {lesson.topic ? (
+              <Badge variant="outline">{lesson.topic}</Badge>
+            ) : null}
+            <Badge variant="outline">
+              {t.minutes(lesson.estimatedMinutes)}
+            </Badge>
+            <Badge variant="outline">{t.levels[lesson.level]}</Badge>
+          </div>
+        </div>
       )
     case "concept":
       return <ConceptBrick brick={item.brick} />
@@ -850,7 +872,8 @@ function WrapUp({
   ]
   return (
     <div className="flex flex-col gap-6">
-      <Mascot mood="cheer" size="lg" />
+      {/* The ninja leaps up from the corner to cheer here (NinjaStage). */}
+      <div data-ninja-slot aria-hidden="true" className="size-22" />
       <Eyebrow>{lesson.title}</Eyebrow>
       <h1 className="-mt-4 text-2xl font-semibold">{t.done}</h1>
       <div className="flex flex-wrap items-center gap-6">
@@ -1104,7 +1127,9 @@ export function ActionArea({
           aria-hidden="true"
           data-text-size={textSize}
           className={cn(
-            "absolute inset-x-4 bottom-4 z-10 rounded-xl border px-5 py-4 shadow-xs motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:inset-x-auto sm:start-6 sm:bottom-6 sm:w-fit sm:max-w-80",
+            "absolute end-4 bottom-4 z-10 rounded-xl border px-5 py-4 shadow-xs motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:bottom-6 sm:w-fit sm:max-w-80",
+            // In the player the ninja sits in the corner, so the toast starts beside him, like something he says.
+            tray ? "start-18 sm:start-20" : "start-4 sm:start-6",
             toneClass[tone]
           )}
         >

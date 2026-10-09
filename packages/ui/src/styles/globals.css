@@ -139,15 +139,167 @@
   color: var(--shiki-dark) !important;
 }
 
-@keyframes mascot-bounce {
-  0% { transform: translateY(0) scale(1); }
-  35% { transform: translateY(-7px) scale(1.04, 0.97); }
+/* The ninja (packages/player/src/ninja.tsx): the logo as a character. Moods are `e-*` classes on the
+   svg; the eyes point where --ex/--ey say. Everything is eye and head transforms on the logo's own paths. */
+.ninja * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.ninja .ninja-head {
+  transform-box: view-box;
+  transform-origin: 32px 36px;
+  transition: transform 0.45s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+.ninja .ninja-eyes {
+  transform-box: view-box;
+  transform-origin: 32px 32px;
+  transform: translate(var(--ex, 0px), var(--ey, 0px));
+  transition: transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.ninja .ninja-open ellipse {
+  transition: transform 0.13s ease, opacity 0.25s ease;
+}
+.ninja .ninja-happy,
+.ninja .ninja-sad {
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.ninja.is-blink .ninja-open ellipse,
+.ninja.e-closed .ninja-open ellipse,
+.ninja.e-shake .ninja-open ellipse {
+  transform: scale(1.06, 0.06);
+}
+.ninja.e-half .ninja-open ellipse {
+  transform: scale(1.02, 0.45);
+}
+.ninja.e-wide .ninja-open ellipse {
+  transform: scale(1.22, 1.28);
+}
+.ninja:is(.e-happy, .e-cheer, .e-wiggle, .e-nod, .e-sparkle, .e-spin, .e-droop, .e-sigh) .ninja-open {
+  opacity: 0;
+}
+.ninja:is(.e-happy, .e-cheer, .e-wiggle, .e-nod, .e-sparkle, .e-spin) .ninja-happy,
+.ninja:is(.e-droop, .e-sigh) .ninja-sad {
+  opacity: 1;
+}
+.ninja.e-droop .ninja-head {
+  transform: translateY(2.5px);
+}
+.ninja.e-oops .ninja-head {
+  transform: rotate(-9deg);
+}
+.ninja.e-oops .ninja-open ellipse:first-child {
+  transform: scale(1, 0.5);
+}
+.ninja.e-oops .ninja-open ellipse:last-child {
+  transform: scale(1, 0.8);
+}
+.ninja.e-lookaway {
+  --ex: 5px;
+  --ey: 1px;
+}
+.ninja.e-lookaway .ninja-open ellipse {
+  transform: scale(1, 0.7);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ninja.e-sigh .ninja-head { animation: ninja-sigh 1.3s ease; }
+  .ninja.e-shake .ninja-head { animation: ninja-shake 0.5s ease; }
+  .ninja.e-cheer { animation: ninja-cheer 0.7s cubic-bezier(0.3, 1.6, 0.5, 1); }
+  .ninja.e-wiggle .ninja-head { animation: ninja-wiggle 0.7s ease; }
+  .ninja.e-nod .ninja-head { animation: ninja-nod 0.9s ease; }
+  .ninja.e-sparkle { animation: ninja-sparkle 0.8s cubic-bezier(0.3, 1.5, 0.5, 1); }
+  .ninja.e-spin .ninja-head { animation: ninja-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+  /* The intro's entrance: two bounces with a small squash on each landing. */
+  .ninja.is-enter { animation: ninja-enter 1.25s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+}
+@keyframes ninja-sigh {
+  30% { transform: translateY(-1.5px) scale(1.02, 0.98); }
+  100% { transform: translateY(2px); }
+}
+@keyframes ninja-shake {
+  20% { transform: translateX(-2.2px); }
+  40% { transform: translateX(2.2px); }
+  60% { transform: translateX(-1.6px); }
+  80% { transform: translateX(1.2px); }
+}
+@keyframes ninja-cheer {
+  30% { transform: translateY(-16%) scale(1.04, 0.96); }
+  60% { transform: translateY(0) scale(0.98, 1.03); }
+}
+@keyframes ninja-wiggle {
+  20% { transform: rotate(-9deg); }
+  45% { transform: rotate(8deg); }
+  70% { transform: rotate(-4deg); }
+}
+@keyframes ninja-nod {
+  25% { transform: translateY(2px) rotate(2deg); }
+  55% { transform: translateY(-1px) rotate(-1deg); }
+}
+@keyframes ninja-sparkle {
+  30% { transform: scale(1.12); }
+}
+@keyframes ninja-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ninja-enter {
+  0% { opacity: 0; transform: translateY(34px) scale(0.9); }
+  18% { opacity: 1; transform: translateY(-18px) scale(1.02, 0.98); }
+  34% { transform: translateY(0) scale(1.06, 0.92); }
+  50% { transform: translateY(-9px) scale(0.99, 1.02); }
+  66% { transform: translateY(0) scale(1.03, 0.96); }
+  80% { transform: translateY(-2px) scale(1); }
   100% { transform: translateY(0) scale(1); }
 }
-@keyframes mascot-shake {
-  0%, 100% { transform: rotate(0); }
-  25% { transform: rotate(-7deg); }
-  75% { transform: rotate(6deg); }
+
+/* The aura behind the intro: a soft glow in the lesson's hue (--aura-h, set by the player), sitting just
+   below the title, plus a smaller one a few hues away that drifts. Softer and dimmer in the dark. */
+:root {
+  --aura-l: 0.88;
+  --aura-c: 0.09;
+  --aura-a: 0.85;
+}
+.dark {
+  --aura-l: 0.52;
+  --aura-c: 0.13;
+  --aura-a: 0.72;
+}
+.aura {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: min(78%, 640px);
+  aspect-ratio: 1.45;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(44px);
+  background: radial-gradient(
+    closest-side,
+    oklch(var(--aura-l) var(--aura-c) var(--aura-h) / var(--aura-a)),
+    oklch(var(--aura-l) calc(var(--aura-c) * 0.55) var(--aura-h) / 0.3) 55%,
+    transparent 74%
+  );
+}
+.aura-second {
+  top: 46%;
+  width: min(44%, 360px);
+  aspect-ratio: 1;
+  filter: blur(36px);
+  background: radial-gradient(
+    closest-side,
+    oklch(var(--aura-l) var(--aura-c) calc(var(--aura-h) + 34) / 0.75),
+    transparent 70%
+  );
+}
+@media (prefers-reduced-motion: no-preference) {
+  .aura { animation: aura-in 2.6s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+  .aura-second { animation: aura-in 2.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s backwards, aura-drift 12s ease-in-out 2.8s infinite alternate; }
+}
+@keyframes aura-in {
+  from { opacity: 0; scale: 1.25; filter: blur(70px); }
+}
+@keyframes aura-drift {
+  from { translate: -16% 8%; }
+  to { translate: 18% -10%; }
 }
 
 /* The learner's text size setting. It scales Tailwind's text sizes only inside elements marked with
