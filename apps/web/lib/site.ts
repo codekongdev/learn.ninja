@@ -4,12 +4,14 @@ export const SITE = {
   /** Always lowercase, including at the start of a sentence. */
   name: "learn.ninja",
   url: "https://learn.ninja",
-  tagline: "Interactive learning with your agent",
+  tagline: "Vibe learn anything with your agent",
   description:
     "Give your AI agent an article, notes, docs, a transcript, or code. It writes one short, interactive lesson and gives you a link to share. Free, no account.",
   repo: "https://github.com/Uxcel-Team/learn",
   maker: "@cmicpace",
   makerUrl: "https://x.com/cmicpace",
+  /** Placeholder until the learn.ninja account exists. */
+  xUrl: "https://x.com",
 }
 
 export const INSTALL_COMMAND = "npx skills add https://learn.ninja -g"

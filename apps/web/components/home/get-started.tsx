@@ -1,11 +1,13 @@
 import { ButtonLink } from "@/components/site/button-link"
 import { CopyButton } from "@/components/site/copy-button"
+import { LogoDivider } from "@/components/site/logo-divider"
 import { AGENT_PROMPT } from "@/lib/site"
 
 export function GetStarted() {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 pb-20 sm:px-6 sm:pb-28">
-      <div className="flex flex-col items-center gap-6 rounded-xl bg-card px-6 py-16 text-center shadow-xs ring-1 ring-foreground/10">
+    <section className="mx-auto flex w-full max-w-3xl flex-col gap-20 px-4 sm:gap-28 sm:px-6">
+      <LogoDivider />
+      <div className="flex flex-col items-center gap-6 text-center">
         <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
           Get started
         </h2>

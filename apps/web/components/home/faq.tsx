@@ -5,24 +5,32 @@ import {
   AccordionTrigger,
 } from "@workspace/ui/components/accordion"
 
+import { LogoDivider } from "@/components/site/logo-divider"
 import { FAQ } from "@/lib/faq"
-
-import { Section } from "./section"
 
 export function Faq() {
   return (
-    <Section id="faq" title="Questions">
-      <Accordion className="mx-auto max-w-2xl">
-        {FAQ.map(({ q, a }) => (
-          <AccordionItem key={q} id={q}>
-            <AccordionTrigger className="text-base">{q}</AccordionTrigger>
-            <AccordionContent className="text-base text-muted-foreground">
-              <p>{renderCode(a)}</p>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </Section>
+    <section
+      id="faq"
+      className="mx-auto flex w-full max-w-3xl scroll-mt-20 flex-col gap-20 px-4 pb-20 sm:gap-28 sm:px-6 sm:pb-28"
+    >
+      <LogoDivider />
+      <div className="flex flex-col gap-10">
+        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          FAQ
+        </h2>
+        <Accordion>
+          {FAQ.map(({ q, a }) => (
+            <AccordionItem key={q} id={q}>
+              <AccordionTrigger className="text-base">{q}</AccordionTrigger>
+              <AccordionContent className="text-base text-muted-foreground">
+                <p>{renderCode(a)}</p>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </section>
   )
 }
 

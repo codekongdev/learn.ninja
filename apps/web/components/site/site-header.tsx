@@ -23,7 +23,7 @@ export function SiteHeader({
         {/* On phones the docs menu (`start`) stands in for this link. */}
         <ButtonLink
           href="/docs"
-          variant="ghost"
+          variant="outline"
           size="sm"
           className={cn("ms-auto", start && "max-sm:hidden")}
         >
