@@ -38,6 +38,7 @@ export async function BrickPreview({
     <PreviewTabs
       preview={
         <BrickDemo
+          visualsCss={process.env.NEXT_PUBLIC_VISUALS_CSS}
           lesson={lesson}
           brickId={brickId}
           prepared={prepared}

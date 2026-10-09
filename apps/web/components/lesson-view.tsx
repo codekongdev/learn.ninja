@@ -17,6 +17,7 @@ export function LessonView(props: LessonPlayerProps) {
   React.useEffect(() => setMounted(true), [])
   return (
     <LessonPlayer
+      visualsCss={process.env.NEXT_PUBLIC_VISUALS_CSS}
       docsHref="/docs"
       privacyHref="/privacy"
       termsHref="/terms"

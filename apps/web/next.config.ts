@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
 import type { NextConfig } from "next"
 import optimizeLocales from "@react-aria/optimize-locales-plugin"
 import { createMDX } from "fumadocs-mdx/next"
@@ -52,7 +55,21 @@ const LESSON_CSP = [
   "form-action 'self'",
 ].join("; ")
 
+// The stylesheet lesson visuals load (public/lesson-visuals.css, built by predev/prebuild before this
+// runs). Its URL carries a hash of its contents, so versioned requests are cached for a year: a deploy
+// that changes the file changes the URL. Without the file, the plain URL keeps the default no-cache.
+function visualsCssUrl(): string {
+  try {
+    const css = readFileSync(join(process.cwd(), "public/lesson-visuals.css"))
+    const v = createHash("sha256").update(css).digest("hex").slice(0, 12)
+    return `/lesson-visuals.css?v=${v}`
+  } catch {
+    return "/lesson-visuals.css"
+  }
+}
+
 const nextConfig: NextConfig = {
+  env: { NEXT_PUBLIC_VISUALS_CSS: visualsCssUrl() },
   transpilePackages: ["@workspace/ui", "@workspace/player", "@workspace/spec"],
   // prepareLesson() reads Tailwind's own stylesheets at runtime to compile each lesson's visuals CSS,
   // so they must ship with the server functions that publish and render lessons.
@@ -99,6 +116,17 @@ const nextConfig: NextConfig = {
         source,
         headers: [{ key: "Content-Security-Policy", value: LESSON_CSP }],
       })),
+      // Only the hashed URL (see visualsCssUrl) is safe to keep; a plain request still revalidates.
+      {
+        source: "/lesson-visuals.css",
+        has: [{ type: "query" as const, key: "v" }],
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
     ]
   },
   async redirects() {
