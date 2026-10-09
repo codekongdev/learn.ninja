@@ -375,13 +375,16 @@ export function NinjaStage({
     return () => cancelAnimationFrame(frame)
   }, [screen, measure, life])
 
-  // Keep him on the slot when the card or its content resizes or scrolls.
+  // Keep him on the slot when the card or its content resizes or scrolls. The content is the
+  // slot's parent: it grows with the text size while the card stays put, moving the slot.
   React.useEffect(() => {
     const card = float.current?.parentElement
     if (!card || !slot) return
     const update = () => setSlot(measure())
     const observer = new ResizeObserver(update)
     observer.observe(card)
+    const content = card.querySelector("[data-ninja-slot]")?.parentElement
+    if (content) observer.observe(content)
     const scroller = card.querySelector("main")
     scroller?.addEventListener("scroll", update, { passive: true })
     return () => {
