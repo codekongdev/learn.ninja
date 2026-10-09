@@ -734,13 +734,18 @@ export function hueFor(topic: string): number {
   return h % 360
 }
 
-/** The soft light behind the intro: one glow below the title and a smaller one a few hues away that drifts. */
-export function Aura({ hue }: { hue: number }) {
+/**
+ * The soft light behind the intro: one glow below the title and a smaller one a few hues away that
+ * drifts. `shift` moves both up or down (px) to follow the content, e.g. when the ninja's slot folds away.
+ */
+export function Aura({ hue, shift = 0 }: { hue: number; shift?: number }) {
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[inherit]"
-      style={{ "--aura-h": hue } as React.CSSProperties}
+      style={
+        { "--aura-h": hue, "--aura-shift": `${shift}px` } as React.CSSProperties
+      }
     >
       <div className="aura" />
       <div className="aura aura-second" />

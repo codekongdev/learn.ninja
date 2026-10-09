@@ -597,7 +597,11 @@ function Player({
               className="relative isolate flex min-h-0 flex-1 flex-col bg-background sm:-m-px sm:rounded-4xl sm:border"
             >
               {item.kind === "intro" ? (
-                <Aura hue={hueFor(lesson.topic ?? lesson.title)} />
+                <Aura
+                  hue={hueFor(lesson.topic ?? lesson.title)}
+                  // Half of the slot (88px) and its gap (20px): the content moves up this far without the ninja.
+                  shift={ninja === "off" ? -54 : 0}
+                />
               ) : null}
               <main
                 ref={scrollRef}
@@ -621,6 +625,7 @@ function Player({
                       item={item}
                       state={state}
                       dispatch={dispatch}
+                      ninja={ninja !== "off"}
                     />
                   </div>
                   <ActionArea
@@ -720,6 +725,26 @@ function Player({
   )
 }
 
+/**
+ * Where the ninja stands on the intro and the wrap-up. With him off it folds shut (and swallows the
+ * column's gap, passed as a negative margin class), so the rest of the screen stays centered.
+ */
+function NinjaSlot({ show, gap }: { show: boolean; gap: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(
+        "grid transition-[grid-template-rows,margin] duration-300 ease-out motion-reduce:transition-none",
+        show ? "grid-rows-[1fr]" : cn("grid-rows-[0fr]", gap)
+      )}
+    >
+      <div className="min-h-0 overflow-hidden">
+        <div data-ninja-slot className="size-22" />
+      </div>
+    </div>
+  )
+}
+
 /** Questions and short screens read best narrow; visuals and side-by-side bricks need room. */
 function columnWidth(item: Item): string {
   if (item.kind === "intro") return "max-w-md"
@@ -774,11 +799,14 @@ export function Screen({
   item,
   state,
   dispatch,
+  ninja = true,
 }: {
   lesson: Lesson
   item: Item
   state: State
   dispatch: React.Dispatch<Action>
+  /** Whether the ninja is on. Off, his slot folds away so the screen stays centered. */
+  ninja?: boolean
 }) {
   const { t } = usePlayer()
   switch (item.kind) {
@@ -786,7 +814,7 @@ export function Screen({
       return (
         // The ninja stands in the slot above the title (NinjaStage puts him there), in the lesson's light.
         <div className="flex flex-col items-center gap-5 text-center">
-          <div data-ninja-slot aria-hidden="true" className="size-22" />
+          <NinjaSlot show={ninja} gap="-mb-5" />
           <div className="flex flex-col gap-3">
             <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
               {lesson.title}
@@ -818,7 +846,7 @@ export function Screen({
         </div>
       )
     case "wrap":
-      return <WrapUp lesson={lesson} results={state.results} />
+      return <WrapUp lesson={lesson} results={state.results} ninja={ninja} />
     case "question":
       return (
         <QuestionScreen
@@ -917,9 +945,11 @@ function QuestionScreen({
 function WrapUp({
   lesson,
   results,
+  ninja = true,
 }: {
   lesson: Lesson
   results: Record<string, Outcome>
+  ninja?: boolean
 }) {
   const { t } = usePlayer()
   const s = summarize(lesson, results)
@@ -933,7 +963,7 @@ function WrapUp({
   return (
     <div className="flex flex-col gap-6">
       {/* The ninja leaps up from the corner to cheer here (NinjaStage). */}
-      <div data-ninja-slot aria-hidden="true" className="size-22" />
+      <NinjaSlot show={ninja} gap="-mb-6" />
       <Eyebrow>{lesson.title}</Eyebrow>
       <h1 className="-mt-4 text-2xl font-semibold">{t.done}</h1>
       <div className="flex flex-wrap items-center gap-6">

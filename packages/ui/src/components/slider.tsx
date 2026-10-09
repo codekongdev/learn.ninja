@@ -15,10 +15,16 @@ type SliderProps<T extends SliderValue = SliderValue> = Omit<
   "className"
 > & {
   className?: string
+  /**
+   * Added to stock: a dot on the track at every step, so a slider with a few stops reads as one.
+   * Needs `step`, `minValue`, and `maxValue`.
+   */
+  ticks?: boolean
 }
 
 function Slider<T extends SliderValue = SliderValue>({
   className,
+  ticks = false,
   ...props
 }: SliderProps<T>) {
   return (
@@ -31,16 +37,38 @@ function Slider<T extends SliderValue = SliderValue>({
       {...props}
     >
       {({ state }) => {
+        const stops =
+          ticks && state.step > 0
+            ? Math.round((state.getThumbMaxValue(0) - state.getThumbMinValue(0)) / state.step) + 1
+            : 0
+        const value = state.getThumbPercent(0)
         return (
           <>
             <SliderTrack
               data-slot="slider-track"
-              className="relative grow overflow-hidden rounded-full bg-muted select-none data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
+              className="relative grow rounded-full bg-muted select-none data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
             >
               <SliderFill
                 data-slot="slider-range"
-                className="absolute bg-primary select-none data-horizontal:h-full data-vertical:w-full"
+                className="absolute rounded-full bg-primary select-none data-horizontal:h-full data-vertical:w-full"
               />
+              {Array.from({ length: stops }, (_, i) => {
+                const at = i / (stops - 1)
+                return (
+                  <span
+                    key={i}
+                    data-slot="slider-tick"
+                    aria-hidden="true"
+                    className={cn(
+                      "pointer-events-none absolute top-1/2 size-1.5 -translate-y-1/2 rounded-full",
+                      // The dot's center sits on the step's point along the track.
+                      "ltr:-translate-x-1/2 rtl:translate-x-1/2",
+                      at <= value ? "bg-primary" : "bg-muted-foreground/40"
+                    )}
+                    style={{ insetInlineStart: `${at * 100}%` }}
+                  />
+                )
+              })}
             </SliderTrack>
             {state.values.map((_, index) => (
               <SliderThumb

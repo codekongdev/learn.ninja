@@ -748,6 +748,7 @@ function NinjaSetting({
             minValue={0}
             maxValue={NINJA_LEVELS.length - 1}
             step={1}
+            ticks
             value={index}
             onChange={(v) => {
               const next = NINJA_LEVELS[Array.isArray(v) ? v[0]! : v]
