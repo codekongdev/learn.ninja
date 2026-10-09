@@ -19,11 +19,11 @@ A subject guide adds advice for one field: how good teachers explain it, which b
 
 | Subject                             | For lessons on…                                           |
 | ----------------------------------- | --------------------------------------------------------- |
-| [Math](/docs/skills/math)           | Arithmetic, percentages, algebra, probability, money math |
-| [Languages](/docs/skills/languages) | Vocabulary, phrases, and grammar in a foreign language    |
+| [Math](/docs/subjects/math)           | Arithmetic, percentages, algebra, probability, money math |
+| [Languages](/docs/subjects/languages) | Vocabulary, phrases, and grammar in a foreign language    |
 
 Subjects only add. Where a subject guide and the core disagree, the core wins, and every lesson still has to pass the checker.
 
 Subjects come with the skill, so `npx skills add https://learn.ninja -g` installs all of them. Run it again to get new and updated subjects.
 
-Teach a subject well? [Add a subject](/docs/skills/write-a-subject).
+Teach a subject well? [Add a subject](/docs/subjects/write-a-subject).

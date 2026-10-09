@@ -104,6 +104,13 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/create", destination: "/docs/quick-start", permanent: false },
+      // The brick pages became one page; "Skills" became "Subjects".
+      { source: "/docs/bricks/:slug.md", destination: "/docs/bricks.md", permanent: true },
+      { source: "/docs/bricks/index", destination: "/docs/bricks", permanent: true },
+      { source: "/docs/bricks/:slug", destination: "/docs/bricks#:slug", permanent: true },
+      { source: "/docs/skills", destination: "/docs/subjects", permanent: true },
+      { source: "/docs/skills.md", destination: "/docs/subjects.md", permanent: true },
+      { source: "/docs/skills/:path*", destination: "/docs/subjects/:path*", permanent: true },
     ]
   },
   // Builds use webpack (next dev/build --webpack): the locale plugin doesn't support Turbopack.

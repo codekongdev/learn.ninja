@@ -71,6 +71,6 @@ After adding or changing a subject, run `npm run skill:build -w @workspace/cli` 
 - every example lesson exists and passes the checker,
 - the guide stays under 1,200 words,
 - the version is bumped when the guide changes, and `CHANGELOG.md` has an entry for it,
-- the subject is in the index and has a page in these docs (`docs/skills/{name}.mdx`).
+- the subject is in the index and has a page in these docs (`docs/subjects/{name}.mdx`).
 
 The core files (`SKILL.md`, the teaching guide, and the lesson format) need a review from the learn.ninja maintainers. Subjects are open to everyone.

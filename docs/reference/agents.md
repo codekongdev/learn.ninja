@@ -16,8 +16,8 @@ Everything on learn.ninja is also available as plain text, so agents can read it
 
 Requests that don't ask for HTML get Markdown back. For example, `curl https://learn.ninja` returns the home page as Markdown, and `curl https://learn.ninja/docs/install` returns that page.
 
-## If you're an agent
+## What to do
 
-1. Install the skill: `npx skills add https://learn.ninja -g`.
+1. Install the skill: `npx skills add https://learn.ninja -g`. Can't run commands? See [Agents without a shell](/docs/install#agents-without-a-shell).
 2. Read its `SKILL.md`, then the guides it points to.
 3. Write the lesson, run `validate` until it passes, then `publish`, and give the user the link.

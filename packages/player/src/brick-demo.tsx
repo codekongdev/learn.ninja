@@ -29,6 +29,8 @@ export interface BrickDemoProps {
   prepared?: Prepared
   /** An answer to check on load, e.g. a wrong pick to show its feedback. */
   checked?: Answer
+  /** Show the Check and help buttons (and feedback). Off, the brick can be played with but not checked. */
+  actions?: boolean
   /** Stylesheet loaded inside the sandbox for HTML visuals. */
   visualsCss?: string
   textSize?: TextSize
@@ -41,6 +43,7 @@ export function BrickDemo({
   brickId,
   prepared = emptyPrepared,
   checked,
+  actions = true,
   visualsCss = "/lesson-visuals.css",
   textSize = "md",
   className,
@@ -81,7 +84,7 @@ export function BrickDemo({
             className={cn(
               "flex flex-col gap-8 px-4 py-8 sm:px-8",
               // Room for the feedback toast in the bottom corner.
-              item.kind === "question" && "pb-28"
+              item.kind === "question" && actions && "pb-28"
             )}
           >
             <div data-text-size={textSize} className="flex flex-col gap-6">
@@ -92,7 +95,7 @@ export function BrickDemo({
                 dispatch={dispatch}
               />
             </div>
-            {item.kind === "question" ? (
+            {item.kind === "question" && actions ? (
               <ActionArea
                 lesson={lesson}
                 item={item}

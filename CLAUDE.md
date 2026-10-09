@@ -9,7 +9,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 ## Layout
 
 - `apps/web`: Next.js 16 app: the home page (`/`), the docs (`/docs`, rendered from `docs/`), bundled test lessons at `/lessons/{slug}`, published lessons at `/l/{slug}-{id}`, the publish API (`POST /api/lessons`, `PUT /api/lessons/{id}`) in `lib/publish/`, and the agent-facing files (below)
-- `docs/`: the docs pages as Markdown/MDX, outside `apps/` so anyone can contribute. Fumadocs (`fumadocs-core` + `fumadocs-mdx`, headless: our own shadcn UI, like ui.shadcn.com) reads them through `apps/web/source.config.ts`. Each folder's `meta.json` orders the sidebar (`"..."` picks up new files); `<BrickPreview lesson="…" brick="…" />` embeds a playable brick from `examples/`
+- `docs/`: the docs pages as Markdown/MDX, outside `apps/` so anyone can contribute. Fumadocs (`fumadocs-core` + `fumadocs-mdx`, headless: our own shadcn UI, like ui.shadcn.com) reads them through `apps/web/source.config.ts`. Each folder's `meta.json` orders the sidebar (`"..."` picks up new files); the sidebar's sections are the separators in `docs/meta.json`, with each page's `##` headings as links under it (`apps/web/lib/docs-nav.ts`); `<BrickPreview lesson="…" brick="…" />` embeds a playable brick from `examples/`
 - `apps/storybook`: Storybook 10 (Vite) for the player and UI components; stories live next to components as `*.stories.tsx`
 - `packages/ui`: shadcn/ui components on React Aria (`--base aria`), shared Tailwind styles and theme
 - `packages/spec`: the lesson spec v0.3: Zod schema, exported JSON Schema, validation rules, and the 0.2 → 0.3 upgrade (single source of truth)

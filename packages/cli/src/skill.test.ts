@@ -128,7 +128,7 @@ describe.each(subjects)("subject %s", (name) => {
   })
 
   it("has a docs page", () => {
-    expect(read(`docs/skills/${name}.mdx`)).toContain(
+    expect(read(`docs/subjects/${name}.mdx`)).toContain(
       `<include>../../skills/learn/subjects/${name}/guide.md</include>`
     )
   })

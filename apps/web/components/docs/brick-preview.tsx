@@ -9,7 +9,8 @@ import { PreviewTabs } from "./preview-tabs"
 
 /**
  * A playable brick from an example lesson, with its JSON in a second tab, like shadcn's component previews.
- * Used in the docs as <BrickPreview lesson="compound-interest" brick="p1" />.
+ * Used in the docs as <BrickPreview lesson="compound-interest" brick="p1" />. Readers can try the brick but
+ * not check it; a demo with `checked` shows its feedback instead.
  */
 export async function BrickPreview({
   lesson: slug,
@@ -41,6 +42,7 @@ export async function BrickPreview({
           brickId={brickId}
           prepared={prepared}
           checked={checked}
+          actions={Boolean(checked)}
           className="rounded-none bg-transparent shadow-none ring-0"
         />
       }

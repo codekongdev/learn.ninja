@@ -3,6 +3,7 @@ import type { InferPageType } from "fumadocs-core/source"
 import { FAQ } from "@/lib/faq"
 import { getLesson } from "@/lib/lessons"
 import { AGENTS, INSTALL_COMMAND, SITE } from "@/lib/site"
+import { docsNavSections } from "@/lib/docs-nav"
 import { source } from "@/lib/source"
 
 // Plain-text versions of the site for agents: /docs/{page}.md, /llms.txt, /llms-full.txt, /index.md.
@@ -16,12 +17,14 @@ export async function pageMarkdown(page: Page): Promise<string> {
       /<BrickPreview\s+lesson="([^"]+)"\s+brick="([^"]+)"[^>]*\/>/g,
       (_, slug: string, id: string) => brickMarkdown(slug, id)
     )
+    // The copy button is only for the browser; the prompt itself follows it in a code block.
+    .replace(/^<CopyPrompt\s*\/>$/gm, "")
     // Heading ids ("## Lesson [#lesson]") and site-relative links read better without and with the domain.
     .replace(/^(#{1,6} .*?) \[#[^\]]+\]$/gm, "$1")
     .replace(/\]\(\//g, `](${SITE.url}/`)
   const lines = [`# ${page.data.title}`, ""]
   if (page.data.description) lines.push(`> ${page.data.description}`, "")
-  lines.push(body.trim(), "")
+  lines.push(body.trim().replace(/\n{3,}/g, "\n\n"), "")
   return lines.join("\n")
 }
 
@@ -34,9 +37,16 @@ function brickMarkdown(slug: string, id: string): string {
   return ["```json", JSON.stringify(brick, null, 2), "```"].join("\n")
 }
 
-export function docsIndex(): string {
+/** The docs pages in sidebar order. */
+function docsPages(): Page[] {
+  const order = docsNavSections().flatMap((s) => s.pages.map((p) => p.url))
   return source
     .getPages()
+    .sort((a, b) => order.indexOf(a.url) - order.indexOf(b.url))
+}
+
+export function docsIndex(): string {
+  return docsPages()
     .map(
       (p) =>
         `- [${p.data.title}](${SITE.url}${p.url}.md): ${p.data.description ?? ""}`
@@ -79,7 +89,7 @@ ${docsIndex()}
 }
 
 export async function llmsFullTxt(): Promise<string> {
-  const pages = await Promise.all(source.getPages().map(pageMarkdown))
+  const pages = await Promise.all(docsPages().map(pageMarkdown))
   return `# ${SITE.name} docs\n\n> ${SITE.description}\n\n${pages.join("\n---\n\n")}`
 }
 

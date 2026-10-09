@@ -4,7 +4,6 @@ import { findNeighbour } from "fumadocs-core/page-tree"
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react"
 
 import { CopyPage } from "@/components/docs/copy-page"
-import { DocsToc } from "@/components/docs/docs-toc"
 import { mdxComponents } from "@/components/docs/mdx-components"
 import { ButtonLink } from "@/components/site/button-link"
 import { DOCS_EDIT_BASE } from "@/lib/site"
@@ -41,22 +40,23 @@ export default async function DocsPage({ params }: Props) {
   const MDX = page.data.body
   const { previous, next } = findNeighbour(source.getPageTree(), page.url)
   return (
-    <div className="flex gap-10 py-8 sm:py-10">
-      <article className="mx-auto flex w-full max-w-2xl min-w-0 flex-col gap-8">
+    <div className="py-8 sm:py-10">
+      <article className="mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-8">
         <header className="flex flex-col gap-3">
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <h1 className="text-3xl font-semibold tracking-tight text-balance">
+            <h1 className="text-2xl font-semibold tracking-tight text-balance">
               {page.data.title}
             </h1>
             <CopyPage markdownUrl={markdownUrl(page.url)} />
           </div>
           {page.data.description ? (
-            <p className="text-base text-pretty text-muted-foreground sm:text-lg">
+            <p className="text-base text-pretty text-muted-foreground">
               {page.data.description}
             </p>
           ) : null}
         </header>
-        <div className="typeset typeset-docs">
+        {/* Headings clear the sticky header when a sidebar link scrolls to them. */}
+        <div className="typeset typeset-docs [&_:is(h2,h3,h4)]:scroll-mt-20">
           <MDX components={mdxComponents} />
         </div>
         <footer className="flex flex-col gap-6 border-t pt-6">
@@ -95,9 +95,6 @@ export default async function DocsPage({ params }: Props) {
           </nav>
         </footer>
       </article>
-      <aside className="sticky top-14 hidden h-[calc(100svh-3.5rem)] w-52 shrink-0 overflow-y-auto pt-2 pb-8 xl:block">
-        <DocsToc toc={page.data.toc} />
-      </aside>
     </div>
   )
 }

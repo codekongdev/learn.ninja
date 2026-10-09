@@ -3,6 +3,7 @@ import type { MDXComponents } from "mdx/types"
 
 import { BrickPreview } from "./brick-preview"
 import { CodeBlock } from "./code-block"
+import { CopyPrompt } from "./copy-prompt"
 
 /** How docs Markdown renders: site links stay in the app, code blocks get a copy button. */
 export const mdxComponents: MDXComponents = {
@@ -19,4 +20,5 @@ export const mdxComponents: MDXComponents = {
     </div>
   ),
   BrickPreview,
+  CopyPrompt,
 }

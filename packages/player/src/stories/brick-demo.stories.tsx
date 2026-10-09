@@ -28,6 +28,11 @@ type Story = StoryObj<typeof meta>
 
 export const Choice: Story = {}
 
+/** Without the Check and help buttons, as in the docs: the brick can be tried but not checked. */
+export const NoActions: Story = {
+  args: { actions: false },
+}
+
 /** Already checked with a wrong pick, to show its feedback. */
 export const CheckedWrong: Story = {
   args: { checked: { kind: "select", ids: ["b"] } },

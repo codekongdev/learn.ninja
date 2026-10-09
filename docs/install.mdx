@@ -1,0 +1,75 @@
+---
+title: Install the skill
+description: Add the learn.ninja skill to Claude Code, Codex, Cursor, or any agent that supports skills, or use the API from an agent that can't run commands.
+---
+
+Run this in a terminal:
+
+```bash
+npx skills add https://learn.ninja -g
+```
+
+The [`skills`](https://github.com/vercel-labs/skills) command finds the learn.ninja skill, asks which of your agents should get it, and copies it into each one. `-g` installs it for your user, so it works in every project. Leave out `-g` to install it only in the current project.
+
+## Let your agent install it
+
+<CopyPrompt />
+
+Paste this into your agent and finish the sentence with what you want to learn. The agent installs the skill, reads these docs, and makes the lesson:
+
+```text
+Install the learn.ninja skill with `npx skills add https://learn.ninja -g`, then read https://learn.ninja/docs and make me a lesson about
+```
+
+## Pick your agent
+
+Any agent that supports skills works. To install for one agent without being asked, name it with `-a` and skip the prompts with `-y`:
+
+```bash
+npx skills add https://learn.ninja -g -a claude-code -y
+```
+
+| Agent | Command |
+| --- | --- |
+| Claude Code | `npx skills add https://learn.ninja -g -a claude-code -y` |
+| Codex | `npx skills add https://learn.ninja -g -a codex -y` |
+| Cursor | `npx skills add https://learn.ninja -g -a cursor -y` |
+| Gemini CLI | `npx skills add https://learn.ninja -g -a gemini-cli -y` |
+| GitHub Copilot | `npx skills add https://learn.ninja -g -a github-copilot -y` |
+| Windsurf | `npx skills add https://learn.ninja -g -a windsurf -y` |
+| Cline | `npx skills add https://learn.ninja -g -a cline -y` |
+| Roo Code | `npx skills add https://learn.ninja -g -a roo -y` |
+| Kiro | `npx skills add https://learn.ninja -g -a kiro-cli -y` |
+| Goose | `npx skills add https://learn.ninja -g -a goose -y` |
+| Amp | `npx skills add https://learn.ninja -g -a amp -y` |
+| OpenCode | `npx skills add https://learn.ninja -g -a opencode -y` |
+| Antigravity | `npx skills add https://learn.ninja -g -a antigravity -y` |
+| Junie | `npx skills add https://learn.ninja -g -a junie -y` |
+
+Several agents at once: `-a claude-code -a cursor`. The full list of agent names is in the [skills CLI readme](https://github.com/vercel-labs/skills#supported-agents).
+
+- **Kiro:** the default agent loads skills from `.kiro/skills/` on its own. A custom agent needs `"skill://.kiro/skills/**/SKILL.md"` in its `resources`.
+- **Claude Code** also finds skills installed into the project (`.claude/skills/`). Install without `-g` to share the skill with a team through the repository.
+
+## Agents without a shell
+
+An agent that can't run commands (a chat app like claude.ai or ChatGPT, or an agent on a locked-down host) can skip the skill and use the format and the API directly:
+
+1. Read the [lesson format](/docs/lessons/lesson-format.md) and the [JSON Schema](/schema/lesson.schema.json).
+2. Write the lesson as JSON.
+3. Publish it with the [Publish API](/docs/reference/api): `POST https://learn.ninja/api/lessons`. The API runs the same checks as the skill and lists every issue, so fix them and post again.
+
+The agent gets the link back, plus an edit token for updating the same link later.
+
+## Updating
+
+When the skill changes, publishing tells your agent that a newer version is available, with the command to update. You can also run:
+
+```bash
+npx skills update
+```
+
+## Requirements
+
+- Node.js 18 or newer, for `npx` and for the skill's checker and publisher.
+- Network access, to publish the lesson.
