@@ -26,12 +26,12 @@ export interface QuestionBrickProps {
   locked: boolean
 }
 
+// A row's mark outranks its selected and hover colors (hence the `!`), so the result shows on the picked row too.
 const markStyles =
-  "data-[status=correct]:border-green-600 data-[status=correct]:bg-green-600/10 " +
-  "data-[status=wrong]:border-yellow-500 data-[status=wrong]:bg-yellow-500/10 " +
-  "data-[status=partial]:border-amber-500 data-[status=partial]:bg-amber-500/10"
+  "data-[status=correct]:border-green-600! data-[status=correct]:bg-green-600/10! " +
+  "data-[status=wrong]:border-yellow-500! data-[status=wrong]:bg-yellow-500/10! " +
+  "data-[status=partial]:border-amber-500! data-[status=partial]:bg-amber-500/10!"
 
-// Answer options show their result in the key badge, so the row itself stays neutral.
 const cardStyles =
   "w-full rounded-lg border bg-background text-start shadow-xs transition-colors dark:bg-input/30 dark:hover:bg-input/50 dark:data-selected:bg-muted " +
   "hover:bg-muted data-selected:border-primary data-selected:bg-muted data-pressed:translate-y-px "
@@ -97,6 +97,45 @@ export function hasOptionCards(brick: QuestionBrick): boolean {
   return brick.type === "choice" && brick.options.some((o) => o.visual)
 }
 
+/**
+ * The option row the explanation opens under: the one right answer in a list of rows. With cards,
+ * several right answers, or no options, it goes below the brick instead (null).
+ */
+export function explanationAnchor(
+  brick: QuestionBrick,
+  marks: Record<string, Mark>
+): string | null {
+  if (brick.type !== "choice" && brick.type !== "scenario") return null
+  if (hasOptionCards(brick)) return null
+  const right = Object.keys(marks).filter((id) => marks[id] === "correct")
+  return right.length === 1 ? right[0]! : null
+}
+
+/** Why the answer is right, one line per block so worked steps stack. Attached, it continues the row above. */
+export function Explanation({
+  text,
+  attached = false,
+}: {
+  text: string
+  attached?: boolean
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-1 border border-green-600 bg-green-600/10 px-4 py-3 text-sm tabular-nums",
+        attached ? "rounded-b-lg border-t-green-600/30" : "rounded-lg"
+      )}
+    >
+      {text
+        .split("\n")
+        .filter((line) => line.trim())
+        .map((line, i) => (
+          <RichText key={i} text={line} className="block" />
+        ))}
+    </div>
+  )
+}
+
 export function OptionsBrick({
   brick,
   answer,
@@ -105,7 +144,13 @@ export function OptionsBrick({
   locked,
   order,
   showOutcomes,
-}: QuestionBrickProps & { order: string[]; showOutcomes: string[] }) {
+  explanation = null,
+}: QuestionBrickProps & {
+  order: string[]
+  showOutcomes: string[]
+  /** Shown under the right answer's row (see explanationAnchor). */
+  explanation?: string | null
+}) {
   const { t, keyScope } = usePlayer()
   const isOptions =
     brick.type === "choice" ||
@@ -155,6 +200,7 @@ export function OptionsBrick({
 
   if (!isOptions) return null
   const cards = hasOptionCards(brick)
+  const anchor = explanation ? explanationAnchor(brick, marks) : null
 
   return (
     <div
@@ -170,7 +216,7 @@ export function OptionsBrick({
           lang?: string
           outcome?: string
         }
-        return (
+        const row = (
           <Selectable
             key={o.id}
             isSelected={selected.includes(o.id)}
@@ -180,9 +226,11 @@ export function OptionsBrick({
             className={cn(
               "group",
               cardStyles,
+              markStyles,
               cards
                 ? "flex flex-col gap-2 p-3"
-                : "flex min-h-12 items-center gap-2 px-4 py-3"
+                : "flex min-h-12 items-center gap-2 px-4 py-3",
+              o.id === anchor && "rounded-b-none border-b-0"
             )}
           >
             {cards ? (
@@ -230,6 +278,14 @@ export function OptionsBrick({
               </>
             )}
           </Selectable>
+        )
+        return o.id === anchor && explanation ? (
+          <div key={o.id} className="flex flex-col">
+            {row}
+            <Explanation text={explanation} attached />
+          </div>
+        ) : (
+          row
         )
       })}
     </div>

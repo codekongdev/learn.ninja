@@ -15,6 +15,8 @@ import {
 import {
   BlankBrick,
   ConceptBrick,
+  Explanation,
+  explanationAnchor,
   HotspotBrick,
   MatchBrick,
   OptionsBrick,
@@ -26,9 +28,10 @@ import { Visual } from "../visuals"
 import { lessons, PlayerFrame } from "./fixtures"
 
 // Every brick, and every question brick in every state. Use the "state" control to switch between
-// idle (interactive), wrong (after a first miss), correct, and revealed (after a second miss).
+// idle (interactive), wrong (after a first miss), correct, why (correct with the explanation open),
+// and revealed (after a second miss: the last pick, the answer, and the explanation).
 
-type Mode = "idle" | "wrong" | "correct" | "revealed"
+type Mode = "idle" | "wrong" | "correct" | "why" | "revealed"
 
 interface HarnessProps {
   brick: Brick
@@ -71,14 +74,22 @@ function Question({
         ? wrong
         : solution(brick)
   const [answer, setAnswer] = React.useState<Answer>(start)
+  // As in the player: where marks name options, a revealed answer keeps the last pick's mark.
+  const keepsPick = ["choice", "compare", "scenario", "hotspot"].includes(
+    brick.type
+  )
   const marks: Record<string, Mark> =
     mode === "idle"
       ? {}
       : mode === "wrong"
         ? checkAnswer(brick, wrong).marks
-        : mode === "correct"
+        : mode === "correct" || mode === "why"
           ? checkAnswer(brick, solution(brick)).marks
-          : solutionMarks(brick)
+          : keepsPick
+            ? { ...solutionMarks(brick), ...checkAnswer(brick, wrong).marks }
+            : solutionMarks(brick)
+  const explanation =
+    mode === "why" || mode === "revealed" ? brick.explanation : null
   const props = { brick, answer, setAnswer, marks, locked: mode !== "idle" }
   const optionIds =
     "options" in brick
@@ -111,6 +122,7 @@ function Question({
             brick.type === "compare" ? optionIds : shuffle(optionIds, seeded())
           }
           showOutcomes={showOutcomes}
+          explanation={explanation}
         />
       ) : brick.type === "hotspot" ? (
         <HotspotBrick {...props} />
@@ -135,6 +147,9 @@ function Question({
           )}
         />
       ) : null}
+      {explanation && !explanationAnchor(brick, marks) ? (
+        <Explanation text={explanation} />
+      ) : null}
     </>
   )
 }
@@ -146,7 +161,7 @@ const meta = {
     mode: {
       name: "state",
       control: "inline-radio",
-      options: ["idle", "wrong", "correct", "revealed"],
+      options: ["idle", "wrong", "correct", "why", "revealed"],
     },
     brick: { control: false },
     wrong: { control: false },

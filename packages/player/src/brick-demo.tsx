@@ -66,6 +66,7 @@ export function BrickDemo({
         value={{
           prepared,
           t: stringsFor(ui),
+          lang: ui,
           dir,
           visualsCss,
           keyScope: scope,

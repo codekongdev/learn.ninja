@@ -31,6 +31,8 @@ import {
   ConceptBrick,
   HotspotBrick,
   MatchBrick,
+  Explanation,
+  explanationAnchor,
   OptionsBrick,
   OrderBrick,
   SortBrick,
@@ -68,6 +70,7 @@ import {
   type Theme,
 } from "./strings"
 import { Visual } from "./visuals"
+import { createLinePicker, voiceLines, type Moment } from "./voices"
 
 export interface LessonPlayerProps {
   lesson: Lesson
@@ -142,6 +145,7 @@ export function LessonPlayer({
         value={{
           prepared,
           t,
+          lang: ui,
           dir,
           visualsCss,
           keyScope: scopeKeys ? root : undefined,
@@ -212,6 +216,8 @@ export interface QuestionState {
   attempts: number
   usedHint: boolean
   hintOpen: boolean
+  /** The explanation is open under the answer: after "Why?", or once the answer is revealed. */
+  whyOpen: boolean
   result: CheckResult | null
   phase: Phase
   /** Display order for options and match columns, fixed for the life of the question. */
@@ -246,6 +252,7 @@ export function freshQuestion(
     attempts: 0,
     usedHint: false,
     hintOpen: false,
+    whyOpen: false,
     result: null,
     phase: "answering",
     optionOrder:
@@ -296,6 +303,7 @@ export type Action =
   | { type: "restart"; lesson: Lesson }
   | { type: "answer"; answer: Answer }
   | { type: "hint" }
+  | { type: "why" }
   | { type: "check" }
   | { type: "retry" }
   | { type: "startFix" }
@@ -360,6 +368,10 @@ export function reducer(state: State, action: Action): State {
             ...state,
             question: { ...state.question, usedHint: true, hintOpen: true },
           }
+        : state
+    case "why":
+      return state.question
+        ? { ...state, question: { ...state.question, whyOpen: true } }
         : state
     case "retry": {
       // The last check's marks stay until the answer changes, so the learner can see what to fix.
@@ -636,6 +648,7 @@ function Player({
                     textSize={textSize}
                     tray={{ el: actionsEl, id: trayId }}
                     ninja={ninja !== "off"}
+                    level={ninja}
                   />
                 </div>
               </main>
@@ -858,6 +871,11 @@ export function Screen({
   }
 }
 
+/** The explanation opens after "Why?", and by itself once a missed answer is revealed (not for the hook's guess). */
+function explanationShown(s: QuestionState, role: Role): boolean {
+  return s.whyOpen || (s.phase === "revealed" && role !== "hook")
+}
+
 function QuestionScreen({
   item,
   state,
@@ -870,13 +888,21 @@ function QuestionScreen({
   const { t } = usePlayer()
   const { brick, role } = item
   const locked = state.phase !== "answering"
-  // After a second miss, show the solution. The hook shows the learner's pick and the right answer.
+  // After a second miss, show the solution. Where the marks name options (not positions in the
+  // learner's answer), the last pick keeps its mark beside the right one.
+  const keepsPick =
+    role === "hook" ||
+    brick.type === "choice" ||
+    brick.type === "compare" ||
+    brick.type === "scenario" ||
+    brick.type === "hotspot"
   const marks: Record<string, Mark> =
     state.phase !== "revealed"
       ? (state.result?.marks ?? {})
-      : role === "hook"
+      : keepsPick
         ? { ...solutionMarks(brick), ...state.result?.marks }
         : solutionMarks(brick)
+  const explanation = explanationShown(state, role) ? brick.explanation : null
   const props = {
     brick,
     answer: state.answer,
@@ -897,7 +923,7 @@ function QuestionScreen({
 
   return (
     <>
-      <h2 className="text-xl font-semibold">
+      <h2 className="text-lg font-semibold">
         <RichText text={brick.prompt} />
       </h2>
       {helper && helper !== brick.prompt ? (
@@ -918,6 +944,7 @@ function QuestionScreen({
           {...props}
           order={state.optionOrder}
           showOutcomes={showOutcomes}
+          explanation={explanation}
         />
       ) : brick.type === "hotspot" ? (
         <HotspotBrick {...props} />
@@ -929,6 +956,9 @@ function QuestionScreen({
         <MatchBrick {...props} rightOrder={state.rightOrder} />
       ) : brick.type === "blank" ? (
         <BlankBrick {...props} bank={state.bank} />
+      ) : null}
+      {explanation && !explanationAnchor(brick, marks) ? (
+        <Explanation text={explanation} />
       ) : null}
       {state.hintOpen && brick.hint ? (
         <Alert>
@@ -1017,7 +1047,7 @@ function WrapUp({
 
 // ---------- action bar ----------
 
-type Tone = "neutral" | "good" | "bad" | "warn" | "info"
+type Tone = "neutral" | "good" | "warn"
 
 /** The screen's main action (Enter runs it; the shortcuts dialog says so), and the feedback after checking. */
 export function ActionArea({
@@ -1028,6 +1058,7 @@ export function ActionArea({
   textSize,
   tray,
   ninja = true,
+  level = "normal",
 }: {
   lesson: Lesson
   item: Item
@@ -1038,8 +1069,14 @@ export function ActionArea({
   tray?: { el: HTMLDivElement | null; id: string }
   /** Whether the ninja is in the card's corner, so the feedback toast leaves him room. */
   ninja?: boolean
+  /** The ninja's character, which picks the voice of the feedback lines. */
+  level?: NinjaLevel
 }) {
-  const { t, keyScope } = usePlayer()
+  const { t, keyScope, lang = "en" } = usePlayer()
+  const pickLine = React.useMemo(
+    () => createLinePicker(lesson.title),
+    [lesson.title]
+  )
   let tone: Tone = "neutral"
   let title: string | null = null
   let message: string | null = null
@@ -1053,9 +1090,7 @@ export function ActionArea({
     onPress: () => dispatch({ type: "next" }),
   }
   let secondary: React.ReactNode = null
-  // "Why?" reveals the explanation, so feedback stays one short line until the learner asks.
-  const [why, setWhy] = React.useState(false)
-  React.useEffect(() => setWhy(false), [state.index, state.question?.attempts])
+  // "Why?" opens the explanation under the answer, so feedback stays one short line until the learner asks.
   let explanation: string | null = null
   const helpButton = (label: string, onPress: () => void) => (
     <Button
@@ -1084,6 +1119,12 @@ export function ActionArea({
     const s = state.question
     const { brick, role } = item
     const r = s.result
+    // One line per piece of feedback, from the character's voice, without repeats.
+    const say = (moment: Moment) =>
+      pickLine(
+        `${state.index}-${s.attempts}-${s.phase}-${moment}-${level}`,
+        voiceLines(lang, level, moment, t)
+      )
     const canHelp = Boolean(brick.hint) && role !== "hook" && !s.usedHint
     const missText = (res: CheckResult) =>
       res.feedback ?? (res.missKey ? missMessage(res, t) : null)
@@ -1096,21 +1137,22 @@ export function ActionArea({
       if (canHelp)
         secondary = helpButton(t.getHelp, () => dispatch({ type: "hint" }))
     } else if (role === "hook" && r) {
-      tone = "info"
-      title = r.correct ? t.goodGuess : t.hookMiss
+      // The hook is a guess, so a miss still moves on, but both get the colors a checked answer would.
+      tone = r.correct ? "good" : "warn"
+      title = say(r.correct ? "goodGuess" : "hookMiss")
       explanation = brick.explanation
+      primary = { ...primary, variant: r.correct ? "success" : "warning" }
     } else if (s.phase === "feedback" && r?.correct) {
       tone = "good"
-      title =
-        s.usedHint && s.attempts === 0
-          ? t.correctWithHint
-          : t.praise[praiseIndex(brick.id, t.praise.length)]!
+      title = say(
+        s.usedHint && s.attempts === 0 ? "correctWithHint" : "praise"
+      )
       explanation = brick.explanation
       primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r) {
       // A miss gets one short line: the option's own feedback, or a nudge to look again.
       tone = "warn"
-      title = (r.partial ? t.close : missText(r)) ?? t.nudge
+      title = r.partial ? say("close") : (missText(r) ?? say("nudge"))
       message = r.partial ? missText(r) : null
       primary = {
         label: t.tryAgain,
@@ -1123,16 +1165,21 @@ export function ActionArea({
           dispatch({ type: "hint" })
         })
     } else if (s.phase === "revealed") {
-      tone = "bad"
-      title = t.answer
-      message = brick.explanation
+      // The answer and why it's right open in the brick, so the toast only points there.
+      title = say("answer")
+      explanation = brick.explanation
     }
+    if (explanation && !explanationShown(s, role))
+      // The button goes once pressed, so focus moves on to Continue.
+      secondary = helpButton(t.why, () => {
+        dispatch({ type: "why" })
+        primaryRef.current?.focus()
+      })
   }
-
-  if (explanation) {
-    if (why) message = explanation
-    else secondary = helpButton(t.why, () => setWhy(true))
-  }
+  const explanationOpen =
+    item.kind === "question" &&
+    state.question !== null &&
+    explanationShown(state.question, item.role)
 
   // Enter runs the main action, including while an answer option has focus (Space still toggles it).
   const run = React.useRef(primary)
@@ -1171,11 +1218,10 @@ export function ActionArea({
   }, [title])
 
   const toneClass: Record<Tone, string> = {
-    neutral: "",
-    good: "border-green-500 bg-green-100 text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-200",
-    bad: "border-red-400 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200",
-    warn: "border-yellow-500 bg-yellow-100 text-yellow-900 dark:border-yellow-600 dark:bg-yellow-950 dark:text-yellow-100",
-    info: "border-border bg-popover text-popover-foreground",
+    neutral: "border-border bg-popover text-popover-foreground",
+    // The marked rows' colors (markStyles in bricks.tsx), mixed into the page the way the browser blends them (sRGB), so the toast matches yet stays opaque.
+    good: "border-green-600 bg-[color-mix(in_srgb,var(--color-green-600)_10%,var(--background))]",
+    warn: "border-yellow-500 bg-[color-mix(in_srgb,var(--color-yellow-500)_10%,var(--background))]",
   }
 
   const buttons = (
@@ -1205,7 +1251,7 @@ export function ActionArea({
       )}
       <p aria-live="polite" className="sr-only">
         {title
-          ? [title, message]
+          ? [title, message, explanationOpen ? explanation : null]
               .filter((x): x is string => Boolean(x))
               .map(plainText)
               .join(" ")
@@ -1213,17 +1259,20 @@ export function ActionArea({
       </p>
       {title ? (
         <div
-          key={`${state.index}-${state.question?.attempts ?? 0}-${tone}-${why}`}
+          key={`${state.index}-${state.question?.attempts ?? 0}-${tone}`}
           aria-hidden="true"
           data-text-size={textSize}
           className={cn(
-            "absolute end-4 bottom-4 z-10 rounded-xl border px-5 py-4 shadow-xs motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:bottom-6 sm:w-fit sm:max-w-80",
-            // In the player the ninja sits in the corner, so the toast starts beside him, like something he says.
-            tray && ninja ? "start-18 sm:start-20" : "start-4 sm:start-6",
+            "absolute end-4 bottom-4 z-10 rounded-xl border px-4 py-3 shadow-xs motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:bottom-6 sm:w-fit sm:max-w-80",
+            // In the player the ninja sits in the corner, so the toast starts beside him as a speech bubble:
+            // the corner nearest him is squared off.
+            tray && ninja
+              ? "start-18 rounded-es-sm sm:start-20"
+              : "start-4 sm:start-6",
             toneClass[tone]
           )}
         >
-          <p className="font-semibold">
+          <p className="text-sm font-semibold">
             <RichText text={title} />
           </p>
           {message ? (
@@ -1318,13 +1367,6 @@ function TrayNotch({
       </Button>
     </div>
   )
-}
-
-/** A stable pick from the praise lines for a question, so it doesn't change on re-render. */
-function praiseIndex(id: string, count: number): number {
-  let h = 0
-  for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0
-  return h % count
 }
 
 function missMessage(r: CheckResult, t: Strings): string {

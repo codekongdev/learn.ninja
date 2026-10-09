@@ -78,7 +78,7 @@
       ],
       "multiple": false,
       "hint": "Work out year 1 first, then use that as the new starting amount.",
-      "explanation": "Year 1: $1,000 × 1.05 = $1,050. Year 2: $1,050 × 1.05 = $1,102.50."
+      "explanation": "Each year's interest joins the balance, so year 2 earns interest on $1,050.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"
     },
     {
       "id": "p2",

@@ -8,6 +8,8 @@ import { stringsFor, type Strings } from "./strings"
 interface PlayerContextValue {
   prepared: Prepared
   t: Strings
+  /** The player's UI language code, for text that isn't in Strings (the ninja's voices). */
+  lang?: string
   dir: "ltr" | "rtl"
   /** URL of the stylesheet lesson visuals load inside their sandbox (Basecoat + Tailwind). */
   visualsCss: string

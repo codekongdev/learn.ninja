@@ -57,7 +57,7 @@ Mechanics of each type:
 
 - **Every wrong option gets `feedback`** that explains _why_ it's wrong, in a sentence or two. Name the misconception: "That's simple interest. Year 2 also earns interest on year 1's $50."
 - **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting.
-- **Every question brick gets an `explanation`** of why the right answer is right. It's shown after the learner answers.
+- **Every question brick gets an `explanation`** of why the right answer is right. It opens under the answer when the learner asks why, or once a missed answer is revealed. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
 - **Blanks:** add a `mistakes` entry for each decoy chip, explaining it.
 - **Hints** (optional) nudge without giving the answer away: "What is the one thing this page exists to help people do?"
 - **Scenario outcomes** describe what happens next, so even a poor choice teaches something.
