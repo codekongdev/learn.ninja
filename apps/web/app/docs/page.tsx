@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 
-import { CopyPage } from "@/components/docs/copy-page"
 import { mdxComponents } from "@/components/docs/mdx-components"
 import { docsPages, sectionId } from "@/lib/docs-nav"
 
@@ -21,12 +20,6 @@ export default function DocsPage() {
   return (
     <div className="py-8 sm:py-10">
       <div className="mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-16">
-        <div className="flex h-7 items-center justify-between gap-4">
-          <h1 className="text-sm font-medium text-muted-foreground">
-            learn.ninja docs
-          </h1>
-          <CopyPage markdownUrl="/llms-full.txt" />
-        </div>
         {docsPages().map((page) => {
           const id = sectionId(page)
           const MDX = page.data.body
