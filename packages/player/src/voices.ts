@@ -62,7 +62,8 @@ export type Slot = keyof Lines
 /** How each character rations flavor: the slot for the nth time a moment comes up in a run. */
 export const CADENCE: Record<Character, readonly Slot[]> = {
   default: ["plain", "plain", "flavor"],
-  sensei: ["plain", "flavor"],
+  // A sensei who says something wise every other answer stops sounding wise.
+  sensei: ["plain", "plain", "flavor"],
   unhinged: ["flavor", "flavor", "plain"],
 }
 

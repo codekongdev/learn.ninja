@@ -46,7 +46,7 @@ import {
   type Outcome,
   type Role,
 } from "./flow"
-import { Aura, hueFor, NinjaStage, type NinjaCue } from "./ninja"
+import { Aura, hueFor, NinjaStage, type CueKind, type NinjaCue } from "./ninja"
 import { emptyPrepared, type Prepared } from "./prepared"
 import { seeded } from "./random"
 import { plainText, RichText } from "./rich-text"
@@ -345,6 +345,26 @@ export function earnedMoment(
   return null
 }
 
+/**
+ * What the ninja's body knows about the answer just checked: the earned moments that get a move
+ * of their own (a streak, the last question), a near miss, and the second miss that shows the
+ * answer. A wrong hook guess is only a guess, so it's a plain miss.
+ */
+export function cueKindFor(
+  state: State,
+  item: Extract<Item, { kind: "question" }>
+): CueKind {
+  const s = state.question
+  if (!s?.result) return "sad"
+  if (s.result.correct) {
+    const earned = earnedMoment(state, item)
+    return earned === "streak" || earned === "last" ? "earned" : "happy"
+  }
+  if (item.role === "hook") return "sad"
+  if (s.phase === "revealed") return "reveal"
+  return s.result.partial ? "close" : "sad"
+}
+
 export type Action =
   | { type: "next" }
   | { type: "restart"; lesson: Lesson }
@@ -596,10 +616,16 @@ function Player({
   const cue: NinjaCue | null =
     item.kind === "question" && q?.result && q.phase !== "answering"
       ? {
-          kind: q.result.correct ? "happy" : "sad",
+          kind: cueKindFor(state, item),
           key: `${state.index}-${q.attempts}-${q.phase}`,
         }
       : null
+  // The wrap-up's send-off, with more for a perfect run.
+  const celebrate = React.useMemo(() => {
+    if (item.kind !== "wrap") return undefined
+    const s = summarize(lesson, state.results)
+    return s.total > 0 && s.first === s.total ? "perfect" : "done"
+  }, [item.kind, lesson, state.results])
 
   return (
     <>
@@ -711,7 +737,7 @@ function Player({
                   area={cardRef}
                   screen={state.index}
                   cue={cue}
-                  celebrate={item.kind === "wrap"}
+                  celebrate={celebrate}
                   level={ninja}
                 />
               ) : null}

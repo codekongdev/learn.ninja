@@ -70,6 +70,11 @@ export const TrayClosed: Story = {
   args: { lesson: lessons.buttons },
   loaders: withPrefs({ tray: "closed" }),
 }
+/** The ninja as the sensei: he settles and bows in, breathes while he waits, and bows at the earned moments. */
+export const NinjaSensei: Story = {
+  args: { lesson: lessons.buttons },
+  loaders: withPrefs({ ninja: "sensei" }),
+}
 /** The ninja setting at its top stop: bigger moves, and two reactions to every answer. */
 export const NinjaUnhinged: Story = {
   args: { lesson: lessons.buttons },

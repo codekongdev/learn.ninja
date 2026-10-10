@@ -28,13 +28,16 @@ export type NinjaMood =
   | "wide"
   | "half"
   | "closed"
-  // Sensei (also used by the others)
-  | "hop"
-  | "jitter"
-  | "pop"
-  | "rattle"
-  | "headshake"
+  // Sensei: slow, held, eyes mostly closed.
+  | "bow"
+  | "deepbow"
+  | "slowblink"
+  | "liftnod"
+  | "breath"
+  | "tilt"
+  | "halfturn"
   // Unhinged
+  | "rattle"
   | "flip"
   | "doublespin"
   | "inflate"
@@ -96,7 +99,14 @@ export const Ninja = React.forwardRef<
 /** One beat of a reaction: a mood, how long to hold it, and where to look meanwhile. */
 type Beat = [mood: NinjaMood, ms: number, lookX?: number, lookY?: number]
 
-type Reactions = Record<"happy" | "sad", Record<string, Beat[]>>
+/**
+ * What his body knows about an answer: right, right at an earned moment (a streak or the last
+ * question), wrong, nearly right, or wrong twice with the answer now shown. A character with no set
+ * for a kind plays its nearest: happy for earned, sad for close and reveal.
+ */
+export type CueKind = "happy" | "earned" | "sad" | "close" | "reveal"
+type Reactions = Record<"happy" | "sad", Record<string, Beat[]>> &
+  Partial<Record<CueKind, Record<string, Beat[]>>>
 
 /**
  * Each setting is a different character. Default is small and warm. Sensei is slow and
@@ -137,35 +147,46 @@ export const REACTIONS: Record<NinjaEnergy, Reactions> = {
       ],
     },
   },
+  // The sensei moves little and late, and never bounces. His approval is a slow blink or one nod
+  // that lifts before it drops, as if weighed first; a bow is kept for the earned moments.
   sensei: {
     happy: {
-      // A slow, approving nod.
-      nod: [["nod", 1400]],
+      // One long, slow blink, then a quiet smile: the smallest possible yes.
+      slowblink: [
+        ["slowblink", 1300],
+        ["happy", 800],
+      ],
+      // A small lift, then one nod.
+      nod: [["liftnod", 1300]],
       // Eyes close for a moment, then a warm smile.
       serene: [
         ["closed", 500],
         ["happy", 1100],
       ],
-      // A quiet smile, no more.
-      smile: [["happy", 1500]],
-      // A small sparkle, held.
-      sparkle: [
-        ["half", 300],
-        ["sparkle", 1200],
-      ],
+    },
+    earned: {
+      // A small bow, held.
+      bow: [["bow", 1700]],
     },
     sad: {
-      // A long breath out.
-      sigh: [["sigh", 1800]],
+      // Eyes close, one slow breath in and out.
+      breath: [["breath", 1900]],
       // Eyes close to think, then half open.
       ponder: [
         ["closed", 900],
         ["half", 900],
       ],
-      // Looks away, then back, unhurried.
-      lookaway: [
-        ["lookaway", 1300],
-        ["half", 600, 0, 0],
+    },
+    close: {
+      // A head tilt, eyes open: considering, not sorry.
+      tilt: [["tilt", 1500]],
+    },
+    reveal: {
+      // A slow half-turn away and back with the eyes half closed, then they close while the answer
+      // sinks in. (Not a headshake: a sideways shake means yes in some places.)
+      halfturn: [
+        ["halfturn", 1300, -4, 0.5],
+        ["closed", 1400, 0, 0],
       ],
     },
   },
@@ -237,6 +258,109 @@ const ANTIC_EVERY: Record<NinjaEnergy, [number, number]> = {
   unhinged: [9000, 16000],
 }
 
+/** How long his own glances take (as --ninja-gaze); following the pointer is quick for everyone. The sensei is unhurried. */
+export const NINJA_GAZE: Record<NinjaEnergy, string> = {
+  default: "0.38s",
+  sensei: "0.6s",
+  unhinged: "0.3s",
+}
+
+/**
+ * How each character waits. Blinks and glances come at random in these ranges (ms); `center` is
+ * the chance a glance returns to the middle instead. The sensei blinks slowly and rarely, looks
+ * around little, breathes (a slow swell, see `.is-breathing`), and now and then closes his eyes
+ * for a few seconds until the pointer comes near.
+ */
+export const IDLE: Record<
+  NinjaEnergy,
+  {
+    blink: [number, number]
+    blinkMs: number
+    doubleBlink: number
+    wander: [number, number]
+    center: number
+    breathing: boolean
+    meditate: { every: [number, number]; lasting: [number, number] } | null
+  }
+> = {
+  default: {
+    blink: [2600, 6500],
+    blinkMs: 120,
+    doubleBlink: 0.25,
+    wander: [1100, 3200],
+    center: 0.35,
+    breathing: false,
+    meditate: null,
+  },
+  sensei: {
+    blink: [4000, 9000],
+    blinkMs: 200,
+    doubleBlink: 0,
+    wander: [2600, 6000],
+    center: 0.5,
+    breathing: true,
+    meditate: { every: [18000, 40000], lasting: [3000, 5000] },
+  },
+  unhinged: {
+    blink: [2600, 6500],
+    blinkMs: 120,
+    doubleBlink: 0.25,
+    wander: [1100, 3200],
+    center: 0.35,
+    breathing: false,
+    meditate: null,
+  },
+}
+
+/**
+ * The intro's entrance: a whole-body class (keyframes in globals.css), moods along the way, and
+ * when it's over. Default and Unhinged bounce in twice and grin; the sensei settles, closes his
+ * eyes, and bows in.
+ */
+export const ENTRANCE: Record<
+  NinjaEnergy,
+  { className: string; beats: [at: number, mood: NinjaMood][]; ends: number }
+> = {
+  default: { className: "is-enter", beats: [[760, "happy"]], ends: 1660 },
+  sensei: {
+    className: "is-settle",
+    beats: [
+      [600, "closed"],
+      [1300, "bow"],
+    ],
+    ends: 3100,
+  },
+  unhinged: { className: "is-enter", beats: [[760, "happy"]], ends: 1660 },
+}
+
+/** The leap between the slot and the corner: how high the arc goes, and whether he grins through it. */
+export const LEAP: Record<NinjaEnergy, { arc: number; grin: boolean }> = {
+  default: { arc: 120, grin: true },
+  sensei: { arc: 60, grin: false },
+  unhinged: { arc: 120, grin: true },
+}
+
+/** The wrap-up, once he's landed: a cheer for most, a bow out for the sensei, deeper after a perfect run. */
+export const WRAP: Record<NinjaEnergy, { done: Beat[]; perfect: Beat[] }> = {
+  default: { done: [["cheer", 1200]], perfect: [["cheer", 1200]] },
+  sensei: {
+    done: [["bow", 2000]],
+    perfect: [
+      ["closed", 600],
+      ["breath", 1900],
+      ["deepbow", 2600],
+    ],
+  },
+  unhinged: { done: [["cheer", 1200]], perfect: [["cheer", 1200]] },
+}
+
+/** The reaction set a character plays for a kind: its own, or the nearest it has. */
+function reactionSet(level: NinjaEnergy, kind: CueKind) {
+  const own = REACTIONS[level][kind]
+  if (own) return own
+  return REACTIONS[level][kind === "earned" ? "happy" : "sad"]
+}
+
 /** A stable pick from a list for a seed, skipping the one played last time. */
 export function pickFrom(names: string[], seed: string, last?: string): string {
   const pool = names.filter((n) => n !== last)
@@ -247,12 +371,12 @@ export function pickFrom(names: string[], seed: string, last?: string): string {
 
 /** The reaction to play for an answer at a setting. Unhinged gets two in a row. */
 export function reactionFor(
-  kind: "happy" | "sad",
+  kind: CueKind,
   seed: string,
   level: NinjaEnergy,
   last?: string
 ): { name: string; beats: Beat[] } {
-  const set = REACTIONS[level][kind]
+  const set = reactionSet(level, kind)
   const names = Object.keys(set)
   const name = pickFrom(names, seed, last)
   let beats = set[name]!
@@ -280,11 +404,14 @@ const MOOD_CLASSES = (
     "wide",
     "half",
     "closed",
-    "hop",
-    "jitter",
-    "pop",
+    "bow",
+    "deepbow",
+    "slowblink",
+    "liftnod",
+    "breath",
+    "tilt",
+    "halfturn",
     "rattle",
-    "headshake",
     "flip",
     "doublespin",
     "inflate",
@@ -373,37 +500,69 @@ export function useNinjaLife(
       }, ms)
       timers.add(t)
     }
+    const idle = IDLE[level]
+    // The sensei's eyes-closed moments: on until the time is up or the pointer comes near.
+    let meditating = false
+    const wake = () => {
+      if (!meditating) return
+      meditating = false
+      // A reaction that cut in has already taken his eyes; it restores idle itself.
+      if (!held.current) setMood(el, "idle")
+    }
     const blinkOnce = (ms: number) => {
       el.classList.add("is-blink")
       later(() => el.classList.remove("is-blink"), ms)
     }
     const blink = () => {
-      if (!held.current) {
-        blinkOnce(120)
-        if (Math.random() < 0.25) later(() => blinkOnce(110), 280)
+      if (!held.current && !meditating) {
+        blinkOnce(idle.blinkMs)
+        if (Math.random() < idle.doubleBlink) later(() => blinkOnce(110), 280)
       }
-      later(blink, rnd(2600, 6500))
+      later(blink, rnd(...idle.blink))
     }
     const wander = () => {
-      if (!held.current && !pointer.current) {
-        if (Math.random() < 0.35) look(0, 0)
+      if (!held.current && !pointer.current && !meditating) {
+        if (Math.random() < idle.center) look(0, 0)
         else look(rnd(-4.5, 4.5), rnd(-1.6, 2.2))
       }
-      later(wander, rnd(1100, 3200))
+      later(wander, rnd(...idle.wander))
     }
-    const move = (e: PointerEvent) => {
-      pointer.current = true
-      if (held.current) return
+    const meditate = () => {
+      const m = idle.meditate
+      if (!m) return
+      if (!held.current && !pointer.current) {
+        meditating = true
+        setMood(el, "closed")
+        later(wake, rnd(...m.lasting))
+      }
+      later(meditate, rnd(...m.every))
+    }
+    // Following the pointer: the eyes snap (`.is-following` shortens their transition) and move once
+    // per frame, from the last pointer position, however many events arrived in between.
+    let at: { x: number; y: number } | null = null
+    let frame = 0
+    const follow = () => {
+      frame = 0
+      if (!at || held.current) return
       const r = el.getBoundingClientRect()
       const cx = r.left + r.width / 2
       const cy = r.top + r.height / 2
       look(
-        clamp(((e.clientX - cx) / (r.width * 1.3)) * 5, -5, 5),
-        clamp(((e.clientY - cy) / (r.height * 1.3)) * 2.4, -2, 2.4)
+        clamp(((at.x - cx) / (r.width * 1.3)) * 5, -5, 5),
+        clamp(((at.y - cy) / (r.height * 1.3)) * 2.4, -2, 2.4)
       )
+    }
+    const move = (e: PointerEvent) => {
+      pointer.current = true
+      wake()
+      at = { x: e.clientX, y: e.clientY }
+      el.classList.add("is-following")
+      if (!frame) frame = requestAnimationFrame(follow)
     }
     const leave = () => {
       pointer.current = false
+      at = null
+      el.classList.remove("is-following")
       if (!held.current) look(0, 0)
     }
     const stunts = ANTICS[level]
@@ -424,12 +583,16 @@ export function useNinjaLife(
     later(wander, 600)
     if (stunts.length) later(antic, rnd(...ANTIC_EVERY[level]))
     if (level === "unhinged") later(tremor, rnd(2500, 6000))
+    if (idle.meditate) later(meditate, rnd(...idle.meditate.every))
+    if (idle.breathing) el.classList.add("is-breathing")
     box.addEventListener("pointermove", move)
     box.addEventListener("pointerleave", leave)
     return () => {
       on = false
       timers.forEach(clearTimeout)
-      el.classList.remove("is-tweaking")
+      if (frame) cancelAnimationFrame(frame)
+      el.classList.remove("is-tweaking", "is-breathing", "is-following")
+      if (meditating) setMood(el, "idle")
       box.removeEventListener("pointermove", move)
       box.removeEventListener("pointerleave", leave)
     }
@@ -452,7 +615,7 @@ const clamp = (v: number, lo: number, hi: number) =>
 // ---------- the stage ----------
 
 export interface NinjaCue {
-  kind: "happy" | "sad"
+  kind: CueKind
   /** Changes once per thing worth reacting to (a check, a reveal). */
   key: string
 }
@@ -474,8 +637,8 @@ export function NinjaStage({
   screen: number
   /** The last answer worth a reaction. */
   cue: NinjaCue | null
-  /** True on the wrap-up: he cheers once he's landed. */
-  celebrate?: boolean
+  /** Set on the wrap-up: his send-off once he's landed, with more for a perfect run. */
+  celebrate?: "done" | "perfect"
   /** Which character he is. The player leaves him out entirely when the setting is off. */
   level?: NinjaEnergy
 }) {
@@ -515,24 +678,13 @@ export function NinjaStage({
     const firstTime = lastScreen.current === null
     lastScreen.current = screen
     if (firstTime) {
-      // The intro's entrance: two bounces and a grin. Demos that open mid-lesson just appear.
+      // The intro's entrance, in character. Demos that open mid-lesson just appear.
       if (next && screen === 0 && !reducedMotion()) {
-        life.hold(true)
-        mark.classList.add("is-enter")
-        const t1 = setTimeout(() => setMood(mark, "happy"), 760)
-        const t2 = setTimeout(() => {
-          setMood(mark, "idle")
-          mark.classList.remove("is-enter")
-          life.hold(false)
-        }, 1660)
+        const undo = enter(mark, life, level)
         // Undo everything if the effect is cut short (React runs it twice in development), or
         // the entrance class stays on him and blocks every later whole-body move.
         return () => {
-          clearTimeout(t1)
-          clearTimeout(t2)
-          mark.classList.remove("is-enter")
-          setMood(mark, "idle")
-          life.hold(false)
+          undo()
           lastScreen.current = null
         }
       }
@@ -548,12 +700,12 @@ export function NinjaStage({
         Math.abs(first.width - last.width) < 2
       )
         return
-      leaping.current = leap(el, mark, life, first, last).then(() => {
+      leaping.current = leap(el, mark, life, first, last, level).then(() => {
         leaping.current = null
       })
     })
     return () => cancelAnimationFrame(frame)
-  }, [screen, measure, life])
+  }, [screen, measure, life, level])
 
   // Keep him on the slot when the card or its content resizes or scrolls. The content is the
   // slot's parent: it grows with the text size while the card stays put, moving the slot.
@@ -594,18 +746,18 @@ export function NinjaStage({
     }
   }, [cue?.key, cue?.kind, level, life])
 
-  // The wrap-up: a cheer once he's landed on his slot.
+  // The wrap-up: his send-off once he's landed on his slot.
   React.useEffect(() => {
     if (!celebrate) return
     let cancelled = false
     ;(async () => {
       await leaping.current
-      if (!cancelled) await life.play([["cheer", 1200]])
+      if (!cancelled) await life.play(WRAP[level][celebrate])
     })()
     return () => {
       cancelled = true
     }
-  }, [celebrate, life])
+  }, [celebrate, level, life])
 
   return (
     <div
@@ -619,6 +771,7 @@ export function NinjaStage({
       style={
         {
           "--ninja-energy": NINJA_ENERGY[level],
+          "--ninja-gaze": NINJA_GAZE[level],
           ...(slot
             ? {
                 left: slot.left,
@@ -635,15 +788,44 @@ export function NinjaStage({
   )
 }
 
-/** Squat, launch, arc over, land with a squash and a small bounce. About 1.4s. */
+/**
+ * Plays the character's entrance on the mark and returns a function that cuts it short and puts
+ * him back to idle (also what a finished entrance does).
+ */
+export function enter(
+  mark: SVGSVGElement,
+  life: NinjaLife,
+  level: NinjaEnergy
+): () => void {
+  const { className, beats, ends } = ENTRANCE[level]
+  life.hold(true)
+  mark.classList.add(className)
+  const timers = beats.map(([at, mood]) =>
+    setTimeout(() => setMood(mark, mood), at)
+  )
+  const done = () => {
+    setMood(mark, "idle")
+    mark.classList.remove(className)
+    life.hold(false)
+  }
+  timers.push(setTimeout(done, ends))
+  return () => {
+    timers.forEach(clearTimeout)
+    done()
+  }
+}
+
+/** Squat, launch, arc over, land with a squash and a small bounce. About 1.4s. The sensei's arc is lower and he lands eyes closed. */
 async function leap(
   el: HTMLElement,
   mark: SVGSVGElement,
   life: NinjaLife,
   first: DOMRect,
-  last: DOMRect
+  last: DOMRect,
+  level: NinjaEnergy = "default"
 ) {
   life.hold(true)
+  const { arc, grin } = LEAP[level]
   const dx = first.left - last.left
   const dy = first.top - last.top
   const s0 = first.width / last.width
@@ -668,7 +850,7 @@ async function leap(
       const u = (p - 0.12) / 0.88
       const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2
       tx = dx * (1 - e)
-      ty = dy * (1 - e) - 120 * Math.sin(Math.PI * u)
+      ty = dy * (1 - e) - arc * Math.sin(Math.PI * u)
       s = lerp(s0, 1, e)
       // The squash becomes a stretch in the air, then neutral.
       sx =
@@ -690,26 +872,37 @@ async function leap(
       offset: p,
     })
   }
-  const t = setTimeout(() => setMood(mark, "happy"), 100)
+  const t = setTimeout(() => setMood(mark, grin ? "happy" : "closed"), 100)
   await el.animate(frames, { duration: 800, easing: "linear" }).finished
   clearTimeout(t)
   setMood(mark, "closed")
+  // The landing: a squash and a bounce, or for the sensei a soft settle with no bounce.
   await el.animate(
-    [
-      { transform: "scale(1)" },
-      { transform: "scale(1.22, .78)", offset: 0.22 },
-      { transform: "translateY(-9px) scale(.96, 1.06)", offset: 0.5 },
-      { transform: "translateY(0) scale(1.08, .94)", offset: 0.7 },
-      { transform: "translateY(-2px) scale(1)", offset: 0.86 },
-      { transform: "translateY(0) scale(1)" },
-    ],
+    grin
+      ? [
+          { transform: "scale(1)" },
+          { transform: "scale(1.22, .78)", offset: 0.22 },
+          { transform: "translateY(-9px) scale(.96, 1.06)", offset: 0.5 },
+          { transform: "translateY(0) scale(1.08, .94)", offset: 0.7 },
+          { transform: "translateY(-2px) scale(1)", offset: 0.86 },
+          { transform: "translateY(0) scale(1)" },
+        ]
+      : [
+          { transform: "scale(1)" },
+          { transform: "scale(1.08, .92)", offset: 0.3 },
+          { transform: "scale(1)" },
+        ],
     { duration: 620, easing: "cubic-bezier(.3,1.2,.4,1)" }
   ).finished
-  setMood(mark, "wide")
-  life.look(4, -2)
-  await sleep(340)
-  setMood(mark, "happy")
-  await sleep(650)
+  if (grin) {
+    setMood(mark, "wide")
+    life.look(4, -2)
+    await sleep(340)
+    setMood(mark, "happy")
+    await sleep(650)
+  } else {
+    await sleep(500)
+  }
   setMood(mark, "idle")
   life.look(0, 0)
   life.hold(false)

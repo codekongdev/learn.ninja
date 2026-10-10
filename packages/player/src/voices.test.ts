@@ -88,9 +88,9 @@ describe("voices", () => {
     ])
     expect(heard(CADENCE.sensei)).toEqual([
       "plain",
-      "flavor",
       "plain",
       "flavor",
+      "plain",
       "plain",
       "flavor",
     ])

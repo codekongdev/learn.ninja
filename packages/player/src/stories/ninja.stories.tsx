@@ -4,9 +4,14 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Button } from "@workspace/ui/components/button"
 
 import {
+  enter,
   Ninja,
+  NINJA_ENERGY,
+  NINJA_GAZE,
   REACTIONS,
   useNinjaLife,
+  WRAP,
+  type CueKind,
   type NinjaEnergy,
   type NinjaMood,
 } from "../ninja"
@@ -22,6 +27,7 @@ const MOODS: NinjaMood[] = [
   "oops",
   "droop",
   "lookaway",
+  "tilt",
 ]
 
 const meta = {
@@ -58,7 +64,8 @@ export const Moods: Story = {
 
 /**
  * Alive (he looks around, blinks, follows the pointer, and at the livelier settings pulls stunts on
- * his own) with buttons for every reaction of the chosen setting, at both sizes.
+ * his own) with buttons for every reaction of the chosen setting, at both sizes, plus the
+ * character's entrance and wrap-up send-off.
  */
 export const Reactions: StoryObj<{ level: NinjaEnergy }> = {
   argTypes: {
@@ -71,11 +78,7 @@ export const Reactions: StoryObj<{ level: NinjaEnergy }> = {
   render: ({ level }) => <ReactionsDemo key={level} level={level} />,
 }
 
-const ENERGY: Record<NinjaEnergy, number> = {
-  default: 1,
-  sensei: 0.85,
-  unhinged: 1.6,
-}
+const KINDS: CueKind[] = ["happy", "earned", "sad", "close", "reveal"]
 
 function ReactionsDemo({ level }: { level: NinjaEnergy }) {
   const area = React.useRef<HTMLDivElement>(null)
@@ -84,40 +87,81 @@ function ReactionsDemo({ level }: { level: NinjaEnergy }) {
   const bigLife = useNinjaLife(big, area, level)
   const smallLife = useNinjaLife(small, area, level)
   const [label, setLabel] = React.useState("idle")
+  const play = (name: string, beats: Parameters<typeof bigLife.play>[0]) => {
+    setLabel(name)
+    void bigLife.play(beats)
+    void smallLife.play(beats)
+  }
+  const group = (title: string, children: React.ReactNode) => (
+    <div key={title} className="flex flex-col items-center gap-2">
+      <p className="text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+        {title}
+      </p>
+      <div className="flex flex-wrap justify-center gap-2">{children}</div>
+    </div>
+  )
   return (
     <div
       ref={area}
       className="flex min-h-screen flex-col items-center justify-center gap-8 p-8"
-      style={{ "--ninja-energy": ENERGY[level] } as React.CSSProperties}
+      style={
+        {
+          "--ninja-energy": NINJA_ENERGY[level],
+          "--ninja-gaze": NINJA_GAZE[level],
+        } as React.CSSProperties
+      }
     >
       <div className="flex items-end gap-10">
         <Ninja ref={big} className="size-32" />
         <Ninja ref={small} className="size-10" />
       </div>
       <p className="font-mono text-xs text-muted-foreground">{label}</p>
-      {(["happy", "sad"] as const).map((kind) => (
-        <div key={kind} className="flex flex-col items-center gap-2">
-          <p className="text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
-            {kind}
-          </p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {Object.entries(REACTIONS[level][kind]).map(([name, beats]) => (
-              <Button
-                key={name}
-                size="sm"
-                variant="outline"
-                onPress={() => {
-                  setLabel(`${kind} · ${name}`)
-                  void bigLife.play(beats)
-                  void smallLife.play(beats)
-                }}
-              >
-                {name}
-              </Button>
-            ))}
-          </div>
-        </div>
-      ))}
+      {KINDS.map((kind) => {
+        const set = REACTIONS[level][kind]
+        if (!set) return null
+        return group(
+          kind,
+          Object.entries(set).map(([name, beats]) => (
+            <Button
+              key={name}
+              size="sm"
+              variant="outline"
+              onPress={() => play(`${kind} · ${name}`, beats)}
+            >
+              {name}
+            </Button>
+          ))
+        )
+      })}
+      {group(
+        "screens",
+        <>
+          <Button
+            size="sm"
+            variant="outline"
+            onPress={() => {
+              setLabel("entrance")
+              for (const [mark, life] of [
+                [big, bigLife],
+                [small, smallLife],
+              ] as const)
+                if (mark.current) enter(mark.current, life, level)
+            }}
+          >
+            entrance
+          </Button>
+          {(["done", "perfect"] as const).map((end) => (
+            <Button
+              key={end}
+              size="sm"
+              variant="outline"
+              onPress={() => play(`wrap · ${end}`, WRAP[level][end])}
+            >
+              wrap · {end}
+            </Button>
+          ))}
+        </>
+      )}
     </div>
   )
 }

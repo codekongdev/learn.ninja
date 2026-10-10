@@ -646,7 +646,7 @@ export const NINJA_LEVELS = [
 const NINJA_PREVIEW: Record<NinjaLevel, NinjaMood> = {
   off: "closed",
   default: "happy",
-  sensei: "nod",
+  sensei: "bow",
   unhinged: "flip",
 }
 
