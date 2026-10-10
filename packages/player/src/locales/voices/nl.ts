@@ -79,81 +79,68 @@ export const nl: Voices = {
   },
   sensei: {
     praise: {
-      plain: ["Goed. Dat is het.", "Ja."],
+      plain: ["Goed.", "Ja."],
       flavor: [
+        "Goed. Nog eens zo.",
         "Je zag het.",
-        "Goed waargenomen.",
-        "Precies zo.",
-        "Je oog wordt scherper.",
-        "Ja. Stil en zeker.",
-        "Dat is de weg.",
-        "Goed. Houd dat vast.",
+        "Strak.",
+        "Zo doe je dat.",
+        "Goed oog.",
+        "Hou dat vast.",
+        "Geen beweging te veel.",
       ],
     },
     correctWithHint: {
-      plain: ["Goed. De hint wees de weg, jij liep hem."],
+      plain: ["Goed. De hint hielp."],
       flavor: [
-        "Vragen is ook een vaardigheid.",
-        "Hulp aangenomen, les onthouden.",
-        "Een hint is een hand, geen kruk.",
+        "Vragen is ook oefenen.",
+        "Je nam de hint en maakte het af.",
+        "Eerst de hulp, dan je eigen handen.",
       ],
     },
     goodGuess: {
-      plain: ["Een goede gok."],
+      plain: ["Goed gegokt."],
       flavor: [
-        "Je instinct weet dingen die jij nog niet weet.",
-        "Vertrouw het gevoel, toets het daarna.",
-        "Goed gegokt. Nu kijken we waarom.",
+        "Eerst het gevoel. Nu de reden.",
+        "Juist gegokt. Eens kijken waarom.",
+        "Je handen wisten het eerder dan je hoofd.",
       ],
     },
     hookMiss: {
-      plain: ["Nog niet, en daar gaat het om."],
-      flavor: [
-        "Een gok laat zien waar we beginnen.",
-        "Geeft niet. De les begint hier.",
-      ],
+      plain: ["Nog niet. Hier beginnen we."],
+      flavor: ["Een gok toont de startlijn.", "Geeft niet. Kijk."],
     },
     nudge: {
-      plain: ["Nog niet. Kijk nog eens."],
-      flavor: [
-        "Rustig. Het is er.",
-        "Adem, kijk dan opnieuw.",
-        "Het antwoord is niet verplaatst.",
-      ],
+      plain: ["Nog niet. Opnieuw."],
+      flavor: ["Langzamer.", "Kijk nog eens.", "Opnieuw. Het is er."],
     },
     close: {
-      plain: ["Dichtbij. Eén past beter."],
-      flavor: ["Goed oog. Zoek nu de beste.", "Bijna. Zoek de scherpere."],
+      plain: ["Dichtbij. Eén is beter."],
+      flavor: ["Bijna. Zoek de scherpere.", "Goed oog. Nog niet de beste."],
     },
     answer: {
       plain: ["Hier is het antwoord."],
       flavor: [
-        "Blijf hier even bij stilstaan.",
-        "De moeilijke leren het meest. Hier is hij.",
-        "Hier is het antwoord. Lees het rustig.",
+        "Kijk, en zie het dan zelf.",
+        "Lees het langzaam.",
+        "De moeilijke leren het meest. Hier.",
       ],
     },
     streak: {
-      plain: ["Drie op rij. Rustig aan."],
-      flavor: ["Je hebt je ritme gevonden.", "Kalme handen, heldere blik."],
+      plain: ["Drie op rij. Rustig."],
+      flavor: ["Goed ritme.", "Rustige handen."],
     },
     comeback: {
-      plain: ["Je keek nog eens, en daar was het."],
-      flavor: ["Zo leer je.", "De tweede blik is de les."],
+      plain: ["Je keek nog eens. Daar is het."],
+      flavor: ["Dat is oefenen.", "De tweede blik is de les."],
     },
     last: {
-      plain: ["En dat is de les. Goed gelopen."],
-      flavor: [
-        "De laatste stap is ook een stap.",
-        "Je hebt afgemaakt wat je begon.",
-      ],
+      plain: ["Dat is de les. Goed gedaan."],
+      flavor: ["Je maakte af wat je begon.", "De laatste stap telt ook."],
     },
     perfect: {
-      plain: ["Geen misstap. Neem dat mee."],
-      flavor: [
-        "Een kalme geest ziet helder.",
-        "Niets te verbeteren. Alleen te onthouden.",
-      ],
+      plain: ["Geen misstap. Hou dat vast."],
+      flavor: ["Niets te verbeteren.", "Stil hoofd, heldere blik."],
     },
   },
   unhinged: {

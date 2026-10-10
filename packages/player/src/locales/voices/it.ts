@@ -79,86 +79,77 @@ export const it: Voices = {
   },
   sensei: {
     praise: {
-      plain: ["Bene. È così.", "Sì."],
+      plain: ["Bene.", "Sì."],
       flavor: [
+        "Bene. Ancora così.",
         "L'hai visto.",
-        "Ben osservato.",
-        "Proprio così.",
-        "Il tuo occhio si affina.",
-        "Sì. Senza rumore.",
-        "Questa è la via.",
-        "Bene. Tienilo.",
+        "Pulito.",
+        "È così che si fa.",
+        "Buon occhio.",
+        "Tienilo.",
+        "Nessun movimento di troppo.",
       ],
     },
     correctWithHint: {
-      plain: [
-        "Corretto. Il suggerimento ha mostrato la via, tu l'hai percorsa.",
-      ],
+      plain: ["Bene. L'aiuto è servito."],
       flavor: [
-        "Anche chiedere è un'abilità.",
-        "Aiuto preso, lezione tenuta.",
-        "Un suggerimento è una mano, non una stampella.",
+        "Chiedere è anche pratica.",
+        "Hai preso l'aiuto e hai finito.",
+        "Prima l'aiuto, poi le tue mani.",
       ],
     },
     goodGuess: {
-      plain: ["Una buona intuizione."],
+      plain: ["Buon intuito."],
       flavor: [
-        "Il tuo istinto sa cose che tu ancora non sai.",
-        "Fidati della sensazione, poi mettila alla prova.",
-        "Ben intuito. Ora vediamo perché.",
+        "Prima l'istinto. Ora il motivo.",
+        "Ben indovinato. Vediamo perché.",
+        "Le tue mani lo sapevano prima della testa.",
       ],
     },
     hookMiss: {
-      plain: ["Non ancora, ed è questo il punto."],
+      plain: ["Non ancora. Si parte da qui."],
       flavor: [
-        "Un'ipotesi ci dice da dove partire.",
-        "Non importa. La lezione comincia qui.",
+        "Un tentativo mostra la linea di partenza.",
+        "Non importa. Guarda.",
       ],
     },
     nudge: {
-      plain: ["Non ancora. Guarda ancora una volta."],
-      flavor: [
-        "Piano. È lì.",
-        "Respira, poi guarda di nuovo.",
-        "La risposta non si è mossa.",
-      ],
+      plain: ["Non ancora. Di nuovo."],
+      flavor: ["Più piano.", "Guarda ancora una volta.", "Di nuovo. È lì."],
     },
     close: {
-      plain: ["Vicino. Una calza meglio."],
+      plain: ["Vicino. Ce n'è una migliore."],
       flavor: [
-        "Buon occhio. Ora trova la migliore.",
         "Quasi. Cerca quella più precisa.",
+        "Buon occhio. Non ancora la migliore.",
       ],
     },
     answer: {
       plain: ["Ecco la risposta."],
       flavor: [
-        "Fermati un momento su questa.",
-        "Le difficili insegnano di più. Eccola.",
-        "Ecco la risposta. Leggila con calma.",
+        "Guarda, poi vedilo da solo.",
+        "Leggila piano.",
+        "Le difficili insegnano di più. Ecco.",
       ],
     },
     streak: {
-      plain: ["Tre di fila. Con calma."],
-      flavor: ["Hai trovato il tuo ritmo.", "Mani ferme, occhi chiari."],
+      plain: ["Tre di fila. Saldo."],
+      flavor: ["Buon ritmo.", "Mani calme."],
     },
     comeback: {
-      plain: ["Hai guardato di nuovo, ed era lì."],
-      flavor: ["Così si impara.", "Il secondo sguardo è la lezione."],
+      plain: ["Hai guardato di nuovo. Eccola."],
+      flavor: ["Questa è pratica.", "Il secondo sguardo è la lezione."],
     },
     last: {
-      plain: ["Ed ecco la lezione. Ben percorsa."],
+      plain: ["Questa è la lezione. Ben fatto."],
       flavor: [
-        "L'ultimo passo è pur sempre un passo.",
-        "Hai finito ciò che avevi iniziato.",
+        "Hai finito ciò che hai iniziato.",
+        "Anche l'ultimo passo conta.",
       ],
     },
     perfect: {
-      plain: ["Nemmeno un inciampo. Portalo con te."],
-      flavor: [
-        "Una mente calma vede chiaro.",
-        "Niente da correggere. Solo da ricordare.",
-      ],
+      plain: ["Nemmeno un passo falso. Tienilo."],
+      flavor: ["Niente da correggere.", "Mente quieta, occhi chiari."],
     },
   },
   unhinged: {

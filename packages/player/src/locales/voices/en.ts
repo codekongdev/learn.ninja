@@ -77,84 +77,71 @@ export const en: Voices = {
   },
   sensei: {
     praise: {
-      plain: ["Good. That's it.", "Yes."],
+      plain: ["Good.", "Yes."],
       flavor: [
+        "Good. Again like that.",
         "You saw it.",
+        "Clean.",
+        "That's the way.",
         "Well seen.",
-        "Just so.",
-        "Your eye is getting sharper.",
-        "Yes. Quietly done.",
-        "That is the way.",
-        "Good. Keep that.",
+        "Keep that.",
+        "No wasted motion.",
       ],
     },
     correctWithHint: {
-      plain: ["Correct. The hint showed the path, you walked it."],
+      plain: ["Good. The hint helped."],
       flavor: [
-        "Asking is also a skill.",
-        "Help taken, lesson kept.",
-        "A hint is a hand, not a crutch.",
+        "Asking is also practice.",
+        "You took the hint and finished it.",
+        "Help first, then your own hands.",
       ],
     },
     goodGuess: {
       plain: ["A good guess."],
       flavor: [
-        "Your instinct knows things you don't yet.",
-        "Trust the feeling, then test it.",
-        "Well guessed. Now let's see why.",
+        "Instinct first. Now the reason.",
+        "Guessed well. Let's see why.",
+        "Your hands knew before your head.",
       ],
     },
     hookMiss: {
-      plain: ["Not yet, and that's the point."],
-      flavor: [
-        "A guess shows us where to start.",
-        "No matter. The lesson begins here.",
-      ],
+      plain: ["Not yet. We begin here."],
+      flavor: ["A guess shows the starting line.", "No matter. Watch."],
     },
     nudge: {
-      plain: ["Not yet. Look once more."],
-      flavor: [
-        "Slow down. It's there.",
-        "Breathe, then look again.",
-        "The answer hasn't moved.",
-      ],
+      plain: ["Not yet. Again."],
+      flavor: ["Slower.", "Look once more.", "Again. It's there."],
     },
     close: {
-      plain: ["Close. One fits better."],
+      plain: ["Close. One is better."],
       flavor: [
-        "Good eye. Now find the best one.",
-        "Nearly. Look for the sharper one.",
+        "Nearly. Find the sharper one.",
+        "Good eye. Not the best one yet.",
       ],
     },
     answer: {
       plain: ["Here is the answer."],
       flavor: [
-        "Sit with this one.",
-        "Hard ones teach the most. Here it is.",
-        "Here is the answer. Read it slowly.",
+        "Watch, then see it for yourself.",
+        "Read it slowly.",
+        "The hard ones teach the most. Here.",
       ],
     },
     streak: {
       plain: ["Three in a row. Steady."],
-      flavor: ["You've found your rhythm.", "Calm hands, clear eyes."],
+      flavor: ["Good rhythm.", "Calm hands."],
     },
     comeback: {
-      plain: ["You looked again, and there it was."],
-      flavor: ["That is how it's learned.", "The second look is the lesson."],
+      plain: ["You looked again. There it is."],
+      flavor: ["That is practice.", "The second look is the lesson."],
     },
     last: {
-      plain: ["And that's the lesson. Well walked."],
-      flavor: [
-        "The last step is still a step.",
-        "You finished what you began.",
-      ],
+      plain: ["That's the lesson. Well done."],
+      flavor: ["You finished what you began.", "The last step counts too."],
     },
     perfect: {
-      plain: ["Not one slip. Carry that with you."],
-      flavor: [
-        "A quiet mind sees clearly.",
-        "Nothing to correct. Only to remember.",
-      ],
+      plain: ["Not one slip. Keep it."],
+      flavor: ["Nothing to correct.", "Quiet mind, clear eyes."],
     },
   },
   unhinged: {

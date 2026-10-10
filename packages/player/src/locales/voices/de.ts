@@ -79,84 +79,78 @@ export const de: Voices = {
   },
   sensei: {
     praise: {
-      plain: ["Gut. Das ist es.", "Ja."],
+      plain: ["Gut.", "Ja."],
       flavor: [
+        "Gut. Noch einmal so.",
         "Du hast es gesehen.",
-        "Gut beobachtet.",
-        "Genau so.",
-        "Dein Blick wird schärfer.",
-        "Ja. Still und sicher.",
-        "Das ist der Weg.",
-        "Gut. Behalte das.",
+        "Sauber.",
+        "So geht das.",
+        "Gutes Auge.",
+        "Behalte das.",
+        "Keine Bewegung zu viel.",
       ],
     },
     correctWithHint: {
-      plain: ["Richtig. Der Tipp zeigte den Weg, du bist ihn gegangen."],
+      plain: ["Gut. Der Hinweis hat geholfen."],
       flavor: [
-        "Fragen ist auch eine Fähigkeit.",
-        "Hilfe angenommen, Lektion behalten.",
-        "Ein Tipp ist eine Hand, keine Krücke.",
+        "Fragen ist auch Übung.",
+        "Du hast den Hinweis genommen und es zu Ende gebracht.",
+        "Erst die Hilfe, dann deine eigenen Hände.",
       ],
     },
     goodGuess: {
       plain: ["Gut geraten."],
       flavor: [
-        "Dein Instinkt weiß Dinge, die du noch nicht weißt.",
-        "Vertrau dem Gefühl, dann prüfe es.",
-        "Gut geraten. Nun sehen wir, warum.",
+        "Erst das Gefühl. Jetzt der Grund.",
+        "Richtig geraten. Sehen wir, warum.",
+        "Deine Hände wussten es vor deinem Kopf.",
       ],
     },
     hookMiss: {
-      plain: ["Noch nicht, und genau darum geht es."],
-      flavor: [
-        "Eine Vermutung zeigt uns, wo wir anfangen.",
-        "Macht nichts. Die Lektion beginnt hier.",
-      ],
+      plain: ["Noch nicht. Hier fangen wir an."],
+      flavor: ["Ein Versuch zeigt die Startlinie.", "Macht nichts. Schau zu."],
     },
     nudge: {
-      plain: ["Noch nicht. Schau noch einmal."],
+      plain: ["Noch nicht. Noch einmal."],
       flavor: [
-        "Langsam. Es ist da.",
-        "Atme, dann schau noch einmal.",
-        "Die Antwort hat sich nicht bewegt.",
+        "Langsamer.",
+        "Schau noch einmal hin.",
+        "Noch einmal. Es ist da.",
       ],
     },
     close: {
-      plain: ["Nah dran. Eine passt besser."],
-      flavor: ["Gutes Auge. Nun finde die beste.", "Fast. Such die schärfere."],
+      plain: ["Nah dran. Eine ist besser."],
+      flavor: [
+        "Fast. Such die schärfere.",
+        "Gutes Auge. Noch nicht die beste.",
+      ],
     },
     answer: {
       plain: ["Hier ist die Antwort."],
       flavor: [
-        "Bleib einen Moment bei dieser.",
-        "Die schweren lehren am meisten. Hier ist sie.",
-        "Hier ist die Antwort. Lies sie langsam.",
+        "Schau zu, dann sieh es selbst.",
+        "Lies sie langsam.",
+        "Die schweren lehren am meisten. Hier.",
       ],
     },
     streak: {
-      plain: ["Drei in Folge. Ruhig weiter."],
-      flavor: [
-        "Du hast deinen Rhythmus gefunden.",
-        "Ruhige Hände, klarer Blick.",
-      ],
+      plain: ["Drei in Folge. Ruhig."],
+      flavor: ["Guter Rhythmus.", "Ruhige Hände."],
     },
     comeback: {
-      plain: ["Du hast noch einmal hingesehen, und da war es."],
-      flavor: ["So lernt man.", "Der zweite Blick ist die Lektion."],
+      plain: ["Du hast noch einmal hingeschaut. Da ist es."],
+      flavor: ["Das ist Übung.", "Der zweite Blick ist die Lektion."],
     },
     last: {
-      plain: ["Und das ist die Lektion. Gut gegangen."],
+      plain: ["Das war die Lektion. Gut gemacht."],
       flavor: [
-        "Der letzte Schritt ist auch ein Schritt.",
         "Du hast beendet, was du begonnen hast.",
+        "Der letzte Schritt zählt auch.",
       ],
     },
     perfect: {
-      plain: ["Kein einziger Fehltritt. Nimm das mit."],
-      flavor: [
-        "Ein ruhiger Geist sieht klar.",
-        "Nichts zu korrigieren. Nur zu behalten.",
-      ],
+      plain: ["Kein einziger Fehltritt. Behalte das."],
+      flavor: ["Nichts zu korrigieren.", "Ruhiger Geist, klarer Blick."],
     },
   },
   unhinged: {

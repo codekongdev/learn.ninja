@@ -79,81 +79,71 @@ export const pl: Voices = {
   },
   sensei: {
     praise: {
-      plain: ["Dobrze. To jest to.", "Tak."],
+      plain: ["Dobrze.", "Tak."],
       flavor: [
-        "Zobaczyłeś to.",
-        "Dobrze dostrzeżone.",
-        "Właśnie tak.",
-        "Twoje oko się wyostrza.",
-        "Tak. Cicho i pewnie.",
-        "To jest droga.",
-        "Dobrze. Zachowaj to.",
+        "Dobrze. Jeszcze raz tak samo.",
+        "Widzisz to.",
+        "Czysto.",
+        "Tak to się robi.",
+        "Dobre oko.",
+        "Zachowaj to.",
+        "Żadnego zbędnego ruchu.",
       ],
     },
     correctWithHint: {
-      plain: ["Dobrze. Podpowiedź wskazała drogę, ty nią poszedłeś."],
+      plain: ["Dobrze. Podpowiedź pomogła."],
       flavor: [
-        "Pytanie to też umiejętność.",
-        "Pomoc przyjęta, lekcja zachowana.",
-        "Podpowiedź to dłoń, nie kula.",
+        "Pytanie to też ćwiczenie.",
+        "Z podpowiedzią, ale do końca.",
+        "Najpierw pomoc, potem własne ręce.",
       ],
     },
     goodGuess: {
       plain: ["Dobry strzał."],
       flavor: [
-        "Twój instynkt wie rzeczy, których ty jeszcze nie wiesz.",
-        "Zaufaj przeczuciu, potem je sprawdź.",
-        "Dobrze wyczute. Teraz zobaczmy dlaczego.",
+        "Najpierw instynkt. Teraz powód.",
+        "Trafne. Zobaczmy dlaczego.",
+        "Ręce wiedziały przed głową.",
       ],
     },
     hookMiss: {
-      plain: ["Jeszcze nie, i o to chodzi."],
-      flavor: [
-        "Strzał pokazuje nam, od czego zacząć.",
-        "Nie szkodzi. Lekcja zaczyna się tutaj.",
-      ],
+      plain: ["Jeszcze nie. Zaczynamy tutaj."],
+      flavor: ["Próba pokazuje linię startu.", "Nic nie szkodzi. Patrz."],
     },
     nudge: {
-      plain: ["Jeszcze nie. Spójrz raz jeszcze."],
-      flavor: [
-        "Powoli. To tam jest.",
-        "Oddech, potem spójrz ponownie.",
-        "Odpowiedź się nie ruszyła.",
-      ],
+      plain: ["Jeszcze nie. Jeszcze raz."],
+      flavor: ["Wolniej.", "Spójrz jeszcze raz.", "Jeszcze raz. To tam jest."],
     },
     close: {
-      plain: ["Blisko. Jedna pasuje lepiej."],
+      plain: ["Blisko. Jedna jest lepsza."],
       flavor: [
-        "Dobre oko. Teraz znajdź najlepszą.",
-        "Prawie. Szukaj tej ostrzejszej.",
+        "Prawie. Znajdź tę ostrzejszą.",
+        "Dobre oko. Jeszcze nie najlepsza.",
       ],
     },
     answer: {
       plain: ["Oto odpowiedź."],
       flavor: [
-        "Zatrzymaj się przy tej na chwilę.",
+        "Patrz, potem zobacz to sam.",
+        "Czytaj powoli.",
         "Trudne uczą najwięcej. Oto ona.",
-        "Oto odpowiedź. Przeczytaj ją powoli.",
       ],
     },
     streak: {
       plain: ["Trzy z rzędu. Spokojnie."],
-      flavor: ["Znalazłeś swój rytm.", "Spokojne ręce, jasne oczy."],
+      flavor: ["Dobry rytm.", "Spokojne ręce."],
     },
     comeback: {
-      plain: ["Spojrzałeś jeszcze raz, i tam było."],
-      flavor: ["Tak się uczy.", "Drugie spojrzenie jest lekcją."],
+      plain: ["Jeszcze jedno spojrzenie i jest."],
+      flavor: ["To jest ćwiczenie.", "Drugie spojrzenie to lekcja."],
     },
     last: {
-      plain: ["I to jest lekcja. Dobrze przebyta."],
-      flavor: ["Ostatni krok to wciąż krok.", "Dokończyłeś, co zacząłeś."],
+      plain: ["To cała lekcja. Dobra robota."],
+      flavor: ["Dokończone, co zaczęte.", "Ostatni krok też się liczy."],
     },
     perfect: {
-      plain: ["Ani jednego potknięcia. Zabierz to ze sobą."],
-      flavor: [
-        "Spokojny umysł widzi jasno.",
-        "Nie ma czego poprawiać. Tylko zapamiętać.",
-      ],
+      plain: ["Ani jednego potknięcia. Zachowaj to."],
+      flavor: ["Nie ma czego poprawiać.", "Spokojny umysł, jasne oczy."],
     },
   },
   unhinged: {

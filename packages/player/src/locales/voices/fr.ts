@@ -79,84 +79,74 @@ export const fr: Voices = {
   },
   sensei: {
     praise: {
-      plain: ["Bien. C'est cela.", "Oui."],
+      plain: ["Bien.", "Oui."],
       flavor: [
+        "Bien. Encore comme ça.",
         "Tu l'as vu.",
-        "Bien observé.",
-        "Exactement ainsi.",
-        "Ton œil s'affine.",
-        "Oui. Sans bruit.",
-        "C'est la voie.",
-        "Bien. Garde cela.",
+        "Net.",
+        "C'est la manière.",
+        "Bon œil.",
+        "Garde ça.",
+        "Pas un geste de trop.",
       ],
     },
     correctWithHint: {
-      plain: ["Correct. L'indice a montré le chemin, tu l'as parcouru."],
+      plain: ["Bien. L'indice a aidé."],
       flavor: [
-        "Demander est aussi une compétence.",
-        "Aide reçue, leçon gardée.",
-        "Un indice est une main, pas une béquille.",
+        "Demander, c'est aussi s'exercer.",
+        "Tu as pris l'indice et tu as fini.",
+        "L'aide d'abord, tes mains ensuite.",
       ],
     },
     goodGuess: {
-      plain: ["Une bonne intuition."],
+      plain: ["Bonne intuition."],
       flavor: [
-        "Ton instinct sait des choses que tu ignores encore.",
-        "Fais confiance à l'intuition, puis vérifie-la.",
-        "Bien deviné. Voyons maintenant pourquoi.",
+        "L'instinct d'abord. La raison maintenant.",
+        "Bien deviné. Voyons pourquoi.",
+        "Tes mains savaient avant ta tête.",
       ],
     },
     hookMiss: {
-      plain: ["Pas encore, et c'est tout l'intérêt."],
-      flavor: [
-        "Une supposition nous dit par où commencer.",
-        "Peu importe. La leçon commence ici.",
-      ],
+      plain: ["Pas encore. On commence ici."],
+      flavor: ["Un essai montre la ligne de départ.", "Peu importe. Regarde."],
     },
     nudge: {
-      plain: ["Pas encore. Regarde une fois de plus."],
-      flavor: [
-        "Doucement. C'est là.",
-        "Respire, puis regarde encore.",
-        "La réponse n'a pas bougé.",
-      ],
+      plain: ["Pas encore. Encore une fois."],
+      flavor: ["Plus lentement.", "Regarde encore.", "Encore. C'est là."],
     },
     close: {
-      plain: ["Proche. Une convient mieux."],
+      plain: ["Proche. Il y a mieux."],
       flavor: [
-        "Bon œil. Trouve maintenant la meilleure.",
-        "Presque. Cherche la plus précise.",
+        "Presque. Cherche la plus juste.",
+        "Bon œil. Pas encore la meilleure.",
       ],
     },
     answer: {
       plain: ["Voici la réponse."],
       flavor: [
-        "Prends un moment avec celle-ci.",
-        "Les difficiles enseignent le plus. La voici.",
-        "Voici la réponse. Lis-la lentement.",
+        "Regarde, puis vois-le par toi-même.",
+        "Lis-la lentement.",
+        "Les difficiles apprennent le plus. Voici.",
       ],
     },
     streak: {
-      plain: ["Trois d'affilée. Du calme."],
-      flavor: ["Tu as trouvé ton rythme.", "Mains calmes, regard clair."],
+      plain: ["Trois de suite. Stable."],
+      flavor: ["Bon rythme.", "Mains calmes."],
     },
     comeback: {
-      plain: ["Tu as regardé encore, et c'était là."],
-      flavor: ["C'est ainsi qu'on apprend.", "Le second regard est la leçon."],
+      plain: ["Tu as regardé encore. La voilà."],
+      flavor: ["C'est ça, s'exercer.", "Le second regard est la leçon."],
     },
     last: {
-      plain: ["Et voilà la leçon. Bien parcourue."],
+      plain: ["C'est la leçon. Bien joué."],
       flavor: [
-        "Le dernier pas est encore un pas.",
-        "Tu as fini ce que tu avais commencé.",
+        "Tu as fini ce que tu as commencé.",
+        "Le dernier pas compte aussi.",
       ],
     },
     perfect: {
-      plain: ["Pas un faux pas. Emporte cela avec toi."],
-      flavor: [
-        "Un esprit calme voit clair.",
-        "Rien à corriger. Seulement à retenir.",
-      ],
+      plain: ["Pas un faux pas. Garde ça."],
+      flavor: ["Rien à corriger.", "Esprit calme, regard clair."],
     },
   },
   unhinged: {

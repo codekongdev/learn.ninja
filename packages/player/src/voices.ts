@@ -1,7 +1,7 @@
 // The ninja's feedback lines for each character. Off and Default share the Default lines, short and
-// plain; Sensei is a calm, patient mentor; Unhinged is a jittery bundle of nerves, sure everything
-// is about to go wrong and hugely relieved when it doesn't. On a miss he panics at the situation,
-// never at the learner.
+// plain; Sensei is a dojo teacher of few words, patient and a little firm, who would rather show than
+// explain; Unhinged is a jittery bundle of nerves, sure everything is about to go wrong and hugely
+// relieved when it doesn't. On a miss he panics at the situation, never at the learner.
 //
 // Each moment has plain lines, said most of the time, and flavor lines, rationed by CADENCE so a
 // lesson of five answers doesn't feel like a fireworks show. Nothing repeats within a run (see
