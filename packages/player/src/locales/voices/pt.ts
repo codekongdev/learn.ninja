@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const pt: Voices = {
-  normal: {
+  default: {
     praise: [
       "É isso aí",
       "Bom trabalho",
@@ -18,7 +18,12 @@ export const pt: Voices = {
       "Dica usada, resposta encontrada",
       "Muito bem resolvido",
     ],
-    goodGuess: ["Bom palpite!", "Boa intuição", "Boa escolha", "Palpite certeiro"],
+    goodGuess: [
+      "Bom palpite!",
+      "Boa intuição",
+      "Boa escolha",
+      "Palpite certeiro",
+    ],
     hookMiss: [
       "Não é bem isso, e tudo bem",
       "Não foi dessa vez, e tudo bem",
@@ -42,54 +47,6 @@ export const pt: Voices = {
       "Veja como funciona",
       "Vamos ver a resposta",
       "Essa era difícil. Aqui está",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Isso, isso, isso!",
-      "Bum, arrasou",
-      "Rápido e certo",
-      "Zás, correto",
-      "Opa, é isso",
-      "Na mosca, próxima",
-      "Uau, impecável",
-      "Você está voando",
-    ],
-    correctWithHint: [
-      "Acertou, e a dica conta também",
-      "Dica, e bum",
-      "Com dica e ainda certo",
-      "A dica fez a parte dela, você também",
-    ],
-    goodGuess: [
-      "Uau, bom palpite!",
-      "Cravou",
-      "Instinto afiado",
-      "Sorte ou gênio?",
-    ],
-    hookMiss: [
-      "Não, tudo certo, bora",
-      "Errou, sem problema",
-      "Palpite errado, palpite divertido",
-      "Rá, não é essa. Próxima",
-    ],
-    nudge: [
-      "Opa, quase. Rápido, mais uma olhada",
-      "Não é. De novo, de novo",
-      "Quase. Mais uma tentativa, vai",
-      "Ops. Mais uma olhada?",
-    ],
-    close: [
-      "Quase, mas não é a melhor",
-      "Opa, quase. Tem uma melhor",
-      "Pertinho, uma é melhor",
-      "Boa escolha, não a melhor",
-    ],
-    answer: [
-      "Tá bom, tá bom, aqui está",
-      "Beleza, hora da resposta",
-      "Sem estresse, aqui está",
-      "Tá, é assim que funciona",
     ],
   },
   unhinged: {

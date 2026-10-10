@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const id: Voices = {
-  normal: {
+  default: {
     praise: [
       "Nah, itu dia",
       "Kerja bagus",
@@ -47,54 +47,6 @@ export const id: Voices = {
       "Begini cara kerjanya",
       "Ayo lihat jawabannya",
       "Yang ini sulit. Ini dia",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Ya, ya, ya!",
-      "Bum, kena",
-      "Cepat dan benar",
-      "Zing, benar",
-      "Oh, itu dia",
-      "Tepat sasaran, lanjut",
-      "Wah, mantap",
-      "Kamu lagi on fire",
-    ],
-    correctWithHint: [
-      "Benar, dan petunjuknya juga dihitung",
-      "Petunjuk, lalu bum",
-      "Pakai petunjuk, tetap benar",
-      "Petunjuknya berhasil, kamu juga",
-    ],
-    goodGuess: [
-      "Wah, tebakan bagus!",
-      "Tebakanmu kena",
-      "Insting tajam",
-      "Hoki atau jenius?",
-    ],
-    hookMiss: [
-      "Bukan, tapi santai, lanjut terus",
-      "Meleset, bukan masalah",
-      "Tebakan salah, tapi seru",
-      "Ha, bukan itu. Lanjut",
-    ],
-    nudge: [
-      "Ooh, nyaris. Cepat, lihat sekali lagi",
-      "Bukan itu. Lagi, lagi",
-      "Hampir. Gas sekali lagi",
-      "Ups. Lihat lagi?",
-    ],
-    close: [
-      "Dekat, tapi bukan yang paling oke",
-      "Ooh, nyaris. Ada yang lebih baik",
-      "Dekat banget, ada yang lebih unggul",
-      "Pilihan bagus, bukan yang terbaik",
-    ],
-    answer: [
-      "Oke oke, ini dia",
-      "Baik, waktunya jawaban",
-      "Santai, jawabannya di sini",
-      "Oke, begini jalannya",
     ],
   },
   unhinged: {

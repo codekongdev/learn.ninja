@@ -64,16 +64,16 @@ export const Reactions: StoryObj<{ level: NinjaEnergy }> = {
   argTypes: {
     level: {
       control: "inline-radio",
-      options: ["normal", "caffeinated", "unhinged"],
+      options: ["default", "sensei", "unhinged"],
     },
   },
-  args: { level: "normal" },
+  args: { level: "default" },
   render: ({ level }) => <ReactionsDemo key={level} level={level} />,
 }
 
 const ENERGY: Record<NinjaEnergy, number> = {
-  normal: 1,
-  caffeinated: 1.3,
+  default: 1,
+  sensei: 0.85,
   unhinged: 1.6,
 }
 

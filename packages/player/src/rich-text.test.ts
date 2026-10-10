@@ -13,9 +13,7 @@ describe("plainText", () => {
   })
 
   it("keeps a formula's source and plain text as is", () => {
-    expect(plainText("Grows by \\( x^2 \\) for $5")).toBe(
-      "Grows by x^2 for $5"
-    )
+    expect(plainText("Grows by \\( x^2 \\) for $5")).toBe("Grows by x^2 for $5")
     expect(plainText("Nice work")).toBe("Nice work")
   })
 })

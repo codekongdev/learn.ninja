@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const it: Voices = {
-  normal: {
+  default: {
     praise: [
       "Ecco",
       "Ottimo lavoro",
@@ -47,54 +47,6 @@ export const it: Voices = {
       "Ecco come funziona",
       "Vediamo la risposta",
       "Questa era difficile. Eccola",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Sì, sì, sì!",
-      "Boom, centrato",
-      "Veloce e giusto",
-      "Zac, corretto",
-      "Oh, eccola",
-      "In pieno, avanti",
-      "Ooh, pulitissimo",
-      "Sei inarrestabile",
-    ],
-    correctWithHint: [
-      "Giusto, e il suggerimento vale",
-      "Suggerimento, poi boom",
-      "Col suggerimento, ma giusto",
-      "Il suggerimento ha fatto il suo, e tu pure",
-    ],
-    goodGuess: [
-      "Wow, bella intuizione!",
-      "Indovinato",
-      "Istinto perfetto",
-      "Fortuna o genio?",
-    ],
-    hookMiss: [
-      "No, nessun problema, avanti",
-      "Mancato, niente di grave",
-      "Sbagliato, ma ci sta",
-      "Ah, non era quella. Avanti",
-    ],
-    nudge: [
-      "Ooh, vicinissimo. Svelto, un'altra occhiata",
-      "Non è quella. Ancora, ancora",
-      "Quasi. Un altro giro, via",
-      "Ops. Un'altra occhiata?",
-    ],
-    close: [
-      "Vicino, ma non è la migliore",
-      "Ooh, quasi. Ce n'è una migliore",
-      "Vicinissimo, una la batte",
-      "Bella scelta, non la migliore",
-    ],
-    answer: [
-      "Ok ok, eccola",
-      "Bene, ora della risposta",
-      "Niente stress, eccola",
-      "Ok, ecco come va",
     ],
   },
   unhinged: {

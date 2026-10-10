@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const vi: Voices = {
-  normal: {
+  default: {
     praise: [
       "Đúng rồi",
       "Làm tốt lắm",
@@ -47,54 +47,6 @@ export const vi: Voices = {
       "Đây là cách nó hoạt động",
       "Cùng xem đáp án nhé",
       "Câu này khó. Đáp án đây",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Đúng, đúng, đúng!",
-      "Bùm, trúng rồi",
-      "Nhanh mà đúng",
-      "Vèo, chính xác",
-      "Ồ, đúng nó rồi",
-      "Trúng ngay, câu tiếp",
-      "Ôi, gọn gàng",
-      "Bạn cháy quá",
-    ],
-    correctWithHint: [
-      "Đúng rồi, gợi ý cũng tính nhé",
-      "Gợi ý, rồi bùm",
-      "Có gợi ý mà vẫn đúng",
-      "Gợi ý làm tốt, bạn cũng vậy",
-    ],
-    goodGuess: [
-      "Ồ, đoán hay quá!",
-      "Biết ngay mà",
-      "Trực giác đỉnh",
-      "Hên hay thiên tài?",
-    ],
-    hookMiss: [
-      "Sai, nhưng ổn mà, đi tiếp",
-      "Trật rồi, chuyện nhỏ",
-      "Đoán sai, mà vui",
-      "Ha, không phải. Đi tiếp",
-    ],
-    nudge: [
-      "Ôi, sát nút. Nhanh, nhìn lại lần nữa",
-      "Không phải. Lại nào, lại nào",
-      "Gần rồi. Thêm một phát nữa",
-      "Úi. Nhìn lại nhé?",
-    ],
-    close: [
-      "Gần, nhưng chưa phải câu tốt nhất",
-      "Ồ, suýt nữa. Có câu hay hơn",
-      "Sát lắm, có câu nhỉnh hơn",
-      "Chọn hay, nhưng chưa hay nhất",
-    ],
-    answer: [
-      "Rồi rồi, đây nè",
-      "Được rồi, đến giờ xem đáp án",
-      "Đừng căng, đáp án đây",
-      "Rồi, nó như thế này",
     ],
   },
   unhinged: {

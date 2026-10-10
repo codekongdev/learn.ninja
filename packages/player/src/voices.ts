@@ -1,7 +1,8 @@
-// The ninja's feedback lines for each character setting. Off and Normal share the Normal lines;
-// Caffeinated is quick and upbeat; Unhinged is a jittery bundle of nerves, sure everything is about
-// to go wrong and hugely relieved when it doesn't. On a miss he panics at the situation, never at
-// the learner. Each moment has several lines so feedback doesn't repeat (see createLinePicker).
+// The ninja's feedback lines for each character. Off and Default share the Default lines, short and
+// plain; Sensei is a calm, patient mentor; Unhinged is a jittery bundle of nerves, sure everything
+// is about to go wrong and hugely relieved when it doesn't. On a miss he panics at the situation,
+// never at the learner. Each moment has several lines so feedback doesn't repeat (see
+// createLinePicker). Every line ends in a period, exclamation point, or question mark.
 //
 // Each language's lines live in ./locales/voices, translated from English (en.ts) for the
 // character rather than word for word.
@@ -43,8 +44,10 @@ export type Moment =
 
 export type Voice = Record<Moment, string[]>
 export type Character = Exclude<NinjaLevel, "off">
-/** One language's lines for every character. */
-export type Voices = Record<Character, Voice>
+/** One language's lines for every character. Sensei is optional until a language has his lines; English stands in. */
+export type Voices = Record<Exclude<Character, "sensei">, Voice> & {
+  sensei?: Voice
+}
 
 const VOICES: Record<UiLanguage, Voices> = {
   en,
@@ -77,7 +80,8 @@ export function voiceLines(
   moment: Moment
 ): string[] {
   const voices = VOICES[uiLanguageFor(lang)?.code ?? "en"]
-  return voices[level === "off" ? "normal" : level][moment]
+  const character = level === "off" ? "default" : level
+  return (voices[character] ?? en[character]!)[moment]
 }
 
 /**

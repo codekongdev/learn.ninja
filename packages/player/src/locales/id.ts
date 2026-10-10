@@ -96,9 +96,15 @@ export const id: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Mati",
-    normal: "Normal",
-    caffeinated: "Berkafein",
+    default: "Bawaan",
+    sensei: "Sensei",
     unhinged: "Lepas kendali",
+  },
+  ninjaHints: {
+    off: "Tetap bersembunyi",
+    default: "Singkat dan jelas",
+    sensei: "Tenang dan sabar",
+    unhinged: "Panik supaya kamu tidak perlu",
   },
   shortcuts: "Pintasan keyboard",
   shortcutMain: "Mulai, periksa, atau lanjutkan",

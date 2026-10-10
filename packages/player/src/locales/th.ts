@@ -92,9 +92,15 @@ export const th: Strings = {
   ninja: "นินจา",
   ninjaLevels: {
     off: "ปิด",
-    normal: "ปกติ",
-    caffeinated: "คาเฟอีนเต็มพิกัด",
+    default: "ค่าเริ่มต้น",
+    sensei: "เซนเซ",
     unhinged: "หลุดโลก",
+  },
+  ninjaHints: {
+    off: "ซ่อนตัวอยู่",
+    default: "สั้นและชัดเจน",
+    sensei: "ใจเย็นและอดทน",
+    unhinged: "ตื่นตระหนกแทนคุณ",
   },
   shortcuts: "แป้นพิมพ์ลัด",
   shortcutMain: "เริ่ม ตรวจคำตอบ หรือไปต่อ",

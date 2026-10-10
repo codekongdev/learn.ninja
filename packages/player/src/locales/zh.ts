@@ -87,9 +87,15 @@ export const zh: Strings = {
   ninja: "忍者",
   ninjaLevels: {
     off: "关闭",
-    normal: "正常",
-    caffeinated: "咖啡因超标",
+    default: "默认",
+    sensei: "师父",
     unhinged: "失控",
+  },
+  ninjaHints: {
+    off: "他躲起来不出现",
+    default: "简短明了",
+    sensei: "沉稳耐心",
+    unhinged: "替你慌张",
   },
   shortcuts: "键盘快捷键",
   shortcutMain: "开始、检查或继续",

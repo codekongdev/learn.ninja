@@ -115,9 +115,15 @@ export const ru: Strings = {
   ninja: "Ниндзя",
   ninjaLevels: {
     off: "Выключен",
-    normal: "Обычный",
-    caffeinated: "На кофеине",
+    default: "По умолчанию",
+    sensei: "Сэнсэй",
     unhinged: "Безумный",
+  },
+  ninjaHints: {
+    off: "Не показывается",
+    default: "Коротко и ясно",
+    sensei: "Спокойный и терпеливый",
+    unhinged: "Паникует за вас",
   },
   shortcuts: "Горячие клавиши",
   shortcutMain: "Начать, проверить или продолжить",

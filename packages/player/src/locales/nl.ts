@@ -108,9 +108,15 @@ export const nl: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Uit",
-    normal: "Normaal",
-    caffeinated: "Gecafeïneerd",
+    default: "Standaard",
+    sensei: "Sensei",
     unhinged: "Doorgedraaid",
+  },
+  ninjaHints: {
+    off: "Hij blijft verborgen",
+    default: "Kort en duidelijk",
+    sensei: "Kalm en geduldig",
+    unhinged: "Raakt in paniek zodat jij dat niet hoeft",
   },
   shortcuts: "Sneltoetsen",
   shortcutMain: "Starten, controleren of doorgaan",

@@ -28,7 +28,7 @@ export type NinjaMood =
   | "wide"
   | "half"
   | "closed"
-  // Caffeinated
+  // Sensei (also used by the others)
   | "hop"
   | "jitter"
   | "pop"
@@ -99,12 +99,12 @@ type Beat = [mood: NinjaMood, ms: number, lookX?: number, lookY?: number]
 type Reactions = Record<"happy" | "sad", Record<string, Beat[]>>
 
 /**
- * Each setting is a different character. Normal is small and warm. Caffeinated is quick and
- * twitchy. Unhinged is theatrical. At every level he's sorry with the learner, never at them: the
+ * Each setting is a different character. Default is small and warm. Sensei is slow and
+ * composed. Unhinged is theatrical. At every level he's sorry with the learner, never at them: the
  * sad moves are all self-directed. Several variants per mood, so the same answer never feels canned.
  */
 export const REACTIONS: Record<NinjaEnergy, Reactions> = {
-  normal: {
+  default: {
     happy: {
       smile: [["happy", 1300]],
       cheer: [["cheer", 1100]],
@@ -137,46 +137,35 @@ export const REACTIONS: Record<NinjaEnergy, Reactions> = {
       ],
     },
   },
-  caffeinated: {
+  sensei: {
     happy: {
-      // Two quick hops.
-      hop: [
-        ["hop", 700],
-        ["happy", 500],
+      // A slow, approving nod.
+      nod: [["nod", 1400]],
+      // Eyes close for a moment, then a warm smile.
+      serene: [
+        ["closed", 500],
+        ["happy", 1100],
       ],
-      // Can't sit still.
-      jitter: [
-        ["jitter", 600],
-        ["happy", 500],
-      ],
-      // Eyes pop, then a grin.
-      pop: [
-        ["pop", 450],
-        ["happy", 700],
-      ],
-      // Eyes dart everywhere.
-      dart: [
-        ["happy", 220, -5, 0],
-        ["happy", 220, 5, 0],
-        ["happy", 260, 0, -2],
-        ["happy", 450, 0, 0],
+      // A quiet smile, no more.
+      smile: [["happy", 1500]],
+      // A small sparkle, held.
+      sparkle: [
+        ["half", 300],
+        ["sparkle", 1200],
       ],
     },
     sad: {
-      // A fast rattle, then squints.
-      rattle: [
-        ["rattle", 550],
-        ["half", 600],
+      // A long breath out.
+      sigh: [["sigh", 1800]],
+      // Eyes close to think, then half open.
+      ponder: [
+        ["closed", 900],
+        ["half", 900],
       ],
-      // A gasp: wide, then a squint.
-      gasp: [
-        ["wide", 350],
-        ["half", 800],
-      ],
-      // Shakes his head, then slumps.
-      slump: [
-        ["headshake", 800],
-        ["droop", 900],
+      // Looks away, then back, unhurried.
+      lookaway: [
+        ["lookaway", 1300],
+        ["half", 600, 0, 0],
       ],
     },
   },
@@ -223,15 +212,16 @@ export const REACTIONS: Record<NinjaEnergy, Reactions> = {
 
 /** How far the keyframes go at each setting (as --ninja-energy). The bigger sets are already big. */
 export const NINJA_ENERGY: Record<NinjaEnergy, number> = {
-  normal: 1,
-  caffeinated: 1.3,
+  default: 1,
+  sensei: 0.85,
   unhinged: 1.6,
 }
 
 /** Things he does on his own while waiting, at the livelier settings. */
 export const ANTICS: Record<NinjaEnergy, Beat[][]> = {
-  normal: [],
-  caffeinated: [REACTIONS.caffeinated.happy.hop!, REACTIONS.caffeinated.happy.dart!],
+  default: [],
+  // The sensei waits without fidgeting.
+  sensei: [],
   unhinged: [
     REACTIONS.unhinged.happy.flip!,
     REACTIONS.unhinged.happy.doublespin!,
@@ -242,8 +232,8 @@ export const ANTICS: Record<NinjaEnergy, Beat[][]> = {
 
 /** How often the antics come (ms), at random in this range. */
 const ANTIC_EVERY: Record<NinjaEnergy, [number, number]> = {
-  normal: [0, 0],
-  caffeinated: [7000, 14000],
+  default: [0, 0],
+  sensei: [0, 0],
   unhinged: [9000, 16000],
 }
 
@@ -340,7 +330,7 @@ export function reducedMotion(): boolean {
 export function useNinjaLife(
   svg: React.RefObject<SVGSVGElement | null>,
   area: React.RefObject<HTMLElement | null>,
-  level: NinjaEnergy = "normal"
+  level: NinjaEnergy = "default"
 ): NinjaLife {
   const held = React.useRef(false)
   const pointer = React.useRef(false)
@@ -476,7 +466,7 @@ export function NinjaStage({
   screen,
   cue,
   celebrate,
-  level = "normal",
+  level = "default",
 }: {
   /** The lesson card: he's positioned inside it and follows the pointer over it. */
   area: React.RefObject<HTMLDivElement | null>

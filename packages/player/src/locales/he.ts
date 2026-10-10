@@ -112,9 +112,15 @@ export const he: Strings = {
   ninja: "נינג'ה",
   ninjaLevels: {
     off: "כבוי",
-    normal: "רגיל",
-    caffeinated: "על קפאין",
+    default: "ברירת מחדל",
+    sensei: "סנסיי",
     unhinged: "יצא מדעתו",
+  },
+  ninjaHints: {
+    off: "נשאר מוסתר",
+    default: "קצר וברור",
+    sensei: "רגוע וסבלני",
+    unhinged: "נלחץ במקומך",
   },
   shortcuts: "קיצורי מקלדת",
   shortcutMain: "התחלה, בדיקה או המשך",

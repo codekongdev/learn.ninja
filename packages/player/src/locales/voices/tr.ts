@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const tr: Voices = {
-  normal: {
+  default: {
     praise: [
       "İşte bu",
       "Harika iş",
@@ -47,54 +47,6 @@ export const tr: Voices = {
       "Şöyle işliyor",
       "Cevaba bir bakalım",
       "Bu biraz zordu. İşte cevap",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Evet, evet, evet!",
-      "Bum, tam isabet",
-      "Hızlı ve doğru",
-      "Vınn, doğru",
-      "Ooo, işte bu",
-      "Tamamdır, sıradaki",
-      "Ooh, tertemiz",
-      "Alev alevsin",
-    ],
-    correctWithHint: [
-      "Oldu, ipucu da sayılır",
-      "İpucu, sonra bum",
-      "İpucuyla ama yine doğru",
-      "İpucu işini yaptı, sen de",
-    ],
-    goodGuess: [
-      "Vay, iyi tahmin!",
-      "Bildin",
-      "Sezgi tam yerinde",
-      "Şans mı, dahilik mi?",
-    ],
-    hookMiss: [
-      "Olmadı, hiç sorun değil, devam",
-      "Kaçtı, dert değil",
-      "Yanlış tahmin, eğlenceli tahmin",
-      "Ha, o değil. Devam",
-    ],
-    nudge: [
-      "Ooh, çok yakın. Çabuk, bir daha bak",
-      "O değil. Bir daha, bir daha",
-      "Az kaldı. Bir hamle daha",
-      "Hop. Bir daha bakar mısın?",
-    ],
-    close: [
-      "Yakın, ama en iyisi o değil",
-      "Ooh, az kaldı. Daha iyisi var",
-      "Çok yakın, biri daha iyi",
-      "İyi seçim, ama en iyisi değil",
-    ],
-    answer: [
-      "Tamam tamam, işte burada",
-      "Hadi, cevap zamanı",
-      "Stres yok, işte cevap",
-      "Tamam, şöyle işliyor",
     ],
   },
   unhinged: {

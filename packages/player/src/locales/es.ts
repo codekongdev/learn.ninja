@@ -106,9 +106,15 @@ export const es: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Apagado",
-    normal: "Normal",
-    caffeinated: "Con cafeína",
+    default: "Predeterminado",
+    sensei: "Sensei",
     unhinged: "Desquiciado",
+  },
+  ninjaHints: {
+    off: "Se queda escondido",
+    default: "Breve y claro",
+    sensei: "Tranquilo y paciente",
+    unhinged: "Se asusta para que tú no tengas que hacerlo",
   },
   shortcuts: "Atajos de teclado",
   shortcutMain: "Empezar, comprobar o continuar",

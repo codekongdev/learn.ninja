@@ -109,9 +109,15 @@ export const de: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Aus",
-    normal: "Normal",
-    caffeinated: "Koffeiniert",
+    default: "Standard",
+    sensei: "Sensei",
     unhinged: "Durchgedreht",
+  },
+  ninjaHints: {
+    off: "Er bleibt versteckt",
+    default: "Kurz und klar",
+    sensei: "Ruhig und geduldig",
+    unhinged: "Dreht durch, damit du es nicht musst",
   },
   shortcuts: "Tastenkürzel",
   shortcutMain: "Starten, prüfen oder weiter",

@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const de: Voices = {
-  normal: {
+  default: {
     praise: [
       "Genau so",
       "Gut gemacht",
@@ -18,7 +18,12 @@ export const de: Voices = {
       "Tipp genutzt, Antwort gefunden",
       "Schön herausgefunden",
     ],
-    goodGuess: ["Gut geraten!", "Gutes Gespür", "Gute Wahl", "Treffsicher geraten"],
+    goodGuess: [
+      "Gut geraten!",
+      "Gutes Gespür",
+      "Gute Wahl",
+      "Treffsicher geraten",
+    ],
     hookMiss: [
       "Nicht ganz, und das ist okay",
       "Diesmal nicht, und das ist okay",
@@ -42,54 +47,6 @@ export const de: Voices = {
       "So funktioniert es",
       "Schauen wir uns die Antwort an",
       "Die war knifflig. Hier ist sie",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Ja, ja, ja!",
-      "Bumm, sitzt",
-      "Schnell und richtig",
-      "Zack, richtig",
-      "Oh, das ist es",
-      "Treffer, weiter",
-      "Ooh, sauber",
-      "Du bist nicht zu bremsen",
-    ],
-    correctWithHint: [
-      "Richtig, und der Tipp zählt auch",
-      "Tipp, dann bumm",
-      "Mit Tipp und trotzdem richtig",
-      "Der Tipp hat geliefert, du auch",
-    ],
-    goodGuess: [
-      "Wow, gut geraten!",
-      "Gewusst",
-      "Instinkt sitzt",
-      "Glück oder Genie?",
-    ],
-    hookMiss: [
-      "Nö, total okay, weiter",
-      "Daneben, kein Ding",
-      "Falsch geraten, schön geraten",
-      "Ha, nicht das. Weiter geht's",
-    ],
-    nudge: [
-      "Ooh, so knapp. Schnell, noch ein Blick",
-      "Nicht das. Nochmal, nochmal",
-      "Fast. Noch ein Versuch, zack",
-      "Hoppla. Noch ein Blick?",
-    ],
-    close: [
-      "Nah dran, aber nicht die beste",
-      "Ooh, fast. Es gibt eine bessere",
-      "So knapp, eine ist besser",
-      "Gute Wahl, nicht die beste",
-    ],
-    answer: [
-      "Okay, okay, hier ist sie",
-      "Na gut, Zeit für die Antwort",
-      "Kein Stress, hier ist sie",
-      "Okay, so geht's",
     ],
   },
   unhinged: {

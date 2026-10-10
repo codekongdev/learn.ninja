@@ -122,7 +122,7 @@ export interface Preferences {
   tray?: "open" | "closed"
   /** Sound effects (on until muted). */
   sound?: "on" | "off"
-  /** How much the ninja reacts (normal until changed). */
+  /** The ninja's character (Default until changed). */
   ninja?: NinjaLevel
 }
 
@@ -134,8 +134,15 @@ export function usePreferences() {
     try {
       const saved = JSON.parse(
         localStorage.getItem(PREFERENCES_KEY) ?? "{}"
-      ) as Partial<Preferences>
-      setPrefs((p) => ({ ...p, ...saved }))
+      ) as Partial<Preferences> & { ninja?: string }
+      // The characters were renamed: Normal became Default, and Sensei took Caffeinated's place.
+      const renamed: Record<string, NinjaLevel> = {
+        normal: "default",
+        caffeinated: "sensei",
+      }
+      if (saved.ninja && saved.ninja in renamed)
+        saved.ninja = renamed[saved.ninja]
+      setPrefs((p) => ({ ...p, ...(saved as Partial<Preferences>) }))
     } catch {
       // Storage can be blocked or empty; the defaults are fine.
     }
@@ -554,9 +561,7 @@ export function AppSettings({
             <DropdownMenuSubTrigger textValue={t.language}>
               <GlobeIcon />
               {t.language}
-              <span className="text-muted-foreground">
-                {language.label}
-              </span>
+              <span className="text-muted-foreground">{language.label}</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent
               aria-label={t.language}
@@ -632,16 +637,16 @@ const SHOW_SOUND = false
 
 export const NINJA_LEVELS = [
   "off",
-  "normal",
-  "caffeinated",
+  "default",
+  "sensei",
   "unhinged",
 ] as const satisfies readonly NinjaLevel[]
 
 /** The signature move the preview plays when you land on each level. */
 const NINJA_PREVIEW: Record<NinjaLevel, NinjaMood> = {
   off: "closed",
-  normal: "happy",
-  caffeinated: "hop",
+  default: "happy",
+  sensei: "nod",
   unhinged: "flip",
 }
 
@@ -661,7 +666,7 @@ export function PlayerSettings({
   t: Strings
 }) {
   const sound = prefs.sound ?? "on"
-  const ninja = prefs.ninja ?? "normal"
+  const ninja = prefs.ninja ?? "default"
   if (side === "start")
     return (
       <NinjaSetting
@@ -705,7 +710,7 @@ export function PlayerSettings({
   )
 }
 
-/** The ninja's level: a slider with four stops, from hidden to over the top, with him previewing each. */
+/** The ninja's character: a slider with four stops, from hidden to unhinged, with him previewing each and a line on what to expect. */
 function NinjaSetting({
   value,
   onChange,
@@ -735,6 +740,8 @@ function NinjaSetting({
             {t.ninjaLevels[value]}
           </span>
         </div>
+        {/* What each character is like, so the names don't have to explain themselves. */}
+        <p className="text-sm text-muted-foreground">{t.ninjaHints[value]}</p>
         <div className="flex items-center gap-4">
           <Ninja
             mood={NINJA_PREVIEW[value]}

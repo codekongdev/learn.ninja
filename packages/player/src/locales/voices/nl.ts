@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const nl: Voices = {
-  normal: {
+  default: {
     praise: [
       "Zo ja",
       "Goed gedaan",
@@ -47,54 +47,6 @@ export const nl: Voices = {
       "Zo zit het",
       "Laten we naar het antwoord kijken",
       "Lastige. Hier is het antwoord",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Ja, ja, ja!",
-      "Boem, raak",
-      "Snel en goed",
-      "Pats, correct",
-      "O, dat is 'm",
-      "Midden in de roos, door",
-      "Ooh, strak",
-      "Je bent niet te stoppen",
-    ],
-    correctWithHint: [
-      "Goed, en de hint telt ook",
-      "Hint, en dan boem",
-      "Met hint en toch goed",
-      "De hint deed z'n werk, jij ook",
-    ],
-    goodGuess: [
-      "Wauw, goed gegokt!",
-      "Raak gegokt",
-      "Instinct klopt",
-      "Geluk of genie?",
-    ],
-    hookMiss: [
-      "Nee, prima hoor, ga door",
-      "Mis, geen punt",
-      "Foute gok, leuke gok",
-      "Ha, niet deze. Door",
-    ],
-    nudge: [
-      "Ooh, zo dichtbij. Snel, nog een blik",
-      "Niet deze. Nog een keer, nog een keer",
-      "Bijna. Nog een rondje",
-      "Oeps. Nog een keer kijken?",
-    ],
-    close: [
-      "Dichtbij, maar niet de allerbeste",
-      "Ooh, bijna. Er is een betere",
-      "Zo dichtbij, één is beter",
-      "Goede keus, niet de beste keus",
-    ],
-    answer: [
-      "Oké oké, hier is ie",
-      "Goed, tijd voor het antwoord",
-      "Geen stress, hier is ie",
-      "Oké, zo gaat het",
     ],
   },
   unhinged: {

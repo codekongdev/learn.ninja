@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const pl: Voices = {
-  normal: {
+  default: {
     praise: [
       "O to chodzi",
       "Dobra robota",
@@ -47,54 +47,6 @@ export const pl: Voices = {
       "Tak to działa",
       "Spójrzmy na odpowiedź",
       "To było trudne. Oto odpowiedź",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Tak, tak, tak!",
-      "Bum, trafione",
-      "Szybko i dobrze",
-      "Bach, poprawnie",
-      "O, to jest to",
-      "W dziesiątkę, dalej",
-      "Ooh, czysto",
-      "Nie do zatrzymania",
-    ],
-    correctWithHint: [
-      "Jest, a podpowiedź też się liczy",
-      "Podpowiedź, a potem bum",
-      "Z podpowiedzią i nadal dobrze",
-      "Podpowiedź zadziałała, ty też",
-    ],
-    goodGuess: [
-      "Wow, dobry strzał!",
-      "Trafiony, zatopiony",
-      "Instynkt w punkt",
-      "Szczęście czy geniusz?",
-    ],
-    hookMiss: [
-      "Nie, spoko, lecimy dalej",
-      "Pudło, nic się nie stało",
-      "Zły strzał, fajny strzał",
-      "Ha, nie to. Jedziemy dalej",
-    ],
-    nudge: [
-      "Ooh, tak blisko. Szybko, spójrz jeszcze raz",
-      "Nie to. Jeszcze, jeszcze",
-      "Prawie. Jeszcze jedno podejście",
-      "Ups. Jeszcze jedno spojrzenie?",
-    ],
-    close: [
-      "Blisko, ale nie najlepsza",
-      "Ooh, prawie. Jest lepsza",
-      "Tak blisko, jedna jest lepsza",
-      "Dobry wybór, nie najlepszy wybór",
-    ],
-    answer: [
-      "Dobra, dobra, oto ona",
-      "No to czas na odpowiedź",
-      "Bez stresu, oto ona",
-      "Okej, to idzie tak",
     ],
   },
   unhinged: {

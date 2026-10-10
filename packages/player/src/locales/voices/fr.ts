@@ -1,7 +1,7 @@
 import type { Voices } from "../../voices"
 
 export const fr: Voices = {
-  normal: {
+  default: {
     praise: [
       "Voilà",
       "Bien joué",
@@ -42,54 +42,6 @@ export const fr: Voices = {
       "Voici comment ça marche",
       "Regardons la réponse",
       "Celle-ci était dure. La voici",
-    ],
-  },
-  caffeinated: {
-    praise: [
-      "Oui, oui, oui !",
-      "Boum, en plein dedans",
-      "Vite et bien",
-      "Tac, correct",
-      "Oh, c'est ça",
-      "Pile, suivante",
-      "Ooh, net et précis",
-      "Tu es en feu",
-    ],
-    correctWithHint: [
-      "Trouvé, et l'indice compte aussi",
-      "Indice, puis boum",
-      "Avec un indice, et c'est juste",
-      "L'indice a fait son job, toi aussi",
-    ],
-    goodGuess: [
-      "Waouh, bien deviné !",
-      "Bien senti",
-      "Instinct au top",
-      "Chance ou génie ?",
-    ],
-    hookMiss: [
-      "Non, pas grave, on continue",
-      "Raté, c'est rien",
-      "Mauvaise pioche, jolie tentative",
-      "Ha, pas ça. On avance",
-    ],
-    nudge: [
-      "Ooh, si près. Vite, regarde encore",
-      "Pas ça. Encore, encore",
-      "Presque. Un autre petit coup",
-      "Oups. Encore un coup d'œil ?",
-    ],
-    close: [
-      "Pas loin, mais pas la meilleure",
-      "Ooh, presque. Il y a mieux",
-      "Si près, une autre la bat",
-      "Bon choix, pas le meilleur",
-    ],
-    answer: [
-      "OK, OK, la voici",
-      "Allez, l'heure de la réponse",
-      "Pas de stress, la voici",
-      "OK, voilà comment ça marche",
     ],
   },
   unhinged: {

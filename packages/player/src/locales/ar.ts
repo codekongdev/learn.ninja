@@ -88,9 +88,15 @@ export const ar: Strings = {
   ninja: "النينجا",
   ninjaLevels: {
     off: "متوقف",
-    normal: "عادي",
-    caffeinated: "مُنشَّط بالكافيين",
+    default: "افتراضي",
+    sensei: "سنسي",
     unhinged: "خارج عن السيطرة",
+  },
+  ninjaHints: {
+    off: "يبقى مختفيًا",
+    default: "قصير وواضح",
+    sensei: "هادئ وصبور",
+    unhinged: "يفزع بدلًا عنك",
   },
   shortcuts: "اختصارات لوحة المفاتيح",
   shortcutMain: "ابدأ أو تحقق أو تابع",

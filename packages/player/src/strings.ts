@@ -92,9 +92,10 @@ export type Strings = {
   /** The sound setting in the tray: its name, and its state while muted. */
   sound: string
   muted: string
-  /** The ninja setting: how big his reactions are. */
+  /** The ninja setting: which character he plays, each with a one-line description. */
   ninja: string
   ninjaLevels: Record<NinjaLevel, string>
+  ninjaHints: Record<NinjaLevel, string>
   /** The keyboard shortcuts dialog, opened from the footer or with "?". */
   shortcuts: string
   shortcutMain: string
@@ -109,8 +110,8 @@ export type Strings = {
 
 export type TextSize = "sm" | "md" | "lg"
 export type Theme = "system" | "light" | "dark"
-/** How much the ninja reacts: hidden, as usual, livelier, or over the top. */
-export type NinjaLevel = "off" | "normal" | "caffeinated" | "unhinged"
+/** The ninja's character: hidden, plain and short, a calm mentor, or a nervous wreck. */
+export type NinjaLevel = "off" | "default" | "sensei" | "unhinged"
 
 /**
  * Languages the player's own text is translated into: the code, the language's name in itself (for

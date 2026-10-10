@@ -482,7 +482,7 @@ function Player({
 }) {
   const { t, keyScope } = usePlayer()
   const { textSize } = prefs
-  const ninja: NinjaLevel = prefs.ninja ?? "normal"
+  const ninja: NinjaLevel = prefs.ninja ?? "default"
   const [state, dispatch] = React.useReducer(reducer, lesson, (l) =>
     start(l, startAt)
   )
@@ -1071,7 +1071,7 @@ export function ActionArea({
   textSize,
   tray,
   ninja = true,
-  level = "normal",
+  level = "default",
   pickLine: picker,
 }: {
   lesson: Lesson

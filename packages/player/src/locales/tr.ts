@@ -100,9 +100,15 @@ export const tr: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Kapalı",
-    normal: "Normal",
-    caffeinated: "Kafeinli",
+    default: "Varsayılan",
+    sensei: "Sensei",
     unhinged: "Zıvanadan çıkmış",
+  },
+  ninjaHints: {
+    off: "Gizli kalır",
+    default: "Kısa ve net",
+    sensei: "Sakin ve sabırlı",
+    unhinged: "Sen panik yapma diye o yapar",
   },
   shortcuts: "Klavye kısayolları",
   shortcutMain: "Başla, kontrol et veya devam et",

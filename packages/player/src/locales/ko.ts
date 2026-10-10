@@ -88,9 +88,15 @@ export const ko: Strings = {
   ninja: "닌자",
   ninjaLevels: {
     off: "끄기",
-    normal: "보통",
-    caffeinated: "카페인 과다",
+    default: "기본",
+    sensei: "사부",
     unhinged: "폭주",
+  },
+  ninjaHints: {
+    off: "숨어 있어요",
+    default: "짧고 분명하게",
+    sensei: "차분하고 참을성 있게",
+    unhinged: "대신 당황해 줘요",
   },
   shortcuts: "키보드 단축키",
   shortcutMain: "시작, 확인 또는 계속",

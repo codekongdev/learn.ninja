@@ -93,9 +93,15 @@ export const vi: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Tắt",
-    normal: "Bình thường",
-    caffeinated: "Đầy caffeine",
+    default: "Mặc định",
+    sensei: "Sensei",
     unhinged: "Mất kiểm soát",
+  },
+  ninjaHints: {
+    off: "Ẩn mình",
+    default: "Ngắn gọn và rõ ràng",
+    sensei: "Điềm tĩnh và kiên nhẫn",
+    unhinged: "Hoảng loạn thay cho bạn",
   },
   shortcuts: "Phím tắt",
   shortcutMain: "Bắt đầu, kiểm tra hoặc tiếp tục",

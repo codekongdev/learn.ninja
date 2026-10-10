@@ -89,9 +89,15 @@ export const ja: Strings = {
   ninja: "忍者",
   ninjaLevels: {
     off: "オフ",
-    normal: "ふつう",
-    caffeinated: "カフェイン過多",
+    default: "標準",
+    sensei: "先生",
     unhinged: "暴走",
+  },
+  ninjaHints: {
+    off: "姿を見せません",
+    default: "短くはっきり",
+    sensei: "穏やかで辛抱強い",
+    unhinged: "あなたの代わりに慌てます",
   },
   shortcuts: "キーボードショートカット",
   shortcutMain: "開始・チェック・続ける",

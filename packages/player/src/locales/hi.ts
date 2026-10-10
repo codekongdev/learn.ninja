@@ -102,9 +102,15 @@ export const hi: Strings = {
   ninja: "निंजा",
   ninjaLevels: {
     off: "बंद",
-    normal: "सामान्य",
-    caffeinated: "कैफ़ीन पर",
+    default: "डिफ़ॉल्ट",
+    sensei: "सेंसेई",
     unhinged: "बेकाबू",
+  },
+  ninjaHints: {
+    off: "छिपा रहता है",
+    default: "छोटा और साफ़",
+    sensei: "शांत और धैर्यवान",
+    unhinged: "आपकी जगह खुद घबरा जाता है",
   },
   shortcuts: "कीबोर्ड शॉर्टकट",
   shortcutMain: "शुरू करें, जाँचें या आगे बढ़ें",

@@ -115,9 +115,15 @@ export const uk: Strings = {
   ninja: "Ніндзя",
   ninjaLevels: {
     off: "Вимкнено",
-    normal: "Звичайний",
-    caffeinated: "На кофеїні",
+    default: "За замовчуванням",
+    sensei: "Сенсей",
     unhinged: "Божевільний",
+  },
+  ninjaHints: {
+    off: "Не показується",
+    default: "Коротко і ясно",
+    sensei: "Спокійний і терплячий",
+    unhinged: "Панікує замість вас",
   },
   shortcuts: "Гарячі клавіші",
   shortcutMain: "Почати, перевірити або продовжити",
