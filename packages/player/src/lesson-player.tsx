@@ -70,7 +70,12 @@ import {
   type Theme,
 } from "./strings"
 import { Visual } from "./visuals"
-import { createLinePicker, voiceLines, type Moment } from "./voices"
+import {
+  createLinePicker,
+  voiceLines,
+  type LinePicker,
+  type Moment,
+} from "./voices"
 
 export interface LessonPlayerProps {
   lesson: Lesson
@@ -234,6 +239,8 @@ export interface State {
   inFix: boolean
   fixQueued: boolean
   question: QuestionState | null
+  /** How many times the lesson has been restarted; seeds the feedback lines so a replay hears them in a new order. */
+  run: number
 }
 
 /** `random` is for a fixed order, e.g. a demo rendered on the server that must match on the client. */
@@ -280,7 +287,7 @@ export function wordBank(brick: Extract<QuestionBrick, { type: "blank" }>) {
   })
 }
 
-function start(lesson: Lesson, startAt?: string): State {
+function start(lesson: Lesson, startAt?: string, run = 0): State {
   const items = buildSequence(lesson)
   // A demo opens on one brick; its shuffle is seeded so the server and the browser agree.
   const at = startAt
@@ -295,6 +302,7 @@ function start(lesson: Lesson, startAt?: string): State {
     inFix: false,
     fixQueued: false,
     question: at < 0 ? null : freshQuestion(items[index], seeded(startAt!)),
+    run,
   }
 }
 
@@ -312,7 +320,7 @@ export function reducer(state: State, action: Action): State {
   const item = state.items[state.index]
   switch (action.type) {
     case "restart":
-      return start(action.lesson)
+      return start(action.lesson, undefined, state.run + 1)
     case "next": {
       let index = state.index + 1
       if (
@@ -478,6 +486,12 @@ function Player({
   const [state, dispatch] = React.useReducer(reducer, lesson, (l) =>
     start(l, startAt)
   )
+  // One line picker for the whole run. It must not live in ActionArea: that remounts with every
+  // screen (the keyed div below), and a fresh picker's first draw is always the same line.
+  const pickLine = React.useMemo(
+    () => createLinePicker(`${lesson.title}:${state.run}`),
+    [lesson.title, state.run]
+  )
   const [theoryOpen, setTheoryOpen] = React.useState(false)
   // Theory starts open where there's room for it beside the lesson.
   React.useEffect(() => {
@@ -501,9 +515,7 @@ function Player({
   // The tray holds the screen's buttons in the middle and the player's settings at the end. The notch
   // opens and closes it (Enter keeps working either way); the buttons render into `actionsEl`.
   const [trayEl, setTrayEl] = React.useState<HTMLDivElement | null>(null)
-  const [actionsEl, setActionsEl] = React.useState<HTMLDivElement | null>(
-    null
-  )
+  const [actionsEl, setActionsEl] = React.useState<HTMLDivElement | null>(null)
   const trayId = React.useId()
   // The tray's natural height, and its height while the notch is being dragged.
   const [trayHeight, setTrayHeight] = React.useState(0)
@@ -649,6 +661,7 @@ function Player({
                     tray={{ el: actionsEl, id: trayId }}
                     ninja={ninja !== "off"}
                     level={ninja}
+                    pickLine={pickLine}
                   />
                 </div>
               </main>
@@ -1059,6 +1072,7 @@ export function ActionArea({
   tray,
   ninja = true,
   level = "normal",
+  pickLine: picker,
 }: {
   lesson: Lesson
   item: Item
@@ -1071,12 +1085,15 @@ export function ActionArea({
   ninja?: boolean
   /** The ninja's character, which picks the voice of the feedback lines. */
   level?: NinjaLevel
+  /** The lesson's line picker, shared across screens so lines don't repeat. A demo of one brick can omit it. */
+  pickLine?: LinePicker
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
-  const pickLine = React.useMemo(
+  const ownPicker = React.useMemo(
     () => createLinePicker(lesson.title),
     [lesson.title]
   )
+  const pickLine = picker ?? ownPicker
   let tone: Tone = "neutral"
   let title: string | null = null
   let message: string | null = null
@@ -1144,9 +1161,7 @@ export function ActionArea({
       primary = { ...primary, variant: r.correct ? "success" : "warning" }
     } else if (s.phase === "feedback" && r?.correct) {
       tone = "good"
-      title = say(
-        s.usedHint && s.attempts === 0 ? "correctWithHint" : "praise"
-      )
+      title = say(s.usedHint && s.attempts === 0 ? "correctWithHint" : "praise")
       explanation = brick.explanation
       primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r) {

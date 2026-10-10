@@ -1,6 +1,8 @@
+import { readFileSync } from "node:fs"
+
 import { describe, expect, it } from "vitest"
 
-import type { QuestionBrick } from "@workspace/spec"
+import type { Lesson, QuestionBrick } from "@workspace/spec"
 
 import type { Item } from "./flow"
 import { freshQuestion, reducer, wordBank, type State } from "./lesson-player"
@@ -46,6 +48,7 @@ function stateFor(brick: QuestionBrick): State {
     mistakes: [],
     inFix: false,
     fixQueued: false,
+    run: 0,
     question: freshQuestion(item, () => 0.5),
   }
 }
@@ -97,5 +100,23 @@ describe("retry", () => {
       },
     })
     expect(state.question?.result).toBeNull()
+  })
+})
+
+describe("restart", () => {
+  it("counts the run, so a replay seeds its feedback lines afresh", () => {
+    const lesson = JSON.parse(
+      readFileSync(
+        new URL("../../../examples/compound-interest.json", import.meta.url),
+        "utf8"
+      )
+    ) as Lesson
+    let state = stateFor(sort)
+    expect(state.run).toBe(0)
+    state = reducer(state, { type: "restart", lesson })
+    expect(state.run).toBe(1)
+    expect(state.index).toBe(0)
+    state = reducer(state, { type: "restart", lesson })
+    expect(state.run).toBe(2)
   })
 })

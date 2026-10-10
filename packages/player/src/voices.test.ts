@@ -39,8 +39,25 @@ describe("voices", () => {
     const seen = Array.from({ length: 12 }, (_, i) => pick(`k${i}`, lines))
     for (let round = 0; round < 3; round++)
       expect(new Set(seen.slice(round * 4, round * 4 + 4)).size).toBe(4)
-    for (let i = 1; i < seen.length; i++)
-      expect(seen[i]).not.toBe(seen[i - 1])
+    for (let i = 1; i < seen.length; i++) expect(seen[i]).not.toBe(seen[i - 1])
+  })
+
+  it("gives one lesson different lines across its screens, however the picker is asked", () => {
+    // The player keeps one picker per run; a picker per screen would start every bag the same way.
+    const lines = voiceLines("en", "unhinged", "praise")
+    const pick = createLinePicker("Compound interest:0")
+    const heard = [1, 3, 5, 6].map((screen) =>
+      pick(`${screen}-0-feedback-praise-unhinged`, lines)
+    )
+    expect(new Set(heard).size).toBe(heard.length)
+  })
+
+  it("starts a replay somewhere else", () => {
+    const lines = voiceLines("en", "normal", "praise")
+    const openers = [0, 1, 2].map((run) =>
+      createLinePicker(`Compound interest:${run}`)("1-0-feedback-praise", lines)
+    )
+    expect(new Set(openers).size).toBeGreaterThan(1)
   })
 
   it("keeps the same line for the same feedback", () => {

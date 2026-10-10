@@ -132,6 +132,7 @@ function begin(brick: Brick, checked?: Answer): State {
     mistakes: [],
     inFix: false,
     fixQueued: false,
+    run: 0,
     // Seeded by the brick id: the server and the browser must shuffle the same way.
     question: freshQuestion(item, seeded(brick.id)),
   }

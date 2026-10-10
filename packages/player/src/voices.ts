@@ -85,7 +85,9 @@ export function voiceLines(
  * starts with the line that ended the last one. Seeded, so a server render and the browser agree.
  * `key` names one piece of feedback; asking again with the same key returns the same line.
  */
-export function createLinePicker(seed: string) {
+export type LinePicker = (key: string, lines: string[]) => string
+
+export function createLinePicker(seed: string): LinePicker {
   const bags = new Map<string, { order: number[]; at: number; round: number }>()
   const picked = new Map<string, string>()
   return (key: string, lines: string[]): string => {
