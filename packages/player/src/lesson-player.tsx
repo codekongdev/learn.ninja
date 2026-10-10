@@ -539,7 +539,7 @@ function Player({
   createHref?: string
   shareUrl?: string
 }) {
-  const { t, keyScope } = usePlayer()
+  const { t, keyScope, lang = "en" } = usePlayer()
   const { textSize } = prefs
   const ninja: NinjaLevel = prefs.ninja ?? "default"
   const [state, dispatch] = React.useReducer(reducer, lesson, (l) =>
@@ -620,12 +620,24 @@ function Player({
           key: `${state.index}-${q.attempts}-${q.phase}`,
         }
       : null
-  // The wrap-up's send-off, with more for a perfect run.
+  // The wrap-up's send-off, with more for a perfect run: a line of his, shown under his slot once
+  // he's leapt up there (or at once when he's off and there's no leap to wait for).
   const celebrate = React.useMemo(() => {
     if (item.kind !== "wrap") return undefined
     const s = summarize(lesson, state.results)
     return s.total > 0 && s.first === s.total ? "perfect" : "done"
   }, [item.kind, lesson, state.results])
+  const wrapLine =
+    celebrate === "perfect"
+      ? pickLine(
+          `${state.index}-0--perfect-${ninja}`,
+          "perfect",
+          voiceLines(lang, ninja, "perfect"),
+          CADENCE[characterFor(ninja)]
+        )
+      : null
+  const [landed, setLanded] = React.useState(false)
+  React.useEffect(() => setLanded(false), [state.index])
 
   return (
     <>
@@ -717,6 +729,7 @@ function Player({
                       state={state}
                       dispatch={dispatch}
                       ninja={ninja !== "off"}
+                      wrapLine={ninja === "off" || landed ? wrapLine : null}
                     />
                   </div>
                   <ActionArea
@@ -738,6 +751,7 @@ function Player({
                   screen={state.index}
                   cue={cue}
                   celebrate={celebrate}
+                  onLanded={() => setLanded(true)}
                   level={ninja}
                 />
               ) : null}
@@ -893,6 +907,7 @@ export function Screen({
   state,
   dispatch,
   ninja = true,
+  wrapLine,
 }: {
   lesson: Lesson
   item: Item
@@ -900,6 +915,8 @@ export function Screen({
   dispatch: React.Dispatch<Action>
   /** Whether the ninja is on. Off, his slot folds away so the screen stays centered. */
   ninja?: boolean
+  /** The wrap-up's line for a perfect run, once he's there to say it. */
+  wrapLine?: string | null
 }) {
   const { t } = usePlayer()
   switch (item.kind) {
@@ -939,7 +956,14 @@ export function Screen({
         </div>
       )
     case "wrap":
-      return <WrapUp lesson={lesson} results={state.results} ninja={ninja} />
+      return (
+        <WrapUp
+          lesson={lesson}
+          results={state.results}
+          ninja={ninja}
+          line={wrapLine}
+        />
+      )
     case "question":
       return (
         <QuestionScreen
@@ -1056,10 +1080,13 @@ function WrapUp({
   lesson,
   results,
   ninja = true,
+  line,
 }: {
   lesson: Lesson
   results: Record<string, Outcome>
   ninja?: boolean
+  /** His line for a perfect run, shown as a bubble under his slot. */
+  line?: string | null
 }) {
   const { t } = usePlayer()
   const s = summarize(lesson, results)
@@ -1072,8 +1099,25 @@ function WrapUp({
   ]
   return (
     <div className="flex flex-col gap-6">
-      {/* The ninja leaps up from the corner to cheer here (NinjaStage). */}
+      {/* The ninja leaps up from the corner to his send-off here (NinjaStage). */}
       <NinjaSlot show={ninja} gap="-mb-6" />
+      {/* Said once he's landed: a speech bubble under him, squared off at the corner nearest him.
+          Always in the tree (hidden until then) so the line is announced when it appears. */}
+      <p
+        aria-live="polite"
+        className={
+          line
+            ? cn(
+                TOAST,
+                toneClass.good,
+                "w-fit max-w-80 text-sm font-semibold motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-top-1",
+                ninja && "rounded-ss-sm"
+              )
+            : "sr-only"
+        }
+      >
+        {line ? <RichText text={line} /> : null}
+      </p>
       <Eyebrow>{lesson.title}</Eyebrow>
       <h1 className="-mt-4 text-2xl font-semibold">{t.done}</h1>
       <div className="flex flex-wrap items-center gap-6">
@@ -1128,6 +1172,15 @@ function WrapUp({
 // ---------- action bar ----------
 
 type Tone = "neutral" | "good" | "warn"
+
+/** The feedback toast's recipe for each tone (the wrap-up's bubble shares it). */
+const TOAST = "rounded-xl border px-4 py-3 shadow-xs"
+const toneClass: Record<Tone, string> = {
+  neutral: "border-border bg-popover text-popover-foreground",
+  // The marked rows' colors (markStyles in bricks.tsx), mixed into the page the way the browser blends them (sRGB), so the toast matches yet stays opaque.
+  good: "border-green-600 bg-[color-mix(in_srgb,var(--color-green-600)_10%,var(--background))]",
+  warn: "border-yellow-500 bg-[color-mix(in_srgb,var(--color-yellow-500)_10%,var(--background))]",
+}
 
 /** The screen's main action (Enter runs it; the shortcuts dialog says so), and the feedback after checking. */
 export function ActionArea({
@@ -1203,15 +1256,11 @@ export function ActionArea({
       onPress: () => dispatch({ type: "startFix" }),
     }
   else if (item.kind === "wrap") {
+    // A perfect lesson earns one last line, said from his slot once he's landed (WrapUp), not from
+    // the corner he's just left.
     primary = {
       label: t.restart,
       onPress: () => dispatch({ type: "restart", lesson }),
-    }
-    // A perfect lesson earns one last line; otherwise the score speaks for itself.
-    const score = summarize(lesson, state.results)
-    if (score.total > 0 && score.first === score.total) {
-      tone = "good"
-      title = say("perfect")
     }
   } else if (item.kind === "question" && state.question) {
     const s = state.question
@@ -1310,13 +1359,6 @@ export function ActionArea({
     hadFeedback.current = has
   }, [title])
 
-  const toneClass: Record<Tone, string> = {
-    neutral: "border-border bg-popover text-popover-foreground",
-    // The marked rows' colors (markStyles in bricks.tsx), mixed into the page the way the browser blends them (sRGB), so the toast matches yet stays opaque.
-    good: "border-green-600 bg-[color-mix(in_srgb,var(--color-green-600)_10%,var(--background))]",
-    warn: "border-yellow-500 bg-[color-mix(in_srgb,var(--color-yellow-500)_10%,var(--background))]",
-  }
-
   const buttons = (
     <>
       <Button
@@ -1356,7 +1398,8 @@ export function ActionArea({
           aria-hidden="true"
           data-text-size={textSize}
           className={cn(
-            "absolute end-4 bottom-4 z-10 rounded-xl border px-4 py-3 shadow-xs motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:bottom-6 sm:w-fit sm:max-w-80",
+            TOAST,
+            "absolute end-4 bottom-4 z-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:bottom-6 sm:w-fit sm:max-w-80",
             // In the player the ninja sits in the corner, so the toast starts beside him as a speech bubble:
             // the corner nearest him is squared off.
             tray && ninja

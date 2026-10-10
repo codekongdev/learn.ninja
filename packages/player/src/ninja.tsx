@@ -629,6 +629,7 @@ export function NinjaStage({
   screen,
   cue,
   celebrate,
+  onLanded,
   level = "default",
 }: {
   /** The lesson card: he's positioned inside it and follows the pointer over it. */
@@ -639,6 +640,8 @@ export function NinjaStage({
   cue: NinjaCue | null
   /** Set on the wrap-up: his send-off once he's landed, with more for a perfect run. */
   celebrate?: "done" | "perfect"
+  /** Called on the wrap-up once he's landed on his slot, before the send-off. */
+  onLanded?: () => void
   /** Which character he is. The player leaves him out entirely when the setting is off. */
   level?: NinjaEnergy
 }) {
@@ -691,6 +694,16 @@ export function NinjaStage({
       return
     }
     if (reducedMotion()) return
+    // The leap is decided on the next frame, but reactions and the send-off wait on it from now,
+    // or they'd find nothing to wait for and play while he's still in the air.
+    let settle = () => {}
+    leaping.current = new Promise<void>((resolve) => {
+      settle = resolve
+    })
+    const landed = () => {
+      settle()
+      leaping.current = null
+    }
     // FLIP: the placement above lands after this effect, so measure the end spot on the next frame.
     const frame = requestAnimationFrame(() => {
       const last = el.getBoundingClientRect()
@@ -698,13 +711,16 @@ export function NinjaStage({
         Math.abs(first.left - last.left) < 2 &&
         Math.abs(first.top - last.top) < 2 &&
         Math.abs(first.width - last.width) < 2
-      )
+      ) {
+        landed()
         return
-      leaping.current = leap(el, mark, life, first, last, level).then(() => {
-        leaping.current = null
-      })
+      }
+      void leap(el, mark, life, first, last, level).then(landed)
     })
-    return () => cancelAnimationFrame(frame)
+    return () => {
+      cancelAnimationFrame(frame)
+      landed()
+    }
   }, [screen, measure, life, level])
 
   // Keep him on the slot when the card or its content resizes or scrolls. The content is the
@@ -747,12 +763,16 @@ export function NinjaStage({
   }, [cue?.key, cue?.kind, level, life])
 
   // The wrap-up: his send-off once he's landed on his slot.
+  const landed = React.useRef(onLanded)
+  landed.current = onLanded
   React.useEffect(() => {
     if (!celebrate) return
     let cancelled = false
     ;(async () => {
       await leaping.current
-      if (!cancelled) await life.play(WRAP[level][celebrate])
+      if (cancelled) return
+      landed.current?.()
+      await life.play(WRAP[level][celebrate])
     })()
     return () => {
       cancelled = true
