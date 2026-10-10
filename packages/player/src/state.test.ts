@@ -4,8 +4,14 @@ import { describe, expect, it } from "vitest"
 
 import type { Lesson, QuestionBrick } from "@workspace/spec"
 
-import type { Item } from "./flow"
-import { freshQuestion, reducer, wordBank, type State } from "./lesson-player"
+import { buildSequence, type Item, type Outcome } from "./flow"
+import {
+  earnedMoment,
+  freshQuestion,
+  reducer,
+  wordBank,
+  type State,
+} from "./lesson-player"
 
 // The player's state: what a fresh question starts with and how answering moves it along.
 
@@ -103,14 +109,15 @@ describe("retry", () => {
   })
 })
 
+const lesson = JSON.parse(
+  readFileSync(
+    new URL("../../../examples/compound-interest.json", import.meta.url),
+    "utf8"
+  )
+) as Lesson
+
 describe("restart", () => {
   it("counts the run, so a replay seeds its feedback lines afresh", () => {
-    const lesson = JSON.parse(
-      readFileSync(
-        new URL("../../../examples/compound-interest.json", import.meta.url),
-        "utf8"
-      )
-    ) as Lesson
     let state = stateFor(sort)
     expect(state.run).toBe(0)
     state = reducer(state, { type: "restart", lesson })
@@ -118,5 +125,83 @@ describe("restart", () => {
     expect(state.index).toBe(0)
     state = reducer(state, { type: "restart", lesson })
     expect(state.run).toBe(2)
+  })
+})
+
+describe("earned moments", () => {
+  // The lesson's questions in play order: the hook, then the scored ones.
+  const items = buildSequence(lesson)
+  const questions = items.flatMap((i, index) =>
+    i.kind === "question" ? [{ index, item: i }] : []
+  )
+  const scored = questions.filter((q) => q.item.role !== "hook")
+
+  /** The state right after the nth scored question was answered correctly, given the earlier outcomes. */
+  function answered(
+    n: number,
+    outcomes: Outcome[],
+    attempts = 0,
+    mistakes: QuestionBrick[] = []
+  ): State {
+    const { index, item } = scored[n]!
+    const results: Record<string, Outcome> = {}
+    scored.slice(0, n).forEach((q, i) => {
+      results[q.item.brick.id] = outcomes[i]!
+    })
+    results[item.brick.id] = attempts > 0 ? "second" : "first"
+    const question = freshQuestion(item, () => 0.5)!
+    return {
+      items,
+      index,
+      results,
+      mistakes,
+      inFix: false,
+      fixQueued: false,
+      run: 0,
+      question: { ...question, attempts, phase: "feedback" },
+    }
+  }
+  const at = (state: State) =>
+    earnedMoment(
+      state,
+      state.items[state.index] as Extract<Item, { kind: "question" }>
+    )
+
+  it("earns nothing for the hook or an ordinary first answer", () => {
+    const hook = questions[0]!
+    const state = { ...answered(0, []), index: hook.index }
+    expect(earnedMoment(state, hook.item)).toBeNull()
+    expect(at(answered(0, []))).toBeNull()
+    expect(at(answered(1, ["first"]))).toBeNull()
+  })
+
+  it("earns a streak on the third first-try answer in a row", () => {
+    expect(at(answered(2, ["first", "hint"]))).toBe("streak")
+    expect(at(answered(2, ["missed", "first"]))).toBeNull()
+    expect(at(answered(3, ["first", "first", "first"]))).toBeNull()
+  })
+
+  it("earns a comeback after a retry or after a miss", () => {
+    expect(at(answered(1, ["first"], 1))).toBe("comeback")
+    expect(at(answered(1, ["missed"]))).toBe("comeback")
+    // The retry already earned its comeback; the next question starts fresh.
+    expect(at(answered(1, ["second"]))).toBeNull()
+  })
+
+  it("earns the last line on the final question, unless a fix round is coming", () => {
+    const final = scored.length - 1
+    expect(at(answered(final, Array(final).fill("first")))).toBe("last")
+    // With a mistake to fix, more questions follow, so this isn't the last (and four in a row is no streak).
+    const mistake = scored[0]!.item.brick
+    expect(
+      at(
+        answered(
+          final,
+          ["missed", ...Array<Outcome>(final - 1).fill("first")],
+          0,
+          [mistake]
+        )
+      )
+    ).toBeNull()
   })
 })

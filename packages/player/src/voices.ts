@@ -1,11 +1,15 @@
 // The ninja's feedback lines for each character. Off and Default share the Default lines, short and
 // plain; Sensei is a calm, patient mentor; Unhinged is a jittery bundle of nerves, sure everything
 // is about to go wrong and hugely relieved when it doesn't. On a miss he panics at the situation,
-// never at the learner. Each moment has several lines so feedback doesn't repeat (see
+// never at the learner.
+//
+// Each moment has plain lines, said most of the time, and flavor lines, rationed by CADENCE so a
+// lesson of five answers doesn't feel like a fireworks show. Nothing repeats within a run (see
 // createLinePicker). Every line ends in a period, exclamation point, or question mark.
 //
-// Each language's lines live in ./locales/voices, translated from English (en.ts) for the
-// character rather than word for word.
+// Each language's lines live in ./locales/voices, written in that language's own idiom for the
+// character rather than translated from English (en.ts); English stands in for anything a language
+// hasn't written yet.
 
 import { shuffle } from "./check"
 import { ar } from "./locales/voices/ar"
@@ -32,7 +36,7 @@ import { zhTw } from "./locales/voices/zh-tw"
 import { seeded } from "./random"
 import { uiLanguageFor, type NinjaLevel, type UiLanguage } from "./strings"
 
-/** A point in a question where the ninja says something. */
+/** A point in a lesson where the ninja says something. */
 export type Moment =
   | "praise"
   | "correctWithHint"
@@ -41,15 +45,30 @@ export type Moment =
   | "nudge"
   | "close"
   | "answer"
+  // Earned: a correct answer at a moment worth more than praise, and a perfect lesson at the wrap.
+  | "streak"
+  | "comeback"
+  | "last"
+  | "perfect"
 
-export type Voice = Record<Moment, string[]>
+/** A moment's lines: the plain ones, said most of the time, and the flavor ones, rationed. */
+export type Lines = { plain: string[]; flavor: string[] }
+export type Voice = Record<Moment, Lines>
 export type Character = Exclude<NinjaLevel, "off">
-/** One language's lines for every character. Sensei is optional until a language has his lines; English stands in. */
-export type Voices = Record<Exclude<Character, "sensei">, Voice> & {
-  sensei?: Voice
+/** English: every character, every moment. */
+export type Voices = Record<Character, Voice>
+/** Another language: what it has written so far; English stands in for the rest. */
+export type PartialVoices = { [C in Character]?: Partial<Voice> }
+
+export type Slot = keyof Lines
+/** How each character rations flavor: the slot for the nth time a moment comes up in a run. */
+export const CADENCE: Record<Character, readonly Slot[]> = {
+  default: ["plain", "plain", "flavor"],
+  sensei: ["plain", "flavor"],
+  unhinged: ["flavor", "flavor", "plain"],
 }
 
-const VOICES: Record<UiLanguage, Voices> = {
+const VOICES: Record<UiLanguage, Voices | PartialVoices> = {
   en,
   es,
   pt,
@@ -73,31 +92,48 @@ const VOICES: Record<UiLanguage, Voices> = {
   "zh-tw": zhTw,
 }
 
-/** The character's lines for a moment, in the player's language (English for one it doesn't have). */
+/** The character a setting plays: Off shows nobody, but his lines are the Default ones. */
+export function characterFor(level: NinjaLevel): Character {
+  return level === "off" ? "default" : level
+}
+
+/** The character's lines for a moment, in the player's language (English for anything it lacks). */
 export function voiceLines(
   lang: string,
   level: NinjaLevel,
   moment: Moment
-): string[] {
+): Lines {
   const voices = VOICES[uiLanguageFor(lang)?.code ?? "en"]
-  const character = level === "off" ? "default" : level
-  return (voices[character] ?? en[character]!)[moment]
+  const character = characterFor(level)
+  return voices[character]?.[moment] ?? en[character][moment]
 }
 
 /**
- * A shuffle bag per set of lines: every line plays once before any repeats, and a new round never
- * starts with the line that ended the last one. Seeded, so a server render and the browser agree.
- * `key` names one piece of feedback; asking again with the same key returns the same line.
+ * Picks a line for one piece of feedback. The nth time a moment comes up in the run, the cadence
+ * says whether it gets a plain or a flavor line; within each, a shuffle bag plays every line once
+ * before any repeats, and a new round never starts with the line that ended the last one. Seeded,
+ * so a server render and the browser agree. `key` names one piece of feedback; asking again with
+ * the same key returns the same line.
  */
-export type LinePicker = (key: string, lines: string[]) => string
+export type LinePicker = (
+  key: string,
+  moment: Moment,
+  lines: Lines,
+  cadence: readonly Slot[]
+) => string
 
 export function createLinePicker(seed: string): LinePicker {
   const bags = new Map<string, { order: number[]; at: number; round: number }>()
   const picked = new Map<string, string>()
-  return (key: string, lines: string[]): string => {
+  const said = new Map<Moment, number>()
+  return (key, moment, lines, cadence) => {
     const known = picked.get(key)
     if (known !== undefined) return known
-    const line = draw(lines)
+    const n = said.get(moment) ?? 0
+    said.set(moment, n + 1)
+    const slot = cadence[n % cadence.length] ?? "plain"
+    const other: Slot = slot === "plain" ? "flavor" : "plain"
+    const line = draw(lines[slot].length ? lines[slot] : lines[other])
     picked.set(key, line)
     return line
   }

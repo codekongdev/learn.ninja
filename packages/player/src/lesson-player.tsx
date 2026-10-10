@@ -71,6 +71,8 @@ import {
 } from "./strings"
 import { Visual } from "./visuals"
 import {
+  CADENCE,
+  characterFor,
   createLinePicker,
   voiceLines,
   type LinePicker,
@@ -304,6 +306,43 @@ function start(lesson: Lesson, startAt?: string, run = 0): State {
     question: at < 0 ? null : freshQuestion(items[index], seeded(startAt!)),
     run,
   }
+}
+
+/**
+ * What a correct answer earns beyond praise: the lesson's last question, three first-try answers in
+ * a row, or a comeback (a retry that landed, a fix-round question, or the question after a miss
+ * that was revealed).
+ * The hook is a guess, so it earns nothing.
+ */
+export function earnedMoment(
+  state: State,
+  item: Extract<Item, { kind: "question" }>
+): Moment | null {
+  const s = state.question
+  if (!s || item.role === "hook") return null
+  const later = state.items
+    .slice(state.index + 1)
+    .some((i) => i.kind === "question")
+  if (!later && state.mistakes.length === 0) return "last"
+  if (s.attempts > 0 || item.role === "fix") return "comeback"
+  // Scored questions so far, in play order, ending with this one.
+  const outcomes = state.items
+    .slice(0, state.index + 1)
+    .flatMap((i) =>
+      i.kind === "question" && i.role !== "hook"
+        ? [state.results[i.brick.id]]
+        : []
+    )
+  let streak = 0
+  for (let i = outcomes.length - 1; i >= 0; i--) {
+    if (outcomes[i] !== "first" && outcomes[i] !== "hint") break
+    streak++
+  }
+  if (streak > 0 && streak % 3 === 0) return "streak"
+  // A second-try success already had its comeback; only a real miss earns one on the next question.
+  const previous = outcomes[outcomes.length - 2]
+  if (previous === "missed") return "comeback"
+  return null
 }
 
 export type Action =
@@ -637,7 +676,9 @@ function Player({
                   className={cn(
                     "mx-auto flex min-h-full w-full flex-col justify-center-safe gap-8 px-4 py-16 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
                     columnWidth(item),
-                    item.kind === "question" && "pb-40"
+                    // Room under the content for the feedback toast (the wrap gets one on a perfect lesson).
+                    (item.kind === "question" || item.kind === "wrap") &&
+                      "pb-40"
                   )}
                 >
                   <div
@@ -1120,6 +1161,14 @@ export function ActionArea({
     </Button>
   )
 
+  // One line per piece of feedback, in the character's voice, rationed and without repeats.
+  const say = (moment: Moment) =>
+    pickLine(
+      `${state.index}-${state.question?.attempts ?? 0}-${state.question?.phase ?? ""}-${moment}-${level}`,
+      moment,
+      voiceLines(lang, level, moment),
+      CADENCE[characterFor(level)]
+    )
   if (item.kind === "intro")
     primary = { label: t.start, onPress: () => dispatch({ type: "next" }) }
   else if (item.kind === "fix")
@@ -1132,16 +1181,16 @@ export function ActionArea({
       label: t.restart,
       onPress: () => dispatch({ type: "restart", lesson }),
     }
+    // A perfect lesson earns one last line; otherwise the score speaks for itself.
+    const score = summarize(lesson, state.results)
+    if (score.total > 0 && score.first === score.total) {
+      tone = "good"
+      title = say("perfect")
+    }
   } else if (item.kind === "question" && state.question) {
     const s = state.question
     const { brick, role } = item
     const r = s.result
-    // One line per piece of feedback, from the character's voice, without repeats.
-    const say = (moment: Moment) =>
-      pickLine(
-        `${state.index}-${s.attempts}-${s.phase}-${moment}-${level}`,
-        voiceLines(lang, level, moment)
-      )
     const canHelp = Boolean(brick.hint) && role !== "hook" && !s.usedHint
     const missText = (res: CheckResult) =>
       res.feedback ?? (res.missKey ? missMessage(res, t) : null)
@@ -1161,7 +1210,10 @@ export function ActionArea({
       primary = { ...primary, variant: r.correct ? "success" : "warning" }
     } else if (s.phase === "feedback" && r?.correct) {
       tone = "good"
-      title = say(s.usedHint && s.attempts === 0 ? "correctWithHint" : "praise")
+      title = say(
+        earnedMoment(state, item) ??
+          (s.usedHint && s.attempts === 0 ? "correctWithHint" : "praise")
+      )
       explanation = brick.explanation
       primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r) {
