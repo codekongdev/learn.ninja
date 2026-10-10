@@ -8,8 +8,8 @@
 // createLinePicker). Every line ends in a period, exclamation point, or question mark.
 //
 // Each language's lines live in ./locales/voices, written in that language's own idiom for the
-// character rather than translated from English (en.ts); English stands in for anything a language
-// hasn't written yet.
+// character rather than translated from English (en.ts): Unhinged's slang especially is the
+// language's own, never a rendering of the English.
 
 import { shuffle } from "./check"
 import { ar } from "./locales/voices/ar"
@@ -55,10 +55,8 @@ export type Moment =
 export type Lines = { plain: string[]; flavor: string[] }
 export type Voice = Record<Moment, Lines>
 export type Character = Exclude<NinjaLevel, "off">
-/** English: every character, every moment. */
+/** One language's lines: every character, every moment. */
 export type Voices = Record<Character, Voice>
-/** Another language: what it has written so far; English stands in for the rest. */
-export type PartialVoices = { [C in Character]?: Partial<Voice> }
 
 export type Slot = keyof Lines
 /** How each character rations flavor: the slot for the nth time a moment comes up in a run. */
@@ -68,7 +66,7 @@ export const CADENCE: Record<Character, readonly Slot[]> = {
   unhinged: ["flavor", "flavor", "plain"],
 }
 
-const VOICES: Record<UiLanguage, Voices | PartialVoices> = {
+const VOICES: Record<UiLanguage, Voices> = {
   en,
   es,
   pt,
@@ -97,15 +95,14 @@ export function characterFor(level: NinjaLevel): Character {
   return level === "off" ? "default" : level
 }
 
-/** The character's lines for a moment, in the player's language (English for anything it lacks). */
+/** The character's lines for a moment, in the player's language (English for one it doesn't have). */
 export function voiceLines(
   lang: string,
   level: NinjaLevel,
   moment: Moment
 ): Lines {
   const voices = VOICES[uiLanguageFor(lang)?.code ?? "en"]
-  const character = characterFor(level)
-  return voices[character]?.[moment] ?? en[character][moment]
+  return voices[characterFor(level)][moment]
 }
 
 /**

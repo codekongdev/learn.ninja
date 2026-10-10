@@ -1,127 +1,243 @@
-import type { PartialVoices } from "../../voices"
+import type { Voices } from "../../voices"
 
-// vi: the Default and Unhinged lines so far; English stands in for Sensei and the earned moments
-// until this language's own are written.
+// Tiếng Việt thân mật (bạn). Default ngắn gọn rõ ràng, Sensei là người thầy điềm tĩnh, còn Unhinged
+// là một bó dây thần kinh nói như người ta nói, không phải như bản dịch.
 
-export const vi: PartialVoices = {
+export const vi: Voices = {
   default: {
     praise: {
-      plain: ["Đúng rồi"],
+      plain: ["Đúng rồi.", "Chính xác."],
       flavor: [
-        "Làm tốt lắm",
-        "Chính xác",
-        "Bạn đã hiểu",
-        "Chuẩn luôn",
-        "Chính là nó",
-        "Tinh mắt đấy",
-        "Hay lắm",
+        "Làm tốt lắm!",
+        "Đúng vậy.",
+        "Bạn tìm ra rồi.",
+        "Trúng phóc.",
+        "Tinh mắt đấy.",
+        "Đó, thấy chưa.",
+        "Chính nó.",
+        "Rất tốt.",
       ],
     },
     correctWithHint: {
-      plain: ["Chính xác, có gợi ý"],
+      plain: ["Đúng, nhờ gợi ý."],
       flavor: [
-        "Nhờ gợi ý mà ra",
-        "Dùng gợi ý, tìm ra đáp án",
-        "Suy luận tốt lắm",
+        "Gợi ý đã làm việc của nó.",
+        "Giải gọn gàng.",
+        "Có gợi ý, nhưng vẫn tới đích.",
       ],
     },
     goodGuess: {
-      plain: ["Đoán hay đấy!"],
-      flavor: ["Trực giác tốt", "Chọn đúng đấy", "Đoán chuẩn thật"],
+      plain: ["Đoán hay!"],
+      flavor: ["Trực giác tốt.", "Chọn đúng.", "Đoán sắc bén."],
     },
     hookMiss: {
-      plain: ["Chưa đúng lắm, và không sao cả"],
+      plain: ["Chưa đúng, và không sao cả."],
       flavor: [
-        "Lần này chưa trúng, và không sao cả",
-        "Thử hay đấy. Cùng xem vì sao nhé",
-        "Chưa đúng lắm. Bạn sẽ sớm hiểu vì sao",
+        "Thử tốt đấy. Xem vì sao nhé.",
+        "Chưa đúng. Bạn sẽ sớm hiểu vì sao.",
       ],
     },
     nudge: {
-      plain: ["Nhìn lại một lần nữa nhé. Mình nghĩ bạn sẽ tìm ra."],
+      plain: ["Chưa đúng. Nhìn lại nhé."],
       flavor: [
-        "Chưa đúng lắm. Nhìn lại nhé.",
-        "Gần rồi. Thử lại lần nữa nhé.",
-        "Nhìn thêm một lần là ra thôi.",
+        "Gần rồi. Thử lại đi.",
+        "Nhìn thêm một lần là ra.",
+        "Nhìn lại lần nữa. Tôi nghĩ bạn sẽ bắt được.",
       ],
     },
     close: {
-      plain: ["Gần đúng, nhưng chưa phải tốt nhất"],
+      plain: ["Gần đúng, nhưng chưa phải tốt nhất."],
       flavor: [
-        "Suýt rồi. Có đáp án tốt hơn",
-        "Tốt, nhưng chưa phải tốt nhất",
-        "Gần rồi. Có lựa chọn hợp hơn",
+        "Gần rồi. Có lựa chọn khác hợp hơn.",
+        "Tốt, nhưng chưa phải tốt nhất.",
       ],
     },
     answer: {
-      plain: ["Đây là đáp án"],
+      plain: ["Đây là đáp án."],
       flavor: [
-        "Đây là cách nó hoạt động",
-        "Cùng xem đáp án nhé",
-        "Câu này khó. Đáp án đây",
+        "Nó hoạt động như thế này.",
+        "Câu này khó. Đây là đáp án.",
+        "Cùng xem đáp án nhé.",
       ],
+    },
+    streak: {
+      plain: ["Ba câu liên tiếp."],
+      flavor: ["Đang lên đà.", "Đó là một chuỗi."],
+    },
+    comeback: {
+      plain: ["Đó rồi."],
+      flavor: ["Lần này được rồi.", "Gỡ lại đẹp."],
+    },
+    last: {
+      plain: ["Câu cuối, và đúng."],
+      flavor: ["Đó chính là bài học.", "Kết thúc mạnh mẽ."],
+    },
+    perfect: {
+      plain: ["Đúng hết."],
+      flavor: ["Không sai câu nào.", "Không có gì phải sửa."],
+    },
+  },
+  sensei: {
+    praise: {
+      plain: ["Tốt. Chính là nó.", "Phải."],
+      flavor: [
+        "Bạn đã thấy nó.",
+        "Quan sát tốt.",
+        "Đúng như vậy.",
+        "Mắt bạn đang sắc hơn.",
+        "Phải. Lặng lẽ mà chắc.",
+        "Đó là con đường.",
+        "Tốt. Giữ lấy điều đó.",
+      ],
+    },
+    correctWithHint: {
+      plain: ["Đúng. Gợi ý chỉ đường, bạn là người đi."],
+      flavor: [
+        "Biết hỏi cũng là một kỹ năng.",
+        "Nhận giúp đỡ, giữ bài học.",
+        "Gợi ý là bàn tay đỡ, không phải cái nạng.",
+      ],
+    },
+    goodGuess: {
+      plain: ["Một phỏng đoán tốt."],
+      flavor: [
+        "Trực giác của bạn biết điều bạn chưa biết.",
+        "Tin vào cảm giác, rồi kiểm chứng nó.",
+        "Đoán tốt. Giờ xem vì sao.",
+      ],
+    },
+    hookMiss: {
+      plain: ["Chưa, và đó chính là điểm mấu chốt."],
+      flavor: [
+        "Một phỏng đoán cho ta biết bắt đầu từ đâu.",
+        "Không sao. Bài học bắt đầu từ đây.",
+      ],
+    },
+    nudge: {
+      plain: ["Chưa. Nhìn thêm lần nữa."],
+      flavor: [
+        "Chậm lại. Nó ở đó.",
+        "Hít thở, rồi nhìn lại.",
+        "Đáp án vẫn chưa đi đâu.",
+      ],
+    },
+    close: {
+      plain: ["Gần rồi. Có một lựa chọn hợp hơn."],
+      flavor: [
+        "Mắt tinh. Giờ tìm lựa chọn tốt nhất.",
+        "Gần rồi. Tìm cái chính xác hơn.",
+      ],
+    },
+    answer: {
+      plain: ["Đây là đáp án."],
+      flavor: [
+        "Ngẫm câu này một chút.",
+        "Câu khó dạy ta nhiều nhất. Đây là đáp án.",
+        "Đây là đáp án. Đọc chậm thôi.",
+      ],
+    },
+    streak: {
+      plain: ["Ba câu liên tiếp. Giữ vững."],
+      flavor: ["Bạn đã tìm được nhịp của mình.", "Tay vững, mắt sáng."],
+    },
+    comeback: {
+      plain: ["Bạn nhìn lại, và nó ở đó."],
+      flavor: ["Học là như thế.", "Cái nhìn thứ hai chính là bài học."],
+    },
+    last: {
+      plain: ["Và đó là bài học. Đi trọn vẹn."],
+      flavor: [
+        "Bước cuối vẫn là một bước.",
+        "Bạn đã hoàn thành điều mình bắt đầu.",
+      ],
+    },
+    perfect: {
+      plain: ["Không một lần vấp. Mang theo điều đó."],
+      flavor: ["Tâm tĩnh thì nhìn rõ.", "Không có gì để sửa. Chỉ để nhớ."],
     },
   },
   unhinged: {
     praise: {
-      plain: ["Á! Đúng rồi. Đúng thật rồi"],
+      plain: ["Đúng. Thở đi.", "Đúng rồi. Không ai hoảng nhé."],
       flavor: [
-        "Ôi, ôi, bạn làm được rồi",
-        "Không tin nổi là được",
-        "Phù. Mình tưởng toi rồi",
-        "Đúng rồi. Không ai hoảng nhé",
-        "Mắt mình hết giật rồi. Đúng",
-        "Bạn làm được mà không gì nổ tung",
-        "Đúng. Tim mình chịu không nổi",
+        "Trời ơi! Đúng. Đúng thật luôn!",
+        "Ôi trời, bạn làm được rồi!",
+        "Không tin nổi là được.",
+        "Phù. Tưởng tiêu rồi chứ.",
+        "Mắt tôi hết giật rồi. Đúng.",
+        "Làm được rồi mà không có gì nổ!",
+        "Đúng. Tim tôi chịu không nổi.",
       ],
     },
     correctWithHint: {
-      plain: ["Gợi ý đã cứu cả hai mình"],
+      plain: ["Gợi ý. Đúng. Thở đi."],
       flavor: [
-        "Phù, gợi ý xong là xong. Mình run quá",
-        "Mình cần trợ giúp, và vậy là ổn",
-        "Gợi ý hiệu quả. Hiệu quả thật",
+        "Gợi ý cứu cả hai ta.",
+        "Phù, gợi ý là xong. Tôi run quá.",
+        "Gợi ý có tác dụng. Có tác dụng thật!",
       ],
     },
     goodGuess: {
-      plain: ["Á! Sao bạn biết?"],
+      plain: ["Khoan, bạn biết sẵn luôn à?"],
       flavor: [
-        "Khoan, bạn biết luôn à?",
-        "Đoán gì mà đúng quá vậy",
-        "Sao được? Bạn theo dõi mình à?",
+        "Trời ơi! Sao bạn biết?",
+        "Đoán gì mà đúng quá vậy.",
+        "Sao được? Bạn đang theo dõi tôi à?",
       ],
     },
     hookMiss: {
-      plain: ["Á! Không sao. Hoàn toàn không sao"],
+      plain: ["Không sao. Thật sự không sao."],
       flavor: [
-        "Sai, nhưng chỉ là đoán thôi. Thở đi",
-        "Không ai thấy đâu. Đi tiếp",
-        "Đừng lo, để mình lo thay",
+        "Sai, nhưng chỉ là đoán thôi. Thở đi.",
+        "Không ai thấy đâu. Đi tiếp.",
+        "Đừng lo, để tôi lo giùm bạn.",
       ],
     },
     nudge: {
-      plain: ["Á! Không phải câu đó. Nhìn lại đi"],
+      plain: ["Không phải cái đó. Nhìn lại đi."],
       flavor: [
-        "Ôi không, ôi không. Nhìn lại nhé?",
-        "Rồi, hít thở sâu. Nhìn lại nào",
-        "Chưa đúng, nhưng vẫn sửa kịp",
+        "Ôi không, ôi không. Nhìn thêm lần nữa nhé?",
+        "Rồi, hít sâu. Nhìn lại đi.",
+        "Không phải, nhưng vẫn sửa được.",
       ],
     },
     close: {
       plain: ["Sát quá. Sao lúc nào cũng sát vậy?"],
       flavor: [
-        "Suýt. Vậy còn tệ hơn",
-        "Có câu tốt hơn, thề luôn",
-        "Gần rồi. Thần kinh mình chịu hết nổi",
+        "Gần rồi. Thế còn tệ hơn.",
+        "Có cái tốt hơn, tôi thề.",
+        "Sát nút. Thần kinh tôi không chịu nổi 'sát nút'.",
       ],
     },
     answer: {
-      plain: ["Rồi, rồi, đừng hoảng. Đây này"],
+      plain: ["Rồi, đừng hoảng. Đây là đáp án."],
       flavor: [
-        "Đây. Đừng bao giờ nhắc lại nhé",
-        "Nhanh, trước khi nó biến mất",
-        "Phù. Rồi. Nó hoạt động thế này",
+        "Đây. Đừng bao giờ nhắc lại chuyện này.",
+        "Nhanh, trước khi nó biến mất!",
+        "Phù. Rồi. Nó hoạt động thế này.",
       ],
+    },
+    streak: {
+      plain: ["Ba câu liên tiếp? Bạn là AI vậy?"],
+      flavor: [
+        "Dừng, dừng, tôi không chịu nổi chuỗi này!",
+        "Ba! Tôi phải ngồi xuống.",
+      ],
+    },
+    comeback: {
+      plain: ["Bạn trở lại rồi. Sau CÁI ĐÓ."],
+      flavor: [
+        "Sửa xong. Không bao giờ nghi ngờ bạn nữa. Cho đến lần sau.",
+        "Phù. Tưởng câu đó hạ gục ta rồi.",
+      ],
+    },
+    last: {
+      plain: ["Xong rồi. Ta làm được."],
+      flavor: ["Tôi phải nằm xuống.", "Câu cuối. Đầu gối tôi mềm nhũn."],
+    },
+    perfect: {
+      plain: ["Hoàn hảo. HOÀN HẢO. Tôi phải ngồi xuống."],
+      flavor: ["Không gì nổ cả. Không một lần.", "Tất cả? Tôi sắp xỉu."],
     },
   },
 }

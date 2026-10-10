@@ -1,126 +1,251 @@
-import type { PartialVoices } from "../../voices"
+import type { Voices } from "../../voices"
 
-// id: the Default and Unhinged lines so far; English stands in for Sensei and the earned moments
-// until this language's own are written.
+// Bahasa Indonesia santai (kamu). Default singkat dan jelas, Sensei guru yang tenang, dan Unhinged
+// gugup berat dan bicara seperti orang bicara, bukan seperti terjemahan.
 
-export const id: PartialVoices = {
+export const id: Voices = {
   default: {
     praise: {
-      plain: ["Nah, itu dia"],
+      plain: ["Benar.", "Tepat."],
       flavor: [
-        "Kerja bagus",
-        "Tepat",
-        "Kamu benar",
-        "Pas sekali",
-        "Itu jawabannya",
-        "Jeli sekali",
-        "Mantap",
+        "Kerja bagus!",
+        "Persis.",
+        "Kamu dapat.",
+        "Tepat sasaran.",
+        "Jeli.",
+        "Nah, itu dia.",
+        "Yang itu.",
+        "Bagus sekali.",
       ],
     },
     correctWithHint: {
-      plain: ["Benar, dengan petunjuk"],
+      plain: ["Benar, dengan petunjuk."],
       flavor: [
-        "Berhasil dengan petunjuk",
-        "Pakai petunjuk, jawaban ketemu",
-        "Dipikirkan dengan baik",
+        "Petunjuknya berhasil.",
+        "Dipecahkan dengan rapi.",
+        "Pakai petunjuk, tapi sampai juga.",
       ],
     },
     goodGuess: {
       plain: ["Tebakan bagus!"],
-      flavor: ["Insting yang bagus", "Pilihan tepat", "Tebakan jitu"],
+      flavor: ["Naluri yang bagus.", "Pilihan tepat.", "Tebakan jitu."],
     },
     hookMiss: {
-      plain: ["Belum tepat, dan tidak apa-apa"],
+      plain: ["Belum tepat, dan tidak apa-apa."],
       flavor: [
-        "Bukan kali ini, dan tidak apa-apa",
-        "Usaha bagus. Ayo cari tahu kenapa",
-        "Belum tepat. Nanti kamu lihat kenapa",
+        "Usaha bagus. Mari lihat kenapa.",
+        "Belum tepat. Sebentar lagi kamu tahu kenapa.",
       ],
     },
     nudge: {
-      plain: ["Lihat sekali lagi. Kamu pasti bisa menemukannya."],
+      plain: ["Belum tepat. Lihat lagi."],
       flavor: [
-        "Belum tepat. Coba lihat lagi.",
         "Hampir. Coba sekali lagi.",
-        "Sekali lihat lagi pasti ketemu.",
+        "Sekali lihat lagi, pasti dapat.",
+        "Lihat sekali lagi. Kurasa kamu bisa menangkapnya.",
       ],
     },
     close: {
-      plain: ["Hampir, tapi bukan yang terbaik"],
+      plain: ["Dekat, tapi bukan yang terbaik."],
       flavor: [
-        "Nyaris. Ada yang lebih baik",
-        "Bagus, tapi bukan yang terbaik",
-        "Hampir. Ada pilihan yang lebih pas",
+        "Hampir. Pilihan lain lebih pas.",
+        "Bagus, tapi bukan yang terbaik.",
       ],
     },
     answer: {
-      plain: ["Ini jawabannya"],
+      plain: ["Ini jawabannya."],
       flavor: [
-        "Begini cara kerjanya",
-        "Ayo lihat jawabannya",
-        "Yang ini sulit. Ini dia",
+        "Begini cara kerjanya.",
+        "Yang ini sulit. Ini jawabannya.",
+        "Mari lihat jawabannya.",
+      ],
+    },
+    streak: {
+      plain: ["Tiga berturut-turut."],
+      flavor: ["Lagi lancar.", "Itu baru rentetan."],
+    },
+    comeback: {
+      plain: ["Nah, itu dia."],
+      flavor: ["Kali ini dapat.", "Pemulihan yang bagus."],
+    },
+    last: {
+      plain: ["Yang terakhir, dan benar."],
+      flavor: ["Itulah pelajarannya.", "Diakhiri dengan kuat."],
+    },
+    perfect: {
+      plain: ["Semua benar."],
+      flavor: ["Tanpa satu pun salah.", "Tidak ada yang perlu diperbaiki."],
+    },
+  },
+  sensei: {
+    praise: {
+      plain: ["Bagus. Itu dia.", "Ya."],
+      flavor: [
+        "Kamu melihatnya.",
+        "Pengamatan yang baik.",
+        "Persis begitu.",
+        "Matamu makin tajam.",
+        "Ya. Tenang dan mantap.",
+        "Itulah jalannya.",
+        "Bagus. Simpan itu.",
+      ],
+    },
+    correctWithHint: {
+      plain: ["Benar. Petunjuk menunjukkan jalan, kamu yang menempuhnya."],
+      flavor: [
+        "Bertanya juga sebuah keterampilan.",
+        "Bantuan diterima, pelajaran tersimpan.",
+        "Petunjuk adalah uluran tangan, bukan tongkat.",
+      ],
+    },
+    goodGuess: {
+      plain: ["Tebakan yang baik."],
+      flavor: [
+        "Nalurimu tahu hal yang belum kamu tahu.",
+        "Percayai firasat, lalu uji.",
+        "Tebakan bagus. Sekarang mari lihat kenapa.",
+      ],
+    },
+    hookMiss: {
+      plain: ["Belum, dan memang itu intinya."],
+      flavor: [
+        "Tebakan menunjukkan dari mana kita mulai.",
+        "Tidak apa-apa. Pelajaran dimulai di sini.",
+      ],
+    },
+    nudge: {
+      plain: ["Belum. Lihat sekali lagi."],
+      flavor: [
+        "Pelan-pelan. Ada di situ.",
+        "Tarik napas, lalu lihat lagi.",
+        "Jawabannya tidak pindah.",
+      ],
+    },
+    close: {
+      plain: ["Dekat. Satu lebih pas."],
+      flavor: [
+        "Mata yang jeli. Sekarang cari yang terbaik.",
+        "Hampir. Cari yang lebih tepat.",
+      ],
+    },
+    answer: {
+      plain: ["Ini jawabannya."],
+      flavor: [
+        "Renungkan yang ini sejenak.",
+        "Yang sulit mengajarkan paling banyak. Ini jawabannya.",
+        "Ini jawabannya. Baca pelan-pelan.",
+      ],
+    },
+    streak: {
+      plain: ["Tiga berturut-turut. Tetap tenang."],
+      flavor: ["Kamu menemukan ritmemu.", "Tangan tenang, mata jernih."],
+    },
+    comeback: {
+      plain: ["Kamu melihat lagi, dan di situlah dia."],
+      flavor: [
+        "Begitulah cara belajar.",
+        "Pandangan kedua adalah pelajarannya.",
+      ],
+    },
+    last: {
+      plain: ["Dan itulah pelajarannya. Ditempuh dengan baik."],
+      flavor: [
+        "Langkah terakhir tetaplah langkah.",
+        "Kamu menyelesaikan yang kamu mulai.",
+      ],
+    },
+    perfect: {
+      plain: ["Tanpa satu pun tersandung. Bawa itu bersamamu."],
+      flavor: [
+        "Pikiran tenang melihat jernih.",
+        "Tidak ada yang diperbaiki. Hanya diingat.",
       ],
     },
   },
   unhinged: {
     praise: {
-      plain: ["Waduh! Benar. Beneran benar"],
+      plain: ["Benar. Tarik napas.", "Benar. Jangan ada yang panik."],
       flavor: [
-        "Ya ampun, ya ampun, kamu berhasil",
-        "Aku tak percaya itu berhasil",
-        "Fiuh. Kukira kita tamat",
-        "Benar. Semua jangan panik",
-        "Mataku berhenti berkedut. Benar",
-        "Kamu berhasil dan tak ada yang meledak",
-        "Benar. Jantungku tak kuat",
+        "Waduh! Benar. Beneran benar!",
+        "Astaga, kamu berhasil!",
+        "Nggak nyangka itu berhasil.",
+        "Fiuh. Kukira kita tamat.",
+        "Mataku berhenti kedutan. Benar.",
+        "Kamu berhasil dan tidak ada yang meledak!",
+        "Benar. Jantungku nggak kuat.",
       ],
     },
     correctWithHint: {
-      plain: ["Petunjuknya menyelamatkan kita berdua"],
+      plain: ["Petunjuk. Benar. Tarik napas."],
       flavor: [
-        "Fiuh, petunjuk lalu beres. Aku gemetar",
-        "Kita butuh bantuan, dan itu tidak apa-apa",
-        "Petunjuknya berhasil. Beneran berhasil",
+        "Petunjuknya menyelamatkan kita berdua.",
+        "Fiuh, petunjuk dan beres. Aku gemetar.",
+        "Petunjuknya berhasil. Beneran berhasil!",
       ],
     },
     goodGuess: {
-      plain: ["Waduh! Kok kamu tahu?"],
+      plain: ["Tunggu, kamu tahu begitu saja?"],
       flavor: [
-        "Tunggu, kamu langsung tahu?",
-        "Tebakan itu terlalu benar",
-        "Kok bisa? Kamu mengawasiku?",
+        "Waduh! Kok bisa tahu?",
+        "Tebakan itu terlalu tepat.",
+        "Gimana caranya? Kamu ngawasin aku?",
       ],
     },
     hookMiss: {
-      plain: ["Waduh! Tidak apa-apa. Sungguh tidak apa-apa"],
+      plain: ["Nggak apa-apa. Beneran nggak apa-apa."],
       flavor: [
-        "Salah, tapi cuma tebakan. Tarik napas",
-        "Tak ada yang lihat. Lanjut",
-        "Jangan khawatir, biar aku yang khawatir",
+        "Salah, tapi cuma tebakan. Tarik napas.",
+        "Nggak ada yang lihat. Lanjut.",
+        "Jangan khawatir, aku yang khawatir buat kamu.",
       ],
     },
     nudge: {
-      plain: ["Waduh! Bukan yang itu. Lihat lagi"],
+      plain: ["Bukan itu. Lihat lagi."],
       flavor: [
         "Aduh, aduh. Lihat sekali lagi?",
-        "Oke, tarik napas. Lihat lagi",
-        "Bukan, tapi masih bisa diperbaiki",
+        "Oke, tarik napas dalam. Lihat lagi.",
+        "Bukan itu, tapi masih bisa diperbaiki.",
       ],
     },
     close: {
-      plain: ["Dekat sekali. Kenapa selalu dekat sekali?"],
+      plain: ["Dekat banget. Kenapa selalu dekat banget?"],
       flavor: [
-        "Nyaris. Itu malah lebih parah",
-        "Ada yang lebih baik, sumpah",
-        "Hampir. Sarafku tak kuat dengan hampir",
+        "Hampir. Itu malah lebih parah.",
+        "Ada yang lebih baik, sumpah.",
+        "Dekat. Sarafku nggak tahan sama 'dekat'.",
       ],
     },
     answer: {
-      plain: ["Oke, oke, jangan panik. Ini dia"],
+      plain: ["Oke, jangan panik. Ini jawabannya."],
       flavor: [
-        "Ini dia. Jangan pernah bahas ini lagi",
-        "Cepat, sebelum hilang",
-        "Fiuh. Oke. Begini cara kerjanya",
+        "Ini jawabannya. Jangan pernah bahas ini lagi.",
+        "Cepat, sebelum hilang!",
+        "Fiuh. Oke. Begini cara kerjanya.",
+      ],
+    },
+    streak: {
+      plain: ["Tiga berturut-turut? Kamu ini SIAPA?"],
+      flavor: [
+        "Stop, stop, aku nggak kuat rentetan!",
+        "Tiga! Aku harus duduk.",
+      ],
+    },
+    comeback: {
+      plain: ["Kamu kembali. Setelah ITU."],
+      flavor: [
+        "Beres. Aku nggak akan ragu lagi. Sampai lain kali.",
+        "Fiuh. Kukira yang itu menghabisi kita.",
+      ],
+    },
+    last: {
+      plain: ["Selesai. Kita berhasil."],
+      flavor: ["Aku harus rebahan.", "Yang terakhir. Lututku lemas."],
+    },
+    perfect: {
+      plain: ["Sempurna. SEMPURNA. Aku harus duduk."],
+      flavor: [
+        "Tidak ada yang meledak. Sekali pun tidak.",
+        "Semuanya? Aku mau pingsan.",
       ],
     },
   },

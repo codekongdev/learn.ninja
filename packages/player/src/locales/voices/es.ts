@@ -1,127 +1,243 @@
-import type { PartialVoices } from "../../voices"
+import type { Voices } from "../../voices"
 
-// es: the Default and Unhinged lines so far; English stands in for Sensei and the earned moments
-// until this language's own are written.
+// Español neutro (tú). Default es breve y claro, Sensei es un maestro sereno, y Unhinged es un manojo
+// de nervios que habla como se habla, no como se traduce.
 
-export const es: PartialVoices = {
+export const es: Voices = {
   default: {
     praise: {
-      plain: ["Eso es"],
+      plain: ["Correcto.", "Así es."],
       flavor: [
-        "Buen trabajo",
-        "Exacto",
-        "Lo tienes",
-        "Perfecto",
-        "Esa es",
-        "Bien visto",
-        "Muy bien",
+        "¡Buen trabajo!",
+        "Exacto.",
+        "Lo tienes.",
+        "Perfecto.",
+        "Bien visto.",
+        "Eso es.",
+        "Esa es.",
+        "Muy bien.",
       ],
     },
     correctWithHint: {
-      plain: ["Correcto, con una pista"],
+      plain: ["Correcto, con una pista."],
       flavor: [
-        "Lo lograste con una pista",
-        "Pista usada, respuesta encontrada",
-        "Bien resuelto",
+        "La pista hizo su trabajo.",
+        "Bien resuelto.",
+        "Con pista, pero lo lograste.",
       ],
     },
     goodGuess: {
       plain: ["¡Buena intuición!"],
-      flavor: ["Buen instinto", "Bien pensado", "Buen ojo"],
+      flavor: ["Buen instinto.", "Buen ojo.", "Bien pensado."],
     },
     hookMiss: {
-      plain: ["No del todo, y no pasa nada"],
+      plain: ["No del todo, y no pasa nada."],
       flavor: [
-        "Esta vez no, y no pasa nada",
-        "Buen intento. Veamos por qué",
-        "No del todo. Pronto verás por qué",
+        "Buen intento. Veamos por qué.",
+        "No del todo. Pronto verás por qué.",
       ],
     },
     nudge: {
-      plain: ["Míralo otra vez. Seguro que lo encuentras."],
+      plain: ["No del todo. Míralo otra vez."],
       flavor: [
-        "No del todo. Vuelve a mirarlo.",
-        "Casi. Inténtalo otra vez.",
+        "Casi. Inténtalo de nuevo.",
         "Un vistazo más y lo tienes.",
+        "Míralo otra vez. Seguro que lo encuentras.",
       ],
     },
     close: {
-      plain: ["Cerca, pero no es la mejor"],
+      plain: ["Cerca, pero no es la mejor."],
+      flavor: ["Casi. Otra opción encaja mejor.", "Bien, pero no es la mejor."],
+    },
+    answer: {
+      plain: ["Esta es la respuesta."],
       flavor: [
-        "Casi. Hay una mejor",
-        "Bien, pero no es la mejor",
-        "Cerca. Otra opción encaja mejor",
+        "Así es como funciona.",
+        "Esta era difícil. Aquí está.",
+        "Veamos la respuesta.",
+      ],
+    },
+    streak: {
+      plain: ["Tres seguidas."],
+      flavor: ["Vas en racha.", "Eso es una racha."],
+    },
+    comeback: {
+      plain: ["Ahí está."],
+      flavor: ["Esta vez sí.", "Buena recuperación."],
+    },
+    last: {
+      plain: ["La última, y correcta."],
+      flavor: ["Esa era la lección.", "Terminaste fuerte."],
+    },
+    perfect: {
+      plain: ["Todas correctas."],
+      flavor: ["Sin un solo fallo.", "Nada que corregir."],
+    },
+  },
+  sensei: {
+    praise: {
+      plain: ["Bien. Eso es.", "Sí."],
+      flavor: [
+        "Lo viste.",
+        "Bien observado.",
+        "Justo así.",
+        "Tu ojo se afina.",
+        "Sí. Sin ruido.",
+        "Ese es el camino.",
+        "Bien. Guarda eso.",
+      ],
+    },
+    correctWithHint: {
+      plain: ["Correcto. La pista mostró el camino, tú lo recorriste."],
+      flavor: [
+        "Pedir ayuda también es una habilidad.",
+        "Ayuda recibida, lección guardada.",
+        "Una pista es una mano, no una muleta.",
+      ],
+    },
+    goodGuess: {
+      plain: ["Una buena intuición."],
+      flavor: [
+        "Tu instinto sabe cosas que tú aún no.",
+        "Confía en la corazonada, luego compruébala.",
+        "Bien intuido. Ahora veamos por qué.",
+      ],
+    },
+    hookMiss: {
+      plain: ["Todavía no, y de eso se trata."],
+      flavor: [
+        "Una suposición nos dice por dónde empezar.",
+        "No importa. La lección empieza aquí.",
+      ],
+    },
+    nudge: {
+      plain: ["Todavía no. Mira una vez más."],
+      flavor: [
+        "Despacio. Ahí está.",
+        "Respira y vuelve a mirar.",
+        "La respuesta no se ha movido.",
+      ],
+    },
+    close: {
+      plain: ["Cerca. Hay una que encaja mejor."],
+      flavor: [
+        "Buen ojo. Ahora busca la mejor.",
+        "Casi. Busca la más precisa.",
       ],
     },
     answer: {
-      plain: ["Esta es la respuesta"],
+      plain: ["Aquí está la respuesta."],
       flavor: [
-        "Así es como funciona",
-        "Veamos la respuesta",
-        "Esta era difícil. Aquí está",
+        "Quédate un momento con esta.",
+        "Las difíciles enseñan más. Aquí está.",
+        "Aquí está la respuesta. Léela despacio.",
+      ],
+    },
+    streak: {
+      plain: ["Tres seguidas. Con calma."],
+      flavor: ["Encontraste tu ritmo.", "Manos tranquilas, ojos claros."],
+    },
+    comeback: {
+      plain: ["Volviste a mirar, y ahí estaba."],
+      flavor: ["Así se aprende.", "La segunda mirada es la lección."],
+    },
+    last: {
+      plain: ["Y esa es la lección. Bien recorrida."],
+      flavor: [
+        "El último paso también es un paso.",
+        "Terminaste lo que empezaste.",
+      ],
+    },
+    perfect: {
+      plain: ["Ni un tropiezo. Llévatelo contigo."],
+      flavor: [
+        "Una mente tranquila ve claro.",
+        "Nada que corregir. Solo que recordar.",
       ],
     },
   },
   unhinged: {
     praise: {
-      plain: ["¡Ay! Es correcto. De verdad es correcto"],
+      plain: ["Correcto. Respira.", "Está bien. Que nadie entre en pánico."],
       flavor: [
-        "Ay, ay, ay, lo lograste",
-        "No puedo creer que funcionara",
-        "Uf. Creí que estábamos perdidos",
-        "Es correcto. Que nadie entre en pánico",
-        "Ya no me tiembla el ojo. Correcto",
-        "Lo lograste y nada explotó",
-        "Correcto. Mi corazón no aguanta esto",
+        "¡Ay! Está bien. ¡Está bien de verdad!",
+        "¡Madre mía, lo lograste!",
+        "No me creo que haya funcionado.",
+        "Uf. Pensé que estábamos perdidos.",
+        "Se me pasó el tic del ojo. Correcto.",
+        "¡Lo lograste y nada explotó!",
+        "Correcto. Mi corazón no aguanta esto.",
       ],
     },
     correctWithHint: {
-      plain: ["La pista nos salvó a los dos"],
+      plain: ["Pista. Correcto. Respira."],
       flavor: [
-        "Uf, pista y listo. Estoy temblando",
-        "Necesitábamos ayuda y no pasa nada",
-        "La pista funcionó. Funcionó de verdad",
+        "La pista nos salvó a los dos.",
+        "Uf, pista y listo. Estoy temblando.",
+        "La pista funcionó. ¡Funcionó de verdad!",
       ],
     },
     goodGuess: {
-      plain: ["¡Ay! ¿Cómo lo sabías?"],
+      plain: ["Espera, ¿lo sabías sin más?"],
       flavor: [
-        "Espera, ¿simplemente lo sabías?",
-        "Esa intuición fue demasiado buena",
-        "¿Cómo? ¿Me estás vigilando?",
+        "¡Ay! ¿Cómo lo supiste?",
+        "Esa intuición fue demasiado buena.",
+        "¿Cómo? ¿Me estás espiando?",
       ],
     },
     hookMiss: {
-      plain: ["¡Ay! Está bien. Todo está bien"],
+      plain: ["No pasa nada. De verdad que no pasa nada."],
       flavor: [
-        "Mal, pero solo era una intuición. Respira",
-        "Nadie vio eso. Sigamos",
-        "No te preocupes, yo me preocupo por ti",
+        "Mal, pero era solo una suposición. Respira.",
+        "Nadie lo vio. Seguimos.",
+        "Tranquilo, yo me preocupo por ti.",
       ],
     },
     nudge: {
-      plain: ["¡Ay! Esa no. Mira otra vez"],
+      plain: ["Esa no. Mira otra vez."],
       flavor: [
-        "Ay, no, ay, no. ¿Otra mirada?",
-        "Bien, respira hondo. Mira otra vez",
-        "No es, pero aún puedes arreglarlo",
+        "Ay, no, ay, no. ¿Una mirada más?",
+        "Bueno, respira hondo. Mira otra vez.",
+        "No es esa, pero todavía lo puedes arreglar.",
       ],
     },
     close: {
       plain: ["Tan cerca. ¿Por qué siempre tan cerca?"],
       flavor: [
-        "Casi. Eso es casi peor",
-        "Hay una mejor, te lo juro",
-        "Cerca. Mis nervios no aguantan tanto",
+        "Casi. Eso es casi peor.",
+        "Hay una mejor, te lo juro.",
+        "Cerca. Mis nervios no soportan lo cerca.",
       ],
     },
     answer: {
-      plain: ["A ver, a ver, sin pánico. Aquí está"],
+      plain: ["Bueno, sin pánico. Aquí está."],
       flavor: [
-        "Aquí está. No volvamos a hablar de esto",
-        "Rápido, antes de que desaparezca",
-        "Uf. Bien. Así es como funciona",
+        "Aquí está. No volvamos a hablar de esto.",
+        "¡Rápido, antes de que desaparezca!",
+        "Uf. Bueno. Así es como funciona.",
       ],
+    },
+    streak: {
+      plain: ["¿Tres seguidas? ¿Quién ERES?"],
+      flavor: [
+        "¡Para, para, no aguanto una racha!",
+        "¡Tres! Necesito sentarme.",
+      ],
+    },
+    comeback: {
+      plain: ["Volviste. De ESO."],
+      flavor: [
+        "Arreglado. Nunca más dudo de ti. Hasta la próxima.",
+        "Uf. Pensé que esa nos había ganado.",
+      ],
+    },
+    last: {
+      plain: ["Se acabó. Lo logramos."],
+      flavor: ["Necesito acostarme.", "La última. Me fallaron las rodillas."],
+    },
+    perfect: {
+      plain: ["Perfecto. PERFECTO. Necesito sentarme."],
+      flavor: ["Nada explotó. Ni una vez.", "¿Todas? Me voy a desmayar."],
     },
   },
 }

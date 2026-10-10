@@ -37,32 +37,34 @@ describe("voices", () => {
       }
   })
 
-  it("ends every English line in a period, exclamation point, or question mark", () => {
-    // The other languages follow when their lines are written (each with its own marks).
-    for (const level of CHARACTERS)
-      for (const moment of MOMENTS) {
-        const { plain, flavor } = voiceLines("en", level, moment)
-        for (const line of [...plain, ...flavor])
-          expect(line, `en ${level} ${moment}`).toMatch(/[.!?]$/)
-      }
-  })
-
-  it("has no blank or repeated lines in any language, and English where a language has nothing yet", () => {
+  it("has every character and moment in every language, as many lines as English", () => {
     for (const { code } of UI_LANGUAGES)
       for (const level of ["off", ...CHARACTERS] as const)
         for (const moment of MOMENTS) {
           const { plain, flavor } = voiceLines(code, level, moment)
-          const all = [...plain, ...flavor]
+          const english = voiceLines("en", level, moment)
           const at = `${code} ${level} ${moment}`
-          expect(all.length, at).toBeGreaterThan(0)
+          expect(plain.length, `${at} plain`).toBe(english.plain.length)
+          expect(flavor.length, `${at} flavor`).toBe(english.flavor.length)
+          const all = [...plain, ...flavor]
           expect(new Set(all).size, `${at} has no repeats`).toBe(all.length)
           for (const line of all) expect(line, at).toMatch(/\S/)
         }
+  })
+
+  it("ends every line in a period, exclamation point, or question mark, in the language's own marks", () => {
+    for (const { code } of UI_LANGUAGES)
+      for (const level of CHARACTERS)
+        for (const moment of MOMENTS) {
+          const { plain, flavor } = voiceLines(code, level, moment)
+          for (const line of [...plain, ...flavor])
+            expect(line, `${code} ${level} ${moment}`).toMatch(/[.!?।؟。！？]$/)
+        }
+  })
+
+  it("uses English for a language the player doesn't have", () => {
     expect(voiceLines("xx", "unhinged", "answer")).toEqual(
       voiceLines("en", "unhinged", "answer")
-    )
-    expect(voiceLines("es", "sensei", "praise")).toEqual(
-      voiceLines("en", "sensei", "praise")
     )
   })
 
