@@ -12,7 +12,7 @@ A lesson is one JSON file with four slots: `hook`, `bricks`, `challenge`, `wrapu
 | `objective`        | yes      | What the learner can do afterwards                                                                                                                                  |
 | `language`         | yes      | Language of all learner-facing text (BCP 47: `en`, `es`, `ar`, `pt-BR`…)                                                                                            |
 | `targetLanguage`   | no       | The language being taught, for language lessons                                                                                                                     |
-| `level`            | yes      | `beginner`, `intermediate`, or `advanced`                                                                                                                           |
+| `level`            | yes      | Who it's for: `beginner`, `intermediate`, or `advanced` (`levels/index.md` says how to choose)                                                                      |
 | `estimatedMinutes` | yes      | 5–10                                                                                                                                                                |
 | `topic`            | no       | A short label, e.g. "UI design"                                                                                                                                     |
 | `source`           | no       | `{ "title": "…", "url": "https://…" }` credit for the material                                                                                                      |

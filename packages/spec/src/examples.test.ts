@@ -6,10 +6,12 @@ import { formatIssues, validateLesson } from "./validate"
 describe("example lessons", () => {
   const files = exampleFiles()
 
-  it("includes all five test lessons", () => {
+  it("includes all seven test lessons", () => {
     expect(files).toEqual([
+      "bronze-age-collapse.json",
       "button-hierarchy.json",
       "compound-interest.json",
+      "correlation-vs-causation.json",
       "map-vs-foreach.json",
       "spanish-greetings.json",
       "writing-a-prd.json",

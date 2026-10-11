@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url"
 
 import { describe, expect, it } from "vitest"
 
+import { LEVELS } from "@workspace/spec"
+
 import { SKILL_VERSION } from "./cli"
 
 // skills/learn is what people install. These tests fail when it's stale: run `npm run skill:build -w @workspace/cli`.
@@ -143,4 +145,49 @@ it("subjects/index.md lists only subjects that exist", () => {
 
 it("subjects/versions.json records only subjects that exist", () => {
   expect(Object.keys(versions).sort()).toEqual([...subjects].sort())
+})
+
+// Levels are core, not contributed: one short file per level, read only when it applies.
+const MAX_LEVEL_WORDS = 400
+
+it("levels/ has index.md and exactly one file per level", () => {
+  expect(readdirSync(new URL("skills/learn/levels", root)).sort()).toEqual(
+    [...LEVELS.map((l) => `${l}.md`), "index.md"].sort()
+  )
+})
+
+it("SKILL.md points at levels/index.md", () => {
+  expect(read("skills/learn/SKILL.md")).toContain("`levels/index.md`")
+})
+
+describe.each(LEVELS)("level %s", (name) => {
+  const guide = read(`skills/learn/levels/${name}.md`)
+
+  it(`stays under ${MAX_LEVEL_WORDS} words`, () => {
+    expect(guide.split(/\s+/).length).toBeLessThanOrEqual(MAX_LEVEL_WORDS)
+  })
+
+  it("ends with a drift check", () => {
+    expect(guide).toContain("## You've drifted if")
+  })
+
+  it("names example lessons that exist", () => {
+    const examples = readdirSync(new URL("skills/learn/examples", root))
+    for (const [, slug] of guide.matchAll(/`examples\/([^`]+)\.json`/g))
+      expect(examples, `${name}: no example lesson ${slug}`).toContain(
+        `${slug}.json`
+      )
+  })
+
+  it("is listed in levels/index.md, the format reference, and the docs", () => {
+    expect(read("skills/learn/levels/index.md")).toContain(
+      `\`levels/${name}.md\``
+    )
+    expect(
+      read("skills/learn/reference/lesson-format.md").match(
+        /^\| `level`.*$/m
+      )?.[0]
+    ).toContain(`\`${name}\``)
+    expect(read("docs/lessons/levels.md")).toContain(`\`${name}\``)
+  })
 })

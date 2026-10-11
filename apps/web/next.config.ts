@@ -151,6 +151,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/create", destination: "/docs", permanent: false },
       ...section("/docs/lessons/lesson-format", "lesson-format"),
+      ...section("/docs/lessons/levels", "levels"),
       ...section("/docs/subjects", "subjects"),
       ...section("/docs/reference/cli", "cli"),
       ...section("/docs/reference/api", "api"),

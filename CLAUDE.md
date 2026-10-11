@@ -17,7 +17,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `packages/cli`: the `learn` command (validate, publish, schema) the skill runs; bundled into `skills/learn/scripts/learn.mjs`
 - `packages/eslint-config`, `packages/typescript-config`: shared configs
 - `skills/learn/`: the installable skill (`npx skills add https://learn.ninja -g`, served by `apps/web` at `/.well-known/skills/`): SKILL.md, teaching guide, format reference (also shown in the docs through `<include>`), and generated copies of the schema, examples, and bundled CLI
-- `examples/`: the five test lessons as JSON, used as fixtures
+- `examples/`: the seven test lessons as JSON (five beginner, one intermediate, one advanced), used as fixtures
 - `spikes/`: throwaway test builds, git-ignored; never import from here
 
 ## Commands

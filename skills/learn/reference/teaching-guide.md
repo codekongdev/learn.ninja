@@ -6,6 +6,7 @@ How to turn the user's input into a lesson that's genuinely good to play. Read t
 
 - A lesson teaches **one core idea** in **5–10 minutes**. Set `estimatedMinutes` honestly (5–10).
 - Write the `objective` as something the learner can _do_ afterwards: "Give each view one clear primary action", not "Learn about buttons".
+- Set `level` for who the lesson is for (`levels/index.md` says how to choose) and read `levels/{level}.md` before writing: it sets what to assume, what the questions ask for, and how much help to give. The shape in the next section is the same at every level.
 - If the input covers several ideas, pick the one everything else depends on. Mention the others to the user as follow-up lessons, and you can suggest one in `wrapup.next`.
 - Stay faithful to the source. If the input is an article, teach what it says; don't add claims it doesn't support.
 
@@ -59,7 +60,7 @@ Mechanics of each type:
 - **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting.
 - **Every question brick gets an `explanation`** of why the right answer is right. It opens under the answer when the learner asks why, or once a missed answer is revealed. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
 - **Blanks:** add a `mistakes` entry for each decoy chip, explaining it.
-- **Hints** (optional) nudge without giving the answer away: "What is the one thing this page exists to help people do?"
+- **Hints** (optional) nudge without giving the answer away: "What is the one thing this page exists to help people do?" How many there are, and how much they give away, follows the level: most questions for beginners, one or two for advanced learners.
 - **Scenario outcomes** describe what happens next, so even a poor choice teaches something.
 
 ## 5. Writing style
@@ -138,4 +139,4 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 ## 9. Before you publish
 
 - Run `validate` and fix every issue. The messages say exactly what to change.
-- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice?
+- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`.

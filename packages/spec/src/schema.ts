@@ -6,6 +6,10 @@ import { z } from "zod"
 
 export const SPEC_VERSION = "0.3" as const
 
+/** Who a lesson is for, from least to most prior knowledge. The skill's `levels/` guides say how each one teaches. */
+export const LEVELS = ["beginner", "intermediate", "advanced"] as const
+export type Level = (typeof LEVELS)[number]
+
 const id = z.string().min(1).max(64)
 /** Markdown subset: **bold**, *italic*, `code`, and inline formulas as \( ... \). A $ is always a dollar sign. */
 const richText = z.string().min(1)
@@ -280,7 +284,7 @@ export const lesson = z.strictObject({
   objective: z.string().min(1),
   language: langCode,
   targetLanguage: langCode.optional(),
-  level: z.enum(["beginner", "intermediate", "advanced"]),
+  level: z.enum(LEVELS),
   estimatedMinutes: z.int().min(5).max(10),
   topic: z.string().min(1).optional(),
   source: z

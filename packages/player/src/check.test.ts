@@ -43,6 +43,8 @@ const allLessons = [
   coding,
   prd,
   lesson("compound-interest.json"),
+  lesson("correlation-vs-causation.json"),
+  lesson("bronze-age-collapse.json"),
 ]
 const allQuestions = allLessons.flatMap((l) => [
   l.hook,

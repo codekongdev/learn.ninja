@@ -56,6 +56,14 @@ export const MapVsForEach: Story = {
   name: "map vs forEach",
   args: { lesson: lessons.coding },
 }
+export const CorrelationVsCausation: Story = {
+  name: "Correlation vs causation",
+  args: { lesson: lessons.correlation },
+}
+export const BronzeAgeCollapse: Story = {
+  name: "Bronze Age collapse",
+  args: { lesson: lessons.bronze },
+}
 // The player reads its preferences on mount, so these stories save a choice before it renders.
 const withPrefs = (prefs: object) => [
   () =>

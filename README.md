@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-The web app runs at http://localhost:3000: the home page, the docs at `/docs`, and the five test lessons at `/lessons/{slug}`.
+The web app runs at http://localhost:3000: the home page, the docs at `/docs`, and the seven test lessons at `/lessons/{slug}`.
 
 ```bash
 npm run storybook

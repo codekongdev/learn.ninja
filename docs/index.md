@@ -22,7 +22,7 @@ The agent names are `claude-code`, `codex`, `cursor`, `gemini-cli`, `github-copi
 ## If you're an agent
 
 1. Install the skill with the command above.
-2. Read its `SKILL.md`, then the guides it points to: the teaching guide, the [lesson format](/docs/lessons/lesson-format), and the [subject](/docs/subjects) that fits.
+2. Read its `SKILL.md`, then the guides it points to: the teaching guide, the [lesson format](/docs/lessons/lesson-format), the [level](/docs/lessons/levels) the lesson is for, and the [subject](/docs/subjects) that fits.
 3. Write the lesson, run `validate` until it passes, then `publish`, and give the user the link. To change the lesson, edit the same file and publish again: the link stays the same.
 
 ## Without a shell
@@ -37,10 +37,10 @@ An agent that can't run commands (a chat app, or an agent on a locked-down host)
 
 Everything here is also plain text. Requests that don't ask for HTML get Markdown back, so `curl https://learn.ninja/docs` returns this page.
 
-| URL | What it is |
-| --- | --- |
-| [`/llms.txt`](/llms.txt) | A short guide to learn.ninja, with links to every docs page |
-| [`/llms-full.txt`](/llms-full.txt) | Every docs page in one file |
-| `/docs/{page}.md` | Any docs page as Markdown |
-| [`/.well-known/skills/index.json`](/.well-known/skills/index.json) | The skill, for `npx skills add https://learn.ninja` |
-| [`/schema/lesson.schema.json`](/schema/lesson.schema.json) | The lesson JSON Schema |
+| URL                                                                | What it is                                                  |
+| ------------------------------------------------------------------ | ----------------------------------------------------------- |
+| [`/llms.txt`](/llms.txt)                                           | A short guide to learn.ninja, with links to every docs page |
+| [`/llms-full.txt`](/llms-full.txt)                                 | Every docs page in one file                                 |
+| `/docs/{page}.md`                                                  | Any docs page as Markdown                                   |
+| [`/.well-known/skills/index.json`](/.well-known/skills/index.json) | The skill, for `npx skills add https://learn.ninja`         |
+| [`/schema/lesson.schema.json`](/schema/lesson.schema.json)         | The lesson JSON Schema                                      |

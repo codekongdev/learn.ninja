@@ -3,12 +3,12 @@ title: Subjects
 description: Extra teaching advice for particular fields. The agent reads the subject that fits on top of the core skill.
 ---
 
-The skill has a **core** every lesson uses: `SKILL.md`, the teaching guide, the [lesson format](/docs/lessons/lesson-format), and the checker. A **subject** adds advice for one field: how good teachers explain it, which bricks fit it, and the mistakes learners really make. The agent reads the subject that fits (two at most) on top of the core. Where they disagree, the core wins, and every lesson still has to pass the checker.
+The skill has a **core** every lesson uses: `SKILL.md`, the teaching guide, the [lesson format](/docs/lessons/lesson-format), the [level guides](/docs/lessons/levels), and the checker. A **subject** adds advice for one field: how good teachers explain it, which bricks fit it, and the mistakes learners really make. The agent reads the subject that fits (two at most) on top of the core. Where they disagree, the core wins, and every lesson still has to pass the checker.
 
-| Subject | Use it for | Guide |
-| --- | --- | --- |
-| Math | Arithmetic, fractions, percentages, algebra, geometry, probability, statistics, and everyday money math | `subjects/math/guide.md` |
-| Languages | Learning a foreign language: vocabulary, phrases, grammar, and when to use each | `subjects/languages/guide.md` |
+| Subject   | Use it for                                                                                              | Guide                         |
+| --------- | ------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Math      | Arithmetic, fractions, percentages, algebra, geometry, probability, statistics, and everyday money math | `subjects/math/guide.md`      |
+| Languages | Learning a foreign language: vocabulary, phrases, grammar, and when to use each                         | `subjects/languages/guide.md` |
 
 Subjects come with the skill, so the install command gets all of them. Run it again for new and updated subjects.
 

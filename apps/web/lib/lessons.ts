@@ -1,5 +1,7 @@
+import bronzeAgeCollapse from "../../../examples/bronze-age-collapse.json"
 import buttonHierarchy from "../../../examples/button-hierarchy.json"
 import compoundInterest from "../../../examples/compound-interest.json"
+import correlationVsCausation from "../../../examples/correlation-vs-causation.json"
 import mapVsForEach from "../../../examples/map-vs-foreach.json"
 import spanishGreetings from "../../../examples/spanish-greetings.json"
 import writingAPrd from "../../../examples/writing-a-prd.json"
@@ -13,6 +15,8 @@ const RAW: Record<string, unknown> = {
   "compound-interest": compoundInterest,
   "spanish-greetings": spanishGreetings,
   "map-vs-foreach": mapVsForEach,
+  "correlation-vs-causation": correlationVsCausation,
+  "bronze-age-collapse": bronzeAgeCollapse,
 }
 
 export const LESSON_SLUGS = Object.keys(RAW)

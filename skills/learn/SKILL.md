@@ -10,7 +10,7 @@ You write one lesson as a JSON file that follows the lesson spec (v0.3), check i
 ## Steps
 
 1. **Pick one core idea.** Read what the user gave you. A lesson teaches one idea in 5–10 minutes. If the input covers several ideas, pick the central one, and tell the user the rest would make good follow-up lessons.
-2. **Read the guides before writing.** Read `reference/teaching-guide.md` (how to teach well, which brick to use when, visuals) and `reference/lesson-format.md` (every field). Then read `subjects/index.md`: if a subject fits (math, languages…), read its guide too. A subject guide adds advice for that field; where one disagrees with this file or the teaching guide, this file and the teaching guide win. Look at one or two files in `examples/` that are closest to the topic.
+2. **Read the guides before writing.** Read `reference/teaching-guide.md` (how to teach well, which brick to use when, visuals) and `reference/lesson-format.md` (every field). Then read `levels/index.md`, pick the lesson's level (the user's words win; otherwise what the input assumes; if unclear, `beginner`), and read that level's file: it says what to assume, how hard to make the questions, and how much to help. Then read `subjects/index.md`: if a subject fits (math, languages…), read its guide too. Level and subject guides add to this file and the teaching guide; where one disagrees, this file and the teaching guide win. Look at one or two files in `examples/` closest to the topic, including the one your level file names.
 3. **Write the lesson file**, e.g. `lesson.json` in the current folder, following the format exactly. `schema/lesson.schema.json` is the formal JSON Schema.
 4. **Check it** and fix every issue it reports, then check again until it passes:
    ```bash
@@ -21,7 +21,7 @@ You write one lesson as a JSON file that follows the lesson spec (v0.3), check i
    node <skill-folder>/scripts/learn.mjs publish lesson.json
    ```
    `<skill-folder>` is the folder this SKILL.md is in. Publishing needs Node 18 or newer and network access.
-6. **Tell the user** the link, that it expires in 24 hours, and offer changes. To change the lesson, edit the same file and run `publish` again: it updates the same link (the edit token is saved in `.learn/state.json`; don't delete or share that file). Use `publish lesson.json --new` only if the user wants a separate copy with a new link.
+6. **Tell the user** the link, that it expires in 24 hours, which level you chose and that you can remake it at another, and offer changes. To change the lesson, edit the same file and run `publish` again: it updates the same link (the edit token is saved in `.learn/state.json`; don't delete or share that file). Use `publish lesson.json --new` only if the user wants a separate copy with a new link.
 
 If `publish` prints that a newer version of the skill is available, tell the user the update command it shows.
 
@@ -29,6 +29,7 @@ If `publish` prints that a newer version of the skill is available, tell the use
 
 - **Accuracy over flourish.** Teach only what's true and supported by the user's input or well-established knowledge. Don't invent statistics, quotes, studies, or examples presented as real.
 - **One idea, interleaved.** Hook (a guess before any teaching) → `bricks`: 1–3 short `concept` bricks, each followed right away by 2–4 question bricks that practise it → one harder challenge → 2–4 takeaways.
+- **Level changes content, not shape.** Every level keeps the same structure and limits. The level file sets what the learner already knows, what the questions demand, how tempting the wrong options are, and how many hints there are.
 - **Bricks fit the content.** Pick each question brick's type by asking how a good teacher would test that point, not to fill a quota. Repeating a type is fine; a forced `order` or `match` isn't.
 - **Every wrong option teaches.** Each wrong option needs `feedback` that explains the misconception, and every question brick needs an `explanation`. Build wrong options from real, common mistakes.
 - **v1 limits:** no `number` bricks (ask numeric questions as `choice` with mistake-based options), every `blank` uses word chips (`choices`), no images or photos, no typed answers.
@@ -39,7 +40,8 @@ If `publish` prints that a newer version of the skill is available, tell the use
 
 - `reference/teaching-guide.md`: how to design the lesson, choose bricks, write feedback, and build visuals
 - `reference/lesson-format.md`: every field of the lesson file, with short examples
+- `levels/index.md`: how to pick the lesson's level; `levels/{level}.md` is each level's guide
 - `subjects/index.md`: the subjects, with when to use each; `subjects/{name}/guide.md` is each subject's guide
 - `schema/lesson.schema.json`: the formal JSON Schema (the checker also enforces cross-field rules it can't express)
-- `examples/*.json`: five complete, valid lessons (UI design, product management, finance, Spanish, JavaScript)
+- `examples/*.json`: seven complete, valid lessons, one at each level (UI design, product management, finance, Spanish, JavaScript, data, history)
 - `scripts/learn.mjs`: the checker and publisher (`validate`, `publish`, `schema`; add `--json` for machine-readable output)
