@@ -13,7 +13,7 @@ const example = readFileSync(
 test("the home page explains the product", async ({ page }) => {
   await page.goto("/")
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Interactive learning"
+    "Vibe learn"
   )
   await expect(
     page.getByRole("button", { name: "Copy prompt for agent" }).first()
