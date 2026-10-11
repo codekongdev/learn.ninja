@@ -56,6 +56,7 @@ Mechanics of each type:
 
 ## 4. Feedback that teaches
 
+- **Feedback explains; it never introduces.** The player shows feedback only after a miss, and explanations and hints only when the learner asks, so a learner who answers right may never see them. If a question needs a term, fact, or method, a concept brick before it teaches it. Feedback can name a mistake only in words the lesson has already taught.
 - **Every wrong option gets `feedback`** that explains _why_ it's wrong, in a sentence or two. Name the misconception: "That's simple interest. Year 2 also earns interest on year 1's $50."
 - **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting.
 - **Every question brick gets an `explanation`** of why the right answer is right. It opens under the answer when the learner asks why, or once a missed answer is revealed. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
@@ -139,4 +140,4 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 ## 9. Before you publish
 
 - Run `validate` and fix every issue. The messages say exactly what to change.
-- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`.
+- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Is every term, fact, and method each question needs taught in an earlier concept brick, not only in feedback, a hint, or an explanation? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`.
