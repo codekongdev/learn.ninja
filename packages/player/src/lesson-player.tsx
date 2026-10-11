@@ -1279,8 +1279,10 @@ export function ActionArea({
         secondary = helpButton(t.getHelp, () => dispatch({ type: "hint" }))
     } else if (role === "hook" && r) {
       // The hook is a guess, so a miss still moves on, but both get the colors a checked answer would.
+      // A wrong guess also says what it got wrong: the misconception is what the lesson starts from.
       tone = r.correct ? "good" : "warn"
       title = say(r.correct ? "goodGuess" : "hookMiss")
+      message = r.correct ? null : missText(r)
       explanation = brick.explanation
       primary = { ...primary, variant: r.correct ? "success" : "warning" }
     } else if (s.phase === "feedback" && r?.correct) {
