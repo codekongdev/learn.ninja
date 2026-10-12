@@ -423,8 +423,14 @@ export function OrderBrick({
     return {
       id,
       textValue: it.text?.replace(/[*`]/g, "") ?? id,
+      // A picture gets its text as a caption underneath, like a choice card's.
       content: it.visual ? (
-        <Visual visual={it.visual} />
+        <span className="flex flex-col gap-2">
+          <Visual visual={it.visual} label={it.text?.replace(/[*`]/g, "")} />
+          {it.text ? (
+            <RichText text={it.text} className="px-1 text-sm font-medium" />
+          ) : null}
+        </span>
       ) : (
         <RichText text={it.text ?? ""} />
       ),

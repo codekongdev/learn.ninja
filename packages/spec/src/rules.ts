@@ -383,6 +383,15 @@ function checkBrickReferences(
             `Each alternative order must list every item id exactly once (${ids.join(", ")}).`
           )
       })
+      // A picture-only item has no name for screen readers (they'd hear its id), so it needs a caption.
+      brick.items.forEach((item, i) => {
+        if (item.visual && !item.text)
+          add(
+            "teaching",
+            `${path}.items[${i}]`,
+            `Item "${item.id}" has a visual but no "text". Add a short caption: it shows under the picture and is what screen readers announce.`
+          )
+      })
       break
     }
     case "sort": {

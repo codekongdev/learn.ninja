@@ -104,6 +104,7 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
   "explanation": "…" }
 ```
 
+- `order` items can be pictures: give an item a `visual` and a short `text` caption, which shows under the picture and is what screen readers announce.
 - `blank` with `"format": "code"` takes a `language` and is usually `"caseSensitive": true`.
 - `blank` options: `numeric` and `tolerance` (for numbers in gaps), `strictAccents` (when accents change meaning, like _si_ and _sí_).
 - `number` bricks exist in the spec but aren't allowed in v1.
@@ -116,4 +117,4 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
 - Prompts ≤40 words; concept bodies ≤80 words.
 - No `number` bricks; every `blank` has `choices` that include an accepted answer.
 - Formulas in `\( … \)` are balanced and render; language codes are valid BCP 47.
-- HTML visuals: no scripts, event handlers, iframes, forms, objects, embeds, `javascript:` links, or external URLs; each under 20 KB; the whole file under 500 KB. A concept's or question's HTML visual has `alt`.
+- HTML visuals: no scripts, event handlers, iframes, forms, objects, embeds, `javascript:` links, or external URLs; each under 20 KB; the whole file under 500 KB. A concept's or question's HTML visual has `alt`; an `order` item with a `visual` has `text`.

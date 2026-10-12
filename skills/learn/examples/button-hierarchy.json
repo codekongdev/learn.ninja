@@ -67,9 +67,7 @@
           "feedback": "Only some people need it, so it shouldn't compete with the main action."
         }
       ],
-      "correct": [
-        "a"
-      ],
+      "correct": ["a"],
       "multiple": false,
       "hint": "What is the one thing this page exists to help people do?",
       "explanation": "Checkout exists to complete the purchase, so **Place order** is the primary action."
@@ -82,9 +80,7 @@
         "kind": "html",
         "html": "<div class='flex gap-2 flex-wrap'><button data-hotspot='create' class='btn'>Create account</button><button data-hotspot='learn' class='btn'>Learn more</button></div>"
       },
-      "correct": [
-        "learn"
-      ],
+      "correct": ["learn"],
       "multiple": false,
       "explanation": "**Learn more** is optional, so it should be secondary or tertiary. **Create account** is the main goal."
     },
@@ -153,23 +149,26 @@
       "items": [
         {
           "id": "a",
+          "text": "Filled",
           "visual": {
             "kind": "html",
-            "html": "<button class='btn'>Filled</button>"
+            "html": "<button class='btn'>Save</button>"
           }
         },
         {
           "id": "b",
+          "text": "Outlined",
           "visual": {
             "kind": "html",
-            "html": "<button class='btn' data-variant='outline'>Outlined</button>"
+            "html": "<button class='btn' data-variant='outline'>Save</button>"
           }
         },
         {
           "id": "c",
+          "text": "Text only",
           "visual": {
             "kind": "html",
-            "html": "<button class='btn' data-variant='ghost'>Text only</button>"
+            "html": "<button class='btn' data-variant='ghost'>Save</button>"
           }
         }
       ],
@@ -215,10 +214,7 @@
           "feedback": "This flips the hierarchy: the main action is the weakest button, and Cancel gets all the weight."
         }
       ],
-      "correct": [
-        "a",
-        "c"
-      ],
+      "correct": ["a", "c"],
       "multiple": true,
       "explanation": "A good footer has one filled button for the main action and lighter styles for the rest. That works with two buttons or three."
     }

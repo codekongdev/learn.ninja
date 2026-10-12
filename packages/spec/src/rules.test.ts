@@ -44,6 +44,24 @@ describe("visuals", () => {
     expectIssue(lesson, { path: "bricks[6].visual", message: /no "alt"/ })
   })
 
+  it("wants a text caption on an order item with a visual", () => {
+    const lesson = buttons()
+    expect(lesson.bricks[5].type).toBe("order")
+    delete lesson.bricks[5].items[1].text
+    expectIssue(lesson, {
+      path: "bricks[5].items[1]",
+      message: /has a visual but no "text"/,
+    })
+  })
+
+  it("accepts order items with a visual and a caption", () => {
+    const lesson = buttons()
+    expect(lesson.bricks[5].items.every((i: { text?: string }) => i.text)).toBe(
+      true
+    )
+    expect(validateLesson(lesson).ok).toBe(true)
+  })
+
   it("doesn't need alt text on a hotspot visual or an option's visual", () => {
     const lesson = buttons()
     expect(lesson.bricks[2].type).toBe("hotspot")
