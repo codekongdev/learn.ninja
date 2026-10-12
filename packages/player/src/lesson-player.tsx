@@ -58,6 +58,7 @@ import {
   PlayerSettings,
   TheoryPanel,
   TRAY_BUTTON,
+  TRAY_GHOST,
   usePreferences,
   type Preferences,
 } from "./shell"
@@ -91,9 +92,8 @@ export interface LessonPlayerProps {
   visualsCss?: string
   /** Where the logo in the header goes. */
   homeHref?: string
-  /** The Docs link in the footer, and the Create button in the header. Omit either to hide it. */
+  /** The Docs link in the footer. Omit it to hide it. */
   docsHref?: string
-  createHref?: string
   /** Footer links to the legal pages. Omit either to hide it. */
   privacyHref?: string
   termsHref?: string
@@ -120,7 +120,6 @@ export function LessonPlayer({
   visualsCss = "/lesson-visuals.css",
   homeHref = "/",
   docsHref,
-  createHref,
   privacyHref,
   termsHref,
   shareUrl,
@@ -193,7 +192,6 @@ export function LessonPlayer({
             }
             expiresAt={expiresAt}
             homeHref={homeHref}
-            createHref={createHref}
             shareUrl={shareUrl}
             chrome={chrome}
           />
@@ -221,7 +219,7 @@ type Phase = "answering" | "feedback" | "revealed"
 export interface QuestionState {
   answer: Answer
   attempts: number
-  usedHint: boolean
+  /** The hint shows when the learner tries again after a miss. */
   hintOpen: boolean
   /** The explanation is open under the answer: after "Why?", or once the answer is revealed. */
   whyOpen: boolean
@@ -259,7 +257,6 @@ export function freshQuestion(
   return {
     answer: initialAnswer(brick, random),
     attempts: 0,
-    usedHint: false,
     hintOpen: false,
     whyOpen: false,
     result: null,
@@ -335,7 +332,7 @@ export function earnedMoment(
     )
   let streak = 0
   for (let i = outcomes.length - 1; i >= 0; i--) {
-    if (outcomes[i] !== "first" && outcomes[i] !== "hint") break
+    if (outcomes[i] !== "first") break
     streak++
   }
   if (streak > 0 && streak % 3 === 0) return "streak"
@@ -369,7 +366,6 @@ export type Action =
   | { type: "next" }
   | { type: "restart"; lesson: Lesson }
   | { type: "answer"; answer: Answer }
-  | { type: "hint" }
   | { type: "why" }
   | { type: "check" }
   | { type: "retry" }
@@ -429,13 +425,6 @@ export function reducer(state: State, action: Action): State {
             },
           }
         : state
-    case "hint":
-      return state.question
-        ? {
-            ...state,
-            question: { ...state.question, usedHint: true, hintOpen: true },
-          }
-        : state
     case "why":
       return state.question
         ? { ...state, question: { ...state.question, whyOpen: true } }
@@ -449,6 +438,8 @@ export function reducer(state: State, action: Action): State {
           ...state.question,
           phase: "answering",
           answer: retryAnswer(item.brick, state.question.answer),
+          // There's no help button: a miss earns the hint on the second try.
+          hintOpen: Boolean(item.brick.hint),
         },
       }
     }
@@ -465,7 +456,7 @@ export function reducer(state: State, action: Action): State {
             ? state.results
             : {
                 ...state.results,
-                [brick.id]: outcomeFor(s.attempts, s.usedHint),
+                [brick.id]: outcomeFor(s.attempts),
               }
         return {
           ...state,
@@ -519,7 +510,6 @@ function Player({
   chrome = true,
   expiresAt,
   homeHref,
-  createHref,
   shareUrl,
 }: {
   lesson: Lesson
@@ -536,7 +526,6 @@ function Player({
   chrome?: boolean
   expiresAt?: number
   homeHref: string
-  createHref?: string
   shareUrl?: string
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
@@ -648,7 +637,6 @@ function Player({
           showParts={item.kind !== "intro"}
           expiresAt={expiresAt}
           homeHref={homeHref}
-          createHref={createHref}
           shareUrl={shareUrl}
           settings={headerSettings}
           onRestart={() => {
@@ -674,24 +662,6 @@ function Player({
           )}
         >
           <div className="relative flex min-w-0 flex-1 flex-col">
-            {SHOW_THEORY ? (
-              <div className="absolute end-4 top-4 z-10 sm:end-6 sm:top-6">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  aria-expanded={theoryOpen}
-                  aria-controls={theoryOpen ? theoryId : undefined}
-                  onPress={() => setTheoryOpen((open) => !open)}
-                >
-                  {t.theory}
-                  {theoryOpen ? (
-                    <PanelRightFilledIcon className="rtl:-scale-x-100" />
-                  ) : (
-                    <PanelRightIcon className="rtl:-scale-x-100" />
-                  )}
-                </Button>
-              </div>
-            ) : null}
             {/* The card's border sits on the window's, so the top reads as one line and the bottom as the card on the tray. */}
             <div
               ref={cardRef}
@@ -795,24 +765,31 @@ function Player({
               >
                 {/* Equal sides keep the actions in the middle (they give way when a phone is too narrow). */}
                 <div className="flex flex-1 items-center gap-1">
-                  <PlayerSettings
-                    side="start"
-                    prefs={prefs}
-                    onPrefs={onPrefs}
-                    t={t}
-                  />
+                  <PlayerSettings prefs={prefs} onPrefs={onPrefs} t={t} />
                 </div>
                 <div
                   ref={setActionsEl}
                   className="flex flex-wrap items-center justify-center gap-2"
                 />
                 <div className="flex flex-1 items-center justify-end gap-1">
-                  <PlayerSettings
-                    side="end"
-                    prefs={prefs}
-                    onPrefs={onPrefs}
-                    t={t}
-                  />
+                  {/* The end of the tray holds help. Theory stays hidden while it's redesigned. */}
+                  {SHOW_THEORY ? (
+                    <Button
+                      variant="ghost"
+                      size="lg"
+                      className={cn(TRAY_BUTTON, TRAY_GHOST)}
+                      aria-expanded={theoryOpen}
+                      aria-controls={theoryOpen ? theoryId : undefined}
+                      onPress={() => setTheoryOpen((open) => !open)}
+                    >
+                      {theoryOpen ? (
+                        <PanelRightFilledIcon className="rtl:-scale-x-100" />
+                      ) : (
+                        <PanelRightIcon className="rtl:-scale-x-100" />
+                      )}
+                      {t.theory}
+                    </Button>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -1064,7 +1041,7 @@ function QuestionScreen({
       {explanation && !explanationAnchor(brick, marks) ? (
         <Explanation text={explanation} />
       ) : null}
-      {state.hintOpen && brick.hint ? (
+      {state.hintOpen && brick.hint && state.phase !== "revealed" ? (
         <Alert>
           <LightbulbIcon aria-hidden="true" />
           <AlertDescription className="text-base text-foreground">
@@ -1093,7 +1070,6 @@ function WrapUp({
   const pct = Math.round((s.first / s.total) * 100)
   const rows: [string, number, string][] = [
     ["bg-green-600", s.first, t.firstTry],
-    ["bg-amber-500", s.hint, t.withHint],
     ["bg-primary", s.second, t.secondTry],
     ["bg-red-600", s.missed, t.missed],
   ]
@@ -1266,7 +1242,6 @@ export function ActionArea({
     const s = state.question
     const { brick, role } = item
     const r = s.result
-    const canHelp = Boolean(brick.hint) && role !== "hook" && !s.usedHint
     const missText = (res: CheckResult) =>
       res.feedback ?? (res.missKey ? missMessage(res, t) : null)
     if (s.phase === "answering") {
@@ -1275,8 +1250,6 @@ export function ActionArea({
         onPress: () => dispatch({ type: "check" }),
         isDisabled: !isReady(brick, s.answer),
       }
-      if (canHelp)
-        secondary = helpButton(t.getHelp, () => dispatch({ type: "hint" }))
     } else if (role === "hook" && r) {
       // The hook is a guess, so a miss still moves on, but both get the colors a checked answer would.
       // A wrong guess also says what it got wrong: the misconception is what the lesson starts from.
@@ -1287,10 +1260,7 @@ export function ActionArea({
       primary = { ...primary, variant: r.correct ? "success" : "warning" }
     } else if (s.phase === "feedback" && r?.correct) {
       tone = "good"
-      title = say(
-        earnedMoment(state, item) ??
-          (s.usedHint && s.attempts === 0 ? "correctWithHint" : "praise")
-      )
+      title = say(earnedMoment(state, item) ?? "praise")
       explanation = brick.explanation
       primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r) {
@@ -1303,11 +1273,6 @@ export function ActionArea({
         onPress: () => dispatch({ type: "retry" }),
         variant: "warning",
       }
-      if (canHelp)
-        secondary = helpButton(t.getHelp, () => {
-          dispatch({ type: "retry" })
-          dispatch({ type: "hint" })
-        })
     } else if (s.phase === "revealed") {
       // The answer and why it's right open in the brick, so the toast only points there.
       title = say("answer")

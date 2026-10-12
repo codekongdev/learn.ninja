@@ -11,7 +11,6 @@ export type Strings = {
   continue: string
   tryAgain: string
   why: string
-  getHelp: string
   hint: string
   hookNote: string
   minutes: (n: number) => string
@@ -59,7 +58,6 @@ export type Strings = {
   fixStart: string
   done: string
   firstTry: string
-  withHint: string
   secondTry: string
   missed: string
   takeaways: string
@@ -72,7 +70,6 @@ export type Strings = {
   home: string
   share: string
   docs: string
-  createLesson: string
   /** The title in the header: press to edit it. */
   renameLesson: string
   lessonName: string

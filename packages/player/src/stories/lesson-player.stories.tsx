@@ -22,7 +22,6 @@ const meta = {
           expiresAt={Date.now() + 14 * 3.6e6}
           homeHref="#"
           docsHref="#"
-          createHref="#"
           privacyHref="#"
           termsHref="#"
           theme={globals.theme === "dark" ? "dark" : "light"}

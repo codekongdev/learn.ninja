@@ -183,7 +183,6 @@ export function LessonHeader({
   showParts = true,
   expiresAt,
   homeHref,
-  createHref,
   shareUrl,
   settings,
   onRestart,
@@ -196,7 +195,6 @@ export function LessonHeader({
   showParts?: boolean
   expiresAt?: number
   homeHref: string
-  createHref?: string
   shareUrl?: string
   /** The app's settings menu, shown before Share. */
   settings?: React.ReactNode
@@ -267,11 +265,6 @@ export function LessonHeader({
       <div className="flex items-center justify-end gap-1 sm:flex-1">
         {settings}
         <ShareButton title={title} url={shareUrl} t={t} />
-        {createHref ? (
-          <LinkButton href={createHref} size="sm" className="max-sm:hidden">
-            {t.createLesson}
-          </LinkButton>
-        ) : null}
       </div>
     </header>
   )
@@ -632,6 +625,13 @@ function ShortcutsDialog({
 /** Every button in the tray is `lg` and a pill, with room for the round ends. */
 export const TRAY_BUTTON = "rounded-full px-4"
 
+/**
+ * The tray is grey (bg-muted), which is also a ghost button's hover and open colour, so a ghost
+ * button in the tray steps off it: a shade darker in light mode, a lighter wash in dark mode.
+ */
+export const TRAY_GHOST =
+  "hover:bg-input aria-expanded:bg-input dark:hover:bg-input/50 dark:aria-expanded:bg-input/50"
+
 /** Sound effects aren't in yet; the setting is ready for when they are. */
 const SHOW_SOUND = false
 
@@ -655,28 +655,23 @@ const NINJA_PREVIEW: Record<NinjaLevel, NinjaMood> = {
  * corner he lives in; text size and sound sit at the end.
  */
 export function PlayerSettings({
-  side,
   prefs,
   onPrefs,
   t,
 }: {
-  side: "start" | "end"
   prefs: Preferences
   onPrefs: (patch: Partial<Preferences>) => void
   t: Strings
 }) {
   const sound = prefs.sound ?? "on"
   const ninja = prefs.ninja ?? "default"
-  if (side === "start")
-    return (
+  return (
+    <>
       <NinjaSetting
         value={ninja}
         onChange={(ninja) => onPrefs({ ninja })}
         t={t}
       />
-    )
-  return (
-    <>
       <SettingMenu
         label={t.textSize}
         icon={<TypeIcon />}
@@ -690,13 +685,13 @@ export function PlayerSettings({
         }))}
         onChange={(textSize) => onPrefs({ textSize })}
         size="lg"
-        className={TRAY_BUTTON}
+        className={cn(TRAY_BUTTON, TRAY_GHOST)}
       />
       {SHOW_SOUND ? (
         <Button
           variant="ghost"
           size="lg"
-          className={TRAY_BUTTON}
+          className={cn(TRAY_BUTTON, TRAY_GHOST)}
           aria-label={`${t.sound}: ${sound === "on" ? t.sound : t.muted}`}
           onPress={() => onPrefs({ sound: sound === "on" ? "off" : "on" })}
         >
@@ -726,7 +721,7 @@ function NinjaSetting({
       <Button
         variant="ghost"
         size="lg"
-        className={TRAY_BUTTON}
+        className={cn(TRAY_BUTTON, TRAY_GHOST)}
         aria-label={`${t.ninja}: ${t.ninjaLevels[value]}`}
       >
         <Ninja mood={value === "off" ? "closed" : "idle"} />

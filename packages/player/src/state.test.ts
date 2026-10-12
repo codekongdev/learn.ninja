@@ -176,7 +176,7 @@ describe("earned moments", () => {
   })
 
   it("earns a streak on the third first-try answer in a row", () => {
-    expect(at(answered(2, ["first", "hint"]))).toBe("streak")
+    expect(at(answered(2, ["first", "first"]))).toBe("streak")
     expect(at(answered(2, ["missed", "first"]))).toBeNull()
     expect(at(answered(3, ["first", "first", "first"]))).toBeNull()
   })

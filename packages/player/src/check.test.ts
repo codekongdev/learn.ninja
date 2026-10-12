@@ -225,18 +225,14 @@ describe("flow", () => {
   it("scores practice and challenge, not the hook", () => {
     const s = summarize(buttons, {
       p1: "first",
-      p2: "hint",
+      p2: "first",
       p3: "second",
       ch: "first",
     })
-    expect(s).toEqual({ first: 2, hint: 1, second: 1, missed: 2, total: 6 })
+    expect(s).toEqual({ first: 3, second: 1, missed: 2, total: 6 })
   })
-  it("records hints and second tries", () => {
-    expect([
-      outcomeFor(0, false),
-      outcomeFor(0, true),
-      outcomeFor(1, false),
-    ]).toEqual(["first", "hint", "second"])
+  it("records first and second tries", () => {
+    expect([outcomeFor(0), outcomeFor(1)]).toEqual(["first", "second"])
   })
   it("reports progress from 0 at the intro to 100 at the fix slot", () => {
     const items = buildSequence(buttons)

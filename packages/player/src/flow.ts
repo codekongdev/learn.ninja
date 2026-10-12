@@ -28,7 +28,7 @@ export function buildSequence(lesson: Lesson): Item[] {
 }
 
 /** How a scored question went on its first pass. */
-export type Outcome = "first" | "hint" | "second" | "missed"
+export type Outcome = "first" | "second" | "missed"
 
 /** Practice and challenge questions count toward the score; the hook and concepts don't. */
 export function scoredQuestions(lesson: Lesson): QuestionBrick[] {
@@ -44,7 +44,7 @@ export function summarize(
   lesson: Lesson,
   results: Record<string, Outcome>
 ): Summary {
-  const summary: Summary = { first: 0, hint: 0, second: 0, missed: 0, total: 0 }
+  const summary: Summary = { first: 0, second: 0, missed: 0, total: 0 }
   for (const brick of scoredQuestions(lesson)) {
     summary[results[brick.id] ?? "missed"]++
     summary.total++
@@ -52,10 +52,9 @@ export function summarize(
   return summary
 }
 
-/** The outcome to record for a question answered correctly. */
-export function outcomeFor(attempts: number, usedHint: boolean): Outcome {
-  if (attempts > 0) return "second"
-  return usedHint ? "hint" : "first"
+/** The outcome to record for a question answered correctly. Opening the theory first costs nothing. */
+export function outcomeFor(attempts: number): Outcome {
+  return attempts > 0 ? "second" : "first"
 }
 
 /** Progress as 0–100: the intro is 0, the wrap-up and fix round are 100. */
