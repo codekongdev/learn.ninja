@@ -1131,7 +1131,7 @@ function QuestionScreen({
         <RichText text={brick.prompt} />
       </h2>
       {helper && !brick.prompt.includes(helper) ? (
-        <p className="-mt-4 font-mono text-sm text-muted-foreground">
+        <p className="-mt-4.5 font-mono text-sm text-muted-foreground">
           {helper}
         </p>
       ) : null}
@@ -1398,8 +1398,7 @@ export function ActionArea({
         onPress: () => dispatch({ type: "check" }),
         isDisabled: !isReady(brick, s.answer),
       }
-      // The retry after a miss keeps its hint in the bubble.
-      if (inBubble && s.hintOpen && brick.hint) message = brick.hint
+      // Try again clears the bubble: the miss already said the hint.
     } else if (role === "hook" && r) {
       // The hook is a guess, so a miss still moves on, but both get the colors a checked answer would.
       // A wrong guess also says what it got wrong: the misconception is what the lesson starts from.
