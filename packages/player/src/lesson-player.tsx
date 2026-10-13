@@ -1019,7 +1019,7 @@ function QuestionScreen({
 
   return (
     <>
-      <h2 className="text-lg font-semibold">
+      <h2 className="text-base font-semibold">
         <RichText text={brick.prompt} />
       </h2>
       {helper && helper !== brick.prompt ? (
