@@ -7,7 +7,7 @@ export const SITE = {
   tagline: "Vibe learn anything with your agent",
   description:
     "Give your AI agent an article, notes, docs, a transcript, or code. It writes one short, interactive lesson and gives you a link to share. Free, no account.",
-  repo: "https://github.com/Uxcel-Team/learn",
+  repo: "https://github.com/learn-ninja/learn.ninja",
   maker: "@cmicpace",
   makerUrl: "https://x.com/cmicpace",
   /** Placeholder until the learn.ninja account exists. */
