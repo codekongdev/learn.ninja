@@ -27,6 +27,7 @@ Every screen has visible layers in both themes. Windows are outlined, not filled
 | Tooltip | Short hints on hover, focus, or tap | The `Tooltip` component: no arrow, white in light mode and black in dark (`bg-popover dark:bg-black`), not shadcn's inverted default |
 
 - Never paint a card with `bg-background`; that merges it into the page in dark mode.
+- Lesson visuals are the exception: an HTML visual's frame is `rounded-xl border bg-background` (no fill, no dot grid), and an option card's visual sits on a `bg-background` panel above a muted caption footer (`bg-muted dark:bg-input/30`). The border keeps them apart from the page. Option cards mark selection and answers with the border color only, never a tint over the visual or caption.
 - Selected controls use `border-primary` plus `bg-muted`, with `dark:data-selected:bg-muted` so the dark tint doesn't hide the selection.
 - Shadows stay at `shadow-xs`. Use rings and borders for separation, not heavier shadows.
 

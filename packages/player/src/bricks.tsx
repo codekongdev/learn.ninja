@@ -37,13 +37,21 @@ const cardStyles =
   "hover:bg-muted data-selected:border-primary data-selected:bg-muted data-pressed:translate-y-px "
 
 /** The number key that picks an option, or after checking, whether it was right. */
-function KeyHint({ i, mark }: { i: number; mark?: Mark }) {
+function KeyHint({
+  i,
+  mark,
+  className = "ms-auto shrink-0",
+}: {
+  i: number
+  mark?: Mark
+  className?: string
+}) {
   if (mark === "correct" || mark === "wrong" || mark === "partial")
     return (
       <Kbd
         aria-hidden="true"
         className={cn(
-          "ms-auto shrink-0",
+          className,
           mark === "correct"
             ? "bg-green-500 text-green-950"
             : "bg-yellow-500 text-yellow-950"
@@ -53,11 +61,22 @@ function KeyHint({ i, mark }: { i: number; mark?: Mark }) {
       </Kbd>
     )
   return (
-    <Kbd aria-hidden="true" className="ms-auto shrink-0 pointer-coarse:hidden">
+    <Kbd aria-hidden="true" className={cn(className, "pointer-coarse:hidden")}>
       {i + 1}
     </Kbd>
   )
 }
+
+// An option card: the visual on a panel in the page's color, the caption in a muted footer. Selection
+// and marks only recolor the border; the panel inherits it. Each card spans two rows of the options
+// grid (a subgrid), so the panels in a row match in height and the captions start on one line.
+const optionCardStyles =
+  "group relative row-span-2 grid grid-rows-subgrid gap-0 rounded-xl border bg-muted text-start shadow-xs transition-colors dark:bg-input/30 " +
+  "hover:border-ring data-selected:border-primary data-pressed:translate-y-px " +
+  "data-[status=correct]:border-green-600! data-[status=wrong]:border-yellow-500! data-[status=partial]:border-amber-500!"
+
+const optionPanelStyles =
+  "relative -mx-px -mt-px flex flex-col justify-center rounded-xl border border-inherit bg-background px-1 py-5 transition-colors"
 
 // ---------- concept ----------
 
@@ -87,12 +106,13 @@ export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
 // ---------- choice, compare, scenario ----------
 
 /**
- * Compare options, and choice options with visuals, show as cards in two columns: each card has an
- * "Option n" label, the visual, and an optional caption. Other options are rows.
+ * Options with visuals (in a compare or a choice) show as cards in two columns: each card has the
+ * visual on a panel, with its number key in the corner, and an optional caption under it. Options
+ * that are only text are rows, even in a compare.
  */
 export function hasOptionCards(brick: QuestionBrick): boolean {
-  if (brick.type === "compare") return true
-  return brick.type === "choice" && brick.options.some((o) => o.visual)
+  if (brick.type !== "compare" && brick.type !== "choice") return false
+  return brick.options.some((o) => o.visual)
 }
 
 /**
@@ -222,36 +242,55 @@ export function OptionsBrick({
             isDisabled={locked}
             data-status={marks[o.id]}
             className={cn(
-              "group",
-              cardStyles,
-              markStyles,
               cards
-                ? "flex flex-col gap-2 p-3"
-                : "flex min-h-12 items-center gap-2 px-4 py-3",
+                ? optionCardStyles
+                : cn(
+                    "group flex min-h-12 items-center gap-2 px-4 py-3",
+                    cardStyles,
+                    markStyles
+                  ),
               o.id === anchor && "rounded-b-none border-b-0"
             )}
           >
             {cards ? (
               <>
                 {/* The key badge numbers the card; the words are for screen readers. */}
-                <span className="flex items-center px-1">
-                  <span className="sr-only">
-                    {t.optionLabel(String(i + 1))}
-                  </span>
-                  <KeyHint i={i} mark={marks[o.id]} />
-                </span>
+                <span className="sr-only">{t.optionLabel(String(i + 1))}</span>
                 {o.visual ? (
-                  <Visual
-                    visual={o.visual}
-                    label={t.optionLabel(String(i + 1))}
-                  />
+                  <span
+                    className={cn(
+                      optionPanelStyles,
+                      // Without a caption, the panel is the whole card.
+                      !o.text && "row-span-2 -mb-px"
+                    )}
+                  >
+                    <KeyHint
+                      i={i}
+                      mark={marks[o.id]}
+                      className="absolute end-3 top-3 z-10"
+                    />
+                    <Visual
+                      visual={o.visual}
+                      label={t.optionLabel(String(i + 1))}
+                      plain
+                    />
+                  </span>
                 ) : null}
                 {o.text ? (
-                  <RichText
-                    text={o.text}
-                    lang={o.lang}
-                    className="px-1 text-sm font-medium"
-                  />
+                  <span
+                    className={cn(
+                      "flex items-start gap-3 px-4 py-3",
+                      !o.visual && "row-span-2"
+                    )}
+                  >
+                    <RichText
+                      text={o.text}
+                      lang={o.lang}
+                      className="flex-1 text-sm font-medium"
+                    />
+                    {/* A card with no visual keeps its key beside the text. */}
+                    {o.visual ? null : <KeyHint i={i} mark={marks[o.id]} />}
+                  </span>
                 ) : null}
               </>
             ) : (

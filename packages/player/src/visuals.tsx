@@ -22,10 +22,13 @@ export function Visual({
   visual,
   hotspots,
   label,
+  plain = false,
 }: {
   visual: VisualSpec
   hotspots?: HotspotControl
   label?: string
+  /** No box of its own: the visual sits on a surface that already frames it, like an option card's panel. */
+  plain?: boolean
 }) {
   if (visual.kind === "html")
     return (
@@ -36,6 +39,7 @@ export function Visual({
         height={visual.height}
         hotspots={hotspots}
         label={label}
+        plain={plain}
       />
     )
   if (visual.kind === "code")
@@ -46,9 +50,10 @@ export function Visual({
         highlight={visual.highlight}
         spots={visual.hotspots}
         hotspots={hotspots}
+        plain={plain}
       />
     )
-  return <MathBlock tex={visual.tex} />
+  return <MathBlock tex={visual.tex} plain={plain} />
 }
 
 // ---------- HTML: a sandboxed iframe with no scripts ----------
@@ -69,6 +74,7 @@ function HtmlFrame({
   height,
   hotspots,
   label,
+  plain,
 }: {
   html: string
   alt?: string
@@ -76,6 +82,7 @@ function HtmlFrame({
   height?: number
   hotspots?: HotspotControl
   label?: string
+  plain: boolean
 }) {
   const { visualsCss, dir, prepared, t } = usePlayer()
   const dark = useIsDark()
@@ -152,7 +159,11 @@ function HtmlFrame({
     <div
       role={interactive ? undefined : "img"}
       aria-label={interactive ? undefined : (alt ?? label ?? t.visual)}
-      className="visual-stage overflow-hidden rounded-xl border bg-muted/40 bg-[radial-gradient(var(--border)_1px,transparent_1.2px)] [background-size:16px_16px]"
+      // On the page's own surface, like the lesson around it, with room above and below.
+      className={cn(
+        "visual-stage",
+        !plain && "overflow-hidden rounded-xl border bg-background py-6"
+      )}
       inert={!interactive}
     >
       <div className="relative">
@@ -238,12 +249,14 @@ function CodeBlock({
   highlight,
   spots,
   hotspots,
+  plain,
 }: {
   code: string
   language: string
   highlight?: number[]
   spots?: { id: string; line: number }[]
   hotspots?: HotspotControl
+  plain: boolean
 }) {
   const { prepared } = usePlayer()
   const lines: CodeLines =
@@ -254,7 +267,10 @@ function CodeBlock({
   return (
     <div
       dir="ltr"
-      className="overflow-x-auto rounded-xl border bg-muted/40 text-start"
+      className={cn(
+        "overflow-x-auto text-start",
+        !plain && "rounded-xl border bg-muted/40"
+      )}
     >
       <pre className="m-0 flex min-w-max flex-col py-3 font-mono text-sm leading-7">
         {lines.map((tokens, i) => {
@@ -322,13 +338,16 @@ function CodeBlock({
 
 // KaTeX's display mode adds 1em above and below the formula; the box's padding is enough. KaTeX's
 // stylesheet is unlayered, so it beats Tailwind's utilities layer without the !.
-function MathBlock({ tex }: { tex: string }) {
+function MathBlock({ tex, plain }: { tex: string; plain: boolean }) {
   const { prepared } = usePlayer()
   const html = prepared.math[mathKey(tex, true)]
   return (
     <div
       dir="ltr"
-      className="flex justify-center overflow-x-auto rounded-xl border bg-muted/40 px-4 py-6 text-xl [&_.katex-display]:m-0!"
+      className={cn(
+        "flex justify-center overflow-x-auto px-4 py-6 text-xl [&_.katex-display]:m-0!",
+        !plain && "rounded-xl border bg-muted/40"
+      )}
     >
       {html ? (
         <div dangerouslySetInnerHTML={{ __html: html }} />

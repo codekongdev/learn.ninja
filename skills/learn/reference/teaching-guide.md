@@ -45,7 +45,7 @@ Before you keep a question brick, ask:
 
 Mechanics of each type:
 
-- **compare:** exactly 2 options. Great with HTML visuals (two UIs) or two short texts.
+- **compare:** exactly 2 options. Best with an HTML visual on each (two screens, two layouts, two charts), which show as cards side by side with an optional short `text` caption under each. Two short texts work too, but they show as plain rows, like a `choice`.
 - **choice:** 2–5 options, one correct (or `multiple: true` for "pick all that apply"; the player adds that instruction under the prompt, so don't write it in the prompt). When the question is about something to look at (a chart, a screen, a diagram), put it in the brick's `visual`, above text options. When the answers themselves are something to look at (which layouts, charts, or components get it right), give every option an HTML visual and a short `text` caption: they show as cards in two columns, like `compare`.
 - **hotspot:** tap the part of a visual that matters. In HTML, mark tappable elements with `data-hotspot="id"`; in code, list `hotspots` by line number.
 - **sort:** 4–8 items into 2–3 groups. Every group should get at least one item.
@@ -121,6 +121,7 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 - **Layout:** Tailwind utilities like `flex gap-2 flex-wrap`, `grid grid-cols-2 gap-4`, `p-4`, `rounded-lg`, `border`, `text-sm`, `font-medium`, `text-muted-foreground`, `bg-muted`.
 - **Theme colors:** use the theme's color names (`bg-primary`, `text-primary-foreground`, `bg-muted`, `border-border`, `text-destructive`) rather than fixed colors, so visuals work in light and dark mode.
 - **Right-to-left:** use direction-aware spacing (`ms-2`, `me-2`, `ps-4`, `pe-4`, `start-0`, `end-0`), not left/right ones.
+- **Width:** the player centers a visual at its own width. When the visual is a surface (a card, dialog, screen, form, table, or chart), give its outer element `w-full` so it fills the space, especially in option cards. Leave small pieces (a few buttons, a badge, a single field) at their natural size.
 - **Keep visuals small and focused:** show just enough to make the point. Each visual must be under 20 KB.
 - **Not allowed** (the checker rejects them): `<script>`, event handlers like `onclick`, `<iframe>`, `<form>`, `<object>`, `<embed>`, `javascript:` links, and anything loaded from an external URL (images, fonts, stylesheets). A visual is a still picture: components show the state you write (open, checked, selected, invalid) and can't be operated.
 - **No images or photos in v1.** Draw what you need with HTML/CSS or inline SVG.
