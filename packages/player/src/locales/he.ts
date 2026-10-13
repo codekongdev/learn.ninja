@@ -22,7 +22,7 @@ export const he: Strings = {
     }),
   levels: { beginner: "מתחילים", intermediate: "בינוני", advanced: "מתקדם" },
   objective: "תוכלו",
-  warmUp: "ניחוש חימום",
+  warmUp: "חימום",
   concept: (i, n) => `מושג ${i} מתוך ${n}`,
   practice: "תרגול",
   challenge: "אתגר",

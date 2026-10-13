@@ -17,7 +17,7 @@ export const vi: Strings = {
     advanced: "Nâng cao",
   },
   objective: "Bạn sẽ có thể",
-  warmUp: "Đoán khởi động",
+  warmUp: "Khởi động",
   concept: (i, n) => `Khái niệm ${i}/${n}`,
   practice: "Luyện tập",
   challenge: "Thử thách",

@@ -23,7 +23,7 @@ export const nl: Strings = {
     advanced: "Expert",
   },
   objective: "Je kunt straks",
-  warmUp: "Opwarmvraag",
+  warmUp: "Opwarmer",
   concept: (i, n) => `Concept ${i} van ${n}`,
   practice: "Oefenen",
   challenge: "Uitdaging",

@@ -18,7 +18,7 @@ export const hi: Strings = {
     p(h, { one: "# घंटे में समाप्त", other: "# घंटे में समाप्त" }),
   levels: { beginner: "शुरुआती", intermediate: "मध्यम", advanced: "उन्नत" },
   objective: "आप कर पाएँगे",
-  warmUp: "वार्म-अप अनुमान",
+  warmUp: "वार्म-अप",
   concept: (i, n) => `अवधारणा ${i} / ${n}`,
   practice: "अभ्यास",
   challenge: "चुनौती",

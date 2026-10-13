@@ -13,7 +13,7 @@ export const ja: Strings = {
   expires: (h) => `あと${h}時間で期限切れ`,
   levels: { beginner: "初級", intermediate: "中級", advanced: "上級" },
   objective: "できるようになること",
-  warmUp: "ウォームアップの予想",
+  warmUp: "ウォームアップ",
   concept: (i, n) => `コンセプト ${i}/${n}`,
   practice: "練習",
   challenge: "チャレンジ",

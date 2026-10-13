@@ -13,7 +13,7 @@ export const ar: Strings = {
   expires: (h) => `ينتهي خلال ${h} ساعة`,
   levels: { beginner: "مبتدئ", intermediate: "متوسط", advanced: "متقدم" },
   objective: "ستتمكن من",
-  warmUp: "تخمين تمهيدي",
+  warmUp: "تمهيد",
   concept: (i, n) => `المفهوم ${i} من ${n}`,
   practice: "تدريب",
   challenge: "تحدٍّ",

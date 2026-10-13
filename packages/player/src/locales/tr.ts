@@ -18,7 +18,7 @@ export const tr: Strings = {
     p(h, { one: "# saat içinde sona erer", other: "# saat içinde sona erer" }),
   levels: { beginner: "Başlangıç", intermediate: "Orta", advanced: "İleri" },
   objective: "Şunları yapabileceksin",
-  warmUp: "Isınma tahmini",
+  warmUp: "Isınma",
   concept: (i, n) => `Kavram ${i}/${n}`,
   practice: "Alıştırma",
   challenge: "Meydan okuma",

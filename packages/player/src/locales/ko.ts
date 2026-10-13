@@ -13,7 +13,7 @@ export const ko: Strings = {
   expires: (h) => `${h}시간 후 만료`,
   levels: { beginner: "초급", intermediate: "중급", advanced: "고급" },
   objective: "이렇게 할 수 있게 돼요",
-  warmUp: "준비 운동 추측",
+  warmUp: "워밍업",
   concept: (i, n) => `개념 ${i}/${n}`,
   practice: "연습",
   challenge: "도전",

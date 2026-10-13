@@ -22,7 +22,7 @@ export const fr: Strings = {
     advanced: "Avancé",
   },
   objective: "Tu sauras",
-  warmUp: "Devinette d'échauffement",
+  warmUp: "Échauffement",
   concept: (i, n) => `Concept ${i} sur ${n}`,
   practice: "Pratique",
   challenge: "Défi",

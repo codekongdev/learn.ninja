@@ -22,7 +22,7 @@ export const it: Strings = {
     advanced: "Avanzato",
   },
   objective: "Saprai",
-  warmUp: "Tentativo di riscaldamento",
+  warmUp: "Riscaldamento",
   concept: (i, n) => `Concetto ${i} di ${n}`,
   practice: "Pratica",
   challenge: "Sfida",

@@ -17,7 +17,7 @@ export const en: Strings = {
     advanced: "Advanced",
   },
   objective: "You'll be able to",
-  warmUp: "Warm-up guess",
+  warmUp: "Warm-up",
   concept: (i, n) => `Concept ${i} of ${n}`,
   practice: "Practice",
   challenge: "Challenge",

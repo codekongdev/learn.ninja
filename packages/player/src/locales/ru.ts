@@ -22,7 +22,7 @@ export const ru: Strings = {
     advanced: "Продвинутый",
   },
   objective: "Вы сможете",
-  warmUp: "Разминочная догадка",
+  warmUp: "Разминка",
   concept: (i, n) => `Понятие ${i} из ${n}`,
   practice: "Практика",
   challenge: "Испытание",

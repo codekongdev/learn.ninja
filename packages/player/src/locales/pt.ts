@@ -21,7 +21,7 @@ export const pt: Strings = {
     advanced: "Avançado",
   },
   objective: "Você vai conseguir",
-  warmUp: "Palpite de aquecimento",
+  warmUp: "Aquecimento",
   concept: (i, n) => `Conceito ${i} de ${n}`,
   practice: "Prática",
   challenge: "Desafio",

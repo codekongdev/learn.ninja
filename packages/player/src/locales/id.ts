@@ -17,7 +17,7 @@ export const id: Strings = {
     advanced: "Lanjutan",
   },
   objective: "Kamu akan bisa",
-  warmUp: "Tebakan pemanasan",
+  warmUp: "Pemanasan",
   concept: (i, n) => `Konsep ${i} dari ${n}`,
   practice: "Latihan",
   challenge: "Tantangan",

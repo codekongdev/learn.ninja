@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { LightbulbIcon, PanelRightIcon, PencilIcon, XIcon } from "lucide-react"
+import { LightbulbIcon, PanelRightIcon, XIcon } from "lucide-react"
 
 import type {
   ConceptBrick as ConceptBrickData,
@@ -1113,7 +1113,7 @@ export function Screen({
     case "concept":
       return (
         <section className={cn(CONCEPT_CARD, "p-6 sm:p-8")}>
-          {label ? <ScreenLabel icon={<LightbulbIcon />} text={label} /> : null}
+          {label ? <ScreenLabel text={label} /> : null}
           <ConceptBrick brick={item.brick} />
         </section>
       )
@@ -1165,24 +1165,14 @@ function screenLabel(state: State, t: Strings): string | undefined {
 }
 
 function ScreenLabel({
-  icon,
   text,
   className,
 }: {
-  icon: React.ReactNode
   text: string
   className?: string
 }) {
   return (
-    <p
-      className={cn(
-        "flex items-center gap-1.5 text-xs font-medium text-muted-foreground [&_svg]:size-3.5",
-        className
-      )}
-    >
-      <span aria-hidden="true" className="contents">
-        {icon}
-      </span>
+    <p className={cn("font-mono text-xs text-muted-foreground", className)}>
       {text}
     </p>
   )
@@ -1247,9 +1237,7 @@ function QuestionScreen({
 
   return (
     <>
-      {label ? (
-        <ScreenLabel icon={<PencilIcon />} text={label} className="-mb-4" />
-      ) : null}
+      {label ? <ScreenLabel text={label} className="-mb-4" /> : null}
       <h2 className="text-lg font-semibold">
         <RichText text={brick.prompt} />
       </h2>

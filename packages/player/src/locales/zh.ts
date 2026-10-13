@@ -13,7 +13,7 @@ export const zh: Strings = {
   expires: (h) => `${h} 小时后过期`,
   levels: { beginner: "入门", intermediate: "中级", advanced: "高级" },
   objective: "你将能够",
-  warmUp: "热身猜测",
+  warmUp: "热身",
   concept: (i, n) => `概念 ${i}/${n}`,
   practice: "练习",
   challenge: "挑战",

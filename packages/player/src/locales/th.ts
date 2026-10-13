@@ -17,7 +17,7 @@ export const th: Strings = {
     advanced: "ขั้นสูง",
   },
   objective: "คุณจะสามารถ",
-  warmUp: "เดาวอร์มอัป",
+  warmUp: "วอร์มอัป",
   concept: (i, n) => `แนวคิดที่ ${i} จาก ${n}`,
   practice: "ฝึกฝน",
   challenge: "ท้าทาย",
