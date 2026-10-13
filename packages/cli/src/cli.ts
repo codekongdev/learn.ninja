@@ -11,7 +11,7 @@ import {
 // The command the lesson skill runs: validate a lesson file, publish it, or update it.
 // Bundled into skills/learn/scripts/learn.mjs, so the skill works without installing anything.
 
-export const SKILL_VERSION = "0.5.3"
+export const SKILL_VERSION = "0.5.4"
 export const DEFAULT_API_URL = "https://learn.ninja"
 
 export interface Io {
