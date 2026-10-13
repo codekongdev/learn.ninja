@@ -42,6 +42,18 @@ function placedQuestions(lesson: Lesson): PlacedQuestion[] {
   ]
 }
 
+/**
+ * A phrase that names an answer by where it sits ("the second statement", "option B"), or null.
+ * English only, and narrow on purpose: "the right answer" or "the third step" are fine.
+ */
+export function positionalReference(text: string): string | null {
+  const plain = text.replace(/[*`]/g, "")
+  const ordinal =
+    /\bthe\s+(?:first|second|third|fourth|last|top|bottom)\s+(?:option|answer|choice|statement|one|explanation|message|example|version|card|pick)s?\b/i
+  const lettered = /\b(?:option|answer|choice)\s+(?:[A-D]|[1-9])\b/
+  return (plain.match(ordinal) ?? plain.match(lettered))?.[0] ?? null
+}
+
 const countWords = (s: string) =>
   s.replace(/[*`]/g, "").trim().split(/\s+/).filter(Boolean).length
 
@@ -133,6 +145,43 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
           )
         }
       })
+    }
+  }
+
+  // The player shuffles options (and a match's right column), so "the second statement" can point
+  // at the wrong one on screen. Explanations and feedback have to name an option by what it says.
+  for (const { brick, path } of questions) {
+    if (
+      brick.type !== "choice" &&
+      brick.type !== "compare" &&
+      brick.type !== "scenario" &&
+      brick.type !== "match"
+    )
+      continue
+    const texts: [string, string | undefined][] = [
+      [`${path}.explanation`, brick.explanation],
+      [`${path}.hint`, brick.hint],
+      ...(brick.type === "match"
+        ? []
+        : brick.options.flatMap((o, i): [string, string | undefined][] => [
+            [
+              `${path}.options[${i}].feedback`,
+              "feedback" in o ? o.feedback : undefined,
+            ],
+            [
+              `${path}.options[${i}].outcome`,
+              "outcome" in o ? o.outcome : undefined,
+            ],
+          ])),
+    ]
+    for (const [where, text] of texts) {
+      const found = text ? positionalReference(text) : null
+      if (found)
+        add(
+          "teaching",
+          where,
+          `"${found}" points at an option by its place, but the player shuffles the options, so it can name the wrong one. Name the option by what it says instead.`
+        )
     }
   }
 
