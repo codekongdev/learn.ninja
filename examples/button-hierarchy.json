@@ -178,7 +178,7 @@
     {
       "id": "p5",
       "type": "choice",
-      "prompt": "Which of these dialog footers follow the button hierarchy? Pick all that apply.",
+      "prompt": "Which of these dialog footers follow the button hierarchy?",
       "options": [
         {
           "id": "a",

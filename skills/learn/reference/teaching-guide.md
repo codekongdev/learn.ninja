@@ -46,7 +46,7 @@ Before you keep a question brick, ask:
 Mechanics of each type:
 
 - **compare:** exactly 2 options. Great with HTML visuals (two UIs) or two short texts.
-- **choice:** 2–5 options, one correct (or `multiple: true` for "pick all that apply"). When the question is about something to look at (a chart, a screen, a diagram), put it in the brick's `visual`, above text options. When the answers themselves are something to look at (which layouts, charts, or components get it right), give every option an HTML visual and a short `text` caption: they show as cards in two columns, like `compare`.
+- **choice:** 2–5 options, one correct (or `multiple: true` for "pick all that apply"; the player adds that instruction under the prompt, so don't write it in the prompt). When the question is about something to look at (a chart, a screen, a diagram), put it in the brick's `visual`, above text options. When the answers themselves are something to look at (which layouts, charts, or components get it right), give every option an HTML visual and a short `text` caption: they show as cards in two columns, like `compare`.
 - **hotspot:** tap the part of a visual that matters. In HTML, mark tappable elements with `data-hotspot="id"`; in code, list `hotspots` by line number.
 - **sort:** 4–8 items into 2–3 groups. Every group should get at least one item.
 - **order:** 3–6 items written in the correct order (the player shuffles them). Use `alsoAccept` if another order is genuinely right too.

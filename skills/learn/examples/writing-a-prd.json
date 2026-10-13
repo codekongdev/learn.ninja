@@ -56,7 +56,7 @@
     {
       "id": "p2",
       "type": "choice",
-      "prompt": "Which belong in a problem statement? Pick all that apply.",
+      "prompt": "Which belong in a problem statement?",
       "options": [
         { "id": "a", "text": "Who is affected" },
         { "id": "b", "text": "Evidence, like data or quotes" },
