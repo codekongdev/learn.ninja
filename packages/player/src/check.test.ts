@@ -137,13 +137,24 @@ describe("sort", () => {
 })
 
 describe("order", () => {
+  it("empties only the wrong slots on a retry", () => {
+    const brick = p(buttons, 1, 1)
+    const target = solution(brick)
+    if (target.kind !== "sequence") throw new Error("not an order brick")
+    const [a, b, c] = target.slots as string[]
+    expect(
+      retryAnswer(brick, { kind: "sequence", slots: [a!, c!, b!], pool: [] })
+    ).toEqual({ kind: "sequence", slots: [a, null, null], pool: [c, b] })
+  })
+
   it("accepts an alternative order", () => {
     const brick = {
       ...p(buttons, 1, 1),
       alsoAccept: [["b", "a", "c"]],
     } as QuestionBrick
     expect(
-      checkAnswer(brick, { kind: "sequence", ids: ["b", "a", "c"] }).correct
+      checkAnswer(brick, { kind: "sequence", slots: ["b", "a", "c"], pool: [] })
+        .correct
     ).toBe(true)
   })
 })

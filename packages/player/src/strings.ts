@@ -46,6 +46,8 @@ export type Strings = {
   pool: string
   /** Announced when a sort item moves; `group` is the pool's name when it's taken back out. */
   placedIn: (item: string, group: string) => string
+  /** Announced when an order item lands in a numbered slot. */
+  placedAt: (item: string, n: number) => string
   wordBank: string
   emptyGap: string
   /** Name of an HTML visual with no alt text. */
@@ -101,7 +103,7 @@ export type Strings = {
   shortcutMain: string
   shortcutPick: string
   /** Drag and drop by keyboard: Enter on a handle, then Tab to a spot. */
-  shortcutDrag: string
+  shortcutOrder: string
   shortcutSort: string
   shortcutUnsort: string
   /** D opens and closes the tray of buttons. */

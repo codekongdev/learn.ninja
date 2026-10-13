@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { flushSync } from "react-dom"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 import { Kbd } from "@workspace/ui/components/kbd"
@@ -10,6 +9,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { QuestionBrickProps } from "./bricks"
 import { POOL } from "./check"
 import { usePlayer } from "./context"
+import { buzz, calm, fly, pulse, shake } from "./motion"
 import { RichText } from "./rich-text"
 
 // The sort brick, as lanes: the groups head the columns and every item keeps its own row. An unsorted
@@ -31,53 +31,6 @@ export function moveItem(
   )
   next[toZone] = [...(next[toZone] ?? []), itemId]
   return next
-}
-
-const calm = () =>
-  typeof window === "undefined" ||
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
-type ViewTransition = { finished: Promise<void>; ready: Promise<void> }
-type WithViewTransitions = Document & {
-  startViewTransition?: (update: () => void) => ViewTransition
-}
-
-/** Name every item for the transition only while it runs, so nothing else changes. */
-function tag(root: HTMLElement, on: boolean) {
-  for (const el of root.querySelectorAll<HTMLElement>("[data-vt]")) {
-    el.style.setProperty("view-transition-name", on ? el.dataset.vt! : "")
-    el.style.setProperty("view-transition-class", on ? "learn-sort-item" : "")
-  }
-}
-
-/** Run a move as a view transition, so the items slide to their new lanes where the browser can. */
-function fly(root: HTMLElement | null, update: () => void): Promise<void> {
-  const doc = document as WithViewTransitions
-  if (!root || !doc.startViewTransition || calm()) {
-    update()
-    return Promise.resolve()
-  }
-  tag(root, true)
-  const transition = doc.startViewTransition(() => {
-    flushSync(update)
-    tag(root, true)
-  })
-  // A transition cut short (another move, or the tab hidden) rejects `ready`; the move itself still lands.
-  transition.ready.catch(() => {})
-  return transition.finished.finally(() => tag(root, false))
-}
-
-/** A small bounce on the lane's heading as an item lands. */
-function pulse(el: HTMLElement | null | undefined) {
-  if (!el || calm()) return
-  el.animate(
-    [
-      { transform: "scale(1)" },
-      { transform: "scale(1.02)" },
-      { transform: "scale(1)" },
-    ],
-    { duration: 280, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" }
-  )
 }
 
 /** How far a finger has to travel before a swipe counts. */
@@ -131,21 +84,7 @@ export function SortBrick({
     .filter((id) => marks[id] === "wrong")
     .join(",")
   React.useEffect(() => {
-    if (!wrong || calm()) return
-    for (const el of root.current?.querySelectorAll<HTMLElement>(
-      '[data-status="wrong"]'
-    ) ?? [])
-      el.animate(
-        [
-          { transform: "translateX(0)" },
-          { transform: "translateX(-4px)" },
-          { transform: "translateX(4px)" },
-          { transform: "translateX(-3px)" },
-          { transform: "translateX(2px)" },
-          { transform: "translateX(0)" },
-        ],
-        { duration: 420, easing: "ease-out" }
-      )
+    if (wrong) shake(root.current)
   }, [wrong])
 
   if (brick.type !== "sort" || answer.kind !== "zones") return null
@@ -166,8 +105,7 @@ export function SortBrick({
     const zone = lane < 0 ? POOL : groups[lane]!.id
     setAim(null)
     setSaid(t.placedIn(textOf(id), lane < 0 ? t.pool : groups[lane]!.label))
-    // A tick under the finger on phones; desktops have nothing to buzz.
-    if (matchMedia("(pointer: coarse)").matches) navigator.vibrate?.(10)
+    buzz()
     void fly(root.current, () => {
       before?.()
       setAnswer({

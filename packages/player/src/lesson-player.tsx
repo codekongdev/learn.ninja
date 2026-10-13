@@ -38,8 +38,8 @@ import {
   Explanation,
   explanationAnchor,
   OptionsBrick,
-  OrderBrick,
 } from "./bricks"
+import { OrderBrick } from "./order"
 import { SortBrick } from "./sort"
 import {
   buildSequence,

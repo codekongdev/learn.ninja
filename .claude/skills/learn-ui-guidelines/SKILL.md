@@ -10,7 +10,7 @@ The look comes from **shadcn's Nova style** (`aria-nova` in both `components.jso
 ## Components first
 
 - Use the components in `packages/ui/src/components` (button, badge, card, alert, progress, dialog, dropdown-menu, direction, selectable). If one is missing, add it with `npx shadcn@latest add <name>` from `apps/web`. Don't copy shadcn classes into new markup.
-- Player code imports UI only from `@workspace/ui/components/*`, never from `react-aria-components` (the drag-and-drop module is the one exception).
+- Player code imports UI only from `@workspace/ui/components/*`, never from `react-aria-components`.
 - Answer options, chips, and gaps use `Selectable` (a React Aria toggle) styled with the control recipe below.
 
 ## Surfaces and elevation
@@ -22,7 +22,7 @@ Every screen has visible layers in both themes. Windows are outlined, not filled
 | Page | App background, header, footer | `bg-background` |
 | Window | The player's lesson card and Theory panel, the docs preview window | `rounded-2xl border` on the page background, no fill or shadow (like shadcn's component previews). A window that overlays content (the Theory panel on phones) adds `bg-background` |
 | Card | Content cards on the site and inside a brick | `bg-card rounded-xl shadow-xs ring-1 ring-foreground/10` (or the `Card` component) |
-| Control on a card | Options, chips, drag items, filled gaps | `rounded-md border bg-background shadow-xs dark:bg-input/30`, hover `bg-muted` / `dark:bg-input/50` |
+| Control on a card | Options, chips, sort and order items, filled gaps | `rounded-md border bg-background shadow-xs dark:bg-input/30`, hover `bg-muted` / `dark:bg-input/50` |
 | Floating | Menus, dialogs | `bg-popover` (the components handle it) |
 | Tooltip | Short hints on hover, focus, or tap | The `Tooltip` component: no arrow, white in light mode and black in dark (`bg-popover dark:bg-black`), not shadcn's inverted default |
 

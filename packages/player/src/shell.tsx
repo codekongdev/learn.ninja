@@ -3,7 +3,6 @@
 import * as React from "react"
 import {
   createLucideIcon,
-  ArrowRightIcon,
   CheckIcon,
   ChevronDownIcon,
   ClockIcon,
@@ -657,11 +656,11 @@ function ShortcutsDialog({
   onOpenChange: (open: boolean) => void
   t: Strings
 }) {
-  // A range (1–9), a sequence (Enter, then Tab), or a pair of keys that each do it (← and →).
-  const rows: [keys: string[], label: string, join?: "then" | "pair"][] = [
+  // A range (1–9), or a pair of keys that each do it (← and →).
+  const rows: [keys: string[], label: string, join?: "pair"][] = [
     [["Enter"], t.shortcutMain],
     [["1", "9"], t.shortcutPick],
-    [["Enter", "Tab"], t.shortcutDrag, "then"],
+    [["↑", "↓"], t.shortcutOrder, "pair"],
     [["←", "→"], t.shortcutSort, "pair"],
     [["Delete"], t.shortcutUnsort],
     [["D"], t.shortcutTray],
@@ -684,14 +683,7 @@ function ShortcutsDialog({
               {keys.map((key, i) => (
                 <React.Fragment key={key}>
                   {i > 0 && join !== "pair" ? (
-                    join === "then" ? (
-                      <ArrowRightIcon
-                        aria-hidden="true"
-                        className="size-3 text-muted-foreground rtl:-scale-x-100"
-                      />
-                    ) : (
-                      <span className="text-xs text-muted-foreground">–</span>
-                    )
+                    <span className="text-xs text-muted-foreground">–</span>
                   ) : null}
                   <Kbd className="bg-muted text-foreground">{key}</Kbd>
                 </React.Fragment>

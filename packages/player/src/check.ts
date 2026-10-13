@@ -6,7 +6,7 @@ import type { QuestionBrick } from "@workspace/spec"
 export type Answer =
   | { kind: "select"; ids: string[] } // choice, compare, scenario, hotspot
   | { kind: "zones"; zones: Record<string, string[]> } // sort: "pool" plus one zone per group
-  | { kind: "sequence"; ids: string[] } // order
+  | { kind: "sequence"; slots: (string | null)[]; pool: string[] } // order: numbered slots, plus items still to place
   | { kind: "pairs"; links: Record<number, number> } // match: left index → right index
   | { kind: "gaps"; values: Record<string, string> } // blank
 
@@ -71,7 +71,8 @@ export function initialAnswer(
     case "order":
       return {
         kind: "sequence",
-        ids: shuffleAway(
+        slots: brick.items.map(() => null),
+        pool: shuffleAway(
           brick.items.map((i) => i.id),
           random
         ),
@@ -95,7 +96,7 @@ export function isReady(brick: QuestionBrick, answer: Answer): boolean {
     case "zones":
       return (answer.zones[POOL] ?? []).length === 0
     case "sequence":
-      return true
+      return answer.slots.every((id) => id !== null)
     case "pairs":
       return (
         brick.type === "match" &&
@@ -173,17 +174,16 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
         : { correct: true, marks }
     }
     case "order": {
-      const seq = answer.kind === "sequence" ? answer.ids : []
+      const seq = answer.kind === "sequence" ? answer.slots : []
       const target = brick.items.map((i) => i.id)
       const accepted = [target, ...(brick.alsoAccept ?? [])]
       const matched = accepted.find(
         (a) => a.join("\u0000") === seq.join("\u0000")
       )
       const marks: Record<string, Mark> = {}
-      seq.forEach(
-        (id, i) =>
-          (marks[id] = matched || target[i] === id ? "correct" : "wrong")
-      )
+      seq.forEach((id, i) => {
+        if (id) marks[id] = matched || target[i] === id ? "correct" : "wrong"
+      })
       return matched
         ? { correct: true, marks }
         : { correct: false, missKey: "order", marks }
@@ -263,7 +263,11 @@ export function solution(brick: QuestionBrick): Answer {
         ]),
       }
     case "order":
-      return { kind: "sequence", ids: brick.items.map((i) => i.id) }
+      return {
+        kind: "sequence",
+        slots: brick.items.map((i) => i.id),
+        pool: [],
+      }
     case "match":
       return {
         kind: "pairs",
@@ -289,7 +293,7 @@ export function solutionMarks(brick: QuestionBrick): Record<string, Mark> {
 
 /**
  * What the learner keeps when they try again: selections are cleared (so they choose afresh),
- * while arrangements stay so they only fix what was wrong.
+ * while arrangements stay so they only fix what was wrong. Wrong gaps and wrong order slots empty out.
  */
 export function retryAnswer(brick: QuestionBrick, answer: Answer): Answer {
   if (answer.kind === "select") return { kind: "select", ids: [] }
@@ -303,6 +307,19 @@ export function retryAnswer(brick: QuestionBrick, answer: Answer): Answer {
           result.marks[id] === "wrong" ? "" : v,
         ])
       ),
+    }
+  }
+  if (answer.kind === "sequence" && brick.type === "order") {
+    // Wrong items go back to the pool; the right ones keep their slots.
+    const { marks } = checkAnswer(brick, answer)
+    const right = (id: string | null) => id !== null && marks[id] === "correct"
+    return {
+      kind: "sequence",
+      slots: answer.slots.map((id) => (right(id) ? id : null)),
+      pool: [
+        ...answer.pool,
+        ...answer.slots.filter((id): id is string => id !== null && !right(id)),
+      ],
     }
   }
   return answer

@@ -20,9 +20,9 @@ import {
   HotspotBrick,
   MatchBrick,
   OptionsBrick,
-  OrderBrick,
 } from "../bricks"
 import { RichText } from "../rich-text"
+import { OrderBrick } from "../order"
 import { SortBrick } from "../sort"
 import { Visual } from "../visuals"
 import { lessons, PlayerFrame } from "./fixtures"
@@ -280,14 +280,14 @@ export const OrderVisual: Story = {
   name: "Order, visual items",
   args: {
     brick: practice(buttons, 1, 1),
-    wrong: { kind: "sequence", ids: ["c", "a", "b"] },
+    wrong: { kind: "sequence", slots: ["c", "a", "b"], pool: [] },
   },
 }
 export const OrderText: Story = {
   name: "Order, dialogue",
   args: {
     brick: spanish.challenge,
-    wrong: { kind: "sequence", ids: ["b", "a", "c", "d"] },
+    wrong: { kind: "sequence", slots: ["b", "a", "c", "d"], pool: [] },
   },
 }
 export const Match: Story = {

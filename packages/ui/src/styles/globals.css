@@ -663,8 +663,8 @@
   --typeset-flow: 1.25em;
 }
 
-/* The sort brick: items slide between lanes. */
-::view-transition-group(.learn-sort-item) {
+/* The sort and order bricks: items slide to their new place. */
+::view-transition-group(.learn-item) {
   animation-duration: 280ms;
   animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }

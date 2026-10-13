@@ -13,7 +13,6 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { Answer, Mark } from "./check"
 import { usePlayer } from "./context"
-import { DropZone } from "./dnd"
 import { RichText } from "./rich-text"
 import { Visual } from "./visuals"
 
@@ -354,48 +353,6 @@ export function HotspotBrick({
       visual={brick.visual}
       hotspots={{ selected, marks, onToggle, disabled: locked }}
       label={brick.prompt}
-    />
-  )
-}
-
-// ---------- order (drag and drop) ----------
-
-export function OrderBrick({
-  brick,
-  answer,
-  setAnswer,
-  marks,
-  locked,
-}: QuestionBrickProps) {
-  if (brick.type !== "order" || answer.kind !== "sequence") return null
-  const byId = new Map(brick.items.map((i) => [i.id, i]))
-  const items = answer.ids.map((id) => {
-    const it = byId.get(id)!
-    return {
-      id,
-      textValue: it.text?.replace(/[*`]/g, "") ?? id,
-      content: it.visual ? (
-        <Visual visual={it.visual} />
-      ) : (
-        <RichText text={it.text ?? ""} />
-      ),
-      lang: it.lang,
-      mark: marks[id],
-    }
-  })
-  const onMove = (itemId: string, _zone: string, index: number) => {
-    const rest = answer.ids.filter((id) => id !== itemId)
-    rest.splice(Math.min(index, rest.length), 0, itemId)
-    setAnswer({ kind: "sequence", ids: rest })
-  }
-  return (
-    <DropZone
-      zoneId="order"
-      label={brick.prompt}
-      items={items}
-      emptyText=""
-      onMove={onMove}
-      disabled={locked}
     />
   )
 }
