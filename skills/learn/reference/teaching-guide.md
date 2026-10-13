@@ -26,16 +26,16 @@ hook → bricks: concept → 2–4 questions → concept → 2–4 questions …
 
 Each question brick should ask the learner to do what they'd really do with this knowledge. Start from the question you'd ask a learner face to face, then pick the type that asks it most directly. There's no quota and no set order: a lesson can use two types or six, and can repeat a type as often as the content calls for. Never pick a type for variety's sake.
 
-| Type       | Natural when the learner needs to…                                                              | Forced when…                                                                                             |
-| ---------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `choice`   | Pick the right answer, cause, or next move                                                      | Never really; it's the safe default. Use `multiple: true` only when several answers are genuinely right. |
-| `compare`  | Judge which of two real examples is better (two UIs, two sentences, two plans)                  | The two options are just a right and a wrong statement; that's a `choice`.                               |
-| `hotspot`  | Find something inside a realistic artifact: a screen, a recipe, a contract, a line of code      | The "artifact" is a list you built only so there's something to tap.                                     |
-| `sort`     | Classify things into categories people really use                                               | The groups are invented for the brick, or there are only two items per group.                            |
-| `order`    | Sequence a real process where the order matters and mistakes have consequences                  | The order is arbitrary, or obvious from the wording.                                                     |
-| `match`    | Pair things that come in pairs: terms and meanings, words and translations, symptoms and causes | It just re-tests the concept brick's vocabulary with no thinking involved.                               |
-| `blank`    | Recall exact wording that matters: code, a phrase in another language, a formula                | It's a sentence from the concept brick with a word removed; that's recall, not understanding.            |
-| `scenario` | Make a call in a realistic situation where options have trade-offs                              | There's one obviously right answer; that's a `choice`.                                                   |
+| Type       | Natural when the learner needs to…                                                              | Forced when…                                                                                              |
+| ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `choice`   | Pick the right answer, cause, or next move                                                      | Never really; it's the safe default. Use `multiple: true` only when several answers are genuinely right.  |
+| `compare`  | Judge which of two real examples is better (two UIs, two sentences, two plans)                  | The two options are just a right and a wrong statement; that's a `choice`.                                |
+| `hotspot`  | Find something inside a realistic artifact: a screen, a recipe, a contract, a line of code      | The "artifact" is a list you built only so there's something to tap.                                      |
+| `sort`     | Classify things into categories people really use, each with a name of its own                  | The groups are invented, one is just "not the other" (Goal / Non-goal), or each group has only two items. |
+| `order`    | Sequence a real process where the order matters and mistakes have consequences                  | The order is arbitrary, or obvious from the wording.                                                      |
+| `match`    | Pair things that come in pairs: terms and meanings, words and translations, symptoms and causes | It just re-tests the concept brick's vocabulary with no thinking involved.                                |
+| `blank`    | Recall exact wording that matters: code, a phrase in another language, a formula                | It's a sentence from the concept brick with a word removed; that's recall, not understanding.             |
+| `scenario` | Make a call in a realistic situation where options have trade-offs                              | There's one obviously right answer; that's a `choice`.                                                    |
 
 Before you keep a question brick, ask:
 
@@ -48,7 +48,7 @@ Mechanics of each type:
 - **compare:** exactly 2 options. Best with an HTML visual on each (two screens, two layouts, two charts), which show as cards side by side with an optional short `text` caption under each. Two short texts work too, but they show as plain rows, like a `choice`.
 - **choice:** 2–5 options, one correct (or `multiple: true` for "pick all that apply"; the player adds that instruction under the prompt, so don't write it in the prompt). When the question is about something to look at (a chart, a screen, a diagram), put it in the brick's `visual`, above text options. When the answers themselves are something to look at (which layouts, charts, or components get it right), give every option an HTML visual and a short `text` caption: they show as cards in two columns, like `compare`.
 - **hotspot:** tap the part of a visual that matters. In HTML, mark tappable elements with `data-hotspot="id"`; in code, list `hotspots` by line number.
-- **sort:** 4–8 items into 2–3 groups. Every group should get at least one item.
+- **sort:** 4–8 items into 2–3 groups. Every group should get at least one item, and every group needs a name of its own. If a group would be "Not X" or "Other", ask "Which of these are X?" as a `choice` with `multiple: true` instead.
 - **order:** 3–6 items written in the correct order (the player shuffles them). Use `alsoAccept` if another order is genuinely right too.
 - **match:** 3–5 pairs.
 - **blank:** fill gaps in a sentence or code from word chips. Each gap's `choices` include the right answer plus 1–2 believable decoys.

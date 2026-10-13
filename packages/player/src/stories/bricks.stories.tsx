@@ -21,9 +21,9 @@ import {
   MatchBrick,
   OptionsBrick,
   OrderBrick,
-  SortBrick,
 } from "../bricks"
 import { RichText } from "../rich-text"
+import { SortBrick } from "../sort"
 import { Visual } from "../visuals"
 import { lessons, PlayerFrame } from "./fixtures"
 
@@ -257,11 +257,22 @@ export const HotspotCode: Story = {
   },
 }
 export const Sort: Story = {
+  name: "Sort, three groups",
   args: {
     brick: practice(buttons, 1, 0),
     wrong: {
       kind: "zones",
       zones: { pool: [], pri: ["a"], sec: ["c"], ter: ["b", "d", "e"] },
+    },
+  },
+}
+export const SortTwoGroups: Story = {
+  name: "Sort, two groups",
+  args: {
+    brick: practice(coding, 1, 0),
+    wrong: {
+      kind: "zones",
+      zones: { pool: [], map: ["a", "b"], each: ["c", "d"] },
     },
   },
 }

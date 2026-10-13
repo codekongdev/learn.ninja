@@ -44,8 +44,8 @@ export type Strings = {
   }
   optionLabel: (letter: string) => string
   pool: string
-  allPlaced: string
-  dropHere: string
+  /** Announced when a sort item moves; `group` is the pool's name when it's taken back out. */
+  placedIn: (item: string, group: string) => string
   wordBank: string
   emptyGap: string
   /** Name of an HTML visual with no alt text. */
@@ -102,6 +102,8 @@ export type Strings = {
   shortcutPick: string
   /** Drag and drop by keyboard: Enter on a handle, then Tab to a spot. */
   shortcutDrag: string
+  shortcutSort: string
+  shortcutUnsort: string
   /** D opens and closes the tray of buttons. */
   shortcutTray: string
   shortcutHelp: string

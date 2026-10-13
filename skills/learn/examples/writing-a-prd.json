@@ -88,35 +88,26 @@
     },
     {
       "id": "p3",
-      "type": "sort",
-      "prompt": "For a “saved searches” feature, sort each item.",
-      "groups": [
-        { "id": "goal", "label": "Goal" },
-        { "id": "non", "label": "Non-goal" }
-      ],
-      "items": [
-        {
-          "id": "a",
-          "text": "Cut the time to rerun a search by 50%",
-          "group": "goal"
-        },
+      "type": "choice",
+      "prompt": "For a “saved searches” feature, which of these are goals?",
+      "options": [
+        { "id": "a", "text": "Cut the time to rerun a search by 50%" },
         {
           "id": "b",
           "text": "Share saved searches with teammates",
-          "group": "non"
+          "feedback": "A useful idea, but it's a feature, not a measurable outcome. List it as a non-goal."
         },
-        {
-          "id": "c",
-          "text": "Increase weekly searches per user by 10%",
-          "group": "goal"
-        },
+        { "id": "c", "text": "Increase weekly searches per user by 10%" },
         {
           "id": "d",
           "text": "Redesign the whole search page",
-          "group": "non"
+          "feedback": "That's a big project, not a measurable result. It's a non-goal for this version."
         }
       ],
-      "explanation": "Goals are measurable outcomes. Sharing and a redesign may be good ideas, but they're out of scope for this version."
+      "correct": ["a", "c"],
+      "multiple": true,
+      "hint": "Which ones could you check with a number?",
+      "explanation": "Goals are measurable outcomes. Sharing and a redesign may be good ideas, but they're non-goals for this version."
     },
     {
       "id": "p4",

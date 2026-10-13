@@ -2,7 +2,7 @@
 name: math
 description: Arithmetic, fractions, percentages, algebra, geometry, probability, statistics, and everyday money math. Use when the learner calculates, simplifies, solves, or reasons with numbers and formulas.
 examples: compound-interest
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Math
@@ -33,16 +33,16 @@ After each concept brick, take support away one step at a time:
 
 How the question bricks fit math:
 
-| Type       | Natural for…                                                                                       |
-| ---------- | -------------------------------------------------------------------------------------------------- |
-| `choice`   | The final answer; which formula applies; which statement is true                                   |
-| `blank`    | A missing step, term, or sign in a formula or worked solution (`"numeric": true` for a number gap) |
-| `hotspot`  | Finding the wrong line in a worked solution: one `data-hotspot` element per line in an HTML visual |
-| `sort`     | Classifying: rational or irrational, linear or not, which expressions equal `\( 2(x + 3) \)`       |
-| `order`    | Steps of a procedure where order matters: solving an equation, order of operations                 |
-| `match`    | Equivalent forms: fraction ↔ decimal ↔ percent, expression ↔ simplified form                       |
-| `compare`  | Two solution methods, or two charts of the same data: which is right, or clearer                   |
-| `scenario` | Choosing which calculation a real decision needs (loan offers, unit prices)                        |
+| Type       | Natural for…                                                                                                     |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- |
+| `choice`   | The final answer; which formula applies; which statement is true                                                 |
+| `blank`    | A missing step, term, or sign in a formula or worked solution (`"numeric": true` for a number gap)               |
+| `hotspot`  | Finding the wrong line in a worked solution: one `data-hotspot` element per line in an HTML visual               |
+| `sort`     | Classifying: rational or irrational; linear, quadratic, or exponential; which expressions equal `\( 2(x + 3) \)` |
+| `order`    | Steps of a procedure where order matters: solving an equation, order of operations                               |
+| `match`    | Equivalent forms: fraction ↔ decimal ↔ percent, expression ↔ simplified form                                     |
+| `compare`  | Two solution methods, or two charts of the same data: which is right, or clearer                                 |
+| `scenario` | Choosing which calculation a real decision needs (loan offers, unit prices)                                      |
 
 ## 4. Wrong options from real errors
 

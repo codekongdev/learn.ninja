@@ -657,11 +657,13 @@ function ShortcutsDialog({
   onOpenChange: (open: boolean) => void
   t: Strings
 }) {
-  // A range (1–9) or a sequence (Enter, then Tab).
-  const rows: [keys: string[], label: string, sequence?: boolean][] = [
+  // A range (1–9), a sequence (Enter, then Tab), or a pair of keys that each do it (← and →).
+  const rows: [keys: string[], label: string, join?: "then" | "pair"][] = [
     [["Enter"], t.shortcutMain],
     [["1", "9"], t.shortcutPick],
-    [["Enter", "Tab"], t.shortcutDrag, true],
+    [["Enter", "Tab"], t.shortcutDrag, "then"],
+    [["←", "→"], t.shortcutSort, "pair"],
+    [["Delete"], t.shortcutUnsort],
     [["D"], t.shortcutTray],
     [["W"], t.why],
     [["?"], t.shortcutHelp],
@@ -672,7 +674,7 @@ function ShortcutsDialog({
         <DialogTitle>{t.shortcuts}</DialogTitle>
       </DialogHeader>
       <ul className="flex flex-col divide-y">
-        {rows.map(([keys, label, sequence]) => (
+        {rows.map(([keys, label, join]) => (
           <li
             key={label}
             className="flex items-center justify-between gap-4 py-2 text-sm"
@@ -681,8 +683,8 @@ function ShortcutsDialog({
             <span className="flex shrink-0 items-center gap-1">
               {keys.map((key, i) => (
                 <React.Fragment key={key}>
-                  {i > 0 ? (
-                    sequence ? (
+                  {i > 0 && join !== "pair" ? (
+                    join === "then" ? (
                       <ArrowRightIcon
                         aria-hidden="true"
                         className="size-3 text-muted-foreground rtl:-scale-x-100"

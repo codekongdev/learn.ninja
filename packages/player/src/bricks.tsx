@@ -11,7 +11,7 @@ import { Kbd } from "@workspace/ui/components/kbd"
 import { Selectable } from "@workspace/ui/components/selectable"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { POOL, type Answer, type Mark } from "./check"
+import type { Answer, Mark } from "./check"
 import { usePlayer } from "./context"
 import { DropZone } from "./dnd"
 import { RichText } from "./rich-text"
@@ -358,93 +358,7 @@ export function HotspotBrick({
   )
 }
 
-// ---------- sort and order (drag and drop) ----------
-
-function moveItem(
-  zones: Record<string, string[]>,
-  itemId: string,
-  toZone: string,
-  index: number
-): Record<string, string[]> {
-  const next = Object.fromEntries(
-    Object.entries(zones).map(([z, ids]) => [
-      z,
-      ids.filter((id) => id !== itemId),
-    ])
-  )
-  const target = next[toZone] ?? []
-  target.splice(Math.min(index, target.length), 0, itemId)
-  next[toZone] = target
-  return next
-}
-
-export function SortBrick({
-  brick,
-  answer,
-  setAnswer,
-  marks,
-  locked,
-}: QuestionBrickProps) {
-  const { t } = usePlayer()
-  if (brick.type !== "sort" || answer.kind !== "zones") return null
-  const byId = new Map(brick.items.map((i) => [i.id, i]))
-  const zoneItems = (zone: string) =>
-    (answer.zones[zone] ?? []).map((id) => {
-      const it = byId.get(id)!
-      return {
-        id,
-        textValue: it.text.replace(/[*`]/g, ""),
-        content: <RichText text={it.text} />,
-        lang: it.lang,
-        mark: marks[id],
-      }
-    })
-  const onMove = (itemId: string, zone: string, index: number) =>
-    setAnswer({
-      kind: "zones",
-      zones: moveItem(answer.zones, itemId, zone, index),
-    })
-
-  return (
-    <div className="flex flex-col gap-3">
-      <DropZone
-        zoneId={POOL}
-        label={t.pool}
-        items={zoneItems(POOL)}
-        emptyText={t.allPlaced}
-        onMove={onMove}
-        layout="grid"
-        disabled={locked}
-      />
-      <div
-        className={cn(
-          "grid gap-3",
-          brick.groups.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"
-        )}
-      >
-        {brick.groups.map((g) => (
-          <div key={g.id} className="flex min-w-0 flex-col gap-2">
-            <div
-              lang={g.lang}
-              className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
-            >
-              {g.label}
-            </div>
-            <DropZone
-              zoneId={g.id}
-              label={g.label}
-              items={zoneItems(g.id)}
-              emptyText={t.dropHere}
-              onMove={onMove}
-              disabled={locked}
-              className="min-h-28"
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
+// ---------- order (drag and drop) ----------
 
 export function OrderBrick({
   brick,

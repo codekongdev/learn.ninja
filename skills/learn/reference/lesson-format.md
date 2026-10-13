@@ -81,7 +81,7 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
   "correct": ["more"], "multiple": false, "explanation": "…" }
 
 { "id": "p4", "type": "sort", "prompt": "Sort each …",
-  "groups": [ { "id": "g1", "label": "Goal" }, { "id": "g2", "label": "Non-goal", "lang": "en" } ],
+  "groups": [ { "id": "g1", "label": "Buenos días", "lang": "es" }, { "id": "g2", "label": "Buenas noches", "lang": "es" } ],
   "items": [ { "id": "a", "text": "…", "group": "g1" }, … 4–8 … ], "explanation": "…" }
 
 { "id": "p5", "type": "order", "prompt": "Put … in order.",

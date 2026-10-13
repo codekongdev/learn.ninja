@@ -1,7 +1,7 @@
 "use client"
 
 // The one module allowed to use react-aria-components directly (see CLAUDE.md):
-// accessible drag and drop for sort and order, by mouse, touch, keyboard, and screen reader.
+// accessible drag and drop for the order brick, by mouse, touch, keyboard, and screen reader.
 
 import * as React from "react"
 import {

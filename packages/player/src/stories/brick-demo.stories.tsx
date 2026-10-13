@@ -43,7 +43,7 @@ export const Concept: Story = {
 }
 
 export const Sort: Story = {
-  args: { lesson: lessons.prd, brickId: "p3" },
+  args: { lesson: lessons.coding, brickId: "p3" },
 }
 
 export const BlankWithCode: Story = {

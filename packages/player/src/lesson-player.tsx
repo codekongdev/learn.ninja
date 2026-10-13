@@ -39,8 +39,8 @@ import {
   explanationAnchor,
   OptionsBrick,
   OrderBrick,
-  SortBrick,
 } from "./bricks"
+import { SortBrick } from "./sort"
 import {
   buildSequence,
   outcomeFor,
