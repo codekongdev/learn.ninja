@@ -1056,7 +1056,7 @@ function ScreenLabel({
   className?: string
 }) {
   return (
-    <p className={cn("font-mono text-xs text-muted-foreground", className)}>
+    <p className={cn("font-mono text-sm text-muted-foreground", className)}>
       {text}
     </p>
   )
@@ -1121,11 +1121,10 @@ function QuestionScreen({
     <>
       {label ? <ScreenLabel text={label} className="-mb-4" /> : null}
       <h2 className="text-base font-semibold">
-
         <RichText text={brick.prompt} />
       </h2>
       {helper && !brick.prompt.includes(helper) ? (
-        <p className="-mt-4 font-mono text-xs text-muted-foreground">
+        <p className="-mt-4 font-mono text-sm text-muted-foreground">
           {helper}
         </p>
       ) : null}
