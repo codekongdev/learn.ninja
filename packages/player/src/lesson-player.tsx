@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { LightbulbIcon, PanelRightIcon, XIcon } from "lucide-react"
+import { LightbulbIcon, PanelRightIcon, PencilIcon, XIcon } from "lucide-react"
 
 import type {
   ConceptBrick as ConceptBrickData,
@@ -629,9 +629,23 @@ function Player({
       asked.phase === "revealed" ||
       (asked.phase === "feedback" && asked.result?.correct === false))
   React.useEffect(() => {
-    if (wantsCard && cardConcepts.length > 0) setCardOpen(true)
-  }, [wantsCard, asked?.attempts, cardConcepts.length])
-  const cardShown = cardOpen && cardConcepts.length > 0
+    if (wantsCard) setCardOpen(true)
+  }, [wantsCard, asked?.attempts])
+  // Why? puts the explanation on the card, above the concept, instead of under the answer.
+  const cardExplanation =
+    item.kind === "question" && asked && explanationShown(asked, item.role)
+      ? item.brick.explanation
+      : null
+  // A miss's own feedback ("This names a solution...") goes on the card too, so the toast stays one
+  // short line and the learning happens on the card.
+  const missed = asked?.result && !asked.result.correct ? asked.result : null
+  const cardFeedback =
+    missed && asked?.phase !== "answering"
+      ? (missed.feedback ?? (missed.missKey ? missMessage(missed, t) : null))
+      : null
+  const cardHasContent =
+    cardConcepts.length > 0 || Boolean(cardExplanation || cardFeedback)
+  const cardShown = cardOpen && cardHasContent
   // "Got it" sends the concept card back out the way it came before the next screen arrives.
   const [leaving, setLeaving] = React.useState(false)
   const leavingRef = React.useRef(false)
@@ -733,11 +747,7 @@ function Player({
               <main
                 ref={scrollRef}
                 tabIndex={-1}
-                className={cn(
-                  "min-h-0 flex-1 overflow-y-auto transition-[padding] duration-300 ease-out outline-none motion-reduce:transition-none",
-                  // On wider screens the question moves over to make room for the card beside it.
-                  cardShown && "sm:pe-88"
-                )}
+                className="min-h-0 flex-1 overflow-y-auto outline-none"
               >
                 <div
                   key={state.index}
@@ -764,6 +774,8 @@ function Player({
                       item={item}
                       state={state}
                       dispatch={dispatch}
+                      label={screenLabel(state, t)}
+                      explanationOnCard
                       ninja={ninja !== "off"}
                       wrapLine={ninja === "off" || landed ? wrapLine : null}
                     />
@@ -779,13 +791,16 @@ function Player({
                     level={ninja}
                     pickLine={pickLine}
                     onConceptDone={leaveConcept}
+                    feedbackOnCard
                   />
                 </div>
               </main>
-              {item.kind === "question" && cardConcepts.length > 0 ? (
+              {item.kind === "question" && cardHasContent ? (
                 <ConceptSideCard
                   key={state.index}
                   concepts={cardConcepts}
+                  explanation={cardExplanation}
+                  feedback={cardFeedback}
                   open={cardShown}
                   onOpenChange={setCardOpen}
                   textSize={textSize}
@@ -892,12 +907,18 @@ function Player({
  */
 function ConceptSideCard({
   concepts,
+  explanation,
+  feedback,
   open,
   onOpenChange,
   textSize,
   t,
 }: {
   concepts: ConceptBrickData[]
+  /** Why the answer is right, once the learner has asked (or it's been revealed). */
+  explanation: string | null
+  /** What the last wrong answer got wrong. */
+  feedback: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
   textSize: TextSize
@@ -935,7 +956,7 @@ function ConceptSideCard({
         }}
         inert={open}
         className={cn(
-          "absolute end-0 top-1/2 z-10 h-auto -translate-y-1/2 rounded-e-none border-e-0 bg-card px-2 py-3 transition-opacity duration-300 dark:bg-card",
+          "absolute end-0 bottom-6 z-10 h-auto rounded-e-none border-e-0 bg-card px-2 py-3 transition-opacity duration-300 dark:bg-card",
           open ? "opacity-0" : "pointer-events-auto"
         )}
       >
@@ -943,14 +964,15 @@ function ConceptSideCard({
       </Button>
       <aside
         id={id}
-        aria-label={concepts[0]!.title}
+        aria-label={concepts[0]?.title ?? t.why}
         inert={!open}
         onKeyDown={(e) => {
           if (e.key === "Escape") close()
         }}
         className={cn(
           CONCEPT_CARD,
-          "absolute end-4 top-1/2 z-20 max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] -translate-y-1/2 gap-0 overflow-hidden transition-[translate,opacity] duration-300 ease-out motion-reduce:transition-none sm:w-80",
+          // It layers over the lesson in the bottom corner, so nothing on the page moves.
+          "absolute end-4 bottom-4 z-20 max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] gap-0 overflow-hidden shadow-md transition-[translate,opacity] duration-300 ease-out motion-reduce:transition-none sm:w-72",
           open
             ? "pointer-events-auto translate-x-0 opacity-100"
             : "opacity-0 ltr:translate-x-[calc(100%+1rem)] rtl:-translate-x-[calc(100%+1rem)]"
@@ -968,8 +990,19 @@ function ConceptSideCard({
         </Button>
         <div
           data-text-size={textSize}
-          className="flex min-h-0 flex-1 flex-col gap-10 overflow-y-auto p-5"
+          className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4"
         >
+          {feedback ? (
+            <div className="me-8 rounded-lg border border-yellow-500 bg-yellow-500/10 px-3 py-2 text-xs">
+              <RichText text={feedback} />
+            </div>
+          ) : null}
+          {explanation ? (
+            <div className="flex flex-col gap-2 [&>div]:text-xs">
+              <h2 className="pe-8 text-base font-semibold">{t.why}</h2>
+              <Explanation text={explanation} />
+            </div>
+          ) : null}
           {concepts.map((c) => (
             <div key={c.id} className="flex flex-col gap-4">
               <ConceptBrick brick={c} compact />
@@ -1057,11 +1090,17 @@ export function Screen({
   dispatch,
   ninja = true,
   wrapLine,
+  label,
+  explanationOnCard = false,
 }: {
   lesson: Lesson
   item: Item
   state: State
   dispatch: React.Dispatch<Action>
+  /** A quiet line above the screen saying what kind it is: "Concept 2 of 3", "Practice"... */
+  label?: string
+  /** The player shows the explanation on the card beside the question; a lone demo shows it in place. */
+  explanationOnCard?: boolean
   /** Whether the ninja is on. Off, his slot folds away so the screen stays centered. */
   ninja?: boolean
   /** The wrap-up's line for a perfect run, once he's there to say it. */
@@ -1096,6 +1135,7 @@ export function Screen({
     case "concept":
       return (
         <section className={cn(CONCEPT_CARD, "p-6 sm:p-8")}>
+          {label ? <ScreenLabel icon={<LightbulbIcon />} text={label} /> : null}
           <ConceptBrick brick={item.brick} />
         </section>
       )
@@ -1123,9 +1163,51 @@ export function Screen({
           item={item}
           state={state.question!}
           dispatch={dispatch}
+          label={label}
+          explanationOnCard={explanationOnCard}
         />
       )
   }
+}
+
+/** What kind of screen this is, for the quiet label above it: a concept, or a question to try. */
+function screenLabel(state: State, t: Strings): string | undefined {
+  const item = state.items[state.index]
+  if (item?.kind === "concept") {
+    const concepts = state.items.filter((i) => i.kind === "concept")
+    return t.concept(concepts.indexOf(item) + 1, concepts.length)
+  }
+  if (item?.kind !== "question") return undefined
+  return {
+    hook: t.warmUp,
+    practice: t.practice,
+    challenge: t.challenge,
+    fix: t.fixing,
+  }[item.role]
+}
+
+function ScreenLabel({
+  icon,
+  text,
+  className,
+}: {
+  icon: React.ReactNode
+  text: string
+  className?: string
+}) {
+  return (
+    <p
+      className={cn(
+        "flex items-center gap-1.5 text-xs font-medium text-muted-foreground [&_svg]:size-3.5",
+        className
+      )}
+    >
+      <span aria-hidden="true" className="contents">
+        {icon}
+      </span>
+      {text}
+    </p>
+  )
 }
 
 /** The explanation opens after "Why?", and by itself once a missed answer is revealed (not for the hook's guess). */
@@ -1137,10 +1219,14 @@ function QuestionScreen({
   item,
   state,
   dispatch,
+  label,
+  explanationOnCard = false,
 }: {
   item: Extract<Item, { kind: "question" }>
   state: QuestionState
   dispatch: React.Dispatch<Action>
+  label?: string
+  explanationOnCard?: boolean
 }) {
   const { t } = usePlayer()
   const { brick, role } = item
@@ -1159,7 +1245,10 @@ function QuestionScreen({
       : keepsPick
         ? { ...solutionMarks(brick), ...state.result?.marks }
         : solutionMarks(brick)
-  const explanation = explanationShown(state, role) ? brick.explanation : null
+  const explanation =
+    !explanationOnCard && explanationShown(state, role)
+      ? brick.explanation
+      : null
   const props = {
     brick,
     answer: state.answer,
@@ -1180,6 +1269,9 @@ function QuestionScreen({
 
   return (
     <>
+      {label ? (
+        <ScreenLabel icon={<PencilIcon />} text={label} className="-mb-4" />
+      ) : null}
       <h2 className="text-lg font-semibold">
         <RichText text={brick.prompt} />
       </h2>
@@ -1346,6 +1438,7 @@ export function ActionArea({
   level = "default",
   pickLine: picker,
   onConceptDone,
+  feedbackOnCard = false,
 }: {
   lesson: Lesson
   item: Item
@@ -1362,6 +1455,8 @@ export function ActionArea({
   pickLine?: LinePicker
   /** "Got it" on a concept: the player animates the card away before moving on. */
   onConceptDone?: () => void
+  /** The player's card carries what a miss got wrong, so the toast says only right or not quite. */
+  feedbackOnCard?: boolean
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const ownPicker = React.useMemo(
@@ -1439,7 +1534,7 @@ export function ActionArea({
       // A wrong guess also says what it got wrong: the misconception is what the lesson starts from.
       tone = r.correct ? "good" : "warn"
       title = say(r.correct ? "goodGuess" : "hookMiss")
-      message = r.correct ? null : missText(r)
+      message = r.correct || feedbackOnCard ? null : missText(r)
       explanation = brick.explanation
       primary = { ...primary, variant: r.correct ? "success" : "warning" }
     } else if (s.phase === "feedback" && r?.correct) {
@@ -1450,8 +1545,12 @@ export function ActionArea({
     } else if (s.phase === "feedback" && r) {
       // A miss gets one short line: the option's own feedback, or a nudge to look again.
       tone = "warn"
-      title = r.partial ? say("close") : (missText(r) ?? say("nudge"))
-      message = r.partial ? missText(r) : null
+      title = r.partial
+        ? say("close")
+        : feedbackOnCard
+          ? say("nudge")
+          : (missText(r) ?? say("nudge"))
+      message = r.partial && !feedbackOnCard ? missText(r) : null
       primary = {
         label: t.tryAgain,
         onPress: () => dispatch({ type: "retry" }),

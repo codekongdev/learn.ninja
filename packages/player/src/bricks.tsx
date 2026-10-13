@@ -76,7 +76,7 @@ export function ConceptBrick({
         <h2
           className={cn(
             "font-semibold tracking-tight text-balance",
-            compact ? "pe-8 text-lg" : "text-2xl"
+            compact ? "pe-8 text-base" : "text-2xl"
           )}
         >
           {brick.title}
@@ -84,7 +84,7 @@ export function ConceptBrick({
         <p
           className={cn(
             "leading-relaxed text-pretty",
-            compact ? "text-sm" : "text-base"
+            compact ? "text-xs" : "text-base"
           )}
         >
           <RichText text={brick.body} />
@@ -92,9 +92,14 @@ export function ConceptBrick({
       </div>
       {brick.visual ? <Visual visual={brick.visual} /> : null}
       {brick.term ? (
-        <dl className="flex flex-col gap-1 border-s-2 border-primary ps-4">
-          <dt className="text-sm font-semibold">{brick.term.word}</dt>
-          <dd className="text-sm text-muted-foreground">
+        <dl
+          className={cn(
+            "flex flex-col gap-1 border-s-2 border-primary ps-4",
+            compact ? "text-xs" : "text-sm"
+          )}
+        >
+          <dt className="font-semibold">{brick.term.word}</dt>
+          <dd className="text-muted-foreground">
             <RichText text={brick.term.definition} />
           </dd>
         </dl>
