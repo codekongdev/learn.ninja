@@ -1156,20 +1156,12 @@ export function Screen({
   }
 }
 
-/** What kind of screen this is, for the quiet label above it: a concept, or a question to try. */
+/** The quiet label above the warm-up, so the first question reads as a guess. Later screens go without. */
 function screenLabel(state: State, t: Strings): string | undefined {
   const item = state.items[state.index]
-  if (item?.kind === "concept") {
-    const concepts = state.items.filter((i) => i.kind === "concept")
-    return t.concept(concepts.indexOf(item) + 1, concepts.length)
-  }
-  if (item?.kind !== "question") return undefined
-  return {
-    hook: t.warmUp,
-    practice: t.practice,
-    challenge: t.challenge,
-    fix: t.fixing,
-  }[item.role]
+  return item?.kind === "question" && item.role === "hook"
+    ? t.warmUp
+    : undefined
 }
 
 function ScreenLabel({
@@ -1249,8 +1241,8 @@ function QuestionScreen({
       <h2 className="text-lg font-semibold">
         <RichText text={brick.prompt} />
       </h2>
-      {helper && helper !== brick.prompt ? (
-        <p className="-mt-4 text-sm text-muted-foreground">{helper}</p>
+      {helper && !brick.prompt.includes(helper) ? (
+        <p className="-mt-4 font-mono text-xs text-muted-foreground">{helper}</p>
       ) : null}
       {brick.type === "scenario" ? (
         <div className="rounded-e-lg border-s-2 border-primary bg-muted px-4 py-3 text-base">
