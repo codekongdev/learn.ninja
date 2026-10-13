@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest"
 
 import type { Lesson, QuestionBrick } from "@workspace/spec"
 
+import { chipsInGaps } from "./bricks"
 import { buildSequence, type Item, type Outcome } from "./flow"
 import {
   earnedMoment,
@@ -269,5 +270,18 @@ describe("scenario story mode", () => {
       tried: ["b"],
       answer: { kind: "select", ids: [] },
     })
+  })
+})
+
+describe("blank word chips", () => {
+  it("gives each placed word its own bank chip, a repeated word in gap order", () => {
+    expect(
+      chipsInGaps(["a", "b", "c"], { a: "const", b: "const", c: "" }, [
+        "let",
+        "const",
+        "const",
+        "var",
+      ])
+    ).toEqual({ a: 1, b: 2 })
   })
 })

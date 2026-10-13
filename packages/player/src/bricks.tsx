@@ -13,6 +13,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { Answer, Mark } from "./check"
 import { usePlayer } from "./context"
+import { buzz, fly, shake } from "./motion"
 import { RichText } from "./rich-text"
 import { Visual } from "./visuals"
 
@@ -499,6 +500,39 @@ export function MatchBrick({
 
 // ---------- blank (word chips) ----------
 
+/** A word chip, in the bank or placed in a gap: the same chip in both, so it reads as one thing moving. */
+const wordChip =
+  "rounded-md border bg-background shadow-xs transition-colors dark:bg-input/30"
+
+/**
+ * Which bank chip sits in each gap. A word listed twice in the bank (two gaps accept it) has two
+ * chips, used in gap order, so each placed word has a chip of its own to slide from and back to.
+ */
+export function chipsInGaps(
+  gapIds: string[],
+  values: Record<string, string>,
+  bank: string[]
+): Record<string, number> {
+  const taken = new Set<number>()
+  const at: Record<string, number> = {}
+  for (const id of gapIds) {
+    const word = values[id]
+    if (!word) continue
+    const i = bank.findIndex((w, j) => w === word && !taken.has(j))
+    if (i < 0) continue
+    taken.add(i)
+    at[id] = i
+  }
+  return at
+}
+
+/**
+ * Gaps to fill from a bank of word chips, set like Duolingo's: the sentence sits on the page at
+ * reading size, and a gap is an underline as wide as the longest word, so the text never jumps.
+ * The gap waiting for a word has a blinking caret. Tapping a word (or its number key) slides it
+ * onto that line, and tapping it there sends it back. A used word leaves a soft ghost in the bank,
+ * so the other chips stay put.
+ */
 export function BlankBrick({
   brick,
   answer,
@@ -507,34 +541,81 @@ export function BlankBrick({
   locked,
   bank,
 }: QuestionBrickProps & { bank: string[] }) {
-  const { t } = usePlayer()
+  const { t, keyScope } = usePlayer()
+  const uid = React.useId().replace(/[^\w-]/g, "")
+  const root = React.useRef<HTMLDivElement>(null)
   const [active, setActive] = React.useState<string | null>(null)
-  if (brick.type !== "blank" || answer.kind !== "gaps") return null
-  const values = answer.values
-  const gapIds = brick.blanks.map((b) => b.id)
+
+  // After checking, wrong words give a small shake, as in sort and order.
+  const wrong = Object.keys(marks)
+    .filter((id) => marks[id] === "wrong")
+    .join(",")
+  React.useEffect(() => {
+    if (wrong) shake(root.current)
+  }, [wrong])
+
+  const values = answer.kind === "gaps" ? answer.values : {}
+  const gapIds = brick.type === "blank" ? brick.blanks.map((b) => b.id) : []
   const firstEmpty = gapIds.find((id) => !values[id])
-  const target = active ?? firstEmpty ?? gapIds[gapIds.length - 1]!
+  const target = active && !values[active] ? active : firstEmpty
+  const placed = chipsInGaps(gapIds, values, bank)
+  const used = new Set(Object.values(placed))
 
+  /** Change the gaps with a slide, then wait at the next empty gap. */
+  const fill = (next: Record<string, string>, wait: string | null) => {
+    buzz()
+    void fly(root.current, () => {
+      setAnswer({ kind: "gaps", values: next })
+      setActive(wait)
+    })
+  }
   const place = (word: string) => {
+    if (!target) return
     const next = { ...values, [target]: word }
-    setAnswer({ kind: "gaps", values: next })
-    setActive(gapIds.find((id) => !next[id]) ?? null)
+    fill(next, gapIds.find((id) => !next[id]) ?? null)
   }
-  const clear = (id: string) => {
-    setAnswer({ kind: "gaps", values: { ...values, [id]: "" } })
-    setActive(id)
-  }
+  const unplace = (id: string) => fill({ ...values, [id]: "" }, id)
 
+  // Number keys pick words, as they pick answer options: 1 for the first chip, 2 for the second…
+  const pick = React.useRef<(n: number) => void>(() => {})
+  pick.current = (n) => {
+    const word = bank[n]
+    if (word !== undefined && !used.has(n)) place(word)
+  }
+  React.useEffect(() => {
+    if (locked) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return
+      const el = e.target as HTMLElement | null
+      if (keyScope && !keyScope.current?.contains(el)) return
+      if (el?.closest("input, textarea, select, [contenteditable=true]")) return
+      const n = Number(e.key)
+      if (!Number.isInteger(n) || n < 1 || n > bank.length) return
+      e.preventDefault()
+      pick.current(n - 1)
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [locked, keyScope, bank.length])
+
+  if (brick.type !== "blank" || answer.kind !== "gaps") return null
   const code = brick.format === "code"
+  const words = [...new Set(bank)]
   const parts = brick.template.split(/(\[\[[^\]]+\]\])/)
+  const vt = (i: number) => `learn-${uid}-w${i}`
+  // One reading size: the words are the sentence's size (code's is mono), set apart by weight and chip.
+  const size = code ? "font-mono text-sm" : "text-base font-medium"
+  const inline = cn(wordChip, "px-2.5 py-0.5", size)
+
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={root} className="flex flex-col gap-8">
+      {/* The sentence is the content: on the page, at reading size, with no card around it. */}
       <div
         lang={brick.lang}
         dir={code ? "ltr" : undefined}
         className={cn(
-          "rounded-xl bg-card px-5 py-4 whitespace-pre-wrap shadow-xs ring-1 ring-foreground/10",
-          code ? "font-mono text-base leading-loose" : "text-xl leading-[2.3]"
+          "whitespace-pre-wrap",
+          code ? "font-mono text-sm leading-9" : "text-base leading-9"
         )}
       >
         {parts.map((part, i) => {
@@ -542,23 +623,60 @@ export function BlankBrick({
           if (!m) return <React.Fragment key={i}>{part}</React.Fragment>
           const id = m[1]!
           const value = values[id]
+          const waiting = !locked && !value && target === id
           return (
             <Selectable
               key={i}
               aria-label={value || t.emptyGap}
-              isSelected={!locked && target === id && !value}
-              onChange={() => clear(id)}
+              isSelected={waiting}
+              onChange={() => (value ? unplace(id) : setActive(id))}
               isDisabled={locked}
-              data-status={marks[id]}
               className={cn(
-                "mx-0.5 inline-block min-w-[4.5rem] rounded-md border-b-2 border-primary bg-muted px-2 text-center align-baseline leading-normal",
-                "data-selected:bg-primary/10",
-                value &&
-                  "border border-border bg-background shadow-xs dark:bg-input/30",
-                markStyles
+                // A line the word lands on, as wide as the longest word.
+                "group/gap inline-grid items-center justify-items-center align-baseline leading-normal transition-colors",
+                value
+                  ? "mx-0.5"
+                  : // An underline just under the text, the width of the longest word as a chip.
+                    "mx-1 border-b-2 border-muted-foreground/40 data-selected:border-foreground"
               )}
             >
-              {value || " "}
+              {/* While empty, every word as a hidden chip in the same cell sets the width, so the
+                  line fits whichever word lands. Filled, the gap fits its word and the text closes up. */}
+              {(value ? [] : words).map((w) => (
+                <span
+                  key={w}
+                  aria-hidden="true"
+                  className={cn(
+                    wordChip,
+                    "invisible border-y-0 px-2.5 shadow-none [grid-area:1/1]",
+                    size
+                  )}
+                >
+                  {w}
+                </span>
+              ))}
+              <span className="[grid-area:1/1]">
+                {value ? (
+                  <span
+                    // A gap emptied for another try loses its mark with its word.
+                    data-status={marks[id]}
+                    data-vt={
+                      placed[id] !== undefined ? vt(placed[id]!) : undefined
+                    }
+                    className={cn(
+                      inline,
+                      "block group-hover/gap:bg-muted dark:group-hover/gap:bg-input/50",
+                      markStyles
+                    )}
+                  >
+                    {value}
+                  </span>
+                ) : waiting ? (
+                  <span className="learn-caret">
+                    <span />
+                  </span>
+                ) : null}
+              </span>
             </Selectable>
           )
         })}
@@ -569,23 +687,44 @@ export function BlankBrick({
         className="flex flex-wrap gap-2"
       >
         {bank.map((word, i) => {
-          // A word listed twice in the bank (two gaps accept it) has two chips: used in order.
-          const placed = Object.values(values).filter((v) => v === word).length
-          const nth = bank.slice(0, i).filter((w) => w === word).length
-          const used = placed > nth
+          const gone = used.has(i)
           return (
             <Selectable
-              key={`${word}-${nth}`}
-              isSelected={used}
-              onChange={() => !used && place(word)}
-              isDisabled={locked}
+              key={`${word}-${i}`}
+              aria-label={word}
+              isSelected={gone}
+              onChange={() => !gone && place(word)}
+              isDisabled={locked || gone}
               lang={brick.lang}
+              data-vt={gone ? undefined : vt(i)}
               className={cn(
-                "rounded-md border bg-background px-3 py-1.5 shadow-xs hover:bg-muted dark:bg-input/30 dark:hover:bg-input/50 data-selected:opacity-45",
-                code ? "font-mono text-sm" : "text-sm font-medium"
+                "flex items-center gap-2",
+                gone
+                  ? // A soft ghost holds its place, so the other chips don't move.
+                    cn(
+                      "rounded-md border border-transparent bg-muted py-1 ps-3 pe-2 text-transparent dark:bg-input/30",
+                      size
+                    )
+                  : cn(
+                      wordChip,
+                      "py-1 ps-3 pe-2 hover:bg-muted dark:hover:bg-input/50",
+                      size
+                    )
               )}
             >
               {word}
+              {/* Its number key, as on answer options. Kept in a used or checked chip, unseen, so it doesn't shrink. */}
+              {i < 9 ? (
+                <Kbd
+                  aria-hidden="true"
+                  className={cn(
+                    "pointer-coarse:hidden",
+                    (gone || locked) && "invisible"
+                  )}
+                >
+                  {i + 1}
+                </Kbd>
+              ) : null}
             </Selectable>
           )
         })}

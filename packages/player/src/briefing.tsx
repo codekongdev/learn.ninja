@@ -176,7 +176,7 @@ export function Briefing({
 function Caret({ at }: { at: "start" | "end" }) {
   // The outer span shows or hides it on cue; the inner one blinks.
   return (
-    <span className={`brief-caret brief-caret-${at}`}>
+    <span className={`learn-caret brief-caret-${at}`}>
       <span />
     </span>
   )
