@@ -625,6 +625,9 @@ function Player({
   // All feedback is in the ninja's speech bubble. After a right answer, Why? (or W) adds the
   // explanation to it; each new screen starts with it closed.
   const [whyOpen, setWhyOpen] = React.useState(false)
+  // Extra scroll room under the lesson when the bubble is taller than the space the screen leaves
+  // for it. It sits below the centered column, so the lesson itself never moves.
+  const [bubbleRoom, setBubbleRoom] = React.useState(0)
   React.useEffect(() => setWhyOpen(false), [state.index])
   const canWhy =
     item.kind === "question" &&
@@ -777,6 +780,7 @@ function Player({
                     level={ninja}
                     pickLine={pickLine}
                     onConceptDone={leaveConcept}
+                    onBubbleRoom={setBubbleRoom}
                     inBubble
                     why={
                       canWhy
@@ -788,6 +792,9 @@ function Player({
                     }
                   />
                 </div>
+                {bubbleRoom > 0 ? (
+                  <div aria-hidden="true" style={{ height: bubbleRoom }} />
+                ) : null}
               </main>
               {ninja !== "off" ? (
                 <NinjaStage
@@ -1293,6 +1300,7 @@ export function ActionArea({
   onConceptDone,
   inBubble = false,
   why,
+  onBubbleRoom,
 }: {
   lesson: Lesson
   item: Item
@@ -1316,6 +1324,8 @@ export function ActionArea({
   inBubble?: boolean
   /** After a right answer, the player's Why?, which adds the explanation to the bubble. */
   why?: { open: boolean; onToggle: () => void } | null
+  /** How much taller the bubble stands than the room the screen leaves for it (pb-40), in px. */
+  onBubbleRoom?: (px: number) => void
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const ownPicker = React.useMemo(
@@ -1500,15 +1510,16 @@ export function ActionArea({
 
   // How much taller the bubble stands than the room the screen leaves for it (pb-40, 160px).
   const [bubbleEl, setBubbleEl] = React.useState<HTMLDivElement | null>(null)
-  const [extraRoom, setExtraRoom] = React.useState(0)
+  const roomRef = React.useRef(onBubbleRoom)
+  roomRef.current = onBubbleRoom
   React.useEffect(() => {
     if (!bubbleEl || !tray) {
-      setExtraRoom(0)
+      roomRef.current?.(0)
       return
     }
     const measure = () => {
       const bottom = parseFloat(getComputedStyle(bubbleEl).bottom) || 0
-      setExtraRoom(Math.max(0, bubbleEl.offsetHeight + bottom + 16 - 160))
+      roomRef.current?.(Math.max(0, bubbleEl.offsetHeight + bottom + 16 - 160))
     }
     measure()
     const observer = new ResizeObserver(measure)
@@ -1549,14 +1560,6 @@ export function ActionArea({
               .join(" ")
           : ""}
       </p>
-      {/* Room under the lesson for a tall bubble, so it never covers an answer. */}
-      {extraRoom > 0 ? (
-        <div
-          aria-hidden="true"
-          className="shrink-0"
-          style={{ height: Math.max(0, extraRoom - 32) }}
-        />
-      ) : null}
       {title || message ? (
         <div
           ref={setBubbleEl}
