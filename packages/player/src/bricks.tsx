@@ -518,9 +518,16 @@ export function MatchBrick({
     "flex w-full items-center gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-start text-sm font-medium shadow-xs hover:bg-muted data-selected:border-primary data-selected:bg-muted dark:bg-input/30 dark:hover:bg-input/50 dark:data-selected:bg-muted " +
     markStyles
 
+  // Both columns share the grid's rows (a subgrid), so each item is as tall as the one beside it and
+  // the pairs line up. The columns stay whole in the DOM, so keyboards and screen readers go down one
+  // column, then the other.
+  const rows = { gridRow: `span ${brick.pairs.length}` }
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <div className="flex min-w-0 flex-col gap-2">
+    <div
+      className="grid grid-cols-2 gap-x-3 gap-y-2"
+      style={{ gridTemplateRows: `repeat(${brick.pairs.length}, auto)` }}
+    >
+      <div className="grid min-w-0 grid-rows-subgrid" style={rows}>
         {brick.pairs.map((p, i) => (
           <Selectable
             key={i}
@@ -536,7 +543,7 @@ export function MatchBrick({
           </Selectable>
         ))}
       </div>
-      <div className="flex min-w-0 flex-col gap-2">
+      <div className="grid min-w-0 grid-rows-subgrid" style={rows}>
         {rightOrder.map((j) => {
           const owner = ownerOf(j)
           return (
