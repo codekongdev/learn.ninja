@@ -74,8 +74,10 @@ const optionCardStyles =
   "hover:border-ring data-selected:border-primary data-pressed:translate-y-px " +
   "data-[status=correct]:border-green-600! data-[status=wrong]:border-yellow-500! data-[status=partial]:border-amber-500!"
 
+// The panel is at least 160px tall, so a small visual (a row of buttons, a badge) still reads as a
+// preview window; taller visuals grow it, and the visual stays centered.
 const optionPanelStyles =
-  "relative -mx-px -mt-px flex flex-col justify-center rounded-xl border border-inherit bg-background px-1 py-5 transition-colors"
+  "relative -mx-px -mt-px flex min-h-40 flex-col justify-center rounded-xl border border-inherit bg-background px-1 py-5 transition-colors"
 
 // ---------- concept ----------
 
