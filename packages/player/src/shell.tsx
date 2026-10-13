@@ -521,22 +521,20 @@ export function LessonFooter({
   ].filter((l): l is [string, string] => Boolean(l[0]))
   return (
     <footer className="flex h-12 shrink-0 items-center gap-2 px-4 pb-[env(safe-area-inset-bottom,0px)] sm:px-8">
-      <div className="flex min-w-0 flex-1 items-center gap-1.5 text-sm font-medium">
+      <div className="flex min-w-0 flex-1 items-center gap-1.5 ps-2 text-xs font-medium text-muted-foreground">
         <a
           href={homeHref}
-          className="shrink-0 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="shrink-0 rounded-md outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <span className="max-sm:hidden">© {new Date().getFullYear()} </span>
           {BRAND.name}
         </a>
         {links.map(([href, label]) => (
           <React.Fragment key={href}>
-            <span aria-hidden="true" className="text-muted-foreground">
-              ·
-            </span>
+            <span aria-hidden="true">·</span>
             <a
               href={href}
-              className="shrink-0 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="shrink-0 rounded-md outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {label}
             </a>
