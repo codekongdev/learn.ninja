@@ -67,7 +67,7 @@ export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
     <>
       <div className="flex flex-col gap-3">
         <h2 className="text-base font-semibold text-balance">{brick.title}</h2>
-        <p className="text-base leading-relaxed text-pretty">
+        <p className="text-sm leading-relaxed text-pretty">
           <RichText text={brick.body} />
         </p>
       </div>
