@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { loadExample } from "./test-helpers"
+import { positionalReference } from "./rules"
 import { validateLesson } from "./validate"
 
 // Each test breaks a valid example lesson in one way and checks the right issue comes back.
@@ -305,5 +306,26 @@ describe("safety rules", () => {
       kind: "safety",
       message: /keep each HTML visual under 20 KB/,
     })
+  })
+})
+
+describe("answers named by their place", () => {
+  it("rejects an explanation that points at a shuffled option by position", () => {
+    const lesson = loadExample("writing-a-prd.json") as {
+      bricks: { type: string; explanation: string }[]
+    }
+    const compare = lesson.bricks.find((b) => b.type === "compare")!
+    compare.explanation = "The second statement names who is hurting."
+    const issues = issuesFor(lesson)
+    expect(issues.map((i) => i.message).join(" ")).toContain(
+      '"The second statement" points at an option by its place'
+    )
+  })
+
+  it("only flags positions, not ordinary ordinals", () => {
+    expect(positionalReference("Pick option B next time.")).toBe("option B")
+    expect(positionalReference("That's the right answer.")).toBeNull()
+    expect(positionalReference("A third one pushes both.")).toBeNull()
+    expect(positionalReference("It comes in the third step.")).toBeNull()
   })
 })
