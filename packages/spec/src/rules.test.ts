@@ -327,5 +327,21 @@ describe("answers named by their place", () => {
     expect(positionalReference("That's the right answer.")).toBeNull()
     expect(positionalReference("A third one pushes both.")).toBeNull()
     expect(positionalReference("It comes in the third step.")).toBeNull()
+    expect(positionalReference("Plot B measures it first.")).toBe("Plot B")
+    expect(positionalReference("Answer a question with a question.")).toBeNull()
+  })
+})
+
+describe("explanation length", () => {
+  it("rejects an explanation over the word limit", () => {
+    const lesson = loadExample("writing-a-prd.json") as {
+      hook: { explanation: string }
+    }
+    lesson.hook.explanation = Array(31).fill("word").join(" ")
+    expect(
+      issuesFor(lesson)
+        .map((i) => i.message)
+        .join(" ")
+    ).toContain("The explanation has 31 words")
   })
 })

@@ -70,7 +70,7 @@
           "right": "Trade-network dependence"
         }
       ],
-      "explanation": "Each find is strong for one cause and silent on the others. The Uluburun wreck, a century before the collapse, shows how far the bronze supply chain stretched, which is what made a cascade possible."
+      "explanation": "Each find is strong for one cause and silent on the others. The Uluburun wreck shows how far the bronze supply chain stretched, which made a cascade possible."
     },
     {
       "id": "p2",
@@ -99,7 +99,7 @@
       ],
       "correct": ["d"],
       "multiple": false,
-      "explanation": "Absence of a foreign signature doesn't prove absence of raiders: Ugarit's letters describe enemy ships burning towns, and attackers who don't settle leave little behind. The other three objections concern what the Sea Peoples *can't* explain, which is the right kind of objection."
+      "explanation": "Missing foreign traces don't rule out raiders: Ugarit's letters describe enemy ships, and attackers who don't settle leave little behind. The other objections target what the Sea Peoples *can't* explain."
     },
     {
       "id": "c2",
@@ -121,7 +121,7 @@
       },
       "correct": ["walls"],
       "multiple": false,
-      "explanation": "Bodies under collapsed masonry are what earthquakes leave; attackers rarely topple walls onto residents, and nothing links the arrowheads to the collapse. Fighting then a quake, or a quake then opportunistic raiders, both fit. The other inferences stay close to what was found."
+      "explanation": "Bodies under fallen masonry are what earthquakes leave, and nothing ties the arrowheads to the collapse. Fighting then a quake, or a quake then raiders, both fit."
     },
     {
       "id": "p4",
@@ -150,7 +150,7 @@
       ],
       "correct": ["a"],
       "multiple": false,
-      "explanation": "The cores give drought a strong claim as a contributor: the timing fits and the famine texts agree. Turning a regional dry phase into the cause of a specific destruction needs site-level evidence, which is why most historians treat drought as one stress among several."
+      "explanation": "Timing and famine texts make drought a strong contributor. Blaming it for one city's fall needs site evidence, so most historians call it one stress among several."
     },
     {
       "id": "c3",
@@ -190,7 +190,7 @@
           "text": "Without bronze or trade income, palaces can't pay or arm; centres are abandoned or burned"
         }
       ],
-      "explanation": "Each step removes the buffer that would have absorbed the next. The real sequence differed by region, and revolt could enter at the third or fifth step; what matters is that the chain runs through the trade network, which is why coupled powers fell together."
+      "explanation": "Each step removes the buffer that would have absorbed the next. The sequence differed by region, but the chain ran through the trade network, so coupled powers fell together."
     },
     {
       "id": "p6",
@@ -208,7 +208,7 @@
         }
       ],
       "correct": "b",
-      "explanation": "The many-causes explanation accounts for more of the evidence, including the inland sites the Sea Peoples story ignores, and it explains why the raids were so devastating: the system was already under strain."
+      "explanation": "The many-causes explanation fits more of the evidence, including inland sites the Sea Peoples story ignores, and shows why the raids hit so hard: the system was already strained."
     }
   ],
   "challenge": {
@@ -238,7 +238,7 @@
     ],
     "correct": ["a"],
     "multiple": false,
-    "explanation": "A single event can't span decades. The dating evidence is why Nur and Cline framed the earthquake idea as a *storm*, a series over about fifty years, and why even that is treated as one contributor rather than the cause."
+    "explanation": "A single event can't span decades. That's why Nur and Cline framed the earthquake idea as a *storm*, a series over about fifty years, and still only one contributor."
   },
   "wrapup": {
     "takeaways": [
