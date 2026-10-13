@@ -12,7 +12,6 @@ export const he: Strings = {
   why: "למה?",
   hint: "רמז",
   skip: "דילוג",
-  gotIt: "הבנתי",
   rewind: "אחורה",
   everyPath: "כל הדרכים",
   replayBrief: "להציג שוב את המצב",

@@ -8,7 +8,6 @@ export const vi: Strings = {
   why: "Vì sao?",
   hint: "Gợi ý",
   skip: "Bỏ qua",
-  gotIt: "Đã hiểu",
   rewind: "Tua lại",
   everyPath: "Mọi hướng đi",
   replayBrief: "Xem lại tình huống",

@@ -12,7 +12,6 @@ export const pl: Strings = {
   why: "Dlaczego?",
   hint: "Podpowiedź",
   skip: "Pomiń",
-  gotIt: "Rozumiem",
   rewind: "Przewiń",
   everyPath: "Wszystkie ścieżki",
   replayBrief: "Pokaż sytuację ponownie",

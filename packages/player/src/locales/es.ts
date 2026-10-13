@@ -12,7 +12,6 @@ export const es: Strings = {
   why: "¿Por qué?",
   hint: "Pista",
   skip: "Saltar",
-  gotIt: "Entendido",
   rewind: "Rebobinar",
   everyPath: "Todos los caminos",
   replayBrief: "Repetir la situación",

@@ -8,7 +8,6 @@ export const th: Strings = {
   why: "ทำไม?",
   hint: "คำใบ้",
   skip: "ข้าม",
-  gotIt: "เข้าใจแล้ว",
   rewind: "ย้อนกลับ",
   everyPath: "ทุกเส้นทาง",
   replayBrief: "ดูสถานการณ์อีกครั้ง",

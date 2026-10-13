@@ -12,7 +12,6 @@ export const nl: Strings = {
   why: "Waarom?",
   hint: "Hint",
   skip: "Overslaan",
-  gotIt: "Begrepen",
   rewind: "Terugspoelen",
   everyPath: "Alle paden",
   replayBrief: "Situatie opnieuw",

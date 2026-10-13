@@ -12,7 +12,6 @@ export const uk: Strings = {
   why: "Чому?",
   hint: "Підказка",
   skip: "Пропустити",
-  gotIt: "Зрозуміло",
   rewind: "Перемотати",
   everyPath: "Усі шляхи",
   replayBrief: "Повторити ситуацію",

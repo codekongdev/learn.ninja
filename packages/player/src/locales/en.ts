@@ -8,7 +8,6 @@ export const en: Strings = {
   why: "Why?",
   hint: "Hint",
   skip: "Skip",
-  gotIt: "Got it",
   rewind: "Rewind",
   everyPath: "Every path",
   replayBrief: "Replay the situation",

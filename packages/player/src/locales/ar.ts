@@ -8,7 +8,6 @@ export const ar: Strings = {
   why: "لماذا؟",
   hint: "تلميح",
   skip: "تخطي",
-  gotIt: "فهمت",
   rewind: "إرجاع",
   everyPath: "كل المسارات",
   replayBrief: "أعد عرض الموقف",

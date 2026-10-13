@@ -8,7 +8,6 @@ export const id: Strings = {
   why: "Mengapa?",
   hint: "Petunjuk",
   skip: "Lewati",
-  gotIt: "Mengerti",
   rewind: "Mundur",
   everyPath: "Semua jalan",
   replayBrief: "Ulangi situasinya",

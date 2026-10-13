@@ -1620,9 +1620,9 @@ export function ActionArea({
       onPress: () => dispatch({ type: "restart", lesson }),
     }
   } else if (item.kind === "question" && state.question && brief) {
-    // The ninja's brief: Skip shows the rest at once; once it's told, Got it goes to the question.
+    // The ninja's brief: Skip shows the rest at once; once it's told, Continue goes to the question.
     primary = brief.told
-      ? { label: t.gotIt, onPress: brief.onDone }
+      ? { label: t.continue, onPress: brief.onDone }
       : { label: t.skip, onPress: brief.onSkip, variant: "outline" }
   } else if (item.kind === "question" && state.question) {
     const s = state.question

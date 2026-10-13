@@ -12,7 +12,6 @@ export const ru: Strings = {
   why: "Почему?",
   hint: "Подсказка",
   skip: "Пропустить",
-  gotIt: "Понятно",
   rewind: "Перемотать",
   everyPath: "Все пути",
   replayBrief: "Повторить ситуацию",

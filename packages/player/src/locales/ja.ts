@@ -8,7 +8,6 @@ export const ja: Strings = {
   why: "なぜ？",
   hint: "ヒント",
   skip: "スキップ",
-  gotIt: "わかりました",
   rewind: "巻き戻す",
   everyPath: "すべての道",
   replayBrief: "状況をもう一度",

@@ -12,7 +12,6 @@ export const tr: Strings = {
   why: "Neden?",
   hint: "İpucu",
   skip: "Geç",
-  gotIt: "Anladım",
   rewind: "Geri sar",
   everyPath: "Tüm yollar",
   replayBrief: "Durumu tekrar göster",

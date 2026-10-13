@@ -676,3 +676,70 @@
   animation-duration: 280ms;
   animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/* A scenario's brief (packages/player/src/briefing.tsx): a caret blinks until the words start,
+   each word fades up from a soft blur on its own delay, and the caret comes back after the last.
+   Skipping, or reduced motion, shows it all at once. */
+.brief-word {
+  display: inline-block;
+  animation: brief-word 495ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.brief-caret {
+  display: inline-block;
+  margin-inline-end: -2px;
+  translate: 0 0.2em;
+}
+.brief-caret > span {
+  display: block;
+  width: 2px;
+  height: 1.1em;
+  border-radius: 9999px;
+  background: var(--foreground);
+  animation: brief-blink 1s ease-in-out infinite;
+}
+.brief-caret-start {
+  animation: brief-out 1ms linear var(--brief-start) forwards;
+}
+.brief-caret-end {
+  margin-inline-start: 1px;
+  animation: brief-in 1ms linear var(--brief-end) both;
+}
+.brief[data-skipped] .brief-word,
+.brief[data-skipped] .brief-caret-end {
+  animation: none;
+}
+.brief[data-skipped] .brief-caret-start {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brief-word,
+  .brief-caret-end,
+  .brief-caret > span {
+    animation: none;
+  }
+  .brief-caret-start {
+    display: none;
+  }
+}
+@keyframes brief-word {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    translate: 0 0.25em;
+  }
+}
+@keyframes brief-blink {
+  50% {
+    opacity: 0.15;
+  }
+}
+@keyframes brief-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes brief-in {
+  from {
+    opacity: 0;
+  }
+}

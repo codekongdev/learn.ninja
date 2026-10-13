@@ -12,7 +12,6 @@ export const hi: Strings = {
   why: "क्यों?",
   hint: "संकेत",
   skip: "छोड़ें",
-  gotIt: "समझ आ गया",
   rewind: "रिवाइंड",
   everyPath: "सभी रास्ते",
   replayBrief: "स्थिति फिर से देखें",

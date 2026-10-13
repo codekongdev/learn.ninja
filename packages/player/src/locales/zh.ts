@@ -8,7 +8,6 @@ export const zh: Strings = {
   why: "为什么？",
   hint: "提示",
   skip: "跳过",
-  gotIt: "明白了",
   rewind: "倒带",
   everyPath: "所有路线",
   replayBrief: "重看情境",

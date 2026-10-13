@@ -2,10 +2,9 @@
 
 import * as React from "react"
 
-import { cn } from "@workspace/ui/lib/utils"
-
 import { reducedMotion } from "./ninja"
-import { RichText } from "./rich-text"
+import { TOKEN } from "./plain-text"
+import { plainText, RichText } from "./rich-text"
 
 /**
  * A scenario's situation as the beats the ninja tells it in: one per sentence, and a colon that
@@ -38,22 +37,60 @@ export function briefBeats(text: string, lang = "en"): string[] {
   return beats
 }
 
-/** Roughly how long a beat takes to read, so the next one doesn't arrive mid-sentence. */
-export function readingMs(beat: string, lang = "en"): number {
-  const plain = beat.replace(/[*`]/g, "")
-  // No spaces between words: count characters instead.
-  const units = /^(zh|ja|th)/.test(lang)
-    ? plain.length / 2.5
-    : plain.split(/\s+/).length
-  return Math.min(2600, Math.max(700, units * 170))
+/**
+ * A beat as the pieces it streams in: one per word, each still valid rich text (a bold phrase
+ * becomes bold words), with code and formulas kept whole. Spaces ride on the word before them.
+ */
+export function streamUnits(beat: string): string[] {
+  const units: string[] = []
+  const add = (piece: string) => {
+    if (/^\s+$/.test(piece) && units.length) units[units.length - 1] += piece
+    else if (piece) units.push(piece)
+  }
+  const words = (text: string, wrap = (w: string) => w) => {
+    for (const part of text.split(/(\s+)/))
+      add(/^\s+$/.test(part) ? part : part && wrap(part))
+  }
+  let last = 0
+  for (const m of beat.matchAll(TOKEN)) {
+    words(beat.slice(last, m.index))
+    const [whole, , , bold, italic] = m
+    if (bold !== undefined) words(bold, (w) => `**${w}**`)
+    else if (italic !== undefined) words(italic, (w) => `*${w}*`)
+    else add(whole)
+    last = m.index + whole.length
+  }
+  words(beat.slice(last))
+  return units
 }
 
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+// The stream's timing, in ms. He hops up (the leap), the caret blinks a moment, then each word
+// fades in a step after the last, overlapping, with a short breath between sentences.
+const LEAP = 650
+const LEAD = 700
+const STEP = 44
+const BREATH = 418
+const FADE = 495
+
+/** When each beat's words start fading in, and when the last one has landed. */
+export function streamSchedule(units: string[][]): {
+  delays: number[][]
+  end: number
+} {
+  let t = LEAP + LEAD
+  const delays = units.map((beat, b) => {
+    if (b > 0) t += BREATH
+    return beat.map(() => (t += STEP) - STEP)
+  })
+  return { delays, end: t - STEP + FADE }
+}
 
 /**
- * The ninja's brief before a scenario: a speech bubble above his slot that fills a beat at a time,
- * with a typing pause before each. `skip` counts Skip presses: a new one shows the rest at once.
- * `onTold` fires once every beat is out.
+ * The ninja's brief before a scenario, said like an assistant's reply: no bubble, just his words
+ * above him. A caret blinks, then the words stream in, each fading up from a soft blur on its own
+ * CSS timer (no re-render per word). Every word is laid out from the start, so nothing reflows and
+ * he never moves. `skip` counts Skip presses: a new one shows the rest at once. `onTold` fires once
+ * it's all out.
  */
 export function Briefing({
   text,
@@ -66,16 +103,15 @@ export function Briefing({
   lang?: string
   skip: number
   onTold: () => void
-  /** Where the ninja stands, under the bubble (NinjaStage puts him there). */
+  /** Where the ninja stands, under his words (NinjaStage puts him there). */
   slot: React.ReactNode
 }) {
   const beats = React.useMemo(() => briefBeats(text, lang), [text, lang])
-  const [shown, setShown] = React.useState(0)
-  const [typing, setTyping] = React.useState(false)
+  const units = React.useMemo(() => beats.map(streamUnits), [beats])
+  const { delays, end } = React.useMemo(() => streamSchedule(units), [units])
   const onToldRef = React.useRef(onTold)
   onToldRef.current = onTold
-  // Skipping ends the telling for good, and he's only done telling once.
-  const skipped = React.useRef(false)
+  // He's only done telling once, whether the stream ran out or was skipped.
   const toldOnce = React.useRef(false)
   const finish = React.useCallback(() => {
     if (toldOnce.current) return
@@ -84,83 +120,64 @@ export function Briefing({
   }, [])
 
   React.useEffect(() => {
-    if (reducedMotion()) {
-      setShown(beats.length)
-      finish()
-      return
-    }
-    let on = true
-    ;(async () => {
-      // He leaps up first; the bubble starts once he's about to land.
-      await sleep(650)
-      for (let i = 0; i < beats.length; i++) {
-        if (!on || skipped.current) return
-        setTyping(true)
-        await sleep(i === 0 ? 450 : 550)
-        if (!on || skipped.current) return
-        setTyping(false)
-        setShown(i + 1)
-        if (i < beats.length - 1) await sleep(readingMs(beats[i]!, lang))
-      }
-      if (on && !skipped.current) finish()
-    })()
-    return () => {
-      on = false
-    }
-  }, [beats, lang, finish])
+    const timer = window.setTimeout(finish, reducedMotion() ? 0 : end)
+    return () => window.clearTimeout(timer)
+  }, [end, finish])
 
   // Skip: everything at once. Only presses after this telling began count.
   const skipAtStart = React.useRef(skip)
+  const skipped = skip !== skipAtStart.current
   React.useEffect(() => {
-    if (skip === skipAtStart.current) return
-    skipped.current = true
-    setTyping(false)
-    setShown(beats.length)
-    finish()
-  }, [skip, beats.length, finish])
+    if (skipped) finish()
+  }, [skipped, finish])
 
-  const done = shown >= beats.length
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-6">
+      {/* Screen readers get the whole brief at once; the streaming words are for the eyes. */}
+      <p className="sr-only">{plainText(text)}</p>
       <div
-        aria-live="polite"
-        className={cn(
-          "relative w-full max-w-md rounded-xl border bg-popover px-5 py-4 text-base text-popover-foreground shadow-xs transition-opacity duration-200",
-          shown === 0 && !typing ? "opacity-0" : "opacity-100"
-        )}
+        aria-hidden="true"
+        data-skipped={skipped || undefined}
+        className="brief flex w-full max-w-md flex-col gap-2 text-base text-pretty"
+        style={
+          {
+            "--brief-start": `${LEAP + LEAD}ms`,
+            "--brief-end": `${end}ms`,
+          } as React.CSSProperties
+        }
       >
-        <div className="flex flex-col gap-2">
-          {beats.slice(0, shown).map((beat, i) => (
-            <p
-              key={i}
-              className="text-pretty motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1"
-            >
-              <RichText text={beat} />
-            </p>
-          ))}
-          {typing && !done ? <Typing /> : null}
-        </div>
-        {/* The tail, pointing down at him. */}
-        <span
-          aria-hidden="true"
-          className="absolute -bottom-1.5 left-1/2 size-3 -translate-x-1/2 rotate-45 border-e border-b bg-popover"
-        />
+        {units.map((beat, b) => (
+          <p key={b}>
+            {b === 0 ? <Caret at="start" /> : null}
+            {beat.map((unit, i) => {
+              const word = unit.trimEnd()
+              return (
+                <React.Fragment key={i}>
+                  <span
+                    className="brief-word"
+                    style={{ animationDelay: `${delays[b]![i]}ms` }}
+                  >
+                    <RichText text={word} />
+                  </span>
+                  {unit.slice(word.length)}
+                </React.Fragment>
+              )
+            })}
+            {b === units.length - 1 ? <Caret at="end" /> : null}
+          </p>
+        ))}
       </div>
       {slot}
     </div>
   )
 }
 
-function Typing() {
+/** The caret: one before the words start and one after they've all landed. It takes no room. */
+function Caret({ at }: { at: "start" | "end" }) {
+  // The outer span shows or hides it on cue; the inner one blinks.
   return (
-    <span aria-hidden="true" className="flex h-6 items-center gap-1">
-      {[0, 150, 300].map((delay) => (
-        <span
-          key={delay}
-          className="size-1.5 animate-pulse rounded-full bg-muted-foreground"
-          style={{ animationDelay: `${delay}ms` }}
-        />
-      ))}
+    <span className={`brief-caret brief-caret-${at}`}>
+      <span />
     </span>
   )
 }

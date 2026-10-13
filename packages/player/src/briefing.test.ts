@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { briefBeats, readingMs } from "./briefing"
+import { briefBeats, streamSchedule, streamUnits } from "./briefing"
 
 // How the ninja splits a scenario's situation into the beats he tells it in.
 
@@ -39,12 +39,42 @@ describe("briefBeats", () => {
   })
 })
 
-describe("readingMs", () => {
-  it("gives longer beats more time, within bounds", () => {
-    expect(readingMs("Short.")).toBe(700)
-    expect(readingMs("one two three four five six seven eight nine ten")).toBe(
-      1700
-    )
-    expect(readingMs("word ".repeat(40))).toBe(2600)
+describe("streamUnits", () => {
+  it("streams a word at a time, spaces riding on the word before", () => {
+    expect(streamUnits("The bank doesn't say why.")).toEqual([
+      "The ",
+      "bank ",
+      "doesn't ",
+      "say ",
+      "why.",
+    ])
+  })
+
+  it("keeps bold on each word, and code and formulas whole", () => {
+    expect(
+      streamUnits("Tap **Save changes** or run `npm run dev` now.")
+    ).toEqual([
+      "Tap ",
+      "**Save** ",
+      "**changes** ",
+      "or ",
+      "run ",
+      "`npm run dev` ",
+      "now.",
+    ])
+    expect(streamUnits("So \\( a + b \\) grows.")).toEqual([
+      "So ",
+      "\\( a + b \\) ",
+      "grows.",
+    ])
+  })
+})
+
+describe("streamSchedule", () => {
+  it("steps word by word, with a breath between sentences", () => {
+    const { delays, end } = streamSchedule([["A ", "b."], ["C."]])
+    expect(delays[0]![1]! - delays[0]![0]!).toBe(44)
+    expect(delays[1]![0]! - delays[0]![1]!).toBe(44 + 418)
+    expect(end).toBe(delays[1]![0]! + 495)
   })
 })

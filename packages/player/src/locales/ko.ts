@@ -8,7 +8,6 @@ export const ko: Strings = {
   why: "왜죠?",
   hint: "힌트",
   skip: "건너뛰기",
-  gotIt: "알겠어요",
   rewind: "되감기",
   everyPath: "모든 선택지",
   replayBrief: "상황 다시 보기",

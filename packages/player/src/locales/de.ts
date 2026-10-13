@@ -12,7 +12,6 @@ export const de: Strings = {
   why: "Warum?",
   hint: "Tipp",
   skip: "Überspringen",
-  gotIt: "Verstanden",
   rewind: "Zurückspulen",
   everyPath: "Alle Wege",
   replayBrief: "Situation noch einmal",
