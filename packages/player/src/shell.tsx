@@ -392,7 +392,7 @@ function LessonProgress({
             // Touch has no hover, so a tap opens and closes the details.
             if (e.pointerType === "touch") setOpen((o) => !o)
           }}
-          className="h-7 w-28 cursor-default px-0 hover:bg-transparent active:translate-y-0 sm:w-full sm:max-w-[400px] dark:hover:bg-transparent"
+          className="h-7 w-28 cursor-help px-0 hover:bg-transparent active:translate-y-0 sm:w-full sm:max-w-[400px] dark:hover:bg-transparent"
         >
           <Progress
             value={value}
