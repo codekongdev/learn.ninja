@@ -614,8 +614,8 @@ function Player({
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [keyScope])
-  // The card beside a question holds the concept it tests. It slides in on Why? and after a miss,
-  // and the tab at the window's edge opens it any time; each new screen starts with it put away.
+  // The theory card: the idea behind the question on screen, the same whatever the learner picked.
+  // Why? opens and closes it, a miss opens it by itself, and each new screen starts with it put away.
   const cardConcepts = React.useMemo(
     () => conceptsFor(state.items, state.index),
     [state.items, state.index]
@@ -623,29 +623,27 @@ function Player({
   const [cardOpen, setCardOpen] = React.useState(false)
   React.useEffect(() => setCardOpen(false), [state.index])
   const asked = state.question
-  const wantsCard =
+  const missedNow =
     asked !== null &&
-    (asked.whyOpen ||
-      asked.phase === "revealed" ||
+    (asked.phase === "revealed" ||
       (asked.phase === "feedback" && asked.result?.correct === false))
   React.useEffect(() => {
-    if (wantsCard) setCardOpen(true)
-  }, [wantsCard, asked?.attempts])
-  // Why? puts the explanation on the card, above the concept, instead of under the answer.
+    if (missedNow) setCardOpen(true)
+  }, [missedNow, asked?.attempts])
+  // Once the question is done (right, revealed, or the warm-up's one guess), the card adds a line on
+  // why this answer is right. Not after a miss with a try left: the theory should do that work.
+  const done =
+    item.kind === "question" &&
+    asked !== null &&
+    (asked.phase === "revealed" ||
+      (asked.phase === "feedback" && asked.result?.correct === true) ||
+      (item.role === "hook" && asked.phase !== "answering"))
   const cardExplanation =
-    item.kind === "question" && asked && explanationShown(asked, item.role)
-      ? item.brick.explanation
-      : null
-  // A miss's own feedback ("This names a solution...") goes on the card too, so the toast stays one
-  // short line and the learning happens on the card.
-  const missed = asked?.result && !asked.result.correct ? asked.result : null
-  const cardFeedback =
-    missed && asked?.phase !== "answering"
-      ? (missed.feedback ?? (missed.missKey ? missMessage(missed, t) : null))
-      : null
-  const cardHasContent =
-    cardConcepts.length > 0 || Boolean(cardExplanation || cardFeedback)
+    item.kind === "question" && done ? item.brick.explanation : null
+  const cardHasContent = cardConcepts.length > 0 || Boolean(cardExplanation)
   const cardShown = cardOpen && cardHasContent
+  const cardId = React.useId()
+  const whyRef = React.useRef<HTMLButtonElement>(null)
   // "Got it" sends the concept card back out the way it came before the next screen arrives.
   const [leaving, setLeaving] = React.useState(false)
   const leavingRef = React.useRef(false)
@@ -792,17 +790,30 @@ function Player({
                     pickLine={pickLine}
                     onConceptDone={leaveConcept}
                     feedbackOnCard
+                    why={
+                      item.kind === "question" && cardHasContent
+                        ? {
+                            open: cardShown,
+                            onToggle: () => setCardOpen((open) => !open),
+                            controls: cardId,
+                            ref: whyRef,
+                          }
+                        : null
+                    }
                   />
                 </div>
               </main>
               {item.kind === "question" && cardHasContent ? (
-                <ConceptSideCard
+                <TheoryCard
                   key={state.index}
+                  id={cardId}
                   concepts={cardConcepts}
                   explanation={cardExplanation}
-                  feedback={cardFeedback}
                   open={cardShown}
-                  onOpenChange={setCardOpen}
+                  onClose={() => {
+                    setCardOpen(false)
+                    whyRef.current?.focus()
+                  }}
                   textSize={textSize}
                   t={t}
                 />
@@ -902,112 +913,79 @@ function Player({
 }
 
 /**
- * The card beside a question, holding the concept it tests. Closed, it waits behind a tab at the
- * window's edge; open, it sits at the end of the window (on a phone, over the question until closed).
+ * The theory behind the question on screen: its concept in a few lines, and once the question is
+ * done, one line on why this answer is right. It layers over the lesson's bottom corner, so nothing
+ * on the page moves (on a phone it covers the question until closed).
  */
-function ConceptSideCard({
+function TheoryCard({
+  id,
   concepts,
   explanation,
-  feedback,
   open,
-  onOpenChange,
+  onClose,
   textSize,
   t,
 }: {
+  id: string
   concepts: ConceptBrickData[]
-  /** Why the answer is right, once the learner has asked (or it's been revealed). */
   explanation: string | null
-  /** What the last wrong answer got wrong. */
-  feedback: string | null
   open: boolean
-  onOpenChange: (open: boolean) => void
+  onClose: () => void
   textSize: TextSize
   t: Strings
 }) {
-  const id = React.useId()
-  const tabRef = React.useRef<HTMLButtonElement>(null)
-  const closeRef = React.useRef<HTMLButtonElement>(null)
-  // Opened or closed by hand, focus follows: to the close button, or back to the tab. Wait for the
-  // render that lifts `inert`, or the focus call lands on an element that can't take it.
-  const moveFocus = React.useRef<"tab" | "close" | null>(null)
-  React.useEffect(() => {
-    const target = moveFocus.current
-    moveFocus.current = null
-    if (target === "close") closeRef.current?.focus()
-    if (target === "tab") tabRef.current?.focus()
-  }, [open])
-  const close = () => {
-    moveFocus.current = "tab"
-    onOpenChange(false)
-  }
   return (
     // Its own clipping layer: parked off the edge, the card mustn't widen the window into something
     // the browser can scroll sideways when focus moves.
     <div className="pointer-events-none absolute inset-0 z-20 overflow-clip">
-      <Button
-        ref={tabRef}
-        variant="outline"
-        aria-label={t.showCard}
-        aria-expanded={open}
-        aria-controls={id}
-        onPress={() => {
-          moveFocus.current = "close"
-          onOpenChange(true)
-        }}
-        inert={open}
-        className={cn(
-          "absolute end-0 bottom-6 z-10 h-auto rounded-e-none border-e-0 bg-card px-2 py-3 transition-opacity duration-300 dark:bg-card",
-          open ? "opacity-0" : "pointer-events-auto"
-        )}
-      >
-        <LightbulbIcon />
-      </Button>
       <aside
         id={id}
         aria-label={concepts[0]?.title ?? t.why}
         inert={!open}
         onKeyDown={(e) => {
-          if (e.key === "Escape") close()
+          if (e.key === "Escape") onClose()
         }}
         className={cn(
           CONCEPT_CARD,
-          // It layers over the lesson in the bottom corner, so nothing on the page moves.
-          "absolute end-4 bottom-4 z-20 max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] gap-0 overflow-hidden shadow-md transition-[translate,opacity] duration-300 ease-out motion-reduce:transition-none sm:w-72",
+          "absolute end-4 bottom-4 max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] gap-0 overflow-hidden shadow-md transition-[translate,opacity] duration-300 ease-out motion-reduce:transition-none sm:w-80",
           open
             ? "pointer-events-auto translate-x-0 opacity-100"
             : "opacity-0 ltr:translate-x-[calc(100%+1rem)] rtl:-translate-x-[calc(100%+1rem)]"
         )}
       >
         <Button
-          ref={closeRef}
           variant="ghost"
           size="icon-sm"
           aria-label={t.closeCard}
-          onPress={close}
+          onPress={onClose}
           className="absolute end-3 top-3 z-10"
         >
           <XIcon />
         </Button>
         <div
           data-text-size={textSize}
-          className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4"
+          className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5"
         >
-          {feedback ? (
-            <div className="me-8 rounded-lg border border-yellow-500 bg-yellow-500/10 px-3 py-2 text-xs">
-              <RichText text={feedback} />
-            </div>
-          ) : null}
-          {explanation ? (
-            <div className="flex flex-col gap-2 [&>div]:text-xs">
-              <h2 className="pe-8 text-base font-semibold">{t.why}</h2>
-              <Explanation text={explanation} />
-            </div>
-          ) : null}
           {concepts.map((c) => (
-            <div key={c.id} className="flex flex-col gap-4">
+            <section key={c.id} className="flex flex-col gap-3">
               <ConceptBrick brick={c} compact />
-            </div>
+            </section>
           ))}
+          {explanation ? (
+            <div
+              className={cn(
+                "flex flex-col gap-1 text-sm leading-relaxed",
+                concepts.length ? "border-t pt-4" : "pe-8"
+              )}
+            >
+              {explanation
+                .split("\n")
+                .filter((line) => line.trim())
+                .map((line, i) => (
+                  <RichText key={i} text={line} className="block" />
+                ))}
+            </div>
+          ) : null}
         </div>
       </aside>
     </div>
@@ -1439,6 +1417,7 @@ export function ActionArea({
   pickLine: picker,
   onConceptDone,
   feedbackOnCard = false,
+  why,
 }: {
   lesson: Lesson
   item: Item
@@ -1455,8 +1434,15 @@ export function ActionArea({
   pickLine?: LinePicker
   /** "Got it" on a concept: the player animates the card away before moving on. */
   onConceptDone?: () => void
-  /** The player's card carries what a miss got wrong, so the toast says only right or not quite. */
+  /** The player's theory card does the teaching, so the toast says only right or not quite. */
   feedbackOnCard?: boolean
+  /** The player's Why? button, which opens and closes the theory card. Without it, Why? opens the explanation in place. */
+  why?: {
+    open: boolean
+    onToggle: () => void
+    controls: string
+    ref: React.Ref<HTMLButtonElement>
+  } | null
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const ownPicker = React.useMemo(
@@ -1568,6 +1554,28 @@ export function ActionArea({
         primaryRef.current?.focus()
       })
   }
+  if (why)
+    secondary = (
+      <Button
+        ref={why.ref}
+        variant="outline"
+        size={tray ? "lg" : "sm"}
+        aria-expanded={why.open}
+        aria-controls={why.controls}
+        className={cn(
+          tray && TRAY_BUTTON,
+          // Open: a shade off the grey tray, as the tray's ghost buttons are when open.
+          "aria-expanded:bg-input dark:aria-expanded:bg-input/50"
+        )}
+        onPress={() => {
+          why.onToggle()
+          // Enter stays the main action (Check, Continue), not a second press of Why?.
+          primaryRef.current?.focus()
+        }}
+      >
+        {t.why}
+      </Button>
+    )
   const explanationOpen =
     item.kind === "question" &&
     state.question !== null &&

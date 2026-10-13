@@ -76,7 +76,6 @@ export const vi: Strings = {
   theory: "Lý thuyết",
   theoryEmpty: "Các khái niệm sẽ hiện ở đây khi bạn học đến.",
   closeTheory: "Đóng lý thuyết",
-  showCard: "Hiện thẻ",
   closeCard: "Đóng thẻ",
   by: "bởi",
   textSize: "Cỡ chữ",

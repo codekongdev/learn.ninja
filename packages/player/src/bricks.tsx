@@ -72,7 +72,7 @@ export function ConceptBrick({
 }) {
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className={cn("flex flex-col", compact ? "gap-2" : "gap-3")}>
         <h2
           className={cn(
             "font-semibold tracking-tight text-balance",
@@ -84,7 +84,7 @@ export function ConceptBrick({
         <p
           className={cn(
             "leading-relaxed text-pretty",
-            compact ? "text-xs" : "text-base"
+            compact ? "text-sm text-muted-foreground" : "text-base"
           )}
         >
           <RichText text={brick.body} />
@@ -95,7 +95,7 @@ export function ConceptBrick({
         <dl
           className={cn(
             "flex flex-col gap-1 border-s-2 border-primary ps-4",
-            compact ? "text-xs" : "text-sm"
+            "text-sm"
           )}
         >
           <dt className="font-semibold">{brick.term.word}</dt>

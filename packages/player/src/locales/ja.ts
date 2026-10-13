@@ -72,7 +72,6 @@ export const ja: Strings = {
   theory: "理論",
   theoryEmpty: "学んだコンセプトがここに表示されます。",
   closeTheory: "理論を閉じる",
-  showCard: "カードを表示",
   closeCard: "カードを閉じる",
   by: "作成者:",
   textSize: "文字サイズ",

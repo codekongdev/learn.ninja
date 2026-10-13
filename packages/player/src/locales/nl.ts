@@ -91,7 +91,6 @@ export const nl: Strings = {
   theory: "Theorie",
   theoryEmpty: "Concepten verschijnen hier zodra je ze leert.",
   closeTheory: "Theorie sluiten",
-  showCard: "Kaart tonen",
   closeCard: "Kaart sluiten",
   by: "door",
   textSize: "Tekstgrootte",

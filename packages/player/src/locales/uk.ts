@@ -98,7 +98,6 @@ export const uk: Strings = {
   theory: "Теорія",
   theoryEmpty: "Поняття з’являються тут у міру вивчення.",
   closeTheory: "Закрити теорію",
-  showCard: "Показати картку",
   closeCard: "Закрити картку",
   by: "від",
   textSize: "Розмір тексту",

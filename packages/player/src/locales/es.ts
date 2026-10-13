@@ -89,7 +89,6 @@ export const es: Strings = {
   theory: "Teoría",
   theoryEmpty: "Los conceptos aparecen aquí a medida que los aprendes.",
   closeTheory: "Cerrar la teoría",
-  showCard: "Mostrar tarjeta",
   closeCard: "Cerrar tarjeta",
   by: "por",
   textSize: "Tamaño del texto",

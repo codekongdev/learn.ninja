@@ -80,8 +80,7 @@ export type Strings = {
   theory: string
   theoryEmpty: string
   closeTheory: string
-  /** The concept card beside a question: the tab that opens it, and its close button. */
-  showCard: string
+  /** The theory card's close button. */
   closeCard: string
   by: string
   textSize: string

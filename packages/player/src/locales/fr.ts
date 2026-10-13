@@ -93,7 +93,6 @@ export const fr: Strings = {
   theory: "Théorie",
   theoryEmpty: "Les concepts apparaissent ici au fil de la leçon.",
   closeTheory: "Fermer la théorie",
-  showCard: "Afficher la fiche",
   closeCard: "Fermer la fiche",
   by: "par",
   textSize: "Taille du texte",

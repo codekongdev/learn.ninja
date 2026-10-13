@@ -71,7 +71,6 @@ export const zhTw: Strings = {
   theory: "理論",
   theoryEmpty: "學到的概念會顯示在這裡。",
   closeTheory: "關閉理論",
-  showCard: "顯示卡片",
   closeCard: "關閉卡片",
   by: "作者：",
   textSize: "文字大小",
