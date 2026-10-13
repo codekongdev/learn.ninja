@@ -9,6 +9,8 @@ export type Strings = {
   start: string
   check: string
   continue: string
+  /** The concept screen's button: the learner has read it. */
+  gotIt: string
   tryAgain: string
   why: string
   hint: string
@@ -78,6 +80,9 @@ export type Strings = {
   theory: string
   theoryEmpty: string
   closeTheory: string
+  /** The concept card beside a question: the tab that opens it, and its close button. */
+  showCard: string
+  closeCard: string
   by: string
   textSize: string
   /** Marks the option a setting starts on, after its name in the menu. */

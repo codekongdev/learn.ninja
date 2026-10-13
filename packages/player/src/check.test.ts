@@ -19,6 +19,7 @@ import {
 } from "./check"
 import {
   buildSequence,
+  conceptsFor,
   outcomeFor,
   progressAt,
   questionAt,
@@ -271,6 +272,31 @@ describe("flow", () => {
         false
       ).current
     ).toBe(questions)
+  })
+  it("gives each question's card the concept taught before it", () => {
+    const items = buildSequence(prd)
+    const hook = items.findIndex((i) => i.kind === "question")
+    expect(conceptsFor(items, hook)).toEqual([])
+    const concept = items.findIndex((i) => i.kind === "concept")
+    const next = items.findIndex((i, k) => k > concept && i.kind === "question")
+    expect(conceptsFor(items, next)).toEqual([
+      (items[concept] as { brick: unknown }).brick,
+    ])
+    const challenge = items.findIndex(
+      (i) => i.kind === "question" && i.role === "challenge"
+    )
+    expect(conceptsFor(items, challenge)).toHaveLength(
+      items.filter((i) => i.kind === "concept").length
+    )
+    // A retry in the fix round shows what its first try did.
+    const fix = items.findIndex((i) => i.kind === "fix")
+    const retry = { ...(items[next] as object), role: "fix" as const }
+    const withRetry = [
+      ...items.slice(0, fix + 1),
+      retry as (typeof items)[number],
+      ...items.slice(fix + 1),
+    ]
+    expect(conceptsFor(withRetry, fix + 1)).toEqual(conceptsFor(items, next))
   })
   it("counts the retries in the fix round", () => {
     const items = buildSequence(prd)

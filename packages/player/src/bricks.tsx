@@ -62,14 +62,31 @@ function KeyHint({ i, mark }: { i: number; mark?: Mark }) {
 // ---------- concept ----------
 
 /** Theory: one idea with an optional visual and a key term. Nothing to answer. */
-export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
+/** A concept's content. `compact` is the smaller version on the card beside a question. */
+export function ConceptBrick({
+  brick,
+  compact = false,
+}: {
+  brick: ConceptBrickData
+  compact?: boolean
+}) {
   return (
     <>
       <div className="flex flex-col gap-3">
-        <h2 className="text-2xl font-semibold tracking-tight text-balance">
+        <h2
+          className={cn(
+            "font-semibold tracking-tight text-balance",
+            compact ? "pe-8 text-lg" : "text-2xl"
+          )}
+        >
           {brick.title}
         </h2>
-        <p className="text-base leading-relaxed text-pretty">
+        <p
+          className={cn(
+            "leading-relaxed text-pretty",
+            compact ? "text-sm" : "text-base"
+          )}
+        >
           <RichText text={brick.body} />
         </p>
       </div>
@@ -85,6 +102,10 @@ export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
     </>
   )
 }
+
+/** The card a concept sits on, on its own screen and beside a question. */
+export const CONCEPT_CARD =
+  "flex flex-col gap-6 rounded-xl bg-card shadow-xs ring-1 ring-foreground/10"
 
 // ---------- choice, compare, scenario ----------
 

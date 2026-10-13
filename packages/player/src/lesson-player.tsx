@@ -2,9 +2,13 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { LightbulbIcon, PanelRightIcon } from "lucide-react"
+import { LightbulbIcon, PanelRightIcon, XIcon } from "lucide-react"
 
-import type { Lesson, QuestionBrick } from "@workspace/spec"
+import type {
+  ConceptBrick as ConceptBrickData,
+  Lesson,
+  QuestionBrick,
+} from "@workspace/spec"
 import { Alert, AlertDescription } from "@workspace/ui/components/alert"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
@@ -28,6 +32,7 @@ import { PlayerProvider, usePlayer } from "./context"
 import {
   hasOptionCards,
   BlankBrick,
+  CONCEPT_CARD,
   ConceptBrick,
   HotspotBrick,
   MatchBrick,
@@ -39,6 +44,7 @@ import {
 } from "./bricks"
 import {
   buildSequence,
+  conceptsFor,
   outcomeFor,
   progressAt,
   questionAt,
@@ -608,6 +614,41 @@ function Player({
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [keyScope])
+  // The card beside a question holds the concept it tests. It slides in on Why? and after a miss,
+  // and the tab at the window's edge opens it any time; each new screen starts with it put away.
+  const cardConcepts = React.useMemo(
+    () => conceptsFor(state.items, state.index),
+    [state.items, state.index]
+  )
+  const [cardOpen, setCardOpen] = React.useState(false)
+  React.useEffect(() => setCardOpen(false), [state.index])
+  const asked = state.question
+  const wantsCard =
+    asked !== null &&
+    (asked.whyOpen ||
+      asked.phase === "revealed" ||
+      (asked.phase === "feedback" && asked.result?.correct === false))
+  React.useEffect(() => {
+    if (wantsCard && cardConcepts.length > 0) setCardOpen(true)
+  }, [wantsCard, asked?.attempts, cardConcepts.length])
+  const cardShown = cardOpen && cardConcepts.length > 0
+  // "Got it" sends the concept card back out the way it came before the next screen arrives.
+  const [leaving, setLeaving] = React.useState(false)
+  const leavingRef = React.useRef(false)
+  const leaveConcept = React.useCallback(() => {
+    if (leavingRef.current) return
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      dispatch({ type: "next" })
+      return
+    }
+    leavingRef.current = true
+    setLeaving(true)
+    window.setTimeout(() => {
+      leavingRef.current = false
+      setLeaving(false)
+      dispatch({ type: "next" })
+    }, 200)
+  }, [])
   const seenConcepts = state.items
     .slice(0, state.index + 1)
     .flatMap((i) => (i.kind === "concept" ? [i.brick] : []))
@@ -671,7 +712,7 @@ function Player({
         {/* The window: the content card on the tray's grey, so the card's corners stay round above it. */}
         <div
           className={cn(
-            "relative flex min-w-0 flex-1 overflow-hidden border-y bg-muted sm:rounded-4xl sm:border",
+            "relative flex min-w-0 flex-1 overflow-clip border-y bg-muted sm:rounded-4xl sm:border",
             // In a product shot the mock browser frames the window; its own border would double up.
             !chrome && "border-0"
           )}
@@ -692,12 +733,22 @@ function Player({
               <main
                 ref={scrollRef}
                 tabIndex={-1}
-                className="min-h-0 flex-1 overflow-y-auto outline-none"
+                className={cn(
+                  "min-h-0 flex-1 overflow-y-auto transition-[padding] duration-300 ease-out outline-none motion-reduce:transition-none",
+                  // On wider screens the question moves over to make room for the card beside it.
+                  cardShown && "sm:pe-88"
+                )}
               >
                 <div
                   key={state.index}
                   className={cn(
-                    "mx-auto flex min-h-full w-full flex-col justify-center-safe gap-8 px-4 py-16 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
+                    "mx-auto flex min-h-full w-full flex-col justify-center-safe gap-8 px-4 py-16",
+                    leaving
+                      ? "motion-safe:animate-out motion-safe:duration-200 motion-safe:fade-out-0 motion-safe:fill-mode-forwards motion-safe:slide-out-to-end-24"
+                      : item.kind === "concept"
+                        ? // A concept arrives as a card from the side, so it doesn't read as the last answer's feedback.
+                          "motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in-0 motion-safe:slide-in-from-end-24"
+                        : "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
                     columnWidth(item),
                     // Room under the content for the feedback toast (the wrap gets one on a perfect lesson).
                     (item.kind === "question" || item.kind === "wrap") &&
@@ -727,9 +778,20 @@ function Player({
                     ninja={ninja !== "off"}
                     level={ninja}
                     pickLine={pickLine}
+                    onConceptDone={leaveConcept}
                   />
                 </div>
               </main>
+              {item.kind === "question" && cardConcepts.length > 0 ? (
+                <ConceptSideCard
+                  key={state.index}
+                  concepts={cardConcepts}
+                  open={cardShown}
+                  onOpenChange={setCardOpen}
+                  textSize={textSize}
+                  t={t}
+                />
+              ) : null}
               {ninja !== "off" ? (
                 <NinjaStage
                   area={cardRef}
@@ -821,6 +883,101 @@ function Player({
         ) : null}
       </div>
     </>
+  )
+}
+
+/**
+ * The card beside a question, holding the concept it tests. Closed, it waits behind a tab at the
+ * window's edge; open, it sits at the end of the window (on a phone, over the question until closed).
+ */
+function ConceptSideCard({
+  concepts,
+  open,
+  onOpenChange,
+  textSize,
+  t,
+}: {
+  concepts: ConceptBrickData[]
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  textSize: TextSize
+  t: Strings
+}) {
+  const id = React.useId()
+  const tabRef = React.useRef<HTMLButtonElement>(null)
+  const closeRef = React.useRef<HTMLButtonElement>(null)
+  // Opened or closed by hand, focus follows: to the close button, or back to the tab. Wait for the
+  // render that lifts `inert`, or the focus call lands on an element that can't take it.
+  const moveFocus = React.useRef<"tab" | "close" | null>(null)
+  React.useEffect(() => {
+    const target = moveFocus.current
+    moveFocus.current = null
+    if (target === "close") closeRef.current?.focus()
+    if (target === "tab") tabRef.current?.focus()
+  }, [open])
+  const close = () => {
+    moveFocus.current = "tab"
+    onOpenChange(false)
+  }
+  return (
+    // Its own clipping layer: parked off the edge, the card mustn't widen the window into something
+    // the browser can scroll sideways when focus moves.
+    <div className="pointer-events-none absolute inset-0 z-20 overflow-clip">
+      <Button
+        ref={tabRef}
+        variant="outline"
+        aria-label={t.showCard}
+        aria-expanded={open}
+        aria-controls={id}
+        onPress={() => {
+          moveFocus.current = "close"
+          onOpenChange(true)
+        }}
+        inert={open}
+        className={cn(
+          "absolute end-0 top-1/2 z-10 h-auto -translate-y-1/2 rounded-e-none border-e-0 bg-card px-2 py-3 transition-opacity duration-300 dark:bg-card",
+          open ? "opacity-0" : "pointer-events-auto"
+        )}
+      >
+        <LightbulbIcon />
+      </Button>
+      <aside
+        id={id}
+        aria-label={concepts[0]!.title}
+        inert={!open}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") close()
+        }}
+        className={cn(
+          CONCEPT_CARD,
+          "absolute end-4 top-1/2 z-20 max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] -translate-y-1/2 gap-0 overflow-hidden transition-[translate,opacity] duration-300 ease-out motion-reduce:transition-none sm:w-80",
+          open
+            ? "pointer-events-auto translate-x-0 opacity-100"
+            : "opacity-0 ltr:translate-x-[calc(100%+1rem)] rtl:-translate-x-[calc(100%+1rem)]"
+        )}
+      >
+        <Button
+          ref={closeRef}
+          variant="ghost"
+          size="icon-sm"
+          aria-label={t.closeCard}
+          onPress={close}
+          className="absolute end-3 top-3 z-10"
+        >
+          <XIcon />
+        </Button>
+        <div
+          data-text-size={textSize}
+          className="flex min-h-0 flex-1 flex-col gap-10 overflow-y-auto p-5"
+        >
+          {concepts.map((c) => (
+            <div key={c.id} className="flex flex-col gap-4">
+              <ConceptBrick brick={c} compact />
+            </div>
+          ))}
+        </div>
+      </aside>
+    </div>
   )
 }
 
@@ -937,7 +1094,11 @@ export function Screen({
         </div>
       )
     case "concept":
-      return <ConceptBrick brick={item.brick} />
+      return (
+        <section className={cn(CONCEPT_CARD, "p-6 sm:p-8")}>
+          <ConceptBrick brick={item.brick} />
+        </section>
+      )
     case "fix":
       return (
         <div className="flex flex-col gap-2">
@@ -1184,6 +1345,7 @@ export function ActionArea({
   ninja = true,
   level = "default",
   pickLine: picker,
+  onConceptDone,
 }: {
   lesson: Lesson
   item: Item
@@ -1198,6 +1360,8 @@ export function ActionArea({
   level?: NinjaLevel
   /** The lesson's line picker, shared across screens so lines don't repeat. A demo of one brick can omit it. */
   pickLine?: LinePicker
+  /** "Got it" on a concept: the player animates the card away before moving on. */
+  onConceptDone?: () => void
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const ownPicker = React.useMemo(
@@ -1241,6 +1405,11 @@ export function ActionArea({
     )
   if (item.kind === "intro")
     primary = { label: t.start, onPress: () => dispatch({ type: "next" }) }
+  else if (item.kind === "concept")
+    primary = {
+      label: t.gotIt,
+      onPress: onConceptDone ?? (() => dispatch({ type: "next" })),
+    }
   else if (item.kind === "fix")
     primary = {
       label: t.fixStart,
