@@ -66,7 +66,6 @@ export const zhTw: Strings = {
   renameLesson: "重新命名課程",
   lessonName: "課程名稱",
   lessonMenu: "課程選單",
-  part: (i, n) => `第 ${i}/${n} 部分`,
   linkCopied: "已複製連結",
   theory: "理論",
   theoryEmpty: "學到的概念會顯示在這裡。",

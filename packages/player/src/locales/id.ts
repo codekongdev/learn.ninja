@@ -74,7 +74,6 @@ export const id: Strings = {
   renameLesson: "Ganti nama pelajaran",
   lessonName: "Nama pelajaran",
   lessonMenu: "Menu pelajaran",
-  part: (i, n) => `Bagian ${i} dari ${n}`,
   linkCopied: "Tautan disalin",
   theory: "Teori",
   theoryEmpty: "Konsep akan muncul di sini saat kamu mempelajarinya.",

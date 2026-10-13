@@ -74,7 +74,6 @@ export type Strings = {
   renameLesson: string
   lessonName: string
   lessonMenu: string
-  part: (i: number, n: number) => string
   linkCopied: string
   theory: string
   theoryEmpty: string

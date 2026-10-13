@@ -78,7 +78,6 @@ export const tr: Strings = {
   renameLesson: "Dersi yeniden adlandır",
   lessonName: "Ders adı",
   lessonMenu: "Ders menüsü",
-  part: (i, n) => `Bölüm ${i}/${n}`,
   linkCopied: "Bağlantı kopyalandı",
   theory: "Teori",
   theoryEmpty: "Kavramlar öğrendikçe burada görünür.",

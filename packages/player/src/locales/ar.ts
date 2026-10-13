@@ -66,7 +66,6 @@ export const ar: Strings = {
   renameLesson: "إعادة تسمية الدرس",
   lessonName: "اسم الدرس",
   lessonMenu: "قائمة الدرس",
-  part: (i, n) => `الجزء ${i} من ${n}`,
   linkCopied: "تم نسخ الرابط",
   theory: "النظرية",
   theoryEmpty: "ستظهر المفاهيم هنا أثناء تعلّمك.",

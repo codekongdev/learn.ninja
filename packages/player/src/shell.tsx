@@ -46,9 +46,10 @@ import { Kbd } from "@workspace/ui/components/kbd"
 import { Popover, PopoverTrigger } from "@workspace/ui/components/popover"
 import { Progress } from "@workspace/ui/components/progress"
 import { Slider } from "@workspace/ui/components/slider"
+import { Tooltip, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { PartProgress } from "./flow"
+import type { QuestionCount } from "./flow"
 import { Ninja, type NinjaMood } from "./ninja"
 import { RichText } from "./rich-text"
 import {
@@ -180,8 +181,11 @@ export function useHoursLeft(expiresAt?: number): number | null {
 
 export function LessonHeader({
   title,
-  parts,
-  showParts = true,
+  progress,
+  count,
+  startedAt,
+  endedAt,
+  showProgress = true,
   expiresAt,
   homeHref,
   shareUrl,
@@ -191,9 +195,14 @@ export function LessonHeader({
   t,
 }: {
   title: string
-  parts: PartProgress
+  /** How far through the lesson, 0–100. */
+  progress: number
+  count: QuestionCount
+  /** When the learner left the title screen, and when they reached the wrap-up (ms since epoch). */
+  startedAt?: number
+  endedAt?: number
   /** False on the title screen: the bar appears with the first question. */
-  showParts?: boolean
+  showProgress?: boolean
   expiresAt?: number
   homeHref: string
   shareUrl?: string
@@ -257,8 +266,14 @@ export function LessonHeader({
           </DialogFooter>
         </Dialog>
       </div>
-      {showParts ? (
-        <PartsProgress parts={parts} t={t} />
+      {showProgress ? (
+        <LessonProgress
+          value={progress}
+          count={count}
+          startedAt={startedAt}
+          endedAt={endedAt}
+          t={t}
+        />
       ) : (
         // Holds the middle of the header so the buttons don't shift when the bar appears.
         <div aria-hidden="true" className="min-w-0 sm:flex-1" />
@@ -330,45 +345,98 @@ function LessonTitle({
 }
 
 /**
- * One segment per part: finished parts and upcoming parts are short pills, the current part is a full bar.
- * It mounts when the lesson starts, so each segment slides in, one after the other.
+ * One bar for the whole lesson. The question count and the time spent wait behind it: hovering or
+ * focusing the bar shows them, and so does a tap on touch screens, so they're there when wanted
+ * and out of the way otherwise.
  */
-function PartsProgress({ parts, t }: { parts: PartProgress; t: Strings }) {
-  const enter = (i: number) => ({
-    className:
-      "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-both motion-safe:duration-500",
-    style: { animationDelay: `${i * 90}ms` },
-  })
+function LessonProgress({
+  value,
+  count,
+  startedAt,
+  endedAt,
+  t,
+}: {
+  value: number
+  count: QuestionCount
+  startedAt?: number
+  endedAt?: number
+  t: Strings
+}) {
+  const [open, setOpen] = React.useState(false)
+  // React Aria only opens a tooltip on hover when the last input was the mouse, and learners press
+  // Enter all lesson long, so the bar opens on hover itself, after a short pause.
+  const hover = React.useRef<number | undefined>(undefined)
+  React.useEffect(() => () => window.clearTimeout(hover.current), [])
+  const counter = count.total > 0 ? `${count.current} / ${count.total}` : null
   return (
-    <div className="flex min-w-0 items-center gap-1.5 sm:flex-1 sm:gap-2">
-      {Array.from({ length: parts.count }, (_, i) =>
-        i === parts.current ? (
+    <div className="flex min-w-0 justify-center motion-safe:animate-in motion-safe:duration-500 motion-safe:fade-in-0 sm:flex-1">
+      <TooltipTrigger
+        isOpen={open}
+        onOpenChange={setOpen}
+        delay={300}
+        shouldCloseOnPress={false}
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-label={counter ? `${t.progress}: ${counter}` : t.progress}
+          onHoverStart={() => {
+            window.clearTimeout(hover.current)
+            hover.current = window.setTimeout(() => setOpen(true), 300)
+          }}
+          onHoverEnd={() => {
+            window.clearTimeout(hover.current)
+            setOpen(false)
+          }}
+          onPress={(e) => {
+            // Touch has no hover, so a tap opens and closes the details.
+            if (e.pointerType === "touch") setOpen((o) => !o)
+          }}
+          className="h-7 w-28 cursor-default px-0 hover:bg-transparent active:translate-y-0 sm:w-full sm:max-w-[400px] dark:hover:bg-transparent"
+        >
           <Progress
-            key={i}
-            value={Math.round(parts.fraction * 100)}
-            aria-label={t.progress}
-            valueLabel={t.part(i + 1, parts.count)}
-            style={enter(i).style}
-            className={cn(
-              "w-16 min-w-0 shrink-0 transition-all duration-500 sm:w-auto sm:max-w-[400px] sm:flex-1 sm:shrink [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-track]]:h-2.5",
-              enter(i).className
-            )}
-          />
-        ) : (
-          <span
-            key={i}
+            value={value}
             aria-hidden="true"
-            style={enter(i).style}
-            className={cn(
-              "h-2.5 w-2.5 shrink-0 rounded-full transition-colors duration-500 sm:w-5",
-              i < parts.current || parts.done ? "bg-primary" : "bg-muted",
-              enter(i).className
-            )}
+            className="w-full transition-all duration-500 [&_[data-slot=progress-indicator]]:rounded-full [&_[data-slot=progress-track]]:h-2.5"
           />
-        )
-      )}
+        </Button>
+        <Tooltip placement="bottom" className="tabular-nums">
+          {count.fixing && counter ? <span>{t.fixing}</span> : null}
+          {counter ? <span>{counter}</span> : null}
+          {counter ? <span aria-hidden="true">·</span> : null}
+          <Elapsed startedAt={startedAt} endedAt={endedAt} />
+        </Tooltip>
+      </TooltipTrigger>
     </div>
   )
+}
+
+/** Time spent as MM:SS (H:MM:SS past an hour), ticking while it's on screen. */
+function Elapsed({
+  startedAt,
+  endedAt,
+}: {
+  startedAt?: number
+  endedAt?: number
+}) {
+  const [now, setNow] = React.useState(() => Date.now())
+  React.useEffect(() => {
+    if (endedAt) return
+    const id = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(id)
+  }, [endedAt])
+  const seconds = startedAt
+    ? Math.max(0, Math.floor(((endedAt ?? now) - startedAt) / 1000))
+    : 0
+  return <span dir="ltr">{formatElapsed(seconds)}</span>
+}
+
+export function formatElapsed(seconds: number): string {
+  const two = (n: number) => String(n).padStart(2, "0")
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  return h > 0 ? `${h}:${two(m)}:${two(s)}` : `${two(m)}:${two(s)}`
 }
 
 function ShareButton({

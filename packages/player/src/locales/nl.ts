@@ -86,7 +86,6 @@ export const nl: Strings = {
   renameLesson: "Les hernoemen",
   lessonName: "Naam van de les",
   lessonMenu: "Lesmenu",
-  part: (i, n) => `Deel ${i} van ${n}`,
   linkCopied: "Link gekopieerd",
   theory: "Theorie",
   theoryEmpty: "Concepten verschijnen hier zodra je ze leert.",

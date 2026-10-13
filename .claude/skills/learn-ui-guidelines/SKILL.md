@@ -24,6 +24,7 @@ Every screen has visible layers in both themes. Windows are outlined, not filled
 | Card | Content cards on the site and inside a brick | `bg-card rounded-xl shadow-xs ring-1 ring-foreground/10` (or the `Card` component) |
 | Control on a card | Options, chips, drag items, filled gaps | `rounded-md border bg-background shadow-xs dark:bg-input/30`, hover `bg-muted` / `dark:bg-input/50` |
 | Floating | Menus, dialogs | `bg-popover` (the components handle it) |
+| Tooltip | Short hints on hover, focus, or tap | The `Tooltip` component: no arrow, white in light mode and black in dark (`bg-popover dark:bg-black`), not shadcn's inverted default |
 
 - Never paint a card with `bg-background`; that merges it into the page in dark mode.
 - Selected controls use `border-primary` plus `bg-muted`, with `dark:data-selected:bg-muted` so the dark tint doesn't hide the selection.

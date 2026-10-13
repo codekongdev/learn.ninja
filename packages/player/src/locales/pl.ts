@@ -94,7 +94,6 @@ export const pl: Strings = {
   renameLesson: "Zmień nazwę lekcji",
   lessonName: "Nazwa lekcji",
   lessonMenu: "Menu lekcji",
-  part: (i, n) => `Część ${i} z ${n}`,
   linkCopied: "Link skopiowany",
   theory: "Teoria",
   theoryEmpty: "Pojęcia pojawiają się tutaj w miarę nauki.",

@@ -93,7 +93,6 @@ export const ru: Strings = {
   renameLesson: "Переименовать урок",
   lessonName: "Название урока",
   lessonMenu: "Меню урока",
-  part: (i, n) => `Часть ${i} из ${n}`,
   linkCopied: "Ссылка скопирована",
   theory: "Теория",
   theoryEmpty: "Понятия появляются здесь по мере изучения.",

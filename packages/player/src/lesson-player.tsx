@@ -40,7 +40,8 @@ import {
 import {
   buildSequence,
   outcomeFor,
-  partAt,
+  progressAt,
+  questionAt,
   summarize,
   type Item,
   type Outcome,
@@ -558,7 +559,14 @@ function Player({
       scrollRef.current?.focus({ preventScroll: true })
     shownIndex.current = state.index
   }, [state.index])
-  const parts = partAt(state.items, state.index, state.inFix)
+  // The clock starts when the learner leaves the title screen and stops at the wrap-up.
+  const [clock, setClock] = React.useState<{ start?: number; end?: number }>({})
+  React.useEffect(() => {
+    if (item.kind === "intro") setClock({})
+    else if (item.kind === "wrap")
+      setClock((c) => (c.end ? c : { ...c, end: Date.now() }))
+    else setClock((c) => (c.start ? c : { start: Date.now() }))
+  }, [item.kind])
   const coarse = useCoarsePointer()
   // The tray holds the screen's buttons in the middle and the player's settings at the end. The notch
   // opens and closes it (Enter keeps working either way); the buttons render into `actionsEl`.
@@ -637,8 +645,11 @@ function Player({
       {chrome ? (
         <LessonHeader
           title={lesson.title}
-          parts={parts}
-          showParts={item.kind !== "intro"}
+          progress={progressAt(state.items, state.index, state.inFix)}
+          count={questionAt(state.items, state.index, state.inFix)}
+          startedAt={clock.start}
+          endedAt={clock.end}
+          showProgress={item.kind !== "intro"}
           expiresAt={expiresAt}
           homeHref={homeHref}
           shareUrl={shareUrl}

@@ -70,7 +70,6 @@ export const th: Strings = {
   renameLesson: "เปลี่ยนชื่อบทเรียน",
   lessonName: "ชื่อบทเรียน",
   lessonMenu: "เมนูบทเรียน",
-  part: (i, n) => `ส่วนที่ ${i} จาก ${n}`,
   linkCopied: "คัดลอกลิงก์แล้ว",
   theory: "ทฤษฎี",
   theoryEmpty: "แนวคิดจะปรากฏที่นี่เมื่อคุณเรียนไปเรื่อยๆ",

@@ -71,7 +71,6 @@ export const vi: Strings = {
   renameLesson: "Đổi tên bài học",
   lessonName: "Tên bài học",
   lessonMenu: "Menu bài học",
-  part: (i, n) => `Phần ${i}/${n}`,
   linkCopied: "Đã sao chép liên kết",
   theory: "Lý thuyết",
   theoryEmpty: "Các khái niệm sẽ hiện ở đây khi bạn học đến.",

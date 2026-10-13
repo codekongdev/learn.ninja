@@ -67,7 +67,6 @@ export const ja: Strings = {
   renameLesson: "レッスン名を変更",
   lessonName: "レッスン名",
   lessonMenu: "レッスンメニュー",
-  part: (i, n) => `パート ${i}/${n}`,
   linkCopied: "リンクをコピーしました",
   theory: "理論",
   theoryEmpty: "学んだコンセプトがここに表示されます。",

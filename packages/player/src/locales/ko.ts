@@ -66,7 +66,6 @@ export const ko: Strings = {
   renameLesson: "레슨 이름 바꾸기",
   lessonName: "레슨 이름",
   lessonMenu: "레슨 메뉴",
-  part: (i, n) => `${n}부 중 ${i}부`,
   linkCopied: "링크를 복사했어요",
   theory: "이론",
   theoryEmpty: "배운 개념이 여기에 표시돼요.",

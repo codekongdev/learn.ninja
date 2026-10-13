@@ -90,7 +90,6 @@ export const he: Strings = {
   renameLesson: "שינוי שם השיעור",
   lessonName: "שם השיעור",
   lessonMenu: "תפריט השיעור",
-  part: (i, n) => `חלק ${i} מתוך ${n}`,
   linkCopied: "הקישור הועתק",
   theory: "תאוריה",
   theoryEmpty: "מושגים יופיעו כאן תוך כדי הלמידה.",

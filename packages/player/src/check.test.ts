@@ -20,8 +20,8 @@ import {
 import {
   buildSequence,
   outcomeFor,
-  partAt,
   progressAt,
+  questionAt,
   summarize,
 } from "./flow"
 
@@ -245,33 +245,48 @@ describe("flow", () => {
       )
     ).toBe(100)
   })
-  it("splits progress into one part per concept plus the challenge", () => {
+  it("counts questions, warm-up and challenge included, and the next one on a concept", () => {
     const items = buildSequence(prd)
-    const at = (kind: string, n = 0) =>
-      items.findIndex(
-        (i, k) =>
-          (i.kind === kind || (i.kind === "question" && i.role === kind)) &&
-          items.slice(0, k).filter((j) => j.kind === kind).length === n
-      )
-    expect(partAt(items, 0, false)).toEqual({
-      count: 4,
-      current: 0,
-      fraction: 0,
-      done: false,
-    })
-    // The warm-up starts part 1; the first concept comes next in the same part.
-    expect(partAt(items, at("hook"), false).current).toBe(0)
-    const concept2 = at("concept", 1)
-    expect(partAt(items, concept2, false)).toMatchObject({
+    const questions = items.filter((i) => i.kind === "question").length
+    const hook = items.findIndex((i) => i.kind === "question")
+    expect(questionAt(items, hook, false)).toEqual({
       current: 1,
-      fraction: 0,
+      total: questions,
+      fixing: false,
     })
-    expect(partAt(items, concept2 + 1, false).fraction).toBeCloseTo(1 / 3)
-    expect(partAt(items, at("challenge"), false)).toMatchObject({
-      current: 3,
-      fraction: 0,
-      done: false,
+    // A concept shows the number of the question after it.
+    const concept = items.findIndex((i) => i.kind === "concept")
+    const next = items.findIndex((i, k) => k > concept && i.kind === "question")
+    expect(questionAt(items, concept, false).current).toBe(
+      questionAt(items, next, false).current
+    )
+    const challenge = items.findIndex(
+      (i) => i.kind === "question" && i.role === "challenge"
+    )
+    expect(questionAt(items, challenge, false).current).toBe(questions)
+    expect(
+      questionAt(
+        items,
+        items.findIndex((i) => i.kind === "wrap"),
+        false
+      ).current
+    ).toBe(questions)
+  })
+  it("counts the retries in the fix round", () => {
+    const items = buildSequence(prd)
+    const fix = items.findIndex((i) => i.kind === "fix")
+    const misses = items.filter(
+      (i) => i.kind === "question" && i.role === "practice"
+    )
+    const withRetries = [
+      ...items.slice(0, fix + 1),
+      ...misses.slice(0, 2).map((i) => ({ ...i, role: "fix" as const })),
+      ...items.slice(fix + 1),
+    ]
+    expect(questionAt(withRetries, fix + 2, true)).toEqual({
+      current: 2,
+      total: 2,
+      fixing: true,
     })
-    expect(partAt(items, at("wrap"), false).done).toBe(true)
   })
 })

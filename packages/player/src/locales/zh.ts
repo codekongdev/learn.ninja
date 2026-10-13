@@ -66,7 +66,6 @@ export const zh: Strings = {
   renameLesson: "重命名课程",
   lessonName: "课程名称",
   lessonMenu: "课程菜单",
-  part: (i, n) => `第 ${i}/${n} 部分`,
   linkCopied: "链接已复制",
   theory: "理论",
   theoryEmpty: "学到的概念会显示在这里。",

@@ -80,7 +80,6 @@ export const hi: Strings = {
   renameLesson: "पाठ का नाम बदलें",
   lessonName: "पाठ का नाम",
   lessonMenu: "पाठ मेनू",
-  part: (i, n) => `भाग ${i} / ${n}`,
   linkCopied: "लिंक कॉपी हो गया",
   theory: "सिद्धांत",
   theoryEmpty: "जैसे-जैसे आप सीखेंगे, अवधारणाएँ यहाँ दिखेंगी।",

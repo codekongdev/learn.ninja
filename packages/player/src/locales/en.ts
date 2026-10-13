@@ -78,7 +78,6 @@ export const en: Strings = {
   renameLesson: "Rename lesson",
   lessonName: "Lesson name",
   lessonMenu: "Lesson menu",
-  part: (i, n) => `Part ${i} of ${n}`,
   linkCopied: "Link copied",
   theory: "Theory",
   theoryEmpty: "Concepts show up here as you learn them.",
