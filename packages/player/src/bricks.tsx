@@ -461,7 +461,11 @@ export function MatchBrick({
   locked,
   rightOrder,
 }: QuestionBrickProps & { rightOrder: number[] }) {
-  const [armed, setArmed] = React.useState<number | null>(null)
+  // The item waiting for its match: either column can go first.
+  const [armed, setArmed] = React.useState<{
+    side: "left" | "right"
+    index: number
+  } | null>(null)
   if (brick.type !== "match" || answer.kind !== "pairs") return null
   const links = answer.links
   const paired = Object.keys(links)
@@ -470,21 +474,29 @@ export function MatchBrick({
   const pairNumber = (left: number) => paired.indexOf(left)
   const ownerOf = (right: number) => paired.find((l) => links[l] === right)
 
-  const pressLeft = (i: number) => {
+  const isArmed = (side: "left" | "right", index: number) =>
+    armed?.side === side && armed.index === index
+  // Pressing an item clears its old pair; it then pairs with the armed item on the other side, or waits.
+  const link = (left: number, right: number) => {
     const next = { ...links }
-    delete next[i]
-    setAnswer({ kind: "pairs", links: next })
-    setArmed(armed === i ? null : i)
-  }
-  const pressRight = (j: number) => {
-    const next = { ...links }
-    const owner = ownerOf(j)
+    delete next[left]
+    const owner = ownerOf(right)
     if (owner !== undefined) delete next[owner]
-    if (armed !== null) {
-      next[armed] = j
-      setArmed(null)
-    }
+    next[left] = right
     setAnswer({ kind: "pairs", links: next })
+    setArmed(null)
+  }
+  const press = (side: "left" | "right", index: number) => {
+    if (armed && armed.side !== side) {
+      if (side === "left") link(index, armed.index)
+      else link(armed.index, index)
+      return
+    }
+    const next = { ...links }
+    const owner = side === "left" ? index : ownerOf(index)
+    if (owner !== undefined) delete next[owner]
+    setAnswer({ kind: "pairs", links: next })
+    setArmed(isArmed(side, index) ? null : { side, index })
   }
 
   const badge = (k: number) => (
@@ -514,8 +526,8 @@ export function MatchBrick({
         {brick.pairs.map((p, i) => (
           <Selectable
             key={i}
-            isSelected={armed === i}
-            onChange={() => pressLeft(i)}
+            isSelected={isArmed("left", i)}
+            onChange={() => press("left", i)}
             isDisabled={locked}
             data-status={marks[`L${i}`]}
             lang={brick.leftLang}
@@ -532,8 +544,8 @@ export function MatchBrick({
           return (
             <Selectable
               key={j}
-              isSelected={false}
-              onChange={() => pressRight(j)}
+              isSelected={isArmed("right", j)}
+              onChange={() => press("right", j)}
               isDisabled={locked}
               data-status={marks[`R${j}`]}
               lang={brick.rightLang}

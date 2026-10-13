@@ -3,6 +3,7 @@
 import * as React from "react"
 import {
   createLucideIcon,
+  ArrowRightIcon,
   CheckIcon,
   ChevronDownIcon,
   ClockIcon,
@@ -586,9 +587,12 @@ function ShortcutsDialog({
   onOpenChange: (open: boolean) => void
   t: Strings
 }) {
-  const rows: [keys: string[], label: string][] = [
+  // A range (1–9) or a sequence (Enter, then Tab).
+  const rows: [keys: string[], label: string, sequence?: boolean][] = [
     [["Enter"], t.shortcutMain],
     [["1", "9"], t.shortcutPick],
+    [["Enter", "Tab"], t.shortcutDrag, true],
+    [["D"], t.shortcutTray],
     [["?"], t.shortcutHelp],
   ]
   return (
@@ -597,7 +601,7 @@ function ShortcutsDialog({
         <DialogTitle>{t.shortcuts}</DialogTitle>
       </DialogHeader>
       <ul className="flex flex-col divide-y">
-        {rows.map(([keys, label]) => (
+        {rows.map(([keys, label, sequence]) => (
           <li
             key={label}
             className="flex items-center justify-between gap-4 py-2 text-sm"
@@ -607,7 +611,14 @@ function ShortcutsDialog({
               {keys.map((key, i) => (
                 <React.Fragment key={key}>
                   {i > 0 ? (
-                    <span className="text-xs text-muted-foreground">–</span>
+                    sequence ? (
+                      <ArrowRightIcon
+                        aria-hidden="true"
+                        className="size-3 text-muted-foreground rtl:-scale-x-100"
+                      />
+                    ) : (
+                      <span className="text-xs text-muted-foreground">–</span>
+                    )
                   ) : null}
                   <Kbd className="bg-muted text-foreground">{key}</Kbd>
                 </React.Fragment>

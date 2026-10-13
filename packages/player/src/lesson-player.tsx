@@ -579,19 +579,23 @@ function Player({
     return () => observer.disconnect()
   }, [trayEl])
   const shownHeight = dragHeight ?? (trayOpen ? trayHeight : 0)
-  // "?" shows the keyboard shortcuts, as it does on most of the web.
-  const shortcuts = React.useRef(onShortcuts)
-  shortcuts.current = onShortcuts
+  // "?" shows the keyboard shortcuts, as it does on most of the web. D opens and closes the tray,
+  // matched by key position so it works on any keyboard layout; touch screens have no notch to toggle.
+  const keys = React.useRef({ onShortcuts, onTrayToggle, coarse })
+  keys.current = { onShortcuts, onTrayToggle, coarse }
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "?" || e.repeat || e.metaKey || e.ctrlKey || e.altKey)
+      const help = e.key === "?"
+      const tray = e.code === "KeyD" && !e.shiftKey && !keys.current.coarse
+      if (!(help || tray) || e.repeat || e.metaKey || e.ctrlKey || e.altKey)
         return
       const target = e.target as HTMLElement | null
       if (keyScope && !keyScope.current?.contains(target)) return
       if (target?.closest("input, textarea, select, [contenteditable=true]"))
         return
       e.preventDefault()
-      shortcuts.current()
+      if (help) keys.current.onShortcuts()
+      else keys.current.onTrayToggle()
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)

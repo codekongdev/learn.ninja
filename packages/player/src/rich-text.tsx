@@ -22,6 +22,9 @@ export function RichText({
 }) {
   const { prepared } = usePlayer()
   const nodes: React.ReactNode[] = []
+  // Text that is only code (an option like `fixed stuff`) already sits in its own card or chip,
+  // so it skips the inline chip: no box inside a box, and wrapped lines stay aligned.
+  const solo = /^`[^`]+`$/.test(text.trim())
   let last = 0
   let key = 0
   for (const m of text.matchAll(TOKEN)) {
@@ -46,7 +49,11 @@ export function RichText({
         <code
           key={key++}
           dir="ltr"
-          className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.9em]"
+          className={
+            solo
+              ? "font-mono text-[0.9em]"
+              : "rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.9em]"
+          }
         >
           {code}
         </code>

@@ -99,6 +99,10 @@ export type Strings = {
   shortcuts: string
   shortcutMain: string
   shortcutPick: string
+  /** Drag and drop by keyboard: Enter on a handle, then Tab to a spot. */
+  shortcutDrag: string
+  /** D opens and closes the tray of buttons. */
+  shortcutTray: string
   shortcutHelp: string
   /** The gear menu in the header (theme, language, docs). */
   settings: string
