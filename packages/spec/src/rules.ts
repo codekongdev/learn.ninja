@@ -197,7 +197,8 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   }
 
   // A brick's HTML visual is a picture to a screen reader, so it needs alt text. (Hotspot visuals
-  // are read through their tappable regions; option and item visuals through their captions.)
+  // are read through their tappable regions, item visuals through their captions, and option
+  // visuals below.)
   const withVisuals = [
     ...lesson.bricks.flatMap((b, i) =>
       b.type === "concept" ? [{ brick: b, path: `bricks[${i}]` }] : []
@@ -212,6 +213,20 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
         `${path}.visual`,
         `This HTML visual has no "alt". Add one sentence saying what it shows, for people using a screen reader.`
       )
+  }
+
+  // An option's visual is read through its alt, or its caption when it has one. A caption is for
+  // what the visual can't say, so most visual options have an alt and no caption.
+  for (const { brick, path } of questions) {
+    if (brick.type !== "choice" && brick.type !== "compare") continue
+    brick.options.forEach((o, j) => {
+      if (o.visual?.kind === "html" && !o.visual.alt && !o.text)
+        add(
+          "teaching",
+          `${path}.options[${j}].visual`,
+          `This option's HTML visual has no "alt" and no caption. Add an "alt": one sentence saying what it shows, for people using a screen reader.`
+        )
+    })
   }
 
   lesson.bricks.forEach((brick, i) => {

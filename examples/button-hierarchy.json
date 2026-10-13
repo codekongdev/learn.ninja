@@ -16,7 +16,8 @@
         "id": "a",
         "visual": {
           "kind": "html",
-          "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Publish</button><button class='btn'>Preview</button><button class='btn'>Cancel</button></div>"
+          "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Publish</button><button class='btn'>Preview</button><button class='btn'>Cancel</button></div>",
+          "alt": "Three filled buttons in a row: Publish, Preview, and Cancel."
         },
         "feedback": "All three shout equally, so nothing stands out."
       },
@@ -24,7 +25,8 @@
         "id": "b",
         "visual": {
           "kind": "html",
-          "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Publish</button><button class='btn' data-variant='outline'>Preview</button><button class='btn' data-variant='ghost'>Cancel</button></div>"
+          "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Publish</button><button class='btn' data-variant='outline'>Preview</button><button class='btn' data-variant='ghost'>Cancel</button></div>",
+          "alt": "A filled Publish button, an outlined Preview button, and a text-only Cancel button."
         }
       }
     ],
@@ -182,35 +184,35 @@
       "options": [
         {
           "id": "a",
-          "text": "Filled Save, outlined Preview, text Cancel",
           "visual": {
             "kind": "html",
-            "html": "<div class='flex gap-2 flex-wrap'><button class='btn' data-size='sm'>Save</button><button class='btn' data-size='sm' data-variant='outline'>Preview</button><button class='btn' data-size='sm' data-variant='ghost'>Cancel</button></div>"
+            "html": "<div class='flex gap-2 flex-wrap'><button class='btn' data-size='sm'>Save</button><button class='btn' data-size='sm' data-variant='outline'>Preview</button><button class='btn' data-size='sm' data-variant='ghost'>Cancel</button></div>",
+            "alt": "A filled Save button, an outlined Preview button, and a text-only Cancel button."
           }
         },
         {
           "id": "b",
-          "text": "Filled Save, filled Cancel",
           "visual": {
             "kind": "html",
-            "html": "<div class='flex gap-2 flex-wrap'><button class='btn' data-size='sm'>Save</button><button class='btn' data-size='sm'>Cancel</button></div>"
+            "html": "<div class='flex gap-2 flex-wrap'><button class='btn' data-size='sm'>Save</button><button class='btn' data-size='sm'>Cancel</button></div>",
+            "alt": "Two filled buttons side by side: Save and Cancel."
           },
           "feedback": "Cancel is filled too, so it competes with Save for attention."
         },
         {
           "id": "c",
-          "text": "Filled Save, text Cancel",
           "visual": {
             "kind": "html",
-            "html": "<div class='flex gap-2 flex-wrap'><button class='btn' data-size='sm'>Save</button><button class='btn' data-size='sm' data-variant='ghost'>Cancel</button></div>"
+            "html": "<div class='flex gap-2 flex-wrap'><button class='btn' data-size='sm'>Save</button><button class='btn' data-size='sm' data-variant='ghost'>Cancel</button></div>",
+            "alt": "A filled Save button and a text-only Cancel button."
           }
         },
         {
           "id": "d",
-          "text": "Text Save, filled Cancel",
           "visual": {
             "kind": "html",
-            "html": "<div class='flex gap-2 flex-wrap'><button class='btn' data-size='sm' data-variant='ghost'>Save</button><button class='btn' data-size='sm'>Cancel</button></div>"
+            "html": "<div class='flex gap-2 flex-wrap'><button class='btn' data-size='sm' data-variant='ghost'>Save</button><button class='btn' data-size='sm'>Cancel</button></div>",
+            "alt": "A text-only Save button and a filled Cancel button."
           },
           "feedback": "This flips the hierarchy: the main action is the weakest button, and Cancel gets all the weight."
         }

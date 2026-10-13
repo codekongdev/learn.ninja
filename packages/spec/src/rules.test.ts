@@ -45,11 +45,26 @@ describe("visuals", () => {
     expectIssue(lesson, { path: "bricks[6].visual", message: /no "alt"/ })
   })
 
-  it("doesn't need alt text on a hotspot visual or an option's visual", () => {
+  it("doesn't need alt text on a hotspot visual", () => {
     const lesson = buttons()
     expect(lesson.bricks[2].type).toBe("hotspot")
     expect(lesson.bricks[2].visual.alt).toBeUndefined()
-    expect(lesson.hook.options[0].visual.alt).toBeUndefined()
+    expect(validateLesson(lesson).ok).toBe(true)
+  })
+
+  it("wants alt text on an option's visual without a caption", () => {
+    const lesson = buttons()
+    delete lesson.hook.options[0].visual.alt
+    expectIssue(lesson, {
+      path: "hook.options[0].visual",
+      message: /no "alt" and no caption/,
+    })
+  })
+
+  it("reads an option's visual through its caption when it has one", () => {
+    const lesson = buttons()
+    delete lesson.hook.options[0].visual.alt
+    lesson.hook.options[0].text = "Three filled buttons"
     expect(validateLesson(lesson).ok).toBe(true)
   })
 })

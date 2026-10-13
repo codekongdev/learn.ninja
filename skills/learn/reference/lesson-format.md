@@ -63,11 +63,11 @@ Brick ids are unique across the whole lesson, including the hook and the challen
 { "kind": "math", "tex": "A = P(1 + r)^n" }
 ```
 
-`alt` is one sentence saying what the visual shows, for screen readers; it's required on a concept's or question's HTML visual (hotspot visuals are read through their regions, option and item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
+`alt` is one sentence saying what the visual shows, for screen readers; it's required on a concept's or question's HTML visual, and on an option's HTML visual that has no caption (hotspot visuals are read through their regions, item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
 
 ## Options
 
-Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedback"? (required on wrong options), "lang"? }`. Give each option text or a visual. Options with visuals show as cards in two columns, with `text` as a caption under the visual; in a `choice`, give either every option a visual or none, and give each visual option a short `text` caption (screen readers announce the caption, not the visual).
+Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedback"? (required on wrong options), "lang"? }`. Give each option text or a visual. Options with visuals show as cards in two columns; in a `choice`, give either every option a visual or none. Give each option visual an `alt` (screen readers announce it). `text` under a visual is a caption: add one only for what the visual can't show, like a name to refer to it by, never text the visual already shows.
 
 ## The question bricks
 
