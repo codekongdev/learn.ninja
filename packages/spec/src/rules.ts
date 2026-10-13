@@ -19,6 +19,8 @@ export const LIMITS = {
   practicePerConcept: { min: 2, max: 4 },
   practiceTotal: { min: 4, max: 8 },
   promptWords: 40,
+  /** An explanation is shown in the ninja's speech bubble, so it stays short. */
+  explanationWords: 30,
   conceptBodyWords: 80,
   htmlVisualBytes: 20 * 1024,
   lessonBytes: 500 * 1024,
@@ -50,7 +52,8 @@ export function positionalReference(text: string): string | null {
   const plain = text.replace(/[*`]/g, "")
   const ordinal =
     /\bthe\s+(?:first|second|third|fourth|last|top|bottom)\s+(?:option|answer|choice|statement|one|explanation|message|example|version|card|pick)s?\b/i
-  const lettered = /\b(?:option|answer|choice)\s+(?:[A-D]|[1-9])\b/
+  const lettered =
+    /\b(?:[Oo]ption|[Aa]nswer|[Cc]hoice|[Pp]lot|[Cc]hart|[Gg]raph|[Vv]ersion)\s+(?:[A-D]|[1-9])\b/
   return (plain.match(ordinal) ?? plain.match(lettered))?.[0] ?? null
 }
 
@@ -127,6 +130,14 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   // ---------- teaching quality ----------
 
   for (const { brick, path } of questions) {
+    const explanationWords = countWords(brick.explanation)
+    if (explanationWords > LIMITS.explanationWords) {
+      add(
+        "teaching",
+        `${path}.explanation`,
+        `The explanation has ${explanationWords} words; keep it to ${LIMITS.explanationWords} or fewer. Apply the idea to this question in a sentence or two; don't restate the concept.`
+      )
+    }
     if (countWords(brick.prompt) > LIMITS.promptWords) {
       add(
         "teaching",

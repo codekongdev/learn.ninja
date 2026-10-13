@@ -56,13 +56,13 @@ Mechanics of each type:
 
 ## 4. Feedback that teaches
 
-- **Feedback explains; it never introduces.** The player shows feedback only after a miss, and explanations and hints only when the learner asks, so a learner who answers right may never see them. If a question needs a term, fact, or method, a concept brick before it teaches it. Feedback can name a mistake only in words the lesson has already taught.
+- **Feedback explains; it never introduces.** All of it shows in the ninja's speech bubble: after a miss, the question's hint (or, without one, the wrong option's feedback); after a right answer, the explanation only if the learner taps Why?. A learner who answers right may never see any of it. If a question needs a term, fact, or method, a concept brick before it teaches it. Feedback can name a mistake only in words the lesson has already taught.
 - **Every wrong option gets `feedback`** that explains _why_ it's wrong, in a sentence or two. Name the misconception: "That's simple interest. Year 2 also earns interest on year 1's $50."
 - **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting.
 - **Name answers by what they say, not where they sit.** The player shuffles options and a match's right column, so "the second statement" or "option B" can point at the wrong one. Write "the nurses' statement" or "the many-causes explanation" instead. The checker rejects position words in explanations, hints, feedback, and outcomes.
-- **Every question brick gets an `explanation`** of why the right answer is right. It opens under the answer when the learner asks why, or once a missed answer is revealed. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
+- **Every question brick gets an `explanation`** of why the right answer is right, in 30 words or fewer (the checker enforces it). It shows in the ninja's speech bubble, so apply the idea to this question; don't restate the concept the learner just read. It shows when the learner taps Why? after a right answer, and by itself once a missed answer is revealed. The warm-up shows no explanation: the concept after it does the explaining. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
 - **Blanks:** add a `mistakes` entry for each decoy chip, explaining it.
-- **Hints** (optional) nudge without giving the answer away: "What is the one thing this page exists to help people do?" How many there are, and how much they give away, follows the level: most questions for beginners, one or two for advanced learners.
+- **Hints** (optional) nudge without giving the answer away, in one short line; the player shows the hint after a miss, before the retry: "What is the one thing this page exists to help people do?" How many there are, and how much they give away, follows the level: most questions for beginners, one or two for advanced learners.
 - **Scenario outcomes** describe what happens next, so even a poor choice teaches something.
 
 ## 5. Writing style

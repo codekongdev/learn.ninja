@@ -31,7 +31,7 @@
     ],
     "correct": ["b"],
     "multiple": false,
-    "explanation": "Hot weather. More people swim and more people buy ice cream. The two numbers never touch each other; a third one pushes both. That third thing is the first idea in this lesson."
+    "explanation": "Hot weather. More people swim and more people buy ice cream; neither causes the other. That hidden third thing is where this lesson starts."
   },
   "bricks": [
     {
@@ -87,7 +87,7 @@
       "correct": ["caption"],
       "multiple": false,
       "hint": "Which part would still be true if anxious people simply exercise less?",
-      "explanation": "The title, the r value and the trend line describe the data. The caption turns a one-week survey correlation into a causal, quantified claim. Anxious people may exercise less (the arrow pointing the other way), or free time may drive both."
+      "explanation": "The title, r value, and trend line describe the data. The caption turns a correlation into a causal claim; anxious people may exercise less, or free time may drive both."
     },
     {
       "id": "c2",
@@ -132,7 +132,7 @@
       "correct": ["a"],
       "multiple": false,
       "hint": "Who reaches for *Skip intro*: someone on episode 1 or episode 7?",
-      "explanation": "Bingeing makes you tap *Skip intro*, not the reverse. A bigger button might lift taps without lifting watching. To find out, show it to a random half of users and compare."
+      "explanation": "Bingeing makes you tap *Skip intro*, not the reverse. A bigger button might lift taps without lifting watching. To find out, show it to a random half and compare."
     },
     {
       "id": "p4",
@@ -174,7 +174,7 @@
           "group": "reverse"
         }
       ],
-      "explanation": "Heat, national wealth and smoking each drive both halves of the first three. In the last three the \"effect\" comes first: low scores send students to tutoring, sales generate reviews, and injuries send athletes to the massage table."
+      "explanation": "Heat, wealth and smoking drive both halves of the ice cream, Nobel and lighter pairs. The rest run backwards: low scores bring tutoring, sales bring reviews, injuries bring massage."
     },
     {
       "id": "c3",
@@ -211,7 +211,7 @@
       ],
       "correct": "b",
       "hint": "Which plot measured tutoring before the score?",
-      "explanation": "Plot B measures tutoring before the outcome and looks at change, so the effect can't have caused the cause. It still isn't randomized: motivated students may tutor more *and* improve more. Better evidence, not proof."
+      "explanation": "The autumn-to-spring plot measures tutoring before the score change, so the effect can't have caused the cause. It still isn't randomized: motivated students may tutor more and improve more."
     },
     {
       "id": "p6",
@@ -267,7 +267,7 @@
       ],
       "correct": ["a"],
       "multiple": false,
-      "explanation": "A policy that stops at a border assigns the cause to one side without regard to the workers themselves: a classic natural-experiment design, used in well-known minimum-wage studies. Its weakness is that the two cities may still differ in other ways."
+      "explanation": "A policy that stops at a border splits otherwise similar places: a natural experiment, used in well-known minimum-wage studies. Its weakness is that the two cities may still differ."
     }
   ],
   "challenge": {
