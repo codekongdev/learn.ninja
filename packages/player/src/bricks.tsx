@@ -75,8 +75,8 @@ export function ConceptBrick({
       <div className={cn("flex flex-col", compact ? "gap-2" : "gap-3")}>
         <h2
           className={cn(
-            "font-semibold tracking-tight text-balance",
-            compact ? "pe-8 text-base" : "text-2xl"
+            "font-semibold text-balance",
+            compact ? "pe-8 text-base" : "text-lg"
           )}
         >
           {brick.title}

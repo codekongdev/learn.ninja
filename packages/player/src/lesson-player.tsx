@@ -1112,10 +1112,11 @@ export function Screen({
       )
     case "concept":
       return (
-        <section className={cn(CONCEPT_CARD, "p-6 sm:p-8")}>
-          {label ? <ScreenLabel text={label} /> : null}
+        // Styled like a question (no card of its own), so the screens read as one lesson.
+        <>
+          {label ? <ScreenLabel text={label} className="-mb-4" /> : null}
           <ConceptBrick brick={item.brick} />
-        </section>
+        </>
       )
     case "fix":
       return (
