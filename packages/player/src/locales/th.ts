@@ -4,7 +4,6 @@ export const th: Strings = {
   start: "เริ่มบทเรียน",
   check: "ตรวจคำตอบ",
   continue: "ต่อไป",
-  gotIt: "เข้าใจแล้ว",
   tryAgain: "ลองอีกครั้ง",
   why: "ทำไม?",
   hint: "คำใบ้",

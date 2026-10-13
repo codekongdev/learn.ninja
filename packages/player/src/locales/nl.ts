@@ -8,7 +8,6 @@ export const nl: Strings = {
   start: "Les starten",
   check: "Antwoord controleren",
   continue: "Doorgaan",
-  gotIt: "Begrepen",
   tryAgain: "Opnieuw proberen",
   why: "Waarom?",
   hint: "Hint",

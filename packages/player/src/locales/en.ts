@@ -4,7 +4,6 @@ export const en: Strings = {
   start: "Start lesson",
   check: "Check answer",
   continue: "Continue",
-  gotIt: "Got it",
   tryAgain: "Try again",
   why: "Why?",
   hint: "Hint",

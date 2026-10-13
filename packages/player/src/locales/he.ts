@@ -8,7 +8,6 @@ export const he: Strings = {
   start: "התחלת השיעור",
   check: "בדיקת התשובה",
   continue: "המשך",
-  gotIt: "הבנתי",
   tryAgain: "נסו שוב",
   why: "למה?",
   hint: "רמז",

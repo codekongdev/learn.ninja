@@ -8,7 +8,6 @@ export const pl: Strings = {
   start: "Rozpocznij lekcję",
   check: "Sprawdź odpowiedź",
   continue: "Dalej",
-  gotIt: "Rozumiem",
   tryAgain: "Spróbuj ponownie",
   why: "Dlaczego?",
   hint: "Podpowiedź",

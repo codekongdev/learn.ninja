@@ -8,7 +8,6 @@ export const uk: Strings = {
   start: "Почати урок",
   check: "Перевірити відповідь",
   continue: "Далі",
-  gotIt: "Зрозуміло",
   tryAgain: "Спробувати ще раз",
   why: "Чому?",
   hint: "Підказка",

@@ -4,7 +4,6 @@ export const ko: Strings = {
   start: "레슨 시작",
   check: "정답 확인",
   continue: "계속",
-  gotIt: "알겠어요",
   tryAgain: "다시 시도",
   why: "왜죠?",
   hint: "힌트",

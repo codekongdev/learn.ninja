@@ -8,7 +8,6 @@ export const hi: Strings = {
   start: "पाठ शुरू करें",
   check: "उत्तर जाँचें",
   continue: "आगे बढ़ें",
-  gotIt: "समझ आ गया",
   tryAgain: "फिर से कोशिश करें",
   why: "क्यों?",
   hint: "संकेत",

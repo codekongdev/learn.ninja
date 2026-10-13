@@ -4,7 +4,6 @@ export const ja: Strings = {
   start: "レッスンを始める",
   check: "答えを確認",
   continue: "次へ",
-  gotIt: "わかった",
   tryAgain: "もう一度",
   why: "なぜ？",
   hint: "ヒント",

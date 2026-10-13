@@ -1361,7 +1361,7 @@ export function ActionArea({
     primary = { label: t.start, onPress: () => dispatch({ type: "next" }) }
   else if (item.kind === "concept")
     primary = {
-      label: t.gotIt,
+      label: t.continue,
       onPress: onConceptDone ?? (() => dispatch({ type: "next" })),
     }
   else if (item.kind === "fix")

@@ -4,7 +4,6 @@ export const zh: Strings = {
   start: "开始课程",
   check: "检查答案",
   continue: "继续",
-  gotIt: "明白了",
   tryAgain: "再试一次",
   why: "为什么？",
   hint: "提示",

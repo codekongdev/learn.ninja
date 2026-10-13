@@ -4,7 +4,6 @@ export const vi: Strings = {
   start: "Bắt đầu bài học",
   check: "Kiểm tra đáp án",
   continue: "Tiếp tục",
-  gotIt: "Đã hiểu",
   tryAgain: "Thử lại",
   why: "Vì sao?",
   hint: "Gợi ý",

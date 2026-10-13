@@ -8,7 +8,6 @@ export const ru: Strings = {
   start: "Начать урок",
   check: "Проверить ответ",
   continue: "Продолжить",
-  gotIt: "Понятно",
   tryAgain: "Попробовать ещё раз",
   why: "Почему?",
   hint: "Подсказка",

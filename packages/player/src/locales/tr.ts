@@ -8,7 +8,6 @@ export const tr: Strings = {
   start: "Derse başla",
   check: "Cevabı kontrol et",
   continue: "Devam",
-  gotIt: "Anladım",
   tryAgain: "Tekrar dene",
   why: "Neden?",
   hint: "İpucu",

@@ -4,7 +4,6 @@ export const id: Strings = {
   start: "Mulai pelajaran",
   check: "Periksa jawaban",
   continue: "Lanjut",
-  gotIt: "Mengerti",
   tryAgain: "Coba lagi",
   why: "Mengapa?",
   hint: "Petunjuk",

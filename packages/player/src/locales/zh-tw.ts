@@ -4,7 +4,6 @@ export const zhTw: Strings = {
   start: "開始課程",
   check: "檢查答案",
   continue: "繼續",
-  gotIt: "了解",
   tryAgain: "再試一次",
   why: "為什麼？",
   hint: "提示",

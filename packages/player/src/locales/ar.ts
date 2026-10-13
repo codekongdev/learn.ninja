@@ -4,7 +4,6 @@ export const ar: Strings = {
   start: "ابدأ الدرس",
   check: "تحقّق من الإجابة",
   continue: "متابعة",
-  gotIt: "فهمت",
   tryAgain: "حاول مرة أخرى",
   why: "لماذا؟",
   hint: "تلميح",

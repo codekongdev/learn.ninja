@@ -9,8 +9,6 @@ export type Strings = {
   start: string
   check: string
   continue: string
-  /** The concept screen's button: the learner has read it. */
-  gotIt: string
   tryAgain: string
   why: string
   hint: string
