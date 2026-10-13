@@ -84,6 +84,7 @@ export const uk: Strings = {
   next: "Рекомендований наступний урок",
   restart: "Почати урок заново",
   progress: "Поступ уроку",
+  progressLabel: "Поступ",
   restartTitle: "Почати цей урок заново?",
   restartBody: "Ви почнете з початку. Ваші відповіді не збережуться.",
   stay: "Вчитися далі",

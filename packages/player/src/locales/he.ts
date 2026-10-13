@@ -81,6 +81,7 @@ export const he: Strings = {
   next: "השיעור הבא המומלץ",
   restart: "התחלת השיעור מחדש",
   progress: "התקדמות בשיעור",
+  progressLabel: "התקדמות",
   restartTitle: "להתחיל את השיעור מחדש?",
   restartBody: "תתחילו מההתחלה. התשובות שלכם עד כה לא יישמרו.",
   stay: "להמשיך ללמוד",

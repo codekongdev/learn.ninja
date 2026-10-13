@@ -84,6 +84,7 @@ export const pl: Strings = {
   next: "Proponowana następna lekcja",
   restart: "Zacznij lekcję od nowa",
   progress: "Postęp lekcji",
+  progressLabel: "Postęp",
   restartTitle: "Zacząć tę lekcję od nowa?",
   restartBody:
     "Zaczniesz od początku. Dotychczasowe odpowiedzi nie zostaną zapisane.",

@@ -61,6 +61,7 @@ export const vi: Strings = {
   next: "Bài học tiếp theo gợi ý",
   restart: "Học lại từ đầu",
   progress: "Tiến độ bài học",
+  progressLabel: "Tiến độ",
   restartTitle: "Học lại bài này từ đầu?",
   restartBody:
     "Bạn sẽ bắt đầu lại từ đầu. Các câu trả lời đến giờ sẽ không được giữ.",

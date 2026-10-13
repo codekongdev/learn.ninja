@@ -1120,7 +1120,8 @@ function QuestionScreen({
   return (
     <>
       {label ? <ScreenLabel text={label} className="-mb-4" /> : null}
-      <h2 className="text-lg font-semibold">
+      <h2 className="text-base font-semibold">
+
         <RichText text={brick.prompt} />
       </h2>
       {helper && !brick.prompt.includes(helper) ? (

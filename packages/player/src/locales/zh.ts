@@ -57,6 +57,7 @@ export const zh: Strings = {
   next: "推荐的下一课",
   restart: "重新开始课程",
   progress: "课程进度",
+  progressLabel: "进度",
   restartTitle: "重新开始这节课？",
   restartBody: "你将从头开始，目前的答案不会保留。",
   stay: "继续学习",

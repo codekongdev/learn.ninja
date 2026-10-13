@@ -68,6 +68,7 @@ export const tr: Strings = {
   next: "Önerilen sonraki ders",
   restart: "Dersi yeniden başlat",
   progress: "Ders ilerlemesi",
+  progressLabel: "İlerleme",
   restartTitle: "Bu ders yeniden başlatılsın mı?",
   restartBody:
     "Baştan başlayacaksın. Şimdiye kadarki cevapların saklanmayacak.",

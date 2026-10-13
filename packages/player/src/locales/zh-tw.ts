@@ -57,6 +57,7 @@ export const zhTw: Strings = {
   next: "推薦的下一課",
   restart: "重新開始課程",
   progress: "課程進度",
+  progressLabel: "進度",
   restartTitle: "重新開始這堂課？",
   restartBody: "你將從頭開始，目前的答案不會保留。",
   stay: "繼續學習",

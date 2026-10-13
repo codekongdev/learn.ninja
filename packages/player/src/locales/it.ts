@@ -78,6 +78,7 @@ export const it: Strings = {
   next: "Prossima lezione consigliata",
   restart: "Ricomincia la lezione",
   progress: "Avanzamento della lezione",
+  progressLabel: "Avanzamento",
   restartTitle: "Ricominciare questa lezione?",
   restartBody:
     "Ripartirai dall'inizio. Le risposte date finora non verranno salvate.",

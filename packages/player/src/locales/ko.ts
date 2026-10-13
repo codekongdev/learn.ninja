@@ -57,6 +57,7 @@ export const ko: Strings = {
   next: "추천 다음 레슨",
   restart: "레슨 다시 시작",
   progress: "레슨 진행률",
+  progressLabel: "진행률",
   restartTitle: "이 레슨을 다시 시작할까요?",
   restartBody: "처음부터 다시 시작해요. 지금까지의 답은 저장되지 않아요.",
   stay: "계속 배우기",
