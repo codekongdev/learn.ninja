@@ -16,6 +16,7 @@ export const nl: Strings = {
   everyPath: "Alle paden",
   replayBrief: "Situatie opnieuw",
   tried: "Geprobeerd",
+  picked: (parts) => `Gekozen: ${parts}`,
   hookNote:
     "Deze eerste vraag is een opwarmer. Hij telt niet mee voor je score.",
   minutes: (n) => p(n, { one: "# min", other: "# min" }),

@@ -16,6 +16,7 @@ export const de: Strings = {
   everyPath: "Alle Wege",
   replayBrief: "Situation noch einmal",
   tried: "Versucht",
+  picked: (parts) => `Gewählt: ${parts}`,
   hookNote:
     "Die erste Frage ist zum Aufwärmen. Sie zählt nicht für deine Punktzahl.",
   minutes: (n) => p(n, { one: "# Min.", other: "# Min." }),

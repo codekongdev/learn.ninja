@@ -12,6 +12,7 @@ export const ar: Strings = {
   everyPath: "كل المسارات",
   replayBrief: "أعد عرض الموقف",
   tried: "جرّبته",
+  picked: (parts) => `المختار: ${parts}`,
   hookNote: "هذا سؤال تمهيدي، ولا يُحتسب في نتيجتك.",
   minutes: (n) => `${n} دقائق`,
   expires: (h) => `ينتهي خلال ${h} ساعة`,

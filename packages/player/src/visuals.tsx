@@ -84,7 +84,7 @@ function HtmlFrame({
   label?: string
   plain: boolean
 }) {
-  const { visualsCss, dir, prepared, t } = usePlayer()
+  const { visualsCss, dir, prepared, t, keyScope } = usePlayer()
   const dark = useIsDark()
   const ref = React.useRef<HTMLIFrameElement>(null)
   const [measured, setMeasured] = React.useState<number | null>(null)
@@ -144,6 +144,7 @@ function HtmlFrame({
             width: r.width,
             height: r.height,
             radius: getComputedStyle(el).borderRadius,
+            frame: frameInset(el),
           }
         })
       )
@@ -154,15 +155,72 @@ function HtmlFrame({
     return () => observer.disconnect()
   }, [loaded, dark, dir, interactive])
 
-  return (
+  // Number keys pick the parts, as they pick answer options: 1 for the first part's keycap, 2 for…
+  const control = React.useRef(hotspots)
+  control.current = hotspots
+  const order = spots.map((s) => s.id).join(",")
+  React.useEffect(() => {
+    if (!interactive || !order) return
+    const ids = order.split(",")
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return
+      const el = e.target as HTMLElement | null
+      if (keyScope && !keyScope.current?.contains(el)) return
+      if (el?.closest("input, textarea, select, [contenteditable=true]")) return
+      const n = Number(e.key)
+      const c = control.current
+      if (!c || c.disabled || !Number.isInteger(n) || n < 1 || n > ids.length)
+        return
+      e.preventDefault()
+      c.onToggle(ids[n - 1]!)
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [interactive, order, keyScope])
+
+  // The tappable parts' corners show when the brick arrives, then while the pointer is over the
+  // stage, or while a finger holds it (phones have no hover).
+  const [reveal, setReveal] = React.useState(interactive)
+  const hold = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(() => {
+    if (!interactive) return
+    const timer = setTimeout(() => setReveal(false), 1800)
+    return () => clearTimeout(timer)
+  }, [interactive])
+  const letGo = () => {
+    if (hold.current) clearTimeout(hold.current)
+    hold.current = null
+    setReveal(false)
+  }
+  const picked = hotspots
+    ? spots.filter((s) => hotspots.selected.includes(s.id)).map((s) => s.label)
+    : []
+
+  const stage = (
     // The frame is inert (nothing inside is read), so the stage itself is the image screen readers get.
     <div
       role={interactive ? undefined : "img"}
       aria-label={interactive ? undefined : (alt ?? label ?? t.visual)}
-      // On the page's own surface, like the lesson around it, with room above and below.
+      data-reveal={(interactive && reveal) || undefined}
+      onPointerDown={
+        interactive
+          ? (e) => {
+              if (e.pointerType !== "touch") return
+              hold.current = setTimeout(() => setReveal(true), 350)
+            }
+          : undefined
+      }
+      onPointerUp={interactive ? letGo : undefined}
+      onPointerCancel={interactive ? letGo : undefined}
+      onPointerLeave={interactive ? letGo : undefined}
       className={cn(
         "visual-stage",
-        !plain && "overflow-hidden rounded-xl border bg-background py-6"
+        interactive
+          ? // A hotspot's visual sits on a filled stage: no frame around it, so nothing boxes it twice.
+            !plain &&
+              "group/stage overflow-hidden rounded-2xl bg-muted py-3 select-none dark:bg-input/30"
+          : // On the page's own surface, like the lesson around it, with room above and below.
+            !plain && "overflow-hidden rounded-xl border bg-background py-6"
       )}
       inert={!interactive}
     >
@@ -186,6 +244,19 @@ function HtmlFrame({
       </div>
     </div>
   )
+  if (!hotspots) return stage
+  return (
+    <div className="flex flex-col gap-3">
+      {stage}
+      {/* What's picked, in words: confirms the tap, and screen readers hear it. */}
+      <p
+        aria-live="polite"
+        className="min-h-5 truncate text-sm text-muted-foreground"
+      >
+        {picked.length ? t.picked(picked.join(", ")) : ""}
+      </p>
+    </div>
+  )
 }
 
 /** Where a [data-hotspot] element sits inside the frame, measured from the player. */
@@ -197,8 +268,36 @@ interface SpotBox {
   width: number
   height: number
   radius: string
+  /** How far in from the box its corners and ring sit (see frameInset). */
+  frame: { top: number; right: number; bottom: number; left: number }
 }
 
+/**
+ * Where to frame a tappable part. A small control (a pill, a button) is framed just outside its own
+ * box, but a block with roomy padding, like a card's full-width header, is framed around its content:
+ * its box runs to the card's edges, and a frame outside it would sit outside the card. The whole box
+ * stays the tap target either way.
+ */
+function frameInset(el: HTMLElement) {
+  const cs = getComputedStyle(el)
+  const side = (padding: string, border: string) => {
+    const p = parseFloat(padding) || 0
+    return p >= 12 ? p + (parseFloat(border) || 0) : 0
+  }
+  return {
+    top: side(cs.paddingTop, cs.borderTopWidth),
+    right: side(cs.paddingRight, cs.borderRightWidth),
+    bottom: side(cs.paddingBottom, cs.borderBottomWidth),
+    left: side(cs.paddingLeft, cs.borderLeftWidth),
+  }
+}
+
+/**
+ * A tappable part of a visual, marked by four small corners like a viewfinder. They show when the
+ * brick arrives, while the pointer is over the stage, or while a finger holds it, so the visual stays
+ * clean the rest of the time. Picking a part closes them into one rounded ring that stands off the
+ * part, whatever its own corners.
+ */
 function HotspotButton({
   spot,
   control,
@@ -208,6 +307,8 @@ function HotspotButton({
 }) {
   const mark = control.marks[spot.id]
   const selected = control.selected.includes(spot.id)
+  const radius = Math.max(parseFloat(spot.radius) || 0, 8)
+  const { frame } = spot
   return (
     <Selectable
       aria-label={spot.label}
@@ -215,31 +316,60 @@ function HotspotButton({
       onChange={() => control.onToggle(spot.id)}
       isDisabled={control.disabled}
       data-status={mark}
-      className={cn(
-        "absolute cursor-pointer outline-2 outline-offset-4 transition-[outline-color] outline-solid",
-        mark === "correct"
-          ? "outline-green-600"
-          : mark === "wrong"
-            ? "outline-yellow-500"
-            : selected
-              ? "outline-primary"
-              : "outline-transparent",
-        !mark &&
-          !selected &&
-          !control.disabled &&
-          "hover:outline-ring hover:outline-dashed"
-      )}
+      className="group/spot absolute cursor-pointer rounded-lg"
       // Measured positions inside the frame, so physical edges are right in both directions.
       style={{
         top: spot.top,
         left: spot.left,
         width: spot.width,
         height: spot.height,
-        borderRadius: spot.radius,
       }}
-    />
+    >
+      {/* The frame: the ring when picked, the corners otherwise. Physical sides, like the box. */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute outline-2 outline-offset-4 transition-[outline-color] outline-solid",
+          mark === "correct"
+            ? "outline-green-600"
+            : mark === "wrong"
+              ? "outline-yellow-500"
+              : selected
+                ? "outline-primary"
+                : "outline-transparent"
+        )}
+        style={{
+          top: frame.top,
+          right: frame.right,
+          bottom: frame.bottom,
+          left: frame.left,
+          borderRadius: frame.top || frame.left ? 8 : radius,
+        }}
+      >
+        {!selected && !mark && !control.disabled
+          ? CORNERS.map((corner) => (
+              <span
+                key={corner}
+                className={cn(
+                  "absolute size-2.5 border-muted-foreground opacity-0 transition-[opacity,border-color] duration-200 motion-reduce:transition-none",
+                  "group-hover/spot:border-foreground group-data-reveal/stage:opacity-100 pointer-fine:group-hover/stage:opacity-100",
+                  corner
+                )}
+              />
+            ))
+          : null}
+      </span>
+    </Selectable>
   )
 }
+
+/** The four corners of the viewfinder, just outside the part's box. */
+const CORNERS = [
+  "-start-1.5 -top-1.5 rounded-ss-sm border-s-2 border-t-2",
+  "-end-1.5 -top-1.5 rounded-se-sm border-e-2 border-t-2",
+  "-start-1.5 -bottom-1.5 rounded-es-sm border-s-2 border-b-2",
+  "-end-1.5 -bottom-1.5 rounded-ee-sm border-e-2 border-b-2",
+]
 
 // ---------- code: highlighted on the server, lines tappable for code hotspots ----------
 

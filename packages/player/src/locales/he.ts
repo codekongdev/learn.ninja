@@ -16,6 +16,7 @@ export const he: Strings = {
   everyPath: "כל הדרכים",
   replayBrief: "להציג שוב את המצב",
   tried: "נוסה",
+  picked: (parts) => `נבחר: ${parts}`,
   hookNote: "השאלה הראשונה היא חימום. היא לא נספרת בניקוד.",
   minutes: (n) => p(n, { one: "דקה אחת", two: "# דקות", other: "# דק׳" }),
   expires: (h) =>

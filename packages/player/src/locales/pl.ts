@@ -16,6 +16,7 @@ export const pl: Strings = {
   everyPath: "Wszystkie ścieżki",
   replayBrief: "Pokaż sytuację ponownie",
   tried: "Wypróbowane",
+  picked: (parts) => `Wybrano: ${parts}`,
   hookNote: "To pierwsze pytanie to rozgrzewka. Nie liczy się do wyniku.",
   minutes: (n) => p(n, { one: "# min", other: "# min" }),
   expires: (h) =>

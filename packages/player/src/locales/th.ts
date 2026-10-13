@@ -12,6 +12,7 @@ export const th: Strings = {
   everyPath: "ทุกเส้นทาง",
   replayBrief: "ดูสถานการณ์อีกครั้ง",
   tried: "ลองแล้ว",
+  picked: (parts) => `เลือกแล้ว: ${parts}`,
   hookNote: "ข้อแรกเป็นการวอร์มอัป ไม่นับคะแนน",
   minutes: (n) => `${n} นาที`,
   expires: (h) => `หมดอายุใน ${h} ชม.`,

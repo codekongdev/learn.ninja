@@ -12,6 +12,7 @@ export const en: Strings = {
   everyPath: "Every path",
   replayBrief: "Replay the situation",
   tried: "Tried",
+  picked: (parts) => `Picked: ${parts}`,
   hookNote: "This first one is a warm-up. It doesn't count toward your score.",
   minutes: (n) => `${n} min`,
   expires: (h) => `Expires in ${h}h`,

@@ -16,6 +16,7 @@ export const fr: Strings = {
   everyPath: "Tous les chemins",
   replayBrief: "Revoir la situation",
   tried: "Essayé",
+  picked: (parts) => `Choisi : ${parts}`,
   hookNote:
     "Cette première question est un échauffement. Elle ne compte pas dans ton score.",
   minutes: (n) => p(n, { one: "# min", other: "# min" }),

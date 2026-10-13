@@ -22,6 +22,8 @@ export type Strings = {
   replayBrief: string
   /** A scenario option already picked and rewound. */
   tried: string
+  /** Under a hotspot's visual: the parts picked, by name. */
+  picked: (parts: string) => string
   hookNote: string
   minutes: (n: number) => string
   expires: (hours: number) => string

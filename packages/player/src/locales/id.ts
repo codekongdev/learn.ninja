@@ -12,6 +12,7 @@ export const id: Strings = {
   everyPath: "Semua jalan",
   replayBrief: "Ulangi situasinya",
   tried: "Sudah dicoba",
+  picked: (parts) => `Dipilih: ${parts}`,
   hookNote: "Pertanyaan pertama ini pemanasan. Tidak dihitung dalam skor.",
   minutes: (n) => `${n} mnt`,
   expires: (h) => `Berakhir dalam ${h} jam`,

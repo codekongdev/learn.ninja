@@ -12,6 +12,7 @@ export const zhTw: Strings = {
   everyPath: "所有路線",
   replayBrief: "重看情境",
   tried: "試過了",
+  picked: (parts) => `已選：${parts}`,
   hookNote: "第一題是暖身，不計入得分。",
   minutes: (n) => `${n} 分鐘`,
   expires: (h) => `${h} 小時後到期`,
