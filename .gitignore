@@ -25,6 +25,8 @@ dist
 .turbo
 
 # misc
+# The learn CLI's publish state, which holds edit tokens
+.learn/
 .DS_Store
 *.pem
 
