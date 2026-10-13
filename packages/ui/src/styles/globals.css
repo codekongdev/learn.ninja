@@ -284,6 +284,9 @@
   .ninja.e-spin .ninja-head {
     animation: ninja-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  .ninja.e-rewind .ninja-head {
+    animation: ninja-rewind 0.7s cubic-bezier(0.5, 0, 0.3, 1);
+  }
   /* Sensei: slow in, slow out, long holds. */
   .ninja.e-bow .ninja-head {
     animation: ninja-bow 1.7s cubic-bezier(0.4, 0, 0.2, 1);
@@ -383,6 +386,11 @@
 @keyframes ninja-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+@keyframes ninja-rewind {
+  to {
+    transform: rotate(-720deg);
   }
 }
 @keyframes ninja-tweak {

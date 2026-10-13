@@ -11,6 +11,12 @@ export const ru: Strings = {
   tryAgain: "Попробовать ещё раз",
   why: "Почему?",
   hint: "Подсказка",
+  skip: "Пропустить",
+  gotIt: "Понятно",
+  rewind: "Перемотать",
+  everyPath: "Все пути",
+  replayBrief: "Повторить ситуацию",
+  tried: "Уже пробовали",
   hookNote: "Первый вопрос — разминка. Он не влияет на результат.",
   minutes: (n) => p(n, { one: "# мин", other: "# мин" }),
   expires: (h) =>

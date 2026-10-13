@@ -11,6 +11,12 @@ export const he: Strings = {
   tryAgain: "נסו שוב",
   why: "למה?",
   hint: "רמז",
+  skip: "דילוג",
+  gotIt: "הבנתי",
+  rewind: "אחורה",
+  everyPath: "כל הדרכים",
+  replayBrief: "להציג שוב את המצב",
+  tried: "נוסה",
   hookNote: "השאלה הראשונה היא חימום. היא לא נספרת בניקוד.",
   minutes: (n) => p(n, { one: "דקה אחת", two: "# דקות", other: "# דק׳" }),
   expires: (h) =>

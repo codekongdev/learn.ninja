@@ -11,6 +11,12 @@ export const it: Strings = {
   tryAgain: "Riprova",
   why: "Perché?",
   hint: "Suggerimento",
+  skip: "Salta",
+  gotIt: "Capito",
+  rewind: "Riavvolgi",
+  everyPath: "Tutte le strade",
+  replayBrief: "Rivedi la situazione",
+  tried: "Provato",
   hookNote:
     "Questa prima domanda è un riscaldamento. Non conta per il punteggio.",
   minutes: (n) => p(n, { one: "# min", other: "# min" }),

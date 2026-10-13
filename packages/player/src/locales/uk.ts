@@ -11,6 +11,12 @@ export const uk: Strings = {
   tryAgain: "Спробувати ще раз",
   why: "Чому?",
   hint: "Підказка",
+  skip: "Пропустити",
+  gotIt: "Зрозуміло",
+  rewind: "Перемотати",
+  everyPath: "Усі шляхи",
+  replayBrief: "Повторити ситуацію",
+  tried: "Уже пробували",
   hookNote: "Перше запитання — розминка. Воно не впливає на результат.",
   minutes: (n) => p(n, { one: "# хв", other: "# хв" }),
   expires: (h) =>

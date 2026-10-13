@@ -11,6 +11,12 @@ export const nl: Strings = {
   tryAgain: "Opnieuw proberen",
   why: "Waarom?",
   hint: "Hint",
+  skip: "Overslaan",
+  gotIt: "Begrepen",
+  rewind: "Terugspoelen",
+  everyPath: "Alle paden",
+  replayBrief: "Situatie opnieuw",
+  tried: "Geprobeerd",
   hookNote:
     "Deze eerste vraag is een opwarmer. Hij telt niet mee voor je score.",
   minutes: (n) => p(n, { one: "# min", other: "# min" }),

@@ -11,6 +11,12 @@ export const pl: Strings = {
   tryAgain: "Spróbuj ponownie",
   why: "Dlaczego?",
   hint: "Podpowiedź",
+  skip: "Pomiń",
+  gotIt: "Rozumiem",
+  rewind: "Przewiń",
+  everyPath: "Wszystkie ścieżki",
+  replayBrief: "Pokaż sytuację ponownie",
+  tried: "Wypróbowane",
   hookNote: "To pierwsze pytanie to rozgrzewka. Nie liczy się do wyniku.",
   minutes: (n) => p(n, { one: "# min", other: "# min" }),
   expires: (h) =>

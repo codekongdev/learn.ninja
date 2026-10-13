@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { LightbulbIcon, PanelRightIcon } from "lucide-react"
+import { LightbulbIcon, PanelRightIcon, RotateCcwIcon } from "lucide-react"
 
 import type {
   ConceptBrick as ConceptBrickData,
@@ -28,6 +28,7 @@ import {
   type CheckResult,
   type Mark,
 } from "./check"
+import { Briefing } from "./briefing"
 import { PlayerProvider, usePlayer } from "./context"
 import {
   hasOptionCards,
@@ -51,7 +52,15 @@ import {
   type Outcome,
   type Role,
 } from "./flow"
-import { Aura, hueFor, NinjaStage, type CueKind, type NinjaCue } from "./ninja"
+import {
+  Aura,
+  hueFor,
+  Ninja,
+  NinjaStage,
+  reducedMotion,
+  type CueKind,
+  type NinjaCue,
+} from "./ninja"
 import { emptyPrepared, type Prepared } from "./prepared"
 import { seeded } from "./random"
 import { plainText, RichText } from "./rich-text"
@@ -234,6 +243,12 @@ export interface QuestionState {
   optionOrder: string[]
   rightOrder: number[]
   bank: string[]
+  /** A scenario opens with the ninja's brief: false until he's told it (true for other bricks). */
+  briefed: boolean
+  /** How many times the brief has been replayed, so each telling starts fresh. */
+  briefs: number
+  /** Scenario options already picked, missed and rewound: they can't be picked again. */
+  tried: string[]
 }
 
 export interface State {
@@ -276,6 +291,9 @@ export function freshQuestion(
           )
         : [],
     bank: brick.type === "blank" ? shuffle(wordBank(brick), random) : [],
+    briefed: brick.type !== "scenario",
+    briefs: 0,
+    tried: [],
   }
 }
 
@@ -372,6 +390,8 @@ export type Action =
   | { type: "restart"; lesson: Lesson }
   | { type: "answer"; answer: Answer }
   | { type: "why" }
+  | { type: "briefed" }
+  | { type: "rebrief" }
   | { type: "check" }
   | { type: "retry" }
   | { type: "startFix" }
@@ -434,17 +454,45 @@ export function reducer(state: State, action: Action): State {
       return state.question
         ? { ...state, question: { ...state.question, whyOpen: true } }
         : state
+    case "briefed":
+      return state.question
+        ? { ...state, question: { ...state.question, briefed: true } }
+        : state
+    case "rebrief":
+      // Only while answering: the brief comes back, then the same question.
+      return state.question?.phase === "answering"
+        ? {
+            ...state,
+            question: {
+              ...state.question,
+              briefed: false,
+              briefs: state.question.briefs + 1,
+            },
+          }
+        : state
     case "retry": {
       // The last check's marks stay until the answer changes, so the learner can see what to fix.
       if (!state.question || item?.kind !== "question") return state
+      const s = state.question
+      // A scenario rewinds to the decision: its marks clear and the missed pick is crossed out.
+      const rewind = item.brick.type === "scenario"
       return {
         ...state,
         question: {
-          ...state.question,
+          ...s,
           phase: "answering",
-          answer: retryAnswer(item.brick, state.question.answer),
+          answer: retryAnswer(item.brick, s.answer),
           // There's no help button: a miss earns the hint on the second try.
           hintOpen: Boolean(item.brick.hint),
+          ...(rewind
+            ? {
+                result: null,
+                tried: [
+                  ...s.tried,
+                  ...(s.answer.kind === "select" ? s.answer.ids : []),
+                ],
+              }
+            : null),
         },
       }
     }
@@ -635,6 +683,23 @@ function Player({
     state.question?.phase === "feedback" &&
     state.question.result?.correct === true
   toggleWhy.current = canWhy ? () => setWhyOpen((open) => !open) : null
+  // Every path makes a scenario's rows taller: scroll them up clear of his bubble.
+  const pathsOpen =
+    canWhy &&
+    whyOpen &&
+    item.kind === "question" &&
+    item.brick.type === "scenario"
+  React.useEffect(() => {
+    if (!pathsOpen) return
+    const frame = requestAnimationFrame(() => {
+      const el = scrollRef.current
+      el?.scrollTo({
+        top: el.scrollHeight,
+        behavior: reducedMotion() ? "auto" : "smooth",
+      })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [pathsOpen])
   // "Got it" sends the concept card back out the way it came before the next screen arrives.
   const [leaving, setLeaving] = React.useState(false)
   const leavingRef = React.useRef(false)
@@ -658,13 +723,41 @@ function Player({
   // The ninja lives on the card and reacts to each check: pleased when it's right, sorry when it's not.
   const cardRef = React.useRef<HTMLDivElement>(null)
   const q = state.question
-  const cue: NinjaCue | null =
-    item.kind === "question" && q?.result && q.phase !== "answering"
-      ? {
-          kind: cueKindFor(state, item),
-          key: `${state.index}-${q.attempts}-${q.phase}`,
-        }
+  // A scenario opens with his brief (story mode): he steps up to tell it, then goes back to his
+  // corner for the question. Each telling has its own key, so a replay starts fresh. With him off
+  // there's no brief: the situation is on the question screen.
+  const briefKey =
+    item.kind === "question" &&
+    item.brick.type === "scenario" &&
+    q &&
+    !q.briefed &&
+    ninja !== "off"
+      ? `${state.run}:${state.index}:${q.briefs}`
       : null
+  const [toldKey, setToldKey] = React.useState<string | null>(null)
+  const [skipBrief, setSkipBrief] = React.useState(0)
+  // A scenario miss rewinds to the decision: time runs back (and so does he) before the retry.
+  const [rewinding, setRewinding] = React.useState(false)
+  const rewind = React.useCallback(() => {
+    if (reducedMotion()) {
+      dispatch({ type: "retry" })
+      return
+    }
+    setRewinding(true)
+    window.setTimeout(() => {
+      setRewinding(false)
+      dispatch({ type: "retry" })
+    }, 750)
+  }, [])
+  const cue: NinjaCue | null =
+    item.kind === "question" && q && rewinding
+      ? { kind: "rewind", key: `${state.index}-${q.attempts}-rewind` }
+      : item.kind === "question" && q?.result && q.phase !== "answering"
+        ? {
+            kind: cueKindFor(state, item),
+            key: `${state.index}-${q.attempts}-${q.phase}`,
+          }
+        : null
   // The wrap-up's send-off, with more for a perfect run: a line of his, shown under his slot once
   // he's leapt up there (or at once when he's off and there's no leap to wait for).
   const celebrate = React.useMemo(() => {
@@ -767,6 +860,16 @@ function Player({
                       inBubble
                       ninja={ninja !== "off"}
                       wrapLine={ninja === "off" || landed ? wrapLine : null}
+                      brief={
+                        briefKey
+                          ? {
+                              key: briefKey,
+                              skip: skipBrief,
+                              onTold: () => setToldKey(briefKey),
+                            }
+                          : null
+                      }
+                      paths={canWhy && whyOpen}
                     />
                   </div>
                   <ActionArea
@@ -782,6 +885,17 @@ function Player({
                     onConceptDone={leaveConcept}
                     onBubbleRoom={setBubbleRoom}
                     inBubble
+                    brief={
+                      briefKey
+                        ? {
+                            told: toldKey === briefKey,
+                            onSkip: () => setSkipBrief((n) => n + 1),
+                            onDone: () => dispatch({ type: "briefed" }),
+                          }
+                        : null
+                    }
+                    onRewind={rewind}
+                    rewinding={rewinding}
                     why={
                       canWhy
                         ? {
@@ -799,12 +913,23 @@ function Player({
               {ninja !== "off" ? (
                 <NinjaStage
                   area={cardRef}
-                  screen={state.index}
+                  screen={briefKey ?? state.index}
                   cue={cue}
                   celebrate={celebrate}
                   onLanded={() => setLanded(true)}
                   level={ninja}
                 />
+              ) : null}
+              {rewinding ? (
+                // Time running back: faint scan lines over the card and a rewind tag in its corner.
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 z-20 bg-[repeating-linear-gradient(0deg,color-mix(in_oklab,var(--color-foreground)_6%,transparent)_0_1px,transparent_1px_4px)] motion-safe:animate-in motion-safe:fade-in-0"
+                >
+                  <Badge className="absolute end-4 top-4 font-mono sm:end-6 sm:top-6">
+                    ◀◀ {t.rewind}
+                  </Badge>
+                </div>
               ) : null}
               {coarse ? null : (
                 <TrayNotch
@@ -968,11 +1093,17 @@ export function Screen({
   wrapLine,
   label,
   inBubble = false,
+  brief = null,
+  paths = false,
 }: {
   lesson: Lesson
   item: Item
   state: State
   dispatch: React.Dispatch<Action>
+  /** A scenario's brief, while the ninja tells it (the player's story mode). */
+  brief?: BriefProps | null
+  /** A scenario after the right answer: every option's outcome (Every path, the player's Why?). */
+  paths?: boolean
   /** A quiet line above the screen saying what kind it is: "Concept 2 of 3", "Practice"... */
   label?: string
   /** The player says hints and explanations in the ninja's bubble; a lone demo shows them in place. */
@@ -1042,6 +1173,10 @@ export function Screen({
           dispatch={dispatch}
           label={label}
           inBubble={inBubble}
+          brief={brief}
+          paths={paths}
+          lang={lesson.language}
+          storyMode={inBubble && ninja}
         />
       )
   }
@@ -1074,21 +1209,58 @@ function explanationShown(s: QuestionState, role: Role): boolean {
   return s.whyOpen || (s.phase === "revealed" && role !== "hook")
 }
 
+/** A scenario's brief while it's being told: `skip` counts presses of Skip, `onTold` ends it. */
+interface BriefProps {
+  key: string
+  skip: number
+  onTold: () => void
+}
+
+/** How a scenario's question arrives after the brief: each part rises in once the ninja has passed it. */
+const rise = (delay: number) => ({
+  className:
+    "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:duration-300 motion-safe:fill-mode-both",
+  style: { animationDelay: `${delay}ms` },
+})
+
 function QuestionScreen({
   item,
   state,
   dispatch,
   label,
   inBubble = false,
+  brief = null,
+  paths = false,
+  lang,
+  storyMode = false,
 }: {
   item: Extract<Item, { kind: "question" }>
   state: QuestionState
   dispatch: React.Dispatch<Action>
   label?: string
   inBubble?: boolean
+  brief?: BriefProps | null
+  paths?: boolean
+  /** The lesson's language, for splitting the brief into sentences. */
+  lang?: string
+  /** The player with the ninja on: a scenario is briefed by him, and its question rises in after. */
+  storyMode?: boolean
 }) {
   const { t } = usePlayer()
   const { brick, role } = item
+  if (brief && brick.type === "scenario")
+    return (
+      <Briefing
+        key={brief.key}
+        text={brick.situation}
+        lang={lang}
+        skip={brief.skip}
+        onTold={brief.onTold}
+        slot={
+          <div aria-hidden="true" data-ninja-slot="brief" className="size-16" />
+        }
+      />
+    )
   const locked = state.phase !== "answering"
   // After a second miss, show the solution. Where the marks name options (not positions in the
   // learner's answer), the last pick keeps its mark beside the right one.
@@ -1099,11 +1271,23 @@ function QuestionScreen({
     brick.type === "scenario" ||
     brick.type === "hotspot"
   const marks: Record<string, Mark> =
-    state.phase !== "revealed"
-      ? (state.result?.marks ?? {})
-      : keepsPick
-        ? { ...solutionMarks(brick), ...state.result?.marks }
-        : solutionMarks(brick)
+    paths && brick.type === "scenario"
+      ? // Every path: each option in its own color, best, okay or poor.
+        Object.fromEntries(
+          brick.options.map((o) => [
+            o.id,
+            o.quality === "best"
+              ? "correct"
+              : o.quality === "okay"
+                ? "partial"
+                : "wrong",
+          ])
+        )
+      : state.phase !== "revealed"
+        ? (state.result?.marks ?? {})
+        : keepsPick
+          ? { ...solutionMarks(brick), ...state.result?.marks }
+          : solutionMarks(brick)
   const explanation =
     !inBubble && explanationShown(state, role) ? brick.explanation : null
   const props = {
@@ -1114,20 +1298,62 @@ function QuestionScreen({
     locked,
   }
   const helper = helperFor(brick, t)
-  const showOutcomes =
-    brick.type === "scenario" && state.result
-      ? [
-          ...(state.answer.kind === "select" ? state.answer.ids : []),
-          ...(state.phase === "revealed"
-            ? brick.options.filter((o) => o.quality === "best").map((o) => o.id)
-            : []),
-        ]
+  const best =
+    brick.type === "scenario"
+      ? brick.options.filter((o) => o.quality === "best").map((o) => o.id)
       : []
+  // In the player the ninja says a pick's outcome, so rows show outcomes only for Every path and
+  // the revealed answer. A lone demo shows them under the picked row.
+  const showOutcomes =
+    brick.type !== "scenario"
+      ? []
+      : paths
+        ? brick.options.map((o) => o.id)
+        : !state.result
+          ? []
+          : [
+              ...(!inBubble && state.answer.kind === "select"
+                ? state.answer.ids
+                : []),
+              ...(state.phase === "revealed" ? best : []),
+            ]
+  // After the brief, the question rises in behind him as he heads back to his corner.
+  const arrive = storyMode && brick.type === "scenario"
+  const at = (delay: number) =>
+    arrive ? rise(delay) : { className: undefined, style: undefined }
 
   return (
     <>
       {label ? <ScreenLabel text={label} className="-mb-4" /> : null}
-      <h2 className="text-base font-semibold">
+      {brick.type === "scenario" ? (
+        // The situation, kept in view while choosing. In story mode it's what the ninja just said.
+        <Card size="sm" className={at(0).className} style={at(0).style}>
+          <CardContent className="flex items-start gap-3 text-muted-foreground [&_code]:text-foreground [&_strong]:text-foreground">
+            {storyMode ? (
+              <Ninja className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+            ) : null}
+            <RichText
+              text={brick.situation}
+              className="min-w-0 flex-1 text-pretty"
+            />
+            {storyMode && state.phase === "answering" ? (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={t.replayBrief}
+                className="-my-1 -me-1.5 shrink-0"
+                onPress={() => dispatch({ type: "rebrief" })}
+              >
+                <RotateCcwIcon className="rtl:-scale-x-100" />
+              </Button>
+            ) : null}
+          </CardContent>
+        </Card>
+      ) : null}
+      <h2
+        className={cn("text-base font-semibold", at(200).className)}
+        style={at(200).style}
+      >
         <RichText text={brick.prompt} />
       </h2>
       {helper && !brick.prompt.includes(helper) ? (
@@ -1135,23 +1361,21 @@ function QuestionScreen({
           {helper}
         </p>
       ) : null}
-      {brick.type === "scenario" ? (
-        <div className="rounded-e-lg border-s-2 border-primary bg-muted px-4 py-3 text-base">
-          <RichText text={brick.situation} />
-        </div>
-      ) : null}
       {brick.visual && brick.type !== "hotspot" ? (
         <Visual visual={brick.visual} />
       ) : null}
       {brick.type === "choice" ||
       brick.type === "compare" ||
       brick.type === "scenario" ? (
-        <OptionsBrick
-          {...props}
-          order={state.optionOrder}
-          showOutcomes={showOutcomes}
-          explanation={explanation}
-        />
+        <div className={at(380).className} style={at(380).style}>
+          <OptionsBrick
+            {...props}
+            order={state.optionOrder}
+            showOutcomes={showOutcomes}
+            explanation={explanation}
+            tried={state.tried}
+          />
+        </div>
       ) : brick.type === "hotspot" ? (
         <HotspotBrick {...props} />
       ) : brick.type === "sort" ? (
@@ -1301,6 +1525,9 @@ export function ActionArea({
   inBubble = false,
   why,
   onBubbleRoom,
+  brief = null,
+  onRewind,
+  rewinding = false,
 }: {
   lesson: Lesson
   item: Item
@@ -1326,6 +1553,12 @@ export function ActionArea({
   why?: { open: boolean; onToggle: () => void } | null
   /** How much taller the bubble stands than the room the screen leaves for it (pb-40), in px. */
   onBubbleRoom?: (px: number) => void
+  /** A scenario's brief in the player: Skip while he's telling it, then Got it. */
+  brief?: { told: boolean; onSkip: () => void; onDone: () => void } | null
+  /** A scenario miss in the player: Rewind (with its effect) instead of Try again. */
+  onRewind?: () => void
+  /** The rewind is playing: the bubble fades and the buttons wait. */
+  rewinding?: boolean
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const ownPicker = React.useMemo(
@@ -1386,19 +1619,31 @@ export function ActionArea({
       label: t.restart,
       onPress: () => dispatch({ type: "restart", lesson }),
     }
+  } else if (item.kind === "question" && state.question && brief) {
+    // The ninja's brief: Skip shows the rest at once; once it's told, Got it goes to the question.
+    primary = brief.told
+      ? { label: t.gotIt, onPress: brief.onDone }
+      : { label: t.skip, onPress: brief.onSkip, variant: "outline" }
   } else if (item.kind === "question" && state.question) {
     const s = state.question
     const { brick, role } = item
     const r = s.result
     const missText = (res: CheckResult) =>
       res.feedback ?? (res.missKey ? missMessage(res, t) : null)
+    // In the player a scenario is a story: the ninja says what each pick led to, a miss rewinds.
+    const story = inBubble && brick.type === "scenario"
     if (s.phase === "answering") {
       primary = {
         label: t.check,
         onPress: () => dispatch({ type: "check" }),
         isDisabled: !isReady(brick, s.answer),
       }
-      // Try again clears the bubble: the miss already said the hint.
+      // Try again clears the bubble: the miss already said the hint. After a scenario's rewind
+      // the miss said its outcome, so the hint comes now.
+      if (story && s.tried.length > 0 && brick.hint) {
+        title = t.hint
+        message = brick.hint
+      }
     } else if (role === "hook" && r) {
       // The hook is a guess, so a miss still moves on, but both get the colors a checked answer would.
       // A wrong guess also says what it got wrong: the misconception is what the lesson starts from.
@@ -1412,8 +1657,21 @@ export function ActionArea({
       tone = "good"
       title = say(earnedMoment(state, item) ?? "praise")
       explanation = brick.explanation
-      if (inBubble && why?.open) message = brick.explanation
+      // What the pick led to; with Every path open the rows show every outcome, so he says why.
+      if (story) message = why?.open ? brick.explanation : (r.feedback ?? null)
+      else if (inBubble && why?.open) message = brick.explanation
       primary = { ...primary, variant: "success" }
+    } else if (s.phase === "feedback" && r && story) {
+      // What the pick led to, then back to the decision.
+      tone = "warn"
+      title = say(r.partial ? "close" : "nudge")
+      message = r.feedback ?? null
+      primary = {
+        label: t.rewind,
+        onPress: onRewind ?? (() => dispatch({ type: "retry" })),
+        variant: "warning",
+        isDisabled: rewinding,
+      }
     } else if (s.phase === "feedback" && r) {
       // A miss gets one short line: the option's own feedback, or a nudge to look again.
       tone = "warn"
@@ -1463,7 +1721,9 @@ export function ActionArea({
           primaryRef.current?.focus()
         }}
       >
-        {t.why}
+        {item.kind === "question" && item.brick.type === "scenario"
+          ? t.everyPath
+          : t.why}
       </Button>
     )
   const explanationOpen =
@@ -1568,6 +1828,9 @@ export function ActionArea({
           className={cn(
             TOAST,
             "absolute end-4 z-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:w-fit sm:max-w-96",
+            // Rewinding: what he said runs back out.
+            rewinding &&
+              "motion-safe:animate-out motion-safe:fade-out-0 motion-safe:fill-mode-forwards motion-safe:slide-out-to-bottom-2",
             // In the player the bubble sits above the ninja, behind him, so he jumps in front of it; the
             // corner over his head is squared off. Without him it takes his corner.
             tray && ninja

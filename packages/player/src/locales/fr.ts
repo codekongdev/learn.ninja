@@ -11,6 +11,12 @@ export const fr: Strings = {
   tryAgain: "Réessayer",
   why: "Pourquoi ?",
   hint: "Indice",
+  skip: "Passer",
+  gotIt: "Compris",
+  rewind: "Rembobiner",
+  everyPath: "Tous les chemins",
+  replayBrief: "Revoir la situation",
+  tried: "Essayé",
   hookNote:
     "Cette première question est un échauffement. Elle ne compte pas dans ton score.",
   minutes: (n) => p(n, { one: "# min", other: "# min" }),

@@ -12,6 +12,18 @@ export type Strings = {
   tryAgain: string
   why: string
   hint: string
+  /** A scenario's brief: show the rest at once. */
+  skip: string
+  /** The brief is told: on to the question. */
+  gotIt: string
+  /** After a scenario miss: back to the decision (it replaces Try again). */
+  rewind: string
+  /** After a scenario, every option's outcome (it replaces Why?). */
+  everyPath: string
+  /** The button that plays a scenario's brief again. */
+  replayBrief: string
+  /** A scenario option already picked and rewound. */
+  tried: string
   hookNote: string
   minutes: (n: number) => string
   expires: (hours: number) => string

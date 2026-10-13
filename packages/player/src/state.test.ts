@@ -205,3 +205,69 @@ describe("earned moments", () => {
     ).toBeNull()
   })
 })
+
+const scenario: Extract<QuestionBrick, { type: "scenario" }> = {
+  id: "sc",
+  type: "scenario",
+  prompt: "What do you do?",
+  situation: "A VP asks for a feature two days before the review.",
+  explanation: "Non-goals protect scope.",
+  hint: "What are non-goals for?",
+  options: [
+    {
+      id: "a",
+      quality: "best",
+      text: "Make it a non-goal",
+      outcome: "Scope holds.",
+    },
+    {
+      id: "b",
+      quality: "okay",
+      text: "Add it and flag the risk",
+      outcome: "Scope grows.",
+    },
+    {
+      id: "c",
+      quality: "poor",
+      text: "Quietly add it",
+      outcome: "Estimates break.",
+    },
+  ],
+}
+
+describe("scenario story mode", () => {
+  it("opens a scenario with the brief, and other bricks without", () => {
+    expect(stateFor(scenario).question?.briefed).toBe(false)
+    expect(stateFor(sort).question?.briefed).toBe(true)
+  })
+
+  it("ends the brief, and replays it only while answering", () => {
+    const told = reducer(stateFor(scenario), { type: "briefed" })
+    expect(told.question?.briefed).toBe(true)
+    const again = reducer(told, { type: "rebrief" })
+    expect(again.question).toMatchObject({ briefed: false, briefs: 1 })
+    const picked = reducer(told, {
+      type: "answer",
+      answer: { kind: "select", ids: ["b"] },
+    })
+    const checked = reducer(picked, { type: "check" })
+    expect(reducer(checked, { type: "rebrief" }).question?.briefed).toBe(true)
+  })
+
+  it("rewinds a miss: the marks clear and the pick is crossed out", () => {
+    let state = reducer(stateFor(scenario), { type: "briefed" })
+    state = reducer(state, {
+      type: "answer",
+      answer: { kind: "select", ids: ["b"] },
+    })
+    state = reducer(state, { type: "check" })
+    expect(state.question?.result?.partial).toBe(true)
+    state = reducer(state, { type: "retry" })
+    expect(state.question).toMatchObject({
+      phase: "answering",
+      result: null,
+      tried: ["b"],
+      answer: { kind: "select", ids: [] },
+    })
+  })
+})

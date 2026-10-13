@@ -162,11 +162,14 @@ export function OptionsBrick({
   order,
   showOutcomes,
   explanation = null,
+  tried = [],
 }: QuestionBrickProps & {
   order: string[]
   showOutcomes: string[]
   /** Shown under the right answer's row (see explanationAnchor). */
   explanation?: string | null
+  /** A scenario's picks already rewound: crossed out, and they can't be picked again. */
+  tried?: string[]
 }) {
   const { t, keyScope } = usePlayer()
   const isOptions =
@@ -176,6 +179,7 @@ export function OptionsBrick({
   const selected = answer.kind === "select" ? answer.ids : []
   const multiple = brick.type === "choice" && brick.multiple
   const toggle = (id: string) => {
+    if (tried.includes(id)) return
     if (multiple)
       setAnswer({
         kind: "select",
@@ -233,20 +237,24 @@ export function OptionsBrick({
           lang?: string
           outcome?: string
         }
+        const wasTried = tried.includes(o.id)
         const row = (
           <Selectable
             key={o.id}
             isSelected={selected.includes(o.id)}
             onChange={() => toggle(o.id)}
-            isDisabled={locked}
+            isDisabled={locked || wasTried}
             data-status={marks[o.id]}
+            // Once marked (Every path), a tried row takes its color like the rest.
+            data-tried={(wasTried && !marks[o.id]) || undefined}
             className={cn(
               cards
                 ? optionCardStyles
                 : cn(
                     "group flex min-h-12 items-center gap-2 px-4 py-3",
                     cardStyles,
-                    markStyles
+                    markStyles,
+                    "data-tried:border-dashed data-tried:bg-transparent data-tried:text-muted-foreground data-tried:shadow-none dark:data-tried:bg-transparent"
                   ),
               o.id === anchor && "rounded-b-none border-b-0"
             )}
@@ -299,7 +307,12 @@ export function OptionsBrick({
                     <RichText
                       text={o.text}
                       lang={o.lang}
-                      className="text-sm font-medium"
+                      className={cn(
+                        "text-sm font-medium",
+                        wasTried &&
+                          !marks[o.id] &&
+                          "line-through decoration-muted-foreground/60"
+                      )}
                     />
                   ) : null}
                   {o.visual ? <Visual visual={o.visual} /> : null}
@@ -310,7 +323,13 @@ export function OptionsBrick({
                     />
                   ) : null}
                 </span>
-                <KeyHint i={i} mark={marks[o.id]} />
+                {wasTried && !marks[o.id] ? (
+                  <span className="ms-auto shrink-0 font-mono text-xs text-muted-foreground">
+                    {t.tried}
+                  </span>
+                ) : (
+                  <KeyHint i={i} mark={marks[o.id]} />
+                )}
               </>
             )}
           </Selectable>

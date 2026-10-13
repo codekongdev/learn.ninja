@@ -11,6 +11,12 @@ export const hi: Strings = {
   tryAgain: "फिर से कोशिश करें",
   why: "क्यों?",
   hint: "संकेत",
+  skip: "छोड़ें",
+  gotIt: "समझ आ गया",
+  rewind: "रिवाइंड",
+  everyPath: "सभी रास्ते",
+  replayBrief: "स्थिति फिर से देखें",
+  tried: "आज़माया",
   hookNote: "यह पहला सवाल वार्म-अप है। यह आपके स्कोर में नहीं गिना जाता।",
   minutes: (n) => p(n, { one: "# मिनट", other: "# मिनट" }),
   expires: (h) =>

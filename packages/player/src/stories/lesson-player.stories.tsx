@@ -95,3 +95,12 @@ export const NinjaOff: Story = {
   args: { lesson: lessons.buttons },
   loaders: withPrefs({ ninja: "off" }),
 }
+/**
+ * Story mode: a scenario opens with the ninja's brief. He steps up to tell it, goes back to his
+ * corner for the question, says what each pick led to, and a miss rewinds to the decision.
+ */
+export const ScenarioStoryMode: Story = {
+  name: "Scenario story mode",
+  args: { lesson: lessons.buttons, startAt: "ch" },
+  loaders: withPrefs({ ninja: "default" }),
+}

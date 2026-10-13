@@ -11,6 +11,12 @@ export const de: Strings = {
   tryAgain: "Noch mal versuchen",
   why: "Warum?",
   hint: "Tipp",
+  skip: "Überspringen",
+  gotIt: "Verstanden",
+  rewind: "Zurückspulen",
+  everyPath: "Alle Wege",
+  replayBrief: "Situation noch einmal",
+  tried: "Versucht",
   hookNote:
     "Die erste Frage ist zum Aufwärmen. Sie zählt nicht für deine Punktzahl.",
   minutes: (n) => p(n, { one: "# Min.", other: "# Min." }),

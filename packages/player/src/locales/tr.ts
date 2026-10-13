@@ -11,6 +11,12 @@ export const tr: Strings = {
   tryAgain: "Tekrar dene",
   why: "Neden?",
   hint: "İpucu",
+  skip: "Geç",
+  gotIt: "Anladım",
+  rewind: "Geri sar",
+  everyPath: "Tüm yollar",
+  replayBrief: "Durumu tekrar göster",
+  tried: "Denendi",
   hookNote: "Bu ilk soru bir ısınma. Puanına sayılmaz.",
   minutes: (n) => p(n, { one: "# dk", other: "# dk" }),
   expires: (h) =>

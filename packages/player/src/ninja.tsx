@@ -44,6 +44,8 @@ export type NinjaMood =
   | "headbang"
   | "faint"
   | "tremble"
+  // Story mode: spins back, as time rewinds to the decision.
+  | "rewind"
 
 /** The ninja settings he can be seen at (the player leaves him out when it's off). */
 export type NinjaEnergy = Exclude<NinjaLevel, "off">
@@ -102,9 +104,10 @@ type Beat = [mood: NinjaMood, ms: number, lookX?: number, lookY?: number]
 /**
  * What his body knows about an answer: right, right at an earned moment (a streak or the last
  * question), wrong, nearly right, or wrong twice with the answer now shown. A character with no set
- * for a kind plays its nearest: happy for earned, sad for close and reveal.
+ * for a kind plays its nearest: happy for earned, sad for close and reveal. A scenario's rewind is
+ * the same move for everyone.
  */
-export type CueKind = "happy" | "earned" | "sad" | "close" | "reveal"
+export type CueKind = "happy" | "earned" | "sad" | "close" | "reveal" | "rewind"
 type Reactions = Record<"happy" | "sad", Record<string, Beat[]>> &
   Partial<Record<CueKind, Record<string, Beat[]>>>
 
@@ -354,8 +357,12 @@ export const WRAP: Record<NinjaEnergy, { done: Beat[]; perfect: Beat[] }> = {
   unhinged: { done: [["cheer", 1200]], perfect: [["cheer", 1200]] },
 }
 
+/** Time runs back to the decision, and so does he. */
+const REWIND: Record<string, Beat[]> = { rewind: [["rewind", 750]] }
+
 /** The reaction set a character plays for a kind: its own, or the nearest it has. */
 function reactionSet(level: NinjaEnergy, kind: CueKind) {
+  if (kind === "rewind") return REWIND
   const own = REACTIONS[level][kind]
   if (own) return own
   return REACTIONS[level][kind === "earned" ? "happy" : "sad"]
@@ -369,7 +376,7 @@ export function pickFrom(names: string[], seed: string, last?: string): string {
   return pool[h % pool.length]!
 }
 
-/** The reaction to play for an answer at a setting. Unhinged gets two in a row. */
+/** The reaction to play for an answer at a setting. Unhinged gets two in a row where there's a choice. */
 export function reactionFor(
   kind: CueKind,
   seed: string,
@@ -380,7 +387,8 @@ export function reactionFor(
   const names = Object.keys(set)
   const name = pickFrom(names, seed, last)
   let beats = set[name]!
-  if (level === "unhinged") {
+  // Unhinged doubles up, except on a rewind: there's only the one move.
+  if (level === "unhinged" && names.length > 1) {
     const encore = pickFrom(names, `${seed}!`, name)
     beats = [...beats, ...set[encore]!]
   }
@@ -418,6 +426,7 @@ const MOOD_CLASSES = (
     "headbang",
     "faint",
     "tremble",
+    "rewind",
   ] satisfies NinjaMood[]
 ).map((m) => `e-${m}`)
 
@@ -622,7 +631,9 @@ export interface NinjaCue {
 
 /**
  * Where he is on the lesson card. He sits in the screen's `[data-ninja-slot]` when it has one
- * (the intro, the wrap-up) and in the card's bottom start corner otherwise, and leaps between the two.
+ * (the intro, the wrap-up, a scenario's brief) and in the card's bottom start corner otherwise, and
+ * leaps between the two. To and from a brief (`data-ninja-slot="brief"`) it's a quick hop, since
+ * the question is waiting.
  */
 export function NinjaStage({
   area,
@@ -634,8 +645,8 @@ export function NinjaStage({
 }: {
   /** The lesson card: he's positioned inside it and follows the pointer over it. */
   area: React.RefObject<HTMLDivElement | null>
-  /** Changes whenever the screen does, so he looks for his slot again. */
-  screen: number
+  /** Changes whenever the screen does (or a scenario's brief ends), so he looks for his slot again. */
+  screen: number | string
   /** The last answer worth a reaction. */
   cue: NinjaCue | null
   /** Set on the wrap-up: his send-off once he's landed, with more for a perfect run. */
@@ -654,9 +665,12 @@ export function NinjaStage({
     left: number
     top: number
     size: number
+    kind: string
   } | null>(null)
-  const lastScreen = React.useRef<number | null>(null)
+  const lastScreen = React.useRef<number | string | null>(null)
   const leaping = React.useRef<Promise<void> | null>(null)
+  // The kind of slot he's in ("" for a plain slot), or null in the corner.
+  const slotKind = React.useRef<string | null>(null)
 
   // The card is the stage's parent. (The `area` ref isn't attached yet when this first runs.)
   const measure = React.useCallback(() => {
@@ -666,7 +680,12 @@ export function NinjaStage({
     if (!el) return null
     const c = card.getBoundingClientRect()
     const r = el.getBoundingClientRect()
-    return { left: r.left - c.left, top: r.top - c.top, size: r.width }
+    return {
+      left: r.left - c.left,
+      top: r.top - c.top,
+      size: r.width,
+      kind: el.dataset.ninjaSlot ?? "",
+    }
   }, [area])
 
   // On each new screen: find the slot, then leap from wherever he was to wherever he goes.
@@ -678,6 +697,8 @@ export function NinjaStage({
     const next = measure()
     setSlot(next)
     setPlaced(true)
+    const brisk = slotKind.current === "brief" || next?.kind === "brief"
+    slotKind.current = next ? next.kind : null
     const firstTime = lastScreen.current === null
     lastScreen.current = screen
     if (firstTime) {
@@ -715,7 +736,7 @@ export function NinjaStage({
         landed()
         return
       }
-      void leap(el, mark, life, first, last, level).then(landed)
+      void leap(el, mark, life, first, last, level, brisk).then(landed)
     })
     return () => {
       cancelAnimationFrame(frame)
@@ -835,17 +856,23 @@ export function enter(
   }
 }
 
-/** Squat, launch, arc over, land with a squash and a small bounce. About 1.4s. The sensei's arc is lower and he lands eyes closed. */
+/**
+ * Squat, launch, arc over, land with a squash and a small bounce. About 1.4s. The sensei's arc is
+ * lower and he lands eyes closed. `brisk` is the hop to and from a scenario's brief: a low arc, a
+ * soft landing, and no grin after, about 0.9s.
+ */
 async function leap(
   el: HTMLElement,
   mark: SVGSVGElement,
   life: NinjaLife,
   first: DOMRect,
   last: DOMRect,
-  level: NinjaEnergy = "default"
+  level: NinjaEnergy = "default",
+  brisk = false
 ) {
   life.hold(true)
-  const { arc, grin } = LEAP[level]
+  const arc = LEAP[level].arc * (brisk ? 0.35 : 1)
+  const grin = LEAP[level].grin && !brisk
   const dx = first.left - last.left
   const dy = first.top - last.top
   const s0 = first.width / last.width
@@ -892,10 +919,14 @@ async function leap(
       offset: p,
     })
   }
-  const t = setTimeout(() => setMood(mark, grin ? "happy" : "closed"), 100)
-  await el.animate(frames, { duration: 800, easing: "linear" }).finished
+  const t = setTimeout(
+    () => setMood(mark, grin ? "happy" : brisk ? "idle" : "closed"),
+    100
+  )
+  await el.animate(frames, { duration: brisk ? 560 : 800, easing: "linear" })
+    .finished
   clearTimeout(t)
-  setMood(mark, "closed")
+  if (!brisk) setMood(mark, "closed")
   // The landing: a squash and a bounce, or for the sensei a soft settle with no bounce.
   await el.animate(
     grin
@@ -912,7 +943,7 @@ async function leap(
           { transform: "scale(1.08, .92)", offset: 0.3 },
           { transform: "scale(1)" },
         ],
-    { duration: 620, easing: "cubic-bezier(.3,1.2,.4,1)" }
+    { duration: brisk ? 340 : 620, easing: "cubic-bezier(.3,1.2,.4,1)" }
   ).finished
   if (grin) {
     setMood(mark, "wide")
@@ -920,7 +951,7 @@ async function leap(
     await sleep(340)
     setMood(mark, "happy")
     await sleep(650)
-  } else {
+  } else if (!brisk) {
     await sleep(500)
   }
   setMood(mark, "idle")
