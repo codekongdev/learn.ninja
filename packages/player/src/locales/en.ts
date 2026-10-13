@@ -68,6 +68,7 @@ export const en: Strings = {
   next: "Suggested next lesson",
   restart: "Restart lesson",
   progress: "Lesson progress",
+  progressLabel: "Progress",
   restartTitle: "Restart this lesson?",
   restartBody:
     "You'll start again from the beginning. Your answers so far won't be kept.",

@@ -58,6 +58,7 @@ export const ja: Strings = {
   next: "おすすめの次のレッスン",
   restart: "レッスンをやり直す",
   progress: "レッスンの進捗",
+  progressLabel: "進捗",
   restartTitle: "このレッスンをやり直しますか？",
   restartBody: "最初からやり直します。これまでの回答は保存されません。",
   stay: "続ける",

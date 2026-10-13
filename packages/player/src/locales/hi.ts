@@ -71,6 +71,7 @@ export const hi: Strings = {
   next: "सुझाया गया अगला पाठ",
   restart: "पाठ फिर से शुरू करें",
   progress: "पाठ की प्रगति",
+  progressLabel: "प्रगति",
   restartTitle: "यह पाठ फिर से शुरू करें?",
   restartBody: "आप शुरुआत से शुरू करेंगे। अब तक के आपके उत्तर नहीं रखे जाएँगे।",
   stay: "सीखते रहें",

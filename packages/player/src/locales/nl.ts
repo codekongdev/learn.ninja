@@ -76,6 +76,7 @@ export const nl: Strings = {
   next: "Voorgestelde volgende les",
   restart: "Les opnieuw starten",
   progress: "Voortgang van de les",
+  progressLabel: "Voortgang",
   restartTitle: "Deze les opnieuw starten?",
   restartBody:
     "Je begint weer van voren af aan. Je antwoorden tot nu toe worden niet bewaard.",

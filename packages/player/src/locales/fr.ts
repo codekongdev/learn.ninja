@@ -78,6 +78,7 @@ export const fr: Strings = {
   next: "Leçon suivante suggérée",
   restart: "Recommencer la leçon",
   progress: "Progression de la leçon",
+  progressLabel: "Progression",
   restartTitle: "Recommencer cette leçon ?",
   restartBody:
     "Tu repartiras du début. Tes réponses jusqu'ici ne seront pas conservées.",

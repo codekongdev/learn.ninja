@@ -77,6 +77,7 @@ export const de: Strings = {
   next: "Vorgeschlagene nächste Lektion",
   restart: "Lektion neu starten",
   progress: "Fortschritt der Lektion",
+  progressLabel: "Fortschritt",
   restartTitle: "Diese Lektion neu starten?",
   restartBody:
     "Du beginnst von vorn. Deine bisherigen Antworten werden nicht gespeichert.",

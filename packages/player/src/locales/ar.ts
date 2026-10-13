@@ -57,6 +57,7 @@ export const ar: Strings = {
   next: "الدرس التالي المقترح",
   restart: "أعد الدرس",
   progress: "تقدم الدرس",
+  progressLabel: "التقدم",
   restartTitle: "هل تريد إعادة هذا الدرس؟",
   restartBody: "ستبدأ من جديد، ولن تُحفظ إجاباتك حتى الآن.",
   stay: "تابع التعلم",

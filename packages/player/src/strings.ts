@@ -64,6 +64,8 @@ export type Strings = {
   next: string
   restart: string
   progress: string
+  /** Short label before the counter in the progress bar tooltip. */
+  progressLabel: string
   restartTitle: string
   restartBody: string
   stay: string

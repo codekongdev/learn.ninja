@@ -64,6 +64,7 @@ export const id: Strings = {
   next: "Saran pelajaran berikutnya",
   restart: "Ulangi pelajaran",
   progress: "Kemajuan pelajaran",
+  progressLabel: "Kemajuan",
   restartTitle: "Ulangi pelajaran ini?",
   restartBody:
     "Kamu akan mulai dari awal. Jawabanmu sejauh ini tidak akan disimpan.",

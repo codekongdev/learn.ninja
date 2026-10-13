@@ -401,7 +401,9 @@ function LessonProgress({
           />
         </Button>
         <Tooltip placement="bottom" className="tabular-nums">
-          {count.fixing && counter ? <span>{t.fixing}</span> : null}
+          {counter ? (
+            <span>{count.fixing ? t.fixing : t.progressLabel}</span>
+          ) : null}
           {counter ? <span>{counter}</span> : null}
           {counter ? <span aria-hidden="true">·</span> : null}
           <Elapsed startedAt={startedAt} endedAt={endedAt} />
