@@ -71,7 +71,6 @@ export const zh: Strings = {
   theory: "理论",
   theoryEmpty: "学到的概念会显示在这里。",
   closeTheory: "关闭理论",
-  closeCard: "关闭卡片",
   by: "作者：",
   textSize: "文字大小",
   defaultOption: "（默认）",

@@ -95,7 +95,6 @@ export const he: Strings = {
   theory: "תאוריה",
   theoryEmpty: "מושגים יופיעו כאן תוך כדי הלמידה.",
   closeTheory: "סגירת התאוריה",
-  closeCard: "סגירת הכרטיס",
   by: "מאת",
   textSize: "גודל הטקסט",
   defaultOption: "(ברירת מחדל)",

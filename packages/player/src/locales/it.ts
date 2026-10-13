@@ -93,7 +93,6 @@ export const it: Strings = {
   theory: "Teoria",
   theoryEmpty: "I concetti compaiono qui man mano che li impari.",
   closeTheory: "Chiudi la teoria",
-  closeCard: "Chiudi scheda",
   by: "di",
   textSize: "Dimensione del testo",
   defaultOption: "(predefinito)",

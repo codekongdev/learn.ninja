@@ -98,7 +98,6 @@ export const ru: Strings = {
   theory: "Теория",
   theoryEmpty: "Понятия появляются здесь по мере изучения.",
   closeTheory: "Закрыть теорию",
-  closeCard: "Закрыть карточку",
   by: "от",
   textSize: "Размер текста",
   defaultOption: "(по умолчанию)",

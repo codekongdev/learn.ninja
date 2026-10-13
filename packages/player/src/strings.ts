@@ -80,8 +80,6 @@ export type Strings = {
   theory: string
   theoryEmpty: string
   closeTheory: string
-  /** The theory card's close button. */
-  closeCard: string
   by: string
   textSize: string
   /** Marks the option a setting starts on, after its name in the menu. */

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { LightbulbIcon, PanelRightIcon, XIcon } from "lucide-react"
+import { LightbulbIcon, PanelRightIcon } from "lucide-react"
 
 import type {
   ConceptBrick as ConceptBrickData,
@@ -32,7 +32,6 @@ import { PlayerProvider, usePlayer } from "./context"
 import {
   hasOptionCards,
   BlankBrick,
-  CONCEPT_CARD,
   ConceptBrick,
   HotspotBrick,
   MatchBrick,
@@ -44,7 +43,6 @@ import {
 } from "./bricks"
 import {
   buildSequence,
-  conceptsFor,
   outcomeFor,
   progressAt,
   questionAt,
@@ -624,33 +622,16 @@ function Player({
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [keyScope])
-  // The theory card: the idea behind the question on screen, the same whatever the learner picked.
-  // Why? (or W) opens and closes it, and each new screen starts with it put away.
-  const cardConcepts = React.useMemo(
-    () => conceptsFor(state.items, state.index),
-    [state.items, state.index]
-  )
-  const [cardOpen, setCardOpen] = React.useState(false)
-  React.useEffect(() => setCardOpen(false), [state.index])
-  const asked = state.question
-  // Once the question is done (right, revealed, or the warm-up's one guess), the card adds a line on
-  // why this answer is right. Not after a miss with a try left: the theory should do that work.
-  const done =
+  // All feedback is in the ninja's speech bubble. After a right answer, Why? (or W) adds the
+  // explanation to it; each new screen starts with it closed.
+  const [whyOpen, setWhyOpen] = React.useState(false)
+  React.useEffect(() => setWhyOpen(false), [state.index])
+  const canWhy =
     item.kind === "question" &&
-    asked !== null &&
-    (asked.phase === "revealed" ||
-      (asked.phase === "feedback" && asked.result?.correct === true) ||
-      (item.role === "hook" && asked.phase !== "answering"))
-  const cardExplanation =
-    item.kind === "question" && done ? item.brick.explanation : null
-  const cardHasContent = cardConcepts.length > 0 || Boolean(cardExplanation)
-  const cardShown = cardOpen && cardHasContent
-  toggleWhy.current =
-    item.kind === "question" && cardHasContent
-      ? () => setCardOpen((open) => !open)
-      : null
-  const cardId = React.useId()
-  const whyRef = React.useRef<HTMLButtonElement>(null)
+    item.role !== "hook" &&
+    state.question?.phase === "feedback" &&
+    state.question.result?.correct === true
+  toggleWhy.current = canWhy ? () => setWhyOpen((open) => !open) : null
   // "Got it" sends the concept card back out the way it came before the next screen arrives.
   const [leaving, setLeaving] = React.useState(false)
   const leavingRef = React.useRef(false)
@@ -780,7 +761,7 @@ function Player({
                       state={state}
                       dispatch={dispatch}
                       label={screenLabel(state, t)}
-                      explanationOnCard
+                      inBubble
                       ninja={ninja !== "off"}
                       wrapLine={ninja === "off" || landed ? wrapLine : null}
                     />
@@ -796,35 +777,18 @@ function Player({
                     level={ninja}
                     pickLine={pickLine}
                     onConceptDone={leaveConcept}
-                    feedbackOnCard
+                    inBubble
                     why={
-                      item.kind === "question" && cardHasContent
+                      canWhy
                         ? {
-                            open: cardShown,
-                            onToggle: () => setCardOpen((open) => !open),
-                            controls: cardId,
-                            ref: whyRef,
+                            open: whyOpen,
+                            onToggle: () => setWhyOpen((open) => !open),
                           }
                         : null
                     }
                   />
                 </div>
               </main>
-              {item.kind === "question" && cardHasContent ? (
-                <TheoryCard
-                  key={state.index}
-                  id={cardId}
-                  concepts={cardConcepts}
-                  explanation={cardExplanation}
-                  open={cardShown}
-                  onClose={() => {
-                    setCardOpen(false)
-                    whyRef.current?.focus()
-                  }}
-                  textSize={textSize}
-                  t={t}
-                />
-              ) : null}
               {ninja !== "off" ? (
                 <NinjaStage
                   area={cardRef}
@@ -920,86 +884,6 @@ function Player({
 }
 
 /**
- * The theory behind the question on screen: its concept in a few lines, and once the question is
- * done, one line on why this answer is right. It layers over the lesson's bottom corner, so nothing
- * on the page moves (on a phone it covers the question until closed).
- */
-function TheoryCard({
-  id,
-  concepts,
-  explanation,
-  open,
-  onClose,
-  textSize,
-  t,
-}: {
-  id: string
-  concepts: ConceptBrickData[]
-  explanation: string | null
-  open: boolean
-  onClose: () => void
-  textSize: TextSize
-  t: Strings
-}) {
-  return (
-    // Its own clipping layer: parked off the edge, the card mustn't widen the window into something
-    // the browser can scroll sideways when focus moves.
-    <div className="pointer-events-none absolute inset-0 z-20 overflow-clip">
-      <aside
-        id={id}
-        aria-label={concepts[0]?.title ?? t.why}
-        inert={!open}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") onClose()
-        }}
-        className={cn(
-          CONCEPT_CARD,
-          "absolute end-4 bottom-4 max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] gap-0 overflow-hidden shadow-md transition-[translate,opacity] duration-300 ease-out motion-reduce:transition-none sm:w-80",
-          open
-            ? "pointer-events-auto translate-x-0 opacity-100"
-            : "opacity-0 ltr:translate-x-[calc(100%+1rem)] rtl:-translate-x-[calc(100%+1rem)]"
-        )}
-      >
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label={t.closeCard}
-          onPress={onClose}
-          className="absolute end-3 top-3 z-10"
-        >
-          <XIcon />
-        </Button>
-        <div
-          data-text-size={textSize}
-          className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5"
-        >
-          {concepts.map((c) => (
-            <section key={c.id} className="flex flex-col gap-3">
-              <ConceptBrick brick={c} compact />
-            </section>
-          ))}
-          {explanation ? (
-            <div
-              className={cn(
-                "flex flex-col gap-1 text-sm leading-relaxed",
-                concepts.length ? "border-t pt-4" : "pe-8"
-              )}
-            >
-              {explanation
-                .split("\n")
-                .filter((line) => line.trim())
-                .map((line, i) => (
-                  <RichText key={i} text={line} className="block" />
-                ))}
-            </div>
-          ) : null}
-        </div>
-      </aside>
-    </div>
-  )
-}
-
-/**
  * Where the ninja stands on the intro and the wrap-up. With him off it folds shut (and swallows the
  * column's gap, passed as a negative margin class), so the rest of the screen stays centered.
  */
@@ -1076,7 +960,7 @@ export function Screen({
   ninja = true,
   wrapLine,
   label,
-  explanationOnCard = false,
+  inBubble = false,
 }: {
   lesson: Lesson
   item: Item
@@ -1084,8 +968,8 @@ export function Screen({
   dispatch: React.Dispatch<Action>
   /** A quiet line above the screen saying what kind it is: "Concept 2 of 3", "Practice"... */
   label?: string
-  /** The player shows the explanation on the card beside the question; a lone demo shows it in place. */
-  explanationOnCard?: boolean
+  /** The player says hints and explanations in the ninja's bubble; a lone demo shows them in place. */
+  inBubble?: boolean
   /** Whether the ninja is on. Off, his slot folds away so the screen stays centered. */
   ninja?: boolean
   /** The wrap-up's line for a perfect run, once he's there to say it. */
@@ -1150,7 +1034,7 @@ export function Screen({
           state={state.question!}
           dispatch={dispatch}
           label={label}
-          explanationOnCard={explanationOnCard}
+          inBubble={inBubble}
         />
       )
   }
@@ -1188,13 +1072,13 @@ function QuestionScreen({
   state,
   dispatch,
   label,
-  explanationOnCard = false,
+  inBubble = false,
 }: {
   item: Extract<Item, { kind: "question" }>
   state: QuestionState
   dispatch: React.Dispatch<Action>
   label?: string
-  explanationOnCard?: boolean
+  inBubble?: boolean
 }) {
   const { t } = usePlayer()
   const { brick, role } = item
@@ -1214,9 +1098,7 @@ function QuestionScreen({
         ? { ...solutionMarks(brick), ...state.result?.marks }
         : solutionMarks(brick)
   const explanation =
-    !explanationOnCard && explanationShown(state, role)
-      ? brick.explanation
-      : null
+    !inBubble && explanationShown(state, role) ? brick.explanation : null
   const props = {
     brick,
     answer: state.answer,
@@ -1242,7 +1124,9 @@ function QuestionScreen({
         <RichText text={brick.prompt} />
       </h2>
       {helper && !brick.prompt.includes(helper) ? (
-        <p className="-mt-4 font-mono text-xs text-muted-foreground">{helper}</p>
+        <p className="-mt-4 font-mono text-xs text-muted-foreground">
+          {helper}
+        </p>
       ) : null}
       {brick.type === "scenario" ? (
         <div className="rounded-e-lg border-s-2 border-primary bg-muted px-4 py-3 text-base">
@@ -1275,7 +1159,10 @@ function QuestionScreen({
       {explanation && !explanationAnchor(brick, marks) ? (
         <Explanation text={explanation} />
       ) : null}
-      {state.hintOpen && brick.hint && state.phase !== "revealed" ? (
+      {!inBubble &&
+      state.hintOpen &&
+      brick.hint &&
+      state.phase !== "revealed" ? (
         <Alert>
           <LightbulbIcon aria-hidden="true" />
           <AlertDescription className="text-base text-foreground">
@@ -1404,7 +1291,7 @@ export function ActionArea({
   level = "default",
   pickLine: picker,
   onConceptDone,
-  feedbackOnCard = false,
+  inBubble = false,
   why,
 }: {
   lesson: Lesson
@@ -1422,15 +1309,13 @@ export function ActionArea({
   pickLine?: LinePicker
   /** "Got it" on a concept: the player animates the card away before moving on. */
   onConceptDone?: () => void
-  /** The player's theory card does the teaching, so the toast says only right or not quite. */
-  feedbackOnCard?: boolean
-  /** The player's Why? button, which opens and closes the theory card. Without it, Why? opens the explanation in place. */
-  why?: {
-    open: boolean
-    onToggle: () => void
-    controls: string
-    ref: React.Ref<HTMLButtonElement>
-  } | null
+  /**
+   * The player's mode: every piece of feedback (the verdict, a miss's hint, the explanation) is said in
+   * the ninja's speech bubble. A lone demo keeps the explanation and hint in place.
+   */
+  inBubble?: boolean
+  /** After a right answer, the player's Why?, which adds the explanation to the bubble. */
+  why?: { open: boolean; onToggle: () => void } | null
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const ownPicker = React.useMemo(
@@ -1503,28 +1388,37 @@ export function ActionArea({
         onPress: () => dispatch({ type: "check" }),
         isDisabled: !isReady(brick, s.answer),
       }
+      // The retry after a miss keeps its hint in the bubble.
+      if (inBubble && s.hintOpen && brick.hint) message = brick.hint
     } else if (role === "hook" && r) {
       // The hook is a guess, so a miss still moves on, but both get the colors a checked answer would.
       // A wrong guess also says what it got wrong: the misconception is what the lesson starts from.
       tone = r.correct ? "good" : "warn"
       title = say(r.correct ? "goodGuess" : "hookMiss")
-      message = r.correct || feedbackOnCard ? null : missText(r)
-      explanation = brick.explanation
+      // In the player the concept after the warm-up does the explaining, so the bubble says only how it went.
+      message = r.correct || inBubble ? null : missText(r)
+      if (!inBubble) explanation = brick.explanation
       primary = { ...primary, variant: r.correct ? "success" : "warning" }
     } else if (s.phase === "feedback" && r?.correct) {
       tone = "good"
       title = say(earnedMoment(state, item) ?? "praise")
       explanation = brick.explanation
+      if (inBubble && why?.open) message = brick.explanation
       primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r) {
       // A miss gets one short line: the option's own feedback, or a nudge to look again.
       tone = "warn"
+      // In the player: the verdict and one line of help, the hint (or the pick's own feedback).
       title = r.partial
         ? say("close")
-        : feedbackOnCard
+        : inBubble
           ? say("nudge")
           : (missText(r) ?? say("nudge"))
-      message = r.partial && !feedbackOnCard ? missText(r) : null
+      message = inBubble
+        ? (brick.hint ?? missText(r))
+        : r.partial
+          ? missText(r)
+          : null
       primary = {
         label: t.tryAgain,
         onPress: () => dispatch({ type: "retry" }),
@@ -1534,33 +1428,29 @@ export function ActionArea({
       // The answer and why it's right open in the brick, so the toast only points there.
       title = say("answer")
       explanation = brick.explanation
+      if (inBubble) message = brick.explanation
     }
-    if (explanation && !explanationShown(s, role))
+    if (!inBubble && explanation && !explanationShown(s, role))
       // The button goes once pressed, so focus moves on to Continue.
       secondary = helpButton(t.why, () => {
         dispatch({ type: "why" })
         primaryRef.current?.focus()
       })
   }
-  // After a miss, Why? is the way forward, so it takes the color and the main action steps back.
-  const whyLeads = Boolean(why) && tone === "warn"
-  if (whyLeads) primary = { ...primary, variant: "outline" }
   if (why)
     secondary = (
       <Button
-        ref={why.ref}
-        variant={whyLeads ? "warning" : "outline"}
+        variant="outline"
         size={tray ? "lg" : "sm"}
         aria-expanded={why.open}
-        aria-controls={why.controls}
         className={cn(
           tray && TRAY_BUTTON,
           // Open: a shade off the grey tray, as the tray's ghost buttons are when open.
-          !whyLeads && "aria-expanded:bg-input dark:aria-expanded:bg-input/50"
+          "aria-expanded:bg-input dark:aria-expanded:bg-input/50"
         )}
         onPress={() => {
           why.onToggle()
-          // Enter stays the main action (Check, Continue), not a second press of Why?.
+          // Enter stays the main action (Continue), not a second press of Why?.
           primaryRef.current?.focus()
         }}
       >
@@ -1608,6 +1498,24 @@ export function ActionArea({
     hadFeedback.current = has
   }, [title])
 
+  // How much taller the bubble stands than the room the screen leaves for it (pb-40, 160px).
+  const [bubbleEl, setBubbleEl] = React.useState<HTMLDivElement | null>(null)
+  const [extraRoom, setExtraRoom] = React.useState(0)
+  React.useEffect(() => {
+    if (!bubbleEl || !tray) {
+      setExtraRoom(0)
+      return
+    }
+    const measure = () => {
+      const bottom = parseFloat(getComputedStyle(bubbleEl).bottom) || 0
+      setExtraRoom(Math.max(0, bubbleEl.offsetHeight + bottom + 16 - 160))
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(bubbleEl)
+    return () => observer.disconnect()
+  }, [bubbleEl, tray])
+
   const buttons = (
     <>
       <Button
@@ -1634,35 +1542,55 @@ export function ActionArea({
         <div className="flex flex-wrap items-center gap-2">{buttons}</div>
       )}
       <p aria-live="polite" className="sr-only">
-        {title
-          ? [title, message, explanationOpen ? explanation : null]
+        {title || message
+          ? [title, message, !inBubble && explanationOpen ? explanation : null]
               .filter((x): x is string => Boolean(x))
               .map(plainText)
               .join(" ")
           : ""}
       </p>
-      {title ? (
+      {/* Room under the lesson for a tall bubble, so it never covers an answer. */}
+      {extraRoom > 0 ? (
         <div
+          aria-hidden="true"
+          className="shrink-0"
+          style={{ height: Math.max(0, extraRoom - 32) }}
+        />
+      ) : null}
+      {title || message ? (
+        <div
+          ref={setBubbleEl}
           key={`${state.index}-${state.question?.attempts ?? 0}-${tone}`}
           aria-hidden="true"
           data-text-size={textSize}
           className={cn(
             TOAST,
-            "absolute end-4 bottom-4 z-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:bottom-6 sm:w-fit sm:max-w-80",
-            // In the player the ninja sits in the corner, so the toast starts beside him as a speech bubble:
-            // the corner nearest him is squared off.
+            "absolute end-4 z-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:w-fit sm:max-w-96",
+            // In the player the bubble sits above the ninja, behind him, so he jumps in front of it; the
+            // corner over his head is squared off. Without him it takes his corner.
             tray && ninja
-              ? "start-18 rounded-es-sm sm:start-20"
-              : "start-4 sm:start-6",
+              ? "start-4 bottom-17 rounded-es-sm sm:start-6 sm:bottom-19"
+              : "start-4 bottom-4 sm:start-6 sm:bottom-6",
             toneClass[tone]
           )}
         >
-          <p className="text-sm font-semibold">
-            <RichText text={title} />
-          </p>
-          {message ? (
-            <RichText text={message} className="mt-1 block text-sm" />
+          {title ? (
+            <p className="text-sm font-semibold">
+              <RichText text={title} />
+            </p>
           ) : null}
+          {message
+            ? message
+                .split("\n")
+                .filter((line) => line.trim())
+                .map((line, i) => (
+                  <RichText
+                    key={i}
+                    text={line}
+                    className={cn("block text-sm", (title || i > 0) && "mt-1")}
+                  />
+                ))
+            : null}
         </div>
       ) : null}
     </>

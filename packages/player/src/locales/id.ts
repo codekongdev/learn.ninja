@@ -79,7 +79,6 @@ export const id: Strings = {
   theory: "Teori",
   theoryEmpty: "Konsep akan muncul di sini saat kamu mempelajarinya.",
   closeTheory: "Tutup teori",
-  closeCard: "Tutup kartu",
   by: "oleh",
   textSize: "Ukuran teks",
   defaultOption: "(bawaan)",

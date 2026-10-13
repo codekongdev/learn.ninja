@@ -97,28 +97,3 @@ export function questionAt(
     fixing: inFix,
   }
 }
-
-/**
- * The concepts a question's card shows: the one taught just before it. The challenge draws on the
- * whole lesson, so it gets every concept; the warm-up comes before any, so it gets none. A retry in
- * the fix round shows what its first try did.
- */
-export function conceptsFor(items: Item[], index: number): ConceptBrick[] {
-  const item = items[index]
-  if (item?.kind !== "question" || item.role === "hook") return []
-  const concepts = (until: number) =>
-    items
-      .slice(0, until)
-      .flatMap((i) => (i.kind === "concept" ? [i.brick] : []))
-  if (item.role === "challenge") return concepts(index)
-  if (item.role === "fix") {
-    const first = items.findIndex(
-      (i) =>
-        i.kind === "question" &&
-        i.role !== "fix" &&
-        i.brick.id === item.brick.id
-    )
-    return first === -1 ? [] : conceptsFor(items, first)
-  }
-  return concepts(index).slice(-1)
-}

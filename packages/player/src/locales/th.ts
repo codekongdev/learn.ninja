@@ -75,7 +75,6 @@ export const th: Strings = {
   theory: "ทฤษฎี",
   theoryEmpty: "แนวคิดจะปรากฏที่นี่เมื่อคุณเรียนไปเรื่อยๆ",
   closeTheory: "ปิดทฤษฎี",
-  closeCard: "ปิดการ์ด",
   by: "โดย",
   textSize: "ขนาดตัวอักษร",
   defaultOption: "(ค่าเริ่มต้น)",

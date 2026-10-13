@@ -83,7 +83,6 @@ export const tr: Strings = {
   theory: "Teori",
   theoryEmpty: "Kavramlar öğrendikçe burada görünür.",
   closeTheory: "Teoriyi kapat",
-  closeCard: "Kartı kapat",
   by: "hazırlayan:",
   textSize: "Metin boyutu",
   defaultOption: "(varsayılan)",

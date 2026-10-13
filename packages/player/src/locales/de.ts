@@ -92,7 +92,6 @@ export const de: Strings = {
   theory: "Theorie",
   theoryEmpty: "Konzepte erscheinen hier, sobald du sie gelernt hast.",
   closeTheory: "Theorie schließen",
-  closeCard: "Karte schließen",
   by: "von",
   textSize: "Textgröße",
   defaultOption: "(Standard)",

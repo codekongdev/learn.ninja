@@ -83,7 +83,6 @@ export const en: Strings = {
   theory: "Theory",
   theoryEmpty: "Concepts show up here as you learn them.",
   closeTheory: "Close theory",
-  closeCard: "Close card",
   by: "by",
   textSize: "Text size",
   defaultOption: "(default)",

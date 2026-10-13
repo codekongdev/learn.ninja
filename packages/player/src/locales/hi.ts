@@ -85,7 +85,6 @@ export const hi: Strings = {
   theory: "सिद्धांत",
   theoryEmpty: "जैसे-जैसे आप सीखेंगे, अवधारणाएँ यहाँ दिखेंगी।",
   closeTheory: "सिद्धांत बंद करें",
-  closeCard: "कार्ड बंद करें",
   by: "द्वारा",
   textSize: "टेक्स्ट का आकार",
   defaultOption: "(डिफ़ॉल्ट)",

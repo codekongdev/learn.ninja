@@ -71,7 +71,6 @@ export const ar: Strings = {
   theory: "النظرية",
   theoryEmpty: "ستظهر المفاهيم هنا أثناء تعلّمك.",
   closeTheory: "إغلاق النظرية",
-  closeCard: "إغلاق البطاقة",
   by: "بواسطة",
   textSize: "حجم النص",
   defaultOption: "(افتراضي)",

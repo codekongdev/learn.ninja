@@ -62,42 +62,18 @@ function KeyHint({ i, mark }: { i: number; mark?: Mark }) {
 // ---------- concept ----------
 
 /** Theory: one idea with an optional visual and a key term. Nothing to answer. */
-/** A concept's content. `compact` is the smaller version on the card beside a question. */
-export function ConceptBrick({
-  brick,
-  compact = false,
-}: {
-  brick: ConceptBrickData
-  compact?: boolean
-}) {
+export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
   return (
     <>
-      <div className={cn("flex flex-col", compact ? "gap-2" : "gap-3")}>
-        <h2
-          className={cn(
-            "font-semibold text-balance",
-            compact ? "pe-8 text-base" : "text-lg"
-          )}
-        >
-          {brick.title}
-        </h2>
-        <p
-          className={cn(
-            "leading-relaxed text-pretty",
-            compact ? "text-sm text-muted-foreground" : "text-base"
-          )}
-        >
+      <div className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-balance">{brick.title}</h2>
+        <p className="text-base leading-relaxed text-pretty">
           <RichText text={brick.body} />
         </p>
       </div>
       {brick.visual ? <Visual visual={brick.visual} /> : null}
       {brick.term ? (
-        <dl
-          className={cn(
-            "flex flex-col gap-1 border-s-2 border-primary ps-4",
-            "text-sm"
-          )}
-        >
+        <dl className="flex flex-col gap-1 border-s-2 border-primary ps-4 text-sm">
           <dt className="font-semibold">{brick.term.word}</dt>
           <dd className="text-muted-foreground">
             <RichText text={brick.term.definition} />
@@ -107,10 +83,6 @@ export function ConceptBrick({
     </>
   )
 }
-
-/** The card a concept sits on, on its own screen and beside a question. */
-export const CONCEPT_CARD =
-  "flex flex-col gap-6 rounded-xl bg-card shadow-xs ring-1 ring-foreground/10"
 
 // ---------- choice, compare, scenario ----------
 

@@ -71,7 +71,6 @@ export const ko: Strings = {
   theory: "이론",
   theoryEmpty: "배운 개념이 여기에 표시돼요.",
   closeTheory: "이론 닫기",
-  closeCard: "카드 닫기",
   by: "제작:",
   textSize: "글자 크기",
   defaultOption: "(기본)",
