@@ -593,15 +593,24 @@ function Player({
     return () => observer.disconnect()
   }, [trayEl])
   const shownHeight = dragHeight ?? (trayOpen ? trayHeight : 0)
-  // "?" shows the keyboard shortcuts, as it does on most of the web. D opens and closes the tray,
-  // matched by key position so it works on any keyboard layout; touch screens have no notch to toggle.
+  // "?" shows the keyboard shortcuts, as it does on most of the web. D opens and closes the tray and
+  // W the theory card (Why?), matched by key position so they work on any keyboard layout; touch
+  // screens have no notch to toggle.
   const keys = React.useRef({ onShortcuts, onTrayToggle, coarse })
   keys.current = { onShortcuts, onTrayToggle, coarse }
+  const toggleWhy = React.useRef<(() => void) | null>(null)
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const help = e.key === "?"
       const tray = e.code === "KeyD" && !e.shiftKey && !keys.current.coarse
-      if (!(help || tray) || e.repeat || e.metaKey || e.ctrlKey || e.altKey)
+      const why = e.code === "KeyW" && !e.shiftKey && toggleWhy.current
+      if (
+        !(help || tray || why) ||
+        e.repeat ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey
+      )
         return
       const target = e.target as HTMLElement | null
       if (keyScope && !keyScope.current?.contains(target)) return
@@ -609,13 +618,14 @@ function Player({
         return
       e.preventDefault()
       if (help) keys.current.onShortcuts()
-      else keys.current.onTrayToggle()
+      else if (tray) keys.current.onTrayToggle()
+      else toggleWhy.current?.()
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [keyScope])
   // The theory card: the idea behind the question on screen, the same whatever the learner picked.
-  // Why? opens and closes it, a miss opens it by itself, and each new screen starts with it put away.
+  // Why? (or W) opens and closes it, and each new screen starts with it put away.
   const cardConcepts = React.useMemo(
     () => conceptsFor(state.items, state.index),
     [state.items, state.index]
@@ -623,13 +633,6 @@ function Player({
   const [cardOpen, setCardOpen] = React.useState(false)
   React.useEffect(() => setCardOpen(false), [state.index])
   const asked = state.question
-  const missedNow =
-    asked !== null &&
-    (asked.phase === "revealed" ||
-      (asked.phase === "feedback" && asked.result?.correct === false))
-  React.useEffect(() => {
-    if (missedNow) setCardOpen(true)
-  }, [missedNow, asked?.attempts])
   // Once the question is done (right, revealed, or the warm-up's one guess), the card adds a line on
   // why this answer is right. Not after a miss with a try left: the theory should do that work.
   const done =
@@ -642,6 +645,10 @@ function Player({
     item.kind === "question" && done ? item.brick.explanation : null
   const cardHasContent = cardConcepts.length > 0 || Boolean(cardExplanation)
   const cardShown = cardOpen && cardHasContent
+  toggleWhy.current =
+    item.kind === "question" && cardHasContent
+      ? () => setCardOpen((open) => !open)
+      : null
   const cardId = React.useId()
   const whyRef = React.useRef<HTMLButtonElement>(null)
   // "Got it" sends the concept card back out the way it came before the next screen arrives.
@@ -1446,7 +1453,7 @@ export function ActionArea({
     label: string
     onPress: () => void
     isDisabled?: boolean
-    variant?: "default" | "warning" | "success"
+    variant?: "default" | "warning" | "success" | "outline"
   } = {
     label: t.continue,
     onPress: () => dispatch({ type: "next" }),
@@ -1543,18 +1550,21 @@ export function ActionArea({
         primaryRef.current?.focus()
       })
   }
+  // After a miss, Why? is the way forward, so it takes the color and the main action steps back.
+  const whyLeads = Boolean(why) && tone === "warn"
+  if (whyLeads) primary = { ...primary, variant: "outline" }
   if (why)
     secondary = (
       <Button
         ref={why.ref}
-        variant="outline"
+        variant={whyLeads ? "warning" : "outline"}
         size={tray ? "lg" : "sm"}
         aria-expanded={why.open}
         aria-controls={why.controls}
         className={cn(
           tray && TRAY_BUTTON,
           // Open: a shade off the grey tray, as the tray's ghost buttons are when open.
-          "aria-expanded:bg-input dark:aria-expanded:bg-input/50"
+          !whyLeads && "aria-expanded:bg-input dark:aria-expanded:bg-input/50"
         )}
         onPress={() => {
           why.onToggle()

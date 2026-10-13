@@ -661,6 +661,7 @@ function ShortcutsDialog({
     [["1", "9"], t.shortcutPick],
     [["Enter", "Tab"], t.shortcutDrag, true],
     [["D"], t.shortcutTray],
+    [["W"], t.why],
     [["?"], t.shortcutHelp],
   ]
   return (
