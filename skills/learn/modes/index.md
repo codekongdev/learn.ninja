@@ -6,7 +6,7 @@ A lesson's mode sets the mix: how much of it teaches and how much it asks. The l
 
 Go down this list and stop at the first signal you find:
 
-1. **The user's words.** "Just explain", "help me understand", "walk me through" → `explain`. "Give me practice", "drill me", "let me try" → `practice`. "Quiz me" or "test my knowledge" → `practice` for now.
+1. **The user's words.** "Just explain", "help me understand", "walk me through" → `explain`. "Give me practice", "drill me", "let me try" → `practice`. "Quiz me" or "test my knowledge" → `practice` for now. The table in `reference/planning.md` lists more of the words people use, like "practical", "hands-on", and "check my understanding".
 2. **A child reader** (`reference/planning.md`) → `balanced`. Children keep an idea by using it often, and a lesson that's mostly reading loses them.
 3. **The kind of knowledge.** Understanding how or why something works (a mechanism, a principle, a historical cause, a scientific idea) leans `explain`. Carrying out a method (a calculation, code, a grammar form, applying a design rule to a screen) leans `practice`. Many topics are both, like a design principle you then apply: if so, this step gives no answer; go on to the level.
 4. **The level.** A beginner meeting a new idea learns more from explanation and worked examples; an intermediate or advanced learner with the basics learns more from solving problems. When steps 1–3 give no answer, beginners lean `explain` and the others lean `practice` only for a method.

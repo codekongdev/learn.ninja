@@ -9,7 +9,7 @@ You write one lesson as a JSON file that follows the lesson spec (v0.3), check i
 
 ## Steps
 
-1. **Plan the lesson without asking.** Read what the user gave you, then read `reference/planning.md`. It sets the scope (one lesson, or a path of several), the size, and the reading age. Don't ask the user anything first: decide, and say what you decided at the end. Ask only if the input is too vague to teach at all ("make a lesson").
+1. **Plan the lesson.** Read what the user gave you, then read `reference/planning.md`. It sets the scope (one lesson, or a path of several), the size, and the reading age, and lists the words people use for each choice. Usually decide without asking, and say what you decided at the end. Only when the request is just a bare topic ("how vaccines work") ask first: one short message with up to three questions and your defaults, as `reference/planning.md` describes.
 2. **Read the guides before writing.** Read `reference/teaching-guide.md` (how to teach well, which brick to use when, visuals) and `reference/lesson-format.md` (every field). Then:
    - **Level:** read `levels/index.md`, pick the level from its ranked signals, and read that level's file: it says what to assume, how hard to make the questions, and how much to help.
    - **Mode:** read `modes/index.md`, pick the mode (explain, balanced, or practice), and read that mode's file: it sets how many concept bricks there are and how many question bricks follow each, for the size you chose.

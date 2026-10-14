@@ -1,6 +1,39 @@
 # Planning
 
-Before writing, read the user's input once for four choices: **scope** (one lesson or a path), **size**, **reading age**, and then, from their own guides, **level** (`levels/index.md`) and **mode** (`modes/index.md`). Don't ask the user about any of them. Decide from what they wrote and what they gave you, and tell them your choices after publishing, with an offer to remake.
+Before writing, read the user's input once for four choices: **scope** (one lesson or a path), **size**, **reading age**, and then, from their own guides, **level** (`levels/index.md`) and **mode** (`modes/index.md`). Usually the request says enough: decide from what they wrote and what they gave you, and tell them your choices after publishing, with an offer to remake.
+
+## When to ask first
+
+Ask only when the request is just a topic, with nothing else to go on: no audience, no level or background, no word about what they want (explain, practise, test), no length, and no source material. "How vaccines work", "the Roman Empire", and "teach me budgeting" are just topics; "teach me" and "make a lesson on" only say that a lesson is wanted.
+
+Then, before writing, send one short message with up to three questions, each with the default you'd use, so the user can answer in a few words or just say "go":
+
+> Before I make it:
+> 1. Who's it for: you, a child (what age?), or a group? (I'll assume you.)
+> 2. What for: to understand it, to practise it, or to test yourself? (I'll assume understand.)
+> 3. How long: quick (3–5 min), standard (5–10), or in depth (10–15)? (I'll assume standard.)
+
+- Ask who it's for and what they want, never "what's your level?": people rate their own level poorly, but they know who the lesson is for and what they want from it. If they say what they already know, use it for the level.
+- Ask once. Anything the reply leaves open takes its default. If there's no one to answer, use the defaults without asking.
+- Map the answers with the table below: "for me" is an adult reader, "understand" is `explain`, "practise" and "test myself" are `practice`, the length is the size.
+- One clear signal is enough to go without asking. "Explain how vaccines work" says what they want; "quiz my 8-year-old on vaccines" says who and what. Fill the rest with defaults.
+
+## Words people use
+
+What people say, and what it sets. These are examples, not a closed list: read for the same meaning in other words and other languages.
+
+| They say | It means | Sets |
+| --- | --- | --- |
+| practical, hands-on, practice, exercises, problems to solve, let me try, drill me, train me, worksheet, reps, get better at, apply it | They want to do it | mode `practice` |
+| quiz me, test me, test my knowledge, check my understanding, how well do I know, exam prep, am I ready for | They want to be tested | mode `practice` (an assessment mode is planned) |
+| explain, help me understand, walk me through, break it down, why does, how does … work, the intuition behind, overview, intro to, in plain English | They want to understand it | mode `explain` |
+| quick, quick one, brief, short, in 5 minutes, TL;DR | They want it short | size `short` |
+| deep dive, in depth, thorough, everything about, comprehensive, master | They want depth | size `long`, or a path if it's several ideas |
+| refresher, brush up, remind me, review, revisit, I already know, I've used | They've met it before | level at least `intermediate`; often size `short` |
+| basics, from scratch, 101, for beginners, I've never, in simple terms, ELI5, for a non-expert | They're new to it | level `beginner` |
+| advanced, for experts, for senior …, terms of art from the field | They know the field | level `advanced` |
+| my kid, my son, my daughter, for kids, a 9-year-old, third grade, my class | A child will read it | reading age `child` |
+
 
 ## Scope: one lesson or a path
 
