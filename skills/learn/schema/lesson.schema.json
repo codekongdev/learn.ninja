@@ -40,8 +40,8 @@
     },
     "estimatedMinutes": {
       "type": "integer",
-      "minimum": 5,
-      "maximum": 10
+      "minimum": 3,
+      "maximum": 15
     },
     "topic": {
       "type": "string",
@@ -69,7 +69,7 @@
     },
     "bricks": {
       "minItems": 3,
-      "maxItems": 15,
+      "maxItems": 20,
       "type": "array",
       "items": {
         "$ref": "#/$defs/Brick"

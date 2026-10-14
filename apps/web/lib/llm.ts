@@ -107,7 +107,7 @@ Works with any agent that supports skills: ${AGENTS.map((a) => a.name).join(", "
 
 ## What's in a lesson
 
-One idea in 5 to 10 minutes: a guess before any teaching, one to three short concepts each followed by practice, a final challenge, and takeaways. Practice uses nine kinds of bricks: concept, choice, compare, hotspot, sort, order, match, blank, and scenario. Every wrong option explains the mistake behind it.
+One idea in 3 to 15 minutes: a guess before any teaching, one to four short concepts each followed by practice, a final challenge, and takeaways. The agent picks a level and a size from what you ask, and splits a big topic into a path of lessons. Practice uses nine kinds of bricks: concept, choice, compare, hotspot, sort, order, match, blank, and scenario. Every wrong option explains the mistake behind it.
 
 ## Questions
 

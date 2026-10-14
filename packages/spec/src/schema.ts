@@ -285,17 +285,17 @@ export const lesson = z.strictObject({
   language: langCode,
   targetLanguage: langCode.optional(),
   level: z.enum(LEVELS),
-  estimatedMinutes: z.int().min(5).max(10),
+  estimatedMinutes: z.int().min(3).max(15),
   topic: z.string().min(1).optional(),
   source: z
     .strictObject({ title: z.string().min(1), url: z.url().optional() })
     .optional(),
   hook: hookBrick,
   /**
-   * The teaching part, in play order: each concept brick is followed by the 2–4 question bricks
+   * The teaching part, in play order: each concept brick is followed by the 1–6 question bricks
    * that practise it. The rhythm is checked in rules.ts.
    */
-  bricks: z.array(brick).min(3).max(15),
+  bricks: z.array(brick).min(3).max(20),
   challenge: questionBrick,
   wrapup: z.strictObject({
     takeaways: z.array(richText).min(2).max(4),

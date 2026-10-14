@@ -191,3 +191,7 @@ describe.each(LEVELS)("level %s", (name) => {
     expect(read("docs/lessons/levels.md")).toContain(`\`${name}\``)
   })
 })
+
+it("SKILL.md points at reference/planning.md", () => {
+  expect(read("skills/learn/SKILL.md")).toContain("`reference/planning.md`")
+})

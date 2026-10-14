@@ -4,21 +4,21 @@ How to turn the user's input into a lesson that's genuinely good to play. Read t
 
 ## 1. Choose one idea
 
-- A lesson teaches **one core idea** in **5–10 minutes**. Set `estimatedMinutes` honestly (5–10).
+- A lesson teaches **one core idea**, in 3–15 minutes depending on its size (`reference/planning.md`). Set `estimatedMinutes` honestly.
 - Write the `objective` as something the learner can _do_ afterwards: "Give each view one clear primary action", not "Learn about buttons".
-- Set `level` for who the lesson is for (`levels/index.md` says how to choose) and read `levels/{level}.md` before writing: it sets what to assume, what the questions ask for, and how much help to give. The shape in the next section is the same at every level.
-- If the input covers several ideas, pick the one everything else depends on. Mention the others to the user as follow-up lessons, and you can suggest one in `wrapup.next`.
+- Set `level` for who the lesson is for (`levels/index.md` says how to choose) and read `levels/{level}.md` before writing: it sets what to assume, what the questions ask for, and how much help to give. The size (`reference/planning.md`) sets how many concepts the shape in the next section has.
+- If the input covers several ideas, `reference/planning.md` says whether to pick the one everything else depends on or to plan a path of lessons. Either way, you can name the next lesson in `wrapup.next`.
 - Stay faithful to the source. If the input is an article, teach what it says; don't add claims it doesn't support.
 
 ## 2. Shape: interleaved, not "read then quiz"
 
 ```
-hook → bricks: concept → 2–4 questions → concept → 2–4 questions … (1–3 concepts) → challenge → wrap-up
+hook → bricks: concept → questions → concept → questions … (1–4 concepts) → challenge → wrap-up
 ```
 
 - **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains. Its `explanation` should make the learner want to know why.
-- **Concept bricks:** one idea each, 80 words at most. The first brick is always a concept. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
-- **Practice:** 2–4 question bricks right after each concept brick, 4–8 in total across the lesson.
+- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
+- **Practice:** 2–4 question bricks right after each concept brick, 3–12 in total across the lesson (`reference/planning.md` has the shape for each size).
 - **Challenge:** one harder, applied question brick that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
 - **Wrap-up:** 2–4 takeaways, each one sentence the learner could act on.
 
@@ -61,7 +61,7 @@ Mechanics of each type:
 - **Every wrong option gets `feedback`** that explains _why_ it's wrong, in a sentence or two. Name the misconception: "That's simple interest. Year 2 also earns interest on year 1's $50."
 - **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting.
 - **Name answers by what they say, not where they sit.** The player shuffles options and a match's right column, so "the second statement" or "option B" can point at the wrong one. Write "the nurses' statement" or "the many-causes explanation" instead. The checker rejects position words in explanations, hints, feedback, and outcomes.
-- **Every question brick gets an `explanation`** of why the right answer is right, in 30 words or fewer (the checker enforces it). It shows in the ninja's speech bubble, so apply the idea to this question; don't restate the concept the learner just read. It shows when the learner taps Why? after a right answer, and by itself once a missed answer is revealed. The warm-up shows no explanation: the concept after it does the explaining. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
+- **Every question brick gets an `explanation`** of why the right answer is right, in 30 words or fewer; aim for about 25, since the checker counts every word (the checker enforces it). It shows in the ninja's speech bubble, so apply the idea to this question; don't restate the concept the learner just read. It shows when the learner taps Why? after a right answer, and by itself once a missed answer is revealed. The warm-up shows no explanation: the concept after it does the explaining. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
 - **Blanks:** add a `mistakes` entry for each decoy chip, explaining it.
 - **Hints** (optional) nudge without giving the answer away, in one short line; the player shows the hint after a miss, before the retry: "What is the one thing this page exists to help people do?" How many there are, and how much they give away, follows the level: most questions for beginners, one or two for advanced learners.
 - **Scenario outcomes** describe what happens next, so even a poor choice teaches something.
@@ -77,7 +77,7 @@ Mechanics of each type:
 
 Visuals make lessons feel real. There are three kinds:
 
-- **`html`**: UI examples, diagrams, simple charts, layouts. It runs in a sandbox with no scripts. Give it an `alt`: one sentence saying what it shows, as you'd describe it to someone who can't see it ("Two buttons: a filled Place order and an outlined Back to cart").
+- **`html`**: UI examples, diagrams, simple charts, layouts. It runs in a sandbox with no scripts. Give it an `alt`: one sentence of at most 200 characters saying what it shows, as you'd describe it to someone who can't see it ("Two buttons: a filled Place order and an outlined Back to cart").
 - **`code`**: code with syntax highlighting. Give the `language` (e.g. `javascript`, `python`, `css`).
 - **`math`**: a formula on its own line, in TeX: `{ "kind": "math", "tex": "A = P(1 + r)^n" }`.
 
