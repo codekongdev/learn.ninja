@@ -1,0 +1,351 @@
+{
+  "spec": "0.3",
+  "title": "SQL window functions in practice",
+  "summary": "You know GROUP BY. Learn to put totals, ranks, and running sums on every row without collapsing them.",
+  "objective": "Write window functions with PARTITION BY and ORDER BY to add group totals, rankings, and running totals, and pick the top row in each group.",
+  "language": "en",
+  "level": "intermediate",
+  "estimatedMinutes": 9,
+  "topic": "SQL",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "The `orders` table holds 6 orders from 3 customers. How many rows does this query return?",
+    "visual": {
+      "kind": "code",
+      "language": "sql",
+      "code": "SELECT customer, amount,\n  SUM(amount) OVER (PARTITION BY customer) AS customer_total\nFROM orders;"
+    },
+    "options": [
+      {
+        "id": "a",
+        "text": "3, one per customer",
+        "feedback": "That's what `GROUP BY customer` would do. `OVER` doesn't merge rows."
+      },
+      { "id": "b", "text": "6, one per order" },
+      {
+        "id": "c",
+        "text": "1, the grand total",
+        "feedback": "That's a plain `SUM(amount)` with no grouping. Here every order keeps its row."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "Six. The sum is computed per customer but written onto every order, so no rows disappear. That's what makes it a window function."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "OVER keeps every row",
+      "body": "`GROUP BY` squeezes each customer's orders into one row. `SUM(amount) OVER (PARTITION BY customer)` keeps every order and writes its customer's total beside it. **PARTITION BY** decides which rows each calculation looks at: the rows that share that value. Any aggregate works this way: `AVG`, `COUNT`, `MAX`. An empty `OVER ()` makes the whole result one window, so each row gets the grand figure.",
+      "term": {
+        "word": "Window function",
+        "definition": "A function that computes a value for each row from a set of related rows (its window) without merging those rows."
+      },
+      "visual": {
+        "kind": "code",
+        "language": "sql",
+        "code": "SELECT customer, amount,\n  SUM(amount) OVER (PARTITION BY customer) AS customer_total\nFROM orders;\n\n-- customer | amount | customer_total\n-- Ana      |     40 |            100\n-- Ana      |     60 |            100\n-- Ben      |     30 |            150\n-- Ben      |     50 |            150\n-- Ben      |     70 |            150\n-- Cleo     |     20 |             20"
+      }
+    },
+    {
+      "id": "p1",
+      "type": "blank",
+      "prompt": "Complete the query so each order shows its share of that customer's total spending.",
+      "format": "code",
+      "language": "sql",
+      "template": "SELECT order_id, customer, amount,\n  100.0 * amount / SUM(amount) OVER (PARTITION BY [[c]]) AS pct_of_customer\nFROM orders;",
+      "blanks": [
+        {
+          "id": "c",
+          "accept": ["customer"],
+          "choices": ["customer", "order_id", "amount"],
+          "mistakes": [
+            {
+              "answer": "order_id",
+              "feedback": "Each order would be its own window, so every row would divide by itself and show 100."
+            },
+            {
+              "answer": "amount",
+              "feedback": "That groups orders that happen to cost the same, not orders from the same customer."
+            }
+          ]
+        }
+      ],
+      "explanation": "Partitioning by `customer` divides each amount by that customer's total: Ana's 40 of 100 shows 40, Ben's 30 of 150 shows 20."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "What does `AVG(salary) OVER (PARTITION BY dept)` show on Theo's row?",
+      "visual": {
+        "kind": "html",
+        "alt": "Employees table: Iris, Design, 4000; Omar, Design, 5000; Lena, Support, 3000; Theo, Support, 3300; Yuki, Support, 4200.",
+        "html": "<table class='table w-full max-w-sm'><thead><tr><th>name</th><th>dept</th><th class='text-end'>salary</th></tr></thead><tbody><tr><td>Iris</td><td>Design</td><td class='text-end'>4000</td></tr><tr><td>Omar</td><td>Design</td><td class='text-end'>5000</td></tr><tr><td>Lena</td><td>Support</td><td class='text-end'>3000</td></tr><tr><td class='font-medium'>Theo</td><td>Support</td><td class='text-end'>3300</td></tr><tr><td>Yuki</td><td>Support</td><td class='text-end'>4200</td></tr></tbody></table>"
+      },
+      "options": [
+        { "id": "a", "text": "3500" },
+        {
+          "id": "b",
+          "text": "3300",
+          "feedback": "That's Theo's own salary. The window is every row in his partition, not just his row."
+        },
+        {
+          "id": "c",
+          "text": "3900",
+          "feedback": "That's the average of all five employees, what `OVER ()` would give. `PARTITION BY dept` limits it to Support."
+        },
+        {
+          "id": "d",
+          "text": "10500",
+          "feedback": "That's the Support total. `AVG` divides it by the 3 rows in the partition."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "Theo's window is the Support rows.\n(3000 + 3300 + 4200) / 3 = 3500"
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "Back to `orders`: 6 orders from Ana (2), Ben (3), and Cleo (1). What does `COUNT(*) OVER ()` put on each row?",
+      "options": [
+        { "id": "a", "text": "6 on every row" },
+        {
+          "id": "b",
+          "text": "1 on every row",
+          "feedback": "An empty `OVER ()` isn't a window of one row; it's the whole result as one window."
+        },
+        {
+          "id": "c",
+          "text": "Each customer's order count: 2, 3, or 1",
+          "feedback": "That needs `PARTITION BY customer`. With nothing inside the parentheses, there's only one window."
+        },
+        {
+          "id": "d",
+          "text": "3 on every row",
+          "feedback": "`COUNT(*)` counts rows in the window, not distinct customers."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "With nothing inside the parentheses, how many windows are there?",
+      "explanation": "`OVER ()` makes all 6 rows one window, so every row gets 6. Handy for showing each row against the whole table."
+    },
+    {
+      "id": "p4",
+      "type": "hotspot",
+      "prompt": "`customer_orders` comes out as 1 on every row, but Ben has 3 orders. Tap the line with the bug.",
+      "visual": {
+        "kind": "code",
+        "language": "sql",
+        "code": "SELECT order_id, customer, amount,\n  SUM(amount) OVER (PARTITION BY customer) AS customer_total,\n  COUNT(*) OVER (PARTITION BY order_id) AS customer_orders\nFROM orders;",
+        "hotspots": [
+          { "id": "l1", "line": 1 },
+          { "id": "l2", "line": 2 },
+          { "id": "l3", "line": 3 },
+          { "id": "l4", "line": 4 }
+        ]
+      },
+      "correct": ["l3"],
+      "multiple": false,
+      "hint": "Which partition would hold exactly one row each time?",
+      "explanation": "Line 3 partitions by `order_id`, which is unique, so each window holds one order. `PARTITION BY customer` counts each customer's orders."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "ORDER BY inside OVER: rank and run",
+      "body": "Put **ORDER BY** inside `OVER` and each window gets a direction. `ROW_NUMBER()` numbers a partition's rows 1, 2, 3…; `RANK()` gives tied rows the same number, then skips ahead. An aggregate becomes a **running total**: `SUM(amount)` adds up the partition from its first row through the current one. Windows are computed after `WHERE`, so you can't filter on them there: compute them in a CTE (`WITH …`), then filter outside.",
+      "visual": {
+        "kind": "code",
+        "language": "sql",
+        "code": "SELECT customer, order_date, amount,\n  ROW_NUMBER() OVER (PARTITION BY customer ORDER BY order_date) AS nth,\n  SUM(amount) OVER (PARTITION BY customer ORDER BY order_date) AS running\nFROM orders;\n\n-- customer | order_date | amount | nth | running\n-- Ana      | 2026-01-03 |     40 |   1 |      40\n-- Ana      | 2026-02-11 |     60 |   2 |     100\n-- Ben      | 2026-01-05 |     30 |   1 |      30\n-- Ben      | 2026-01-19 |     50 |   2 |      80\n-- Ben      | 2026-03-02 |     70 |   3 |     150"
+      }
+    },
+    {
+      "id": "p5",
+      "type": "blank",
+      "prompt": "Complete the query so `running_total` adds up each customer's spending over time.",
+      "format": "code",
+      "language": "sql",
+      "template": "SELECT customer, order_date, amount,\n  SUM(amount) OVER (PARTITION BY customer [[o]] order_date) AS running_total\nFROM orders;",
+      "blanks": [
+        {
+          "id": "o",
+          "accept": ["ORDER BY"],
+          "choices": ["ORDER BY", "GROUP BY", "PARTITION BY"],
+          "mistakes": [
+            {
+              "answer": "GROUP BY",
+              "feedback": "`GROUP BY` isn't allowed inside `OVER`. The window needs a direction, which comes from `ORDER BY`."
+            },
+            {
+              "answer": "PARTITION BY",
+              "feedback": "A window has only one `PARTITION BY`. Splitting by date would also leave nothing to add up."
+            }
+          ]
+        }
+      ],
+      "explanation": "`ORDER BY order_date` gives each customer's window a direction, so the sum runs from the first order to the current one."
+    },
+    {
+      "id": "p6",
+      "type": "choice",
+      "prompt": "Kai paid 15 on March 1, 25 on March 8, and 10 on March 15. What is `SUM(amount) OVER (PARTITION BY customer ORDER BY paid_on)` on the March 8 row?",
+      "options": [
+        { "id": "a", "text": "40" },
+        {
+          "id": "b",
+          "text": "25",
+          "feedback": "That's just this row's amount. The running total also includes every earlier row in Kai's partition."
+        },
+        {
+          "id": "c",
+          "text": "15",
+          "feedback": "That stops one row short. The running total goes through the current row, not up to it."
+        },
+        {
+          "id": "d",
+          "text": "50",
+          "feedback": "That's Kai's whole total, what you'd get without `ORDER BY`. With it, March 15 isn't counted yet on the March 8 row."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Which of Kai's rows come up to and including March 8?",
+      "explanation": "The window runs from Kai's first row through the current one.\n15 + 25 = 40"
+    },
+    {
+      "id": "p7",
+      "type": "choice",
+      "prompt": "Scores: Mia 95, Raj 95, Lea 90, Tom 80. What does `RANK() OVER (ORDER BY score DESC)` give Mia, Raj, Lea, and Tom?",
+      "options": [
+        { "id": "a", "text": "1, 1, 3, 4" },
+        {
+          "id": "b",
+          "text": "1, 2, 3, 4",
+          "feedback": "That's `ROW_NUMBER()`, which gives tied rows different numbers. `RANK()` gives Mia and Raj the same number."
+        },
+        {
+          "id": "c",
+          "text": "1, 1, 2, 3",
+          "feedback": "Right that Mia and Raj share 1, but `RANK()` then skips ahead: two rows took first place, so Lea is 3."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "Mia and Raj tie for 1. Two rows used up places 1 and 2, so `RANK()` skips to 3 for Lea and 4 for Tom."
+    },
+    {
+      "id": "p8",
+      "type": "choice",
+      "prompt": "You want `rn = 1` on each customer's most recent order. Which window does that?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`ROW_NUMBER() OVER (PARTITION BY customer ORDER BY order_date DESC)`"
+        },
+        {
+          "id": "b",
+          "text": "`ROW_NUMBER() OVER (PARTITION BY customer ORDER BY order_date)`",
+          "feedback": "Without `DESC` the dates run oldest first, so `rn = 1` marks each customer's first order."
+        },
+        {
+          "id": "c",
+          "text": "`ROW_NUMBER() OVER (ORDER BY order_date DESC)`",
+          "feedback": "With no `PARTITION BY`, the numbering runs across all customers, so only the single latest order in the table gets 1."
+        },
+        {
+          "id": "d",
+          "text": "`ROW_NUMBER() OVER (PARTITION BY order_date ORDER BY customer)`",
+          "feedback": "This partitions by date, so it numbers customers within each day instead of orders within each customer."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Check two things: what the window is split by, and which way the dates run.",
+      "explanation": "Partition by `customer`, then sort newest first with `DESC`, so each customer's latest order is numbered 1."
+    },
+    {
+      "id": "p9",
+      "type": "hotspot",
+      "prompt": "This should list each customer's biggest order, but it fails with an error. Tap the line that breaks it.",
+      "visual": {
+        "kind": "code",
+        "language": "sql",
+        "code": "SELECT customer, order_id, amount,\n  ROW_NUMBER() OVER (PARTITION BY customer ORDER BY amount DESC) AS rn\nFROM orders\nWHERE rn = 1;",
+        "hotspots": [
+          { "id": "l1", "line": 1 },
+          { "id": "l2", "line": 2 },
+          { "id": "l3", "line": 3 },
+          { "id": "l4", "line": 4 }
+        ]
+      },
+      "correct": ["l4"],
+      "multiple": false,
+      "hint": "Which runs first: WHERE, or the window functions?",
+      "explanation": "`WHERE` runs before the window is computed, so `rn` doesn't exist yet. Compute `rn` in a CTE, then filter `WHERE rn = 1` outside it."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "Show each customer's biggest order. If two of a customer's orders tie for biggest, show both. Which query does it?",
+    "options": [
+      {
+        "id": "a",
+        "text": "RANK in a CTE",
+        "visual": {
+          "kind": "code",
+          "language": "sql",
+          "code": "WITH r AS (\n  SELECT *, RANK() OVER (\n    PARTITION BY customer\n    ORDER BY amount DESC) AS rk\n  FROM orders)\nSELECT * FROM r WHERE rk = 1;"
+        }
+      },
+      {
+        "id": "b",
+        "text": "ROW_NUMBER in a CTE",
+        "visual": {
+          "kind": "code",
+          "language": "sql",
+          "code": "WITH r AS (\n  SELECT *, ROW_NUMBER() OVER (\n    PARTITION BY customer\n    ORDER BY amount DESC) AS rk\n  FROM orders)\nSELECT * FROM r WHERE rk = 1;"
+        },
+        "feedback": "Filtering in a CTE is right, but `ROW_NUMBER()` gives tied orders 1 and 2, so one of the tied orders is dropped."
+      },
+      {
+        "id": "c",
+        "text": "RANK filtered in WHERE",
+        "visual": {
+          "kind": "code",
+          "language": "sql",
+          "code": "SELECT *, RANK() OVER (\n  PARTITION BY customer\n  ORDER BY amount DESC) AS rk\nFROM orders\nWHERE rk = 1;"
+        },
+        "feedback": "`RANK()` keeps ties, but `WHERE` runs before the window exists, so `rk` is unknown and the query fails."
+      },
+      {
+        "id": "d",
+        "text": "RANK with no partition",
+        "visual": {
+          "kind": "code",
+          "language": "sql",
+          "code": "WITH r AS (\n  SELECT *, RANK() OVER (\n    ORDER BY amount DESC) AS rk\n  FROM orders)\nSELECT * FROM r WHERE rk = 1;"
+        },
+        "feedback": "Without `PARTITION BY customer`, the ranking runs across the whole table, so you get only the biggest order overall."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "hint": "Check three things: what keeps ties, where the filter runs, and what the window is split by.",
+    "explanation": "`RANK()` gives tied top orders both 1, `PARTITION BY customer` ranks within each customer, and the CTE lets you filter on `rk` after it's computed."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Reach for a window function when you need a group figure on every row; use GROUP BY when you want one row per group.",
+      "PARTITION BY sets which rows each calculation sees; check it first when the numbers look wrong.",
+      "ORDER BY inside OVER turns sums into running totals and enables ROW_NUMBER and RANK; use RANK when ties should share a place.",
+      "To filter on a window column, compute it in a CTE and filter outside."
+    ],
+    "next": "LAG and LEAD: comparing a row with the one before it"
+  }
+}

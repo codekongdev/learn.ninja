@@ -38,6 +38,25 @@ Branch: 8 of 8. Main matched every level; it can't make short lessons, practice-
 
 Fixed after run 2: agents aim for about 25-word explanations; the mode guide says what to do when a topic is both a principle and a method; the format reference says `choice` needs `multiple`.
 
+## Run 3 (14 October, asking first and everyday wording, branch only)
+
+The agent may now ask before writing, but only when the request is a bare topic. When it asked, a reply was sent as a user would.
+
+| # | Prompt | Should | Result |
+| --- | --- | --- | --- |
+| 1 | How a car works | Ask | ✅ Asked. Reply "for my 12-year-old, to understand it" → beginner, child, explain |
+| 2 | Make a lesson about the French Revolution | Ask | ✅ Asked (and offered a series). Reply "for me, I know the basics, quick one" → intermediate, short |
+| 3 | Teach me compound interest | Ask | ✅ Asked. Reply "go" → explain, but "go" should match not asking (balanced) ❌ |
+| 4 | Explain how a car works | Don't ask; explain | ✅ Beginner, explain |
+| 5 | Quiz my 10-year-old on how a car works | Don't ask; child, practice | ✅ Beginner, child, practice, 8 questions |
+| 6 | Give me some hands-on practice with Git branching | Don't ask; practice | ✅ Practice, 9 questions |
+| 7 | Make it practical: SQL window functions | Don't ask; practice | ✅ Intermediate, practice, 9 questions |
+| 8 | Check my understanding of supply and demand | Don't ask; practice | ✅ Intermediate, practice, 9 questions |
+
+Asked in all 3 bare-topic cases and in none of the other 5; never asked anyone to rate their own level. Asking took about 10 seconds before the agent stopped to wait. 6 of 8 lessons passed validation first time.
+
+Fixed after run 3: the "what for" question now defaults to "a bit of both" (balanced), so "go" gives the same lesson as not asking; for a big topic, the question adds one line offering a short series instead of one lesson.
+
 ## Play them
 
 The links in the `path.md` files pointed at Gene's local server and won't work for you. Start the dev server on this branch (`npm run dev`), then publish every lesson to it:

@@ -1,0 +1,349 @@
+{
+  "spec": "0.3",
+  "title": "Supply and demand: shifts and new equilibria",
+  "summary": "You know the two curves. Check that you can tell a shift from a slide and predict what happens to price and quantity.",
+  "objective": "Given a market event, say which curve shifts and which way, then predict the new price and quantity, even when both curves move.",
+  "language": "en",
+  "level": "intermediate",
+  "estimatedMinutes": 9,
+  "topic": "Economics",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "A frost wipes out a third of a big coffee harvest, and coffee prices jump. A news anchor says: \"Higher prices will cut demand, which will bring prices back down.\" Is the anchor right?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Yes: that's how markets correct themselves",
+        "feedback": "It sounds right, but it mixes up two different things that both get called \"demand\"."
+      },
+      {
+        "id": "b",
+        "text": "No: higher prices cut the amount people buy, but that doesn't push prices back down"
+      },
+      {
+        "id": "c",
+        "text": "No: scarcity makes demand rise, so prices climb further",
+        "feedback": "Scarcity here is on the supply side. Buyers' wants didn't change because of the frost."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "People buy less coffee at the higher price, but that's a response to the price, not a new cause pushing it down. The first concept shows why."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Slide along, or shift the curve?",
+      "body": "Only a change in the good's **own price** moves you *along* a curve: a change in **quantity demanded** or **quantity supplied**. Everything else **shifts** the whole curve. Demand shifts with income, tastes, expectations, and the prices of substitutes or complements. Supply shifts with input costs, technology, and the number of sellers. *Example:* coffee beans get dearer, so cafés' costs rise and latte **supply** shifts left. Pricier lattes then cut quantity demanded; demand itself hasn't moved.",
+      "visual": {
+        "kind": "html",
+        "alt": "Two small graphs. Left: a point slides down one demand curve. Right: the whole demand curve moves right to a new position.",
+        "html": "<svg viewBox='0 0 320 170' direction='ltr' class='w-full max-w-sm mx-auto' xmlns='http://www.w3.org/2000/svg'><defs><marker id='ah' viewBox='0 0 10 10' refX='8' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'><path d='M0 0 L10 5 L0 10 z' class='fill-foreground'/></marker></defs><line x1='20' y1='130' x2='150' y2='130' class='stroke-border'/><line x1='20' y1='10' x2='20' y2='130' class='stroke-border'/><text x='8' y='20' class='fill-muted-foreground text-xs'>P</text><text x='142' y='145' class='fill-muted-foreground text-xs'>Q</text><line x1='30' y1='20' x2='140' y2='120' class='stroke-primary' stroke-width='2'/><text x='128' y='108' class='fill-muted-foreground text-xs'>D</text><circle cx='55' cy='43' r='4' class='fill-primary'/><circle cx='105' cy='88' r='4' class='fill-primary'/><line x1='64' y1='42' x2='104' y2='78' class='stroke-foreground' marker-end='url(#ah)'/><text x='85' y='162' text-anchor='middle' class='fill-muted-foreground text-xs'>Own price falls: slide</text><line x1='180' y1='130' x2='310' y2='130' class='stroke-border'/><line x1='180' y1='10' x2='180' y2='130' class='stroke-border'/><text x='168' y='20' class='fill-muted-foreground text-xs'>P</text><text x='302' y='145' class='fill-muted-foreground text-xs'>Q</text><line x1='185' y1='20' x2='270' y2='120' class='stroke-muted-foreground' stroke-width='2' stroke-dasharray='4 3'/><text x='256' y='106' class='fill-muted-foreground text-xs'>D1</text><line x1='215' y1='20' x2='300' y2='120' class='stroke-primary' stroke-width='2'/><text x='288' y='106' class='fill-muted-foreground text-xs'>D2</text><line x1='220' y1='62' x2='248' y2='62' class='stroke-foreground' marker-end='url(#ah)'/><text x='245' y='162' text-anchor='middle' class='fill-muted-foreground text-xs'>Something else: shift</text></svg>"
+      }
+    },
+    {
+      "id": "p1",
+      "type": "blank",
+      "prompt": "Bus fares rise. Complete the analyst's notes.",
+      "format": "text",
+      "template": "Fewer people ride the bus: a fall in the [[a]] of bus rides. More people buy bikes instead: a rise in the [[b]] for bikes.",
+      "blanks": [
+        {
+          "id": "a",
+          "accept": ["quantity demanded"],
+          "choices": ["quantity demanded", "demand", "supply"],
+          "mistakes": [
+            {
+              "answer": "demand",
+              "feedback": "The bus's own fare changed, so riders slide along the bus demand curve; the curve itself stays put."
+            },
+            {
+              "answer": "supply",
+              "feedback": "Riders are buyers, and the bus company didn't change what it offers. This is about the demand side."
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "accept": ["demand"],
+          "choices": ["demand", "quantity demanded", "supply"],
+          "mistakes": [
+            {
+              "answer": "quantity demanded",
+              "feedback": "Bike prices didn't change. A substitute's price did, and that shifts the whole bike demand curve."
+            },
+            {
+              "answer": "supply",
+              "feedback": "Bike makers' costs and technology didn't change. It's buyers who want more bikes at every price."
+            }
+          ]
+        }
+      ],
+      "explanation": "Bus riders respond to the bus's own price: a slide along. Bikes are a substitute, so pricier buses shift bike demand right."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "A ride-share app raises fares at rush hour, and more drivers log on. How would an economist describe the extra drivers?",
+      "options": [
+        { "id": "a", "text": "A rise in the quantity supplied of rides" },
+        {
+          "id": "b",
+          "text": "A rise in the supply of rides",
+          "feedback": "Drivers are reacting to the fare, which is the ride's own price. That's a slide along the supply curve, not a shift."
+        },
+        {
+          "id": "c",
+          "text": "A rise in the demand for rides",
+          "feedback": "Drivers are sellers, so they sit on the supply side. Riders' wants are a different curve."
+        },
+        {
+          "id": "d",
+          "text": "A fall in the demand for rides, since riders pay more",
+          "feedback": "Riders taking fewer rides at a higher fare is a fall in quantity demanded, and the question asks about drivers."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "The fare is the ride's own price. Drivers offering more rides at a higher fare is a slide up the existing supply curve."
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "The price of home printers falls sharply. What happens in the market for ink cartridges?",
+      "options": [
+        { "id": "a", "text": "Demand for ink shifts right" },
+        {
+          "id": "b",
+          "text": "Quantity demanded of ink rises along its curve",
+          "feedback": "A slide along needs a change in ink's own price. Printers are another good, so their price shifts the ink curve."
+        },
+        {
+          "id": "c",
+          "text": "Supply of ink shifts right",
+          "feedback": "Ink makers' costs, technology, and numbers didn't change. The change comes from buyers."
+        },
+        {
+          "id": "d",
+          "text": "Demand for ink shifts left",
+          "feedback": "That's the pattern for substitutes. Printers and ink are used together, so they're complements."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Are printers and ink substitutes or complements?",
+      "explanation": "Printers and ink are complements. Cheaper printers mean more printers in homes, so people want more ink at every ink price."
+    },
+    {
+      "id": "p4",
+      "type": "sort",
+      "prompt": "Each event hits the market for strawberries. Sort them by what happens in that market.",
+      "groups": [
+        { "id": "dem", "label": "Demand shifts" },
+        { "id": "sup", "label": "Supply shifts" },
+        { "id": "along", "label": "Movement along a curve" }
+      ],
+      "items": [
+        { "id": "a", "text": "A widely shared study says strawberries boost memory", "group": "dem" },
+        { "id": "b", "text": "The price of whipped cream falls", "group": "dem" },
+        { "id": "c", "text": "Shoppers expect strawberries to be cheaper next week", "group": "dem" },
+        { "id": "d", "text": "Farm workers' wages rise", "group": "sup" },
+        { "id": "e", "text": "A new variety yields twice as many berries per plant", "group": "sup" },
+        { "id": "f", "text": "Several new farms start growing strawberries", "group": "sup" },
+        { "id": "g", "text": "Strawberries go on sale and shoppers buy more", "group": "along" },
+        { "id": "h", "text": "Growers pick more of the crop as the strawberry price climbs", "group": "along" }
+      ],
+      "hint": "First ask: is this strawberries' own price changing, or something else?",
+      "explanation": "Tastes, a complement's price, and expectations shift demand. Wages, yields, and new farms shift supply. Only strawberries' own price causes a slide along."
+    },
+    {
+      "id": "p5",
+      "type": "hotspot",
+      "prompt": "A colleague wrote these notes on the e-scooter market. Tap the line that gets it wrong.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm mx-auto'><header><h2>E-scooter market: this quarter</h2><p>Draft notes</p></header><section><ul class='flex flex-col gap-2 text-sm'><li data-hotspot='battery' aria-label='Battery prices fell, so scooter supply shifts right.' class='rounded-md border px-3 py-2'>Battery prices fell → scooter <strong>supply</strong> shifts right</li><li data-hotspot='ban' aria-label='City bans scooters on sidewalks, so scooter demand shifts left.' class='rounded-md border px-3 py-2'>City bans scooters on sidewalks → scooter <strong>demand</strong> shifts left</li><li data-hotspot='price' aria-label='Scooter prices fell, so scooter demand shifts right.' class='rounded-md border px-3 py-2'>Scooter prices fell → scooter <strong>demand</strong> shifts right</li><li data-hotspot='bikeshare' aria-label='Bike-share fees doubled, so scooter demand shifts right.' class='rounded-md border px-3 py-2'>Bike-share fees doubled → scooter <strong>demand</strong> shifts right</li></ul></section></div>"
+      },
+      "correct": ["price"],
+      "multiple": false,
+      "hint": "Which line is about the scooter's own price?",
+      "explanation": "Cheaper scooters mean people buy more along the same demand curve: a rise in quantity demanded. The other lines name real shifters: input costs, rules, a substitute's price."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "Three steps to the new equilibrium",
+      "body": "To predict where a market lands, run three steps. **1.** Which curve shifts? **2.** Which way? **3.** Read the result off the table. *Example:* a heatwave shifts demand for fans right, so their price and quantity both rise. When **both** curves shift at once, take each shift alone. Where they push a variable the same way, you're sure of it; where they clash, it's ambiguous until you know which shift is bigger.",
+      "visual": {
+        "kind": "html",
+        "alt": "Table: demand right raises price and quantity; demand left lowers both; supply right lowers price, raises quantity; supply left raises price, lowers quantity.",
+        "html": "<table class='table w-full max-w-sm mx-auto'><thead><tr><th>Shift</th><th>Price</th><th>Quantity</th></tr></thead><tbody><tr><td>Demand right</td><td>Up</td><td>Up</td></tr><tr><td>Demand left</td><td>Down</td><td>Down</td></tr><tr><td>Supply right</td><td>Down</td><td>Up</td></tr><tr><td>Supply left</td><td>Up</td><td>Down</td></tr></tbody></table>"
+      }
+    },
+    {
+      "id": "p6",
+      "type": "blank",
+      "prompt": "Finish the three steps for this case.",
+      "format": "text",
+      "template": "A big study finds oat milk is healthier than people thought. Demand for oat milk shifts [[dir]], so its price [[p]] and the quantity sold [[q]].",
+      "blanks": [
+        {
+          "id": "dir",
+          "accept": ["right"],
+          "choices": ["right", "left"],
+          "mistakes": [
+            {
+              "answer": "left",
+              "feedback": "Better health news makes people want more oat milk at every price, which is a shift to the right."
+            }
+          ]
+        },
+        {
+          "id": "p",
+          "accept": ["rises"],
+          "choices": ["rises", "falls"],
+          "mistakes": [
+            {
+              "answer": "falls",
+              "feedback": "A falling price comes from demand shifting left or supply shifting right. Neither happened here."
+            }
+          ]
+        },
+        {
+          "id": "q",
+          "accept": ["rises"],
+          "choices": ["rises", "falls", "stays the same"],
+          "mistakes": [
+            {
+              "answer": "falls",
+              "feedback": "Sellers offer more at the higher price, so the quantity traded goes up, not down."
+            },
+            {
+              "answer": "stays the same",
+              "feedback": "Only one curve moved, so nothing offsets it. Demand shifting right raises both price and quantity."
+            }
+          ]
+        }
+      ],
+      "explanation": "Tastes moved toward oat milk, so demand shifts right. Demand right means price up and quantity up."
+    },
+    {
+      "id": "p7",
+      "type": "choice",
+      "prompt": "A new machine halves the cost of making solar panels. What happens to the price and quantity of panels sold?",
+      "options": [
+        { "id": "a", "text": "Price falls, quantity rises" },
+        {
+          "id": "b",
+          "text": "Price rises, quantity falls",
+          "feedback": "That's supply shifting left. Lower costs let makers offer more at every price: a shift right."
+        },
+        {
+          "id": "c",
+          "text": "Price falls, quantity falls",
+          "feedback": "That's demand shifting left. Buyers' wants didn't change; makers' costs did."
+        },
+        {
+          "id": "d",
+          "text": "Price falls, quantity unchanged, since demand didn't move",
+          "feedback": "Demand didn't shift, but cheaper panels raise the quantity demanded along it, so more panels are sold."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "Lower costs shift supply right. Supply right means a lower price and, as buyers slide down their demand curve, a larger quantity."
+    },
+    {
+      "id": "p8",
+      "type": "choice",
+      "prompt": "Over one year, concert ticket prices rose while fewer tickets were sold. Which single shift fits both facts?",
+      "options": [
+        { "id": "a", "text": "Supply shifted left" },
+        {
+          "id": "b",
+          "text": "Demand shifted right",
+          "feedback": "Demand right raises price, but it raises quantity too. Here quantity fell."
+        },
+        {
+          "id": "c",
+          "text": "Demand shifted left",
+          "feedback": "Demand left lowers quantity, but it lowers price too. Here price rose."
+        },
+        {
+          "id": "d",
+          "text": "Supply shifted right",
+          "feedback": "Supply right does the opposite of what happened: price down, quantity up."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Price and quantity moved in opposite directions. Which curve does that when it shifts?",
+      "explanation": "Demand shifts move price and quantity together; supply shifts move them apart. Price up with quantity down means supply shifted left, for example fewer tour dates."
+    },
+    {
+      "id": "p9",
+      "type": "choice",
+      "prompt": "Cheaper fertiliser boosts the corn harvest. In the same season, ethanol plants start buying much more corn. What can you predict for sure about the corn market?",
+      "options": [
+        { "id": "a", "text": "Quantity rises; the price change is ambiguous" },
+        {
+          "id": "b",
+          "text": "Price rises; the quantity change is ambiguous",
+          "feedback": "Take each shift alone. Supply right lowers price while demand right raises it, so price is the one that clashes."
+        },
+        {
+          "id": "c",
+          "text": "Price falls and quantity rises",
+          "feedback": "That's true only if the supply shift is bigger than the demand shift, and you don't know that."
+        },
+        {
+          "id": "d",
+          "text": "Both price and quantity are ambiguous",
+          "feedback": "Both shifts push quantity up, so quantity isn't in doubt. Only price clashes."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Write down what each shift does to price and to quantity, then compare.",
+      "explanation": "Supply right: price down, quantity up. Demand right: price up, quantity up. Quantity rises for sure; price depends on which shift is bigger."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "A frost destroys much of the orange crop. Nothing happens to apples. What happens in the market for apple juice?",
+    "options": [
+      { "id": "a", "text": "Apple juice price and quantity both rise" },
+      {
+        "id": "b",
+        "text": "Apple juice price rises and quantity falls",
+        "feedback": "That's a supply shift left, but the frost hit oranges, not apple juice makers' costs. Apple juice changes through its buyers."
+      },
+      {
+        "id": "c",
+        "text": "Nothing changes; the frost is in another market",
+        "feedback": "The frost makes orange juice dearer, and apple juice is a substitute, so it reaches the apple juice market through demand."
+      },
+      {
+        "id": "d",
+        "text": "Quantity demanded of apple juice rises along its curve; its price stays the same",
+        "feedback": "Apple juice's own price didn't start this. A substitute's price did, which shifts the whole demand curve right and raises the price."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "hint": "Start in the orange market, then ask how apple juice is related to orange juice.",
+    "explanation": "Orange supply shifts left, so orange juice gets dearer.\nApple juice is a substitute, so its demand shifts right.\nDemand right: price up, quantity up."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Before calling it a shift, check whether the good's own price changed: if so, it's a slide along the curve.",
+      "Demand shifts with buyers' world (income, tastes, related prices, expectations); supply shifts with sellers' world (costs, technology, number of sellers).",
+      "Demand shifts move price and quantity together; supply shifts move them apart.",
+      "When both curves shift, take each alone: you can be sure of only the variable they push the same way."
+    ],
+    "next": "Elasticity: how far price and quantity move when a curve shifts"
+  }
+}

@@ -1,0 +1,335 @@
+{
+  "spec": "0.3",
+  "title": "Git branching: branch, commit, merge",
+  "summary": "Practise starting a branch, saving work on it, and bringing it back into main.",
+  "objective": "Create a branch, commit on it, and merge it into main with the right commands in the right order.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 8,
+  "topic": "Git",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "You create a new branch, change `index.html`, and commit. Then you switch back to `main`. What does `index.html` look like on main?",
+    "options": [
+      { "id": "a", "text": "Just as it was before your change" },
+      {
+        "id": "b",
+        "text": "It has your change",
+        "feedback": "Your commit lives on the new branch. Main keeps its own version of the file."
+      },
+      {
+        "id": "c",
+        "text": "It's gone until you switch back",
+        "feedback": "Main still has the file, in the version main last saved."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "explanation": "Each branch keeps its own commits, so main doesn't see your change. Let's see how to work on a branch and then bring the change over."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Work on a branch",
+      "body": "A **branch** is a separate line of work. **Commits** (saved snapshots of your files) made on it don't change `main`. New commits always land on the branch you're **on**. `git switch -c name` creates a branch and moves you onto it. `git switch name` moves you to a branch that already exists. `git branch name` only creates one: you stay where you are. `git branch` lists branches, with `*` beside yours.",
+      "term": {
+        "word": "Branch",
+        "definition": "A separate line of commits. New commits go to the branch you're on."
+      },
+      "visual": {
+        "kind": "code",
+        "language": "bash",
+        "code": "git switch -c login-form        # create login-form and move onto it\ngit branch                      # list branches\n#   main\n# * login-form\ngit add .                       # pick the changed files to save\ngit commit -m \"Add login form\"  # this commit lands on login-form"
+      }
+    },
+    {
+      "id": "p1",
+      "type": "blank",
+      "prompt": "You're on `main`. Complete the commands to start a `dark-mode` branch and save your work on it.",
+      "format": "code",
+      "language": "bash",
+      "caseSensitive": true,
+      "template": "git [[a]] -c dark-mode\ngit add .\ngit [[b]] -m \"Add dark mode\"",
+      "blanks": [
+        {
+          "id": "a",
+          "accept": ["switch"],
+          "choices": ["switch", "branch", "commit"],
+          "mistakes": [
+            {
+              "answer": "branch",
+              "feedback": "`git branch` makes a branch but leaves you on main, so your commit would land on main."
+            },
+            {
+              "answer": "commit",
+              "feedback": "`git commit` saves a snapshot. It doesn't create a branch or move you."
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "accept": ["commit"],
+          "choices": ["commit", "switch", "branch"],
+          "mistakes": [
+            {
+              "answer": "switch",
+              "feedback": "`git switch` moves between branches. Saving your work is `git commit`."
+            },
+            {
+              "answer": "branch",
+              "feedback": "`git branch` creates or lists branches. Saving your work is `git commit`."
+            }
+          ]
+        }
+      ],
+      "hint": "One command creates a branch and moves you; another saves a snapshot.",
+      "explanation": "`git switch -c dark-mode` creates the branch and moves you onto it, so `git commit` saves your work there."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "You run `git branch` and see this. Then you commit. Which branch gets the commit?",
+      "visual": {
+        "kind": "code",
+        "language": "bash",
+        "code": "$ git branch\n  main\n* signup-page"
+      },
+      "options": [
+        { "id": "a", "text": "`signup-page`" },
+        {
+          "id": "b",
+          "text": "`main`",
+          "feedback": "Main is listed first, but the `*` marks the branch you're on: signup-page."
+        },
+        {
+          "id": "c",
+          "text": "Both branches",
+          "feedback": "A commit lands on one branch only: the one you're on."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Look for the `*`.",
+      "explanation": "The `*` shows you're on signup-page, and new commits always land on the branch you're on."
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "You're on `signup-page` and want to go back to `main`, which already exists. Which command do you run?",
+      "options": [
+        { "id": "a", "text": "`git switch main`" },
+        {
+          "id": "b",
+          "text": "`git switch -c main`",
+          "feedback": "`-c` creates a new branch. Main already exists, so Git refuses to make another."
+        },
+        {
+          "id": "c",
+          "text": "`git branch main`",
+          "feedback": "`git branch name` only creates a branch and never moves you. Main already exists anyway."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Do you need to create anything, or just move?",
+      "explanation": "Main already exists, so you only need to move: `git switch main`, without `-c`."
+    },
+    {
+      "id": "p4",
+      "type": "choice",
+      "prompt": "Starting on `main`, you run these commands. Which of the two new commits are on `main`?",
+      "visual": {
+        "kind": "code",
+        "language": "bash",
+        "code": "git switch -c api\ngit commit -m \"A\"\ngit switch main\ngit commit -m \"B\""
+      },
+      "options": [
+        { "id": "a", "text": "Only B" },
+        {
+          "id": "b",
+          "text": "A and B",
+          "feedback": "A was made while you were on api, so it stays on api."
+        },
+        {
+          "id": "c",
+          "text": "Only A",
+          "feedback": "A landed on api. Main gets B, made after switching back."
+        },
+        {
+          "id": "d",
+          "text": "Neither",
+          "feedback": "B was made after `git switch main`, so it landed on main."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "For each commit, which branch were you on at that moment?",
+      "explanation": "A was committed on api. After `git switch main`, B was committed on main. So main has B, and api has A."
+    },
+    {
+      "id": "p5",
+      "type": "hotspot",
+      "prompt": "Sam wanted the fix on its own branch, but the commit landed on `main`. Tap the line that went wrong.",
+      "visual": {
+        "kind": "code",
+        "language": "bash",
+        "code": "git switch main\ngit branch header-fix\ngit add .\ngit commit -m \"Fix header\"",
+        "hotspots": [
+          { "id": "l1", "line": 1 },
+          { "id": "l2", "line": 2 },
+          { "id": "l3", "line": 3 },
+          { "id": "l4", "line": 4 }
+        ]
+      },
+      "correct": ["l2"],
+      "multiple": false,
+      "hint": "Which line made a branch without moving onto it?",
+      "explanation": "`git branch header-fix` created the branch but left Sam on main. `git switch -c header-fix` would have moved Sam onto it."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "Merge it back",
+      "body": "To **merge** is to bring one branch's commits into another. First switch to the branch that should **receive** the work, then name the branch to bring in. On `main`, `git merge login-form` adds login-form's commits to main; login-form itself doesn't change. Once it's merged, `git branch -d login-form` deletes the finished branch. Its commits stay in main.",
+      "term": {
+        "word": "Merge",
+        "definition": "Bring another branch's commits into the branch you're on."
+      },
+      "visual": {
+        "kind": "code",
+        "language": "bash",
+        "code": "git switch main            # go to the branch that receives the work\ngit merge login-form       # bring login-form's commits into main\ngit branch -d login-form   # delete the finished branch"
+      }
+    },
+    {
+      "id": "p6",
+      "type": "blank",
+      "prompt": "Your `search-bar` branch is finished. Complete the commands to bring it into `main`.",
+      "format": "code",
+      "language": "bash",
+      "caseSensitive": true,
+      "template": "git switch [[a]]\ngit merge [[b]]",
+      "blanks": [
+        {
+          "id": "a",
+          "accept": ["main"],
+          "choices": ["main", "search-bar"],
+          "mistakes": [
+            {
+              "answer": "search-bar",
+              "feedback": "Switch to the branch that receives the work. That's main, not search-bar."
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "accept": ["search-bar"],
+          "choices": ["search-bar", "main"],
+          "mistakes": [
+            {
+              "answer": "main",
+              "feedback": "You're already on main. `git merge` names the branch to bring in: search-bar."
+            }
+          ]
+        }
+      ],
+      "hint": "Stand on the receiving branch, then name the one to bring in.",
+      "explanation": "On main, `git merge search-bar` brings search-bar's commits into main."
+    },
+    {
+      "id": "p7",
+      "type": "choice",
+      "prompt": "You're on `main` and run `git merge pricing`. Which branch gets new commits?",
+      "options": [
+        { "id": "a", "text": "`main`" },
+        {
+          "id": "b",
+          "text": "`pricing`",
+          "feedback": "Merging changes the branch you're on. pricing is only read from; it stays the same."
+        },
+        {
+          "id": "c",
+          "text": "Both",
+          "feedback": "Only the branch you're on receives the commits. pricing stays the same."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Which branch are you on?",
+      "explanation": "You're on main, so main receives pricing's commits. pricing itself doesn't change."
+    },
+    {
+      "id": "p8",
+      "type": "order",
+      "prompt": "Starting on `main`, put these steps in order to build a `menu` feature and bring it into main.",
+      "items": [
+        { "id": "a", "text": "`git switch -c menu`" },
+        { "id": "b", "text": "`git commit -m \"Add menu\"`" },
+        { "id": "c", "text": "`git switch main`" },
+        { "id": "d", "text": "`git merge menu`" },
+        { "id": "e", "text": "`git branch -d menu`" }
+      ],
+      "hint": "You can only merge from the receiving branch, and only delete a branch once it's merged.",
+      "explanation": "Branch off, commit there, return to main, merge menu in, then delete the finished branch."
+    },
+    {
+      "id": "p9",
+      "type": "hotspot",
+      "prompt": "Lee wanted the fix in `main`, but main hasn't changed. Tap the line that went wrong.",
+      "visual": {
+        "kind": "code",
+        "language": "bash",
+        "code": "git switch -c checkout-fix\ngit add .\ngit commit -m \"Fix checkout total\"\ngit merge main",
+        "hotspots": [
+          { "id": "l1", "line": 1 },
+          { "id": "l2", "line": 2 },
+          { "id": "l3", "line": 3 },
+          { "id": "l4", "line": 4 }
+        ]
+      },
+      "correct": ["l4"],
+      "multiple": false,
+      "hint": "Which branch is Lee on when the merge runs?",
+      "explanation": "Lee merged while still on checkout-fix, so main's commits went into checkout-fix. Run `git switch main`, then `git merge checkout-fix`."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "scenario",
+    "prompt": "What do you do?",
+    "situation": "You're halfway through a `profile-page` branch, with your work so far committed. A teammate asks you to fix a typo on `main` right now. The profile page isn't ready to share.",
+    "options": [
+      {
+        "id": "a",
+        "quality": "best",
+        "text": "Switch to main, run `git switch -c typo-fix`, fix and commit, then switch to main and `git merge typo-fix`",
+        "outcome": "Main gets just the typo fix. profile-page waits untouched, and you switch back to it when you're ready."
+      },
+      {
+        "id": "b",
+        "quality": "okay",
+        "text": "Fix the typo on profile-page and commit it there",
+        "outcome": "The fix is saved, but main won't get it until the whole profile page is finished and merged."
+      },
+      {
+        "id": "c",
+        "quality": "poor",
+        "text": "Switch to main, run `git merge profile-page`, then fix the typo",
+        "outcome": "The typo gets fixed, but your half-finished profile page lands in main too."
+      }
+    ],
+    "hint": "Which branch should get the fix, and which work isn't ready for it?",
+    "explanation": "A small branch off main keeps the fix separate. Merging only typo-fix gives main exactly the change it needs."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Start new work with `git switch -c name`, so your commits land on the new branch.",
+      "Check `git branch` for the `*` before you commit: that's where the commit goes.",
+      "To merge, switch to the receiving branch first, then `git merge` the other one.",
+      "Delete a finished branch with `git branch -d` once it's merged."
+    ],
+    "next": "Resolving merge conflicts"
+  }
+}

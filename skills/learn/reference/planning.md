@@ -10,12 +10,14 @@ Then, before writing, send one short message with up to three questions, each wi
 
 > Before I make it:
 > 1. Who's it for: you, a child (what age?), or a group? (I'll assume you.)
-> 2. What for: to understand it, to practise it, or to test yourself? (I'll assume understand.)
+> 2. What for: to understand it, to practise it, to test yourself, or a bit of both? (I'll assume a bit of both.)
 > 3. How long: quick (3–5 min), standard (5–10), or in depth (10–15)? (I'll assume standard.)
+
+If the topic holds several ideas (a whole period of history, a field, a long framework), add one line after the questions: "It's a big topic, so I'll make one lesson on its central idea; say if you'd rather have a short series."
 
 - Ask who it's for and what they want, never "what's your level?": people rate their own level poorly, but they know who the lesson is for and what they want from it. If they say what they already know, use it for the level.
 - Ask once. Anything the reply leaves open takes its default. If there's no one to answer, use the defaults without asking.
-- Map the answers with the table below: "for me" is an adult reader, "understand" is `explain`, "practise" and "test myself" are `practice`, the length is the size.
+- Map the answers with the table below: "for me" is an adult reader, "understand" is `explain`, "practise" and "test myself" are `practice`, "a bit of both" (or no answer) is `balanced`, the length is the size, and "a series" is a path. Saying "go" gives the same lesson as not asking.
 - One clear signal is enough to go without asking. "Explain how vaccines work" says what they want; "quiz my 8-year-old on vaccines" says who and what. Fill the rest with defaults.
 
 ## Words people use
