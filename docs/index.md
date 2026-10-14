@@ -17,12 +17,14 @@ Works with any agent that supports [skills](https://github.com/vercel-labs/skill
 npx skills add https://learn.ninja -g -a claude-code -y
 ```
 
-The agent names are `claude-code`, `codex`, `cursor`, `gemini-cli`, `github-copilot`, `windsurf`, `cline`, `roo`, `kiro-cli`, `goose`, `amp`, `opencode`, `antigravity`, and `junie` (the [full list](https://github.com/vercel-labs/skills#supported-agents)). Leave out `-g` to install only in the current project. Needs Node.js 18 or newer and network access. Update with `npx skills update`.
+The agent names are `claude-code`, `codex`, `cursor`, `gemini-cli`, `github-copilot`, `windsurf`, `cline`, `roo`, `kiro-cli`, `goose`, `amp`, `opencode`, `antigravity`, and `junie` (the [full list](https://github.com/vercel-labs/skills#supported-agents)). Leave out `-g` to install only in the current project. Needs Node.js 18 or newer and network access.
+
+You install once. The guides and the checks come from learn.ninja each time the agent makes a lesson, so changes reach you without reinstalling. The agent only asks you to run the install command again when the small command-line tool itself changes.
 
 ## If you're an agent
 
 1. Install the skill with the command above.
-2. Read its `SKILL.md`, then the guides it points to: the teaching guide, the [lesson format](/docs/lessons/lesson-format), and the [level](/docs/lessons/levels) the lesson is for.
+2. Read its `SKILL.md`. It has you run `sync`, which downloads the current steps and guides into `.learn/skill/`, then follow `steps.md` there: the teaching guide, the [lesson format](/docs/lessons/lesson-format), and the [level](/docs/lessons/levels) the lesson is for.
 3. Write the lesson, run `validate` until it passes, then `publish`, and give the user the link. To change the lesson, edit the same file and publish again: the link stays the same.
 
 ## Without a shell

@@ -39,6 +39,7 @@ describe("skills/learn", () => {
     expect(result.stdout.trim()).toBe(SKILL_VERSION)
   })
 
+  // With no server to reach, `validate` falls back to the bundled rules: that's what this checks.
   it.each(readdirSync(new URL("skills/learn/examples", root)))(
     "bundled script validates %s",
     (file) => {
@@ -49,15 +50,30 @@ describe("skills/learn", () => {
           "validate",
           fileURLToPath(new URL(`skills/learn/examples/${file}`, root)),
         ],
-        { encoding: "utf8" }
+        {
+          encoding: "utf8",
+          env: { ...process.env, LEARN_API_URL: "http://127.0.0.1:1" },
+        }
       )
       expect(result.status, result.stderr).toBe(0)
+      expect(result.stdout).toContain("Checked offline")
     }
   )
 
   it("names the skill in SKILL.md", () => {
     expect(read("skills/learn/SKILL.md")).toMatch(
       /^---\nname: learn\ndescription: .+\n---/
+    )
+  })
+
+  // The installed SKILL.md is a short bootstrap: the steps sync from learn.ninja, so it rarely changes.
+  it("keeps SKILL.md short, and sends the agent to sync and steps.md", () => {
+    const skill = read("skills/learn/SKILL.md")
+    expect(skill.split(/\s+/).length).toBeLessThanOrEqual(220)
+    expect(skill).toContain("scripts/learn.mjs sync")
+    expect(skill).toContain("`.learn/skill/steps.md`")
+    expect(skill, "guides are read from the synced copy").not.toMatch(
+      /reference\/|levels\//
     )
   })
 })
@@ -71,8 +87,8 @@ it("levels/ has index.md and exactly one file per level", () => {
   )
 })
 
-it("SKILL.md points at levels/index.md", () => {
-  expect(read("skills/learn/SKILL.md")).toContain("`levels/index.md`")
+it("steps.md points at levels/index.md", () => {
+  expect(read("skills/learn/steps.md")).toContain("`levels/index.md`")
 })
 
 describe.each(LEVELS)("level %s", (name) => {
@@ -107,6 +123,6 @@ describe.each(LEVELS)("level %s", (name) => {
   })
 })
 
-it("SKILL.md points at reference/planning.md", () => {
-  expect(read("skills/learn/SKILL.md")).toContain("`reference/planning.md`")
+it("steps.md points at reference/planning.md", () => {
+  expect(read("skills/learn/steps.md")).toContain("`reference/planning.md`")
 })

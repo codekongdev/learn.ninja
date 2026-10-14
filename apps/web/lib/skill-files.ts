@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto"
 import { readdirSync, readFileSync } from "node:fs"
 import path from "node:path"
 
@@ -33,6 +34,28 @@ export function skillIndex() {
 }
 
 export const SKILL_ROUTE_NAME = SKILL_NAME
+
+/**
+ * The files `learn sync` downloads into a project's .learn/skill/: the steps, guides, levels, examples,
+ * and schema. Never the CLI (code stays with the install) and not SKILL.md (the short installed
+ * bootstrap, which is what points at the synced copy).
+ */
+export function syncedFiles(): string[] {
+  return skillFiles().filter(
+    (f) => f !== "SKILL.md" && !f.startsWith("scripts/")
+  )
+}
+
+/** Every synced file's text, with a hash of the lot so a CLI can tell whether its copy is current. */
+export function skillBundle() {
+  const files: Record<string, string> = {}
+  const hash = createHash("sha256")
+  for (const f of syncedFiles()) {
+    files[f] = readSkillFile(f).toString("utf8")
+    hash.update(f).update("\0").update(files[f]).update("\0")
+  }
+  return { hash: hash.digest("hex").slice(0, 16), files }
+}
 
 const TYPES: Record<string, string> = {
   ".md": "text/markdown; charset=utf-8",
