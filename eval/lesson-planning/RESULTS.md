@@ -53,7 +53,7 @@ The agent may now ask before writing, but only when the request is a bare topic.
 | 7 | Make it practical: SQL window functions | Don't ask; practice | ✅ Intermediate, practice, 9 questions |
 | 8 | Check my understanding of supply and demand | Don't ask; practice | ✅ Intermediate, practice, 9 questions |
 
-Asked in all 3 bare-topic cases and in none of the other 5; never asked anyone to rate their own level. Asking took about 10 seconds before the agent stopped to wait. 6 of 8 lessons passed validation first time.
+Asked in all 3 bare-topic cases and in none of the other 5; never asked anyone to rate their own level. Asking took about 10 seconds before the agent stopped to wait. 7 of 8 lessons passed validation first time.
 
 Fixed after run 3: the "what for" question now defaults to "a bit of both" (balanced), so "go" gives the same lesson as not asking; for a big topic, the question adds one line offering a short series instead of one lesson.
 
