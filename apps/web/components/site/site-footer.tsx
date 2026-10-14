@@ -58,6 +58,7 @@ export function SiteFooter({ className }: { className?: string }) {
                 key={m.handle}
                 variant="secondary"
                 size="sm"
+                className="px-1.5"
                 href={m.url}
                 target="_blank"
                 rel="noopener noreferrer"
