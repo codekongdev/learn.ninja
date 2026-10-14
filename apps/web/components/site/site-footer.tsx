@@ -14,7 +14,6 @@ const COLUMNS = [
     links: [
       { href: "/docs", label: "Docs" },
       { href: "/docs#install", label: "Install" },
-      { href: "/docs#subjects", label: "Subjects" },
     ],
   },
   {
