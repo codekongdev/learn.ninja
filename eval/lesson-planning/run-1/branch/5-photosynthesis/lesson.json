@@ -1,0 +1,231 @@
+{
+  "spec": "0.3",
+  "title": "How photosynthesis works",
+  "summary": "See how a plant turns air, water, and sunlight into its own food, and why that puts oxygen in the air.",
+  "objective": "Explain what a plant takes in and gives out during photosynthesis, and where the oxygen comes from.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 6,
+  "topic": "Biology",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "A big oak tree weighs many tonnes. Where does most of that wood come from?",
+    "options": [
+      {
+        "id": "a",
+        "text": "The soil around its roots",
+        "feedback": "It's the usual guess. But the soil around a growing tree barely goes down: roots take only small amounts of minerals from it."
+      },
+      {
+        "id": "b",
+        "text": "The water it drinks",
+        "feedback": "Water matters, and it's much of a living tree's weight. But dry wood is mostly built from something else."
+      },
+      {
+        "id": "c",
+        "text": "The air around its leaves"
+      }
+    ],
+    "correct": ["c"],
+    "multiple": false,
+    "explanation": "Mostly from the air. The carbon in wood comes from carbon dioxide, a gas the leaves take in. Let's see how a plant turns air into wood."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "A plant makes its own food",
+      "body": "**Photosynthesis** is how plants make their own food. A plant takes in **carbon dioxide** from the air and **water** from the soil, and uses the energy in **sunlight** to turn them into **sugar**. **Oxygen** is left over and goes out into the air. The plant burns some of the sugar for energy and builds the rest into its leaves, stems, and wood. That's how a tree is made mostly from air.",
+      "term": {
+        "word": "Photosynthesis",
+        "definition": "How plants use the energy in light to turn carbon dioxide and water into sugar, releasing oxygen."
+      },
+      "visual": {
+        "kind": "html",
+        "alt": "A diagram: sunlight, carbon dioxide, and water go into a leaf; sugar and oxygen come out.",
+        "html": "<div class='w-full max-w-sm flex items-center justify-between gap-2 text-sm'><div class='flex flex-col gap-2'><span class='text-xs text-muted-foreground'>Goes in</span><span class='badge' data-variant='outline'>Sunlight</span><span class='badge' data-variant='outline'>Carbon dioxide</span><span class='badge' data-variant='outline'>Water</span></div><span class='text-muted-foreground text-lg'>→</span><div class='rounded-xl border bg-muted px-4 py-6 font-medium text-center'>Leaf</div><span class='text-muted-foreground text-lg'>→</span><div class='flex flex-col gap-2'><span class='text-xs text-muted-foreground'>Comes out</span><span class='badge'>Sugar</span><span class='badge' data-variant='secondary'>Oxygen</span></div></div>"
+      }
+    },
+    {
+      "id": "p1",
+      "type": "sort",
+      "prompt": "Sort each one: does the plant take it in for photosynthesis, or does photosynthesis produce it?",
+      "groups": [
+        { "id": "in", "label": "Taken in" },
+        { "id": "out", "label": "Produced" }
+      ],
+      "items": [
+        { "id": "a", "text": "Carbon dioxide", "group": "in" },
+        { "id": "b", "text": "Water", "group": "in" },
+        { "id": "c", "text": "Sunlight", "group": "in" },
+        { "id": "d", "text": "Oxygen", "group": "out" },
+        { "id": "e", "text": "Sugar", "group": "out" }
+      ],
+      "hint": "Think of a recipe: ingredients and energy go in, food and leftovers come out.",
+      "explanation": "Carbon dioxide and water are the ingredients and sunlight is the energy. Sugar is the food, and oxygen is the leftover."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "A plant gets bright light and plenty of water, but the air around it has no carbon dioxide. What happens to it?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It can't make sugar, so it slowly runs out of food"
+        },
+        {
+          "id": "b",
+          "text": "It grows normally, because light is its food",
+          "feedback": "Light gives the energy, but the sugar is built from carbon dioxide and water. With one ingredient missing, there's nothing to build with."
+        },
+        {
+          "id": "c",
+          "text": "It takes the carbon it needs from the soil instead",
+          "feedback": "Roots take in water and small amounts of minerals. The sugar's carbon comes from carbon dioxide in the air."
+        },
+        {
+          "id": "d",
+          "text": "It releases extra oxygen instead of making sugar",
+          "feedback": "Oxygen is a leftover of making sugar. If the plant can't make sugar, it has no leftover to release."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Check the recipe: which ingredient is missing?",
+      "explanation": "Carbon dioxide is one of the two ingredients. Sunlight and water alone can't make sugar, so the plant goes without food."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "The leaf gathers the ingredients",
+      "body": "Now, how does a leaf collect what it needs? Carbon dioxide gets in through tiny pores called **stomata**, mostly on the leaf's underside. Water comes up from the roots through the **veins**. Inside the leaf's cells, tiny green parts called **chloroplasts** hold **chlorophyll**, a green substance that soaks up light energy. It absorbs red and blue light best and reflects green, which is why leaves look green.",
+      "term": {
+        "word": "Chlorophyll",
+        "definition": "The green substance in leaves that absorbs light energy for photosynthesis."
+      },
+      "visual": {
+        "kind": "html",
+        "alt": "A cut-through leaf: light hits the top surface, cells below are packed with green chloroplasts, a round vein brings water, and a pore in the underside lets carbon dioxide in.",
+        "html": "<div class='w-full max-w-sm flex flex-col gap-1 text-xs'><div class='text-center text-muted-foreground'>☀ Light from above</div><div class='h-3 rounded-t-lg border bg-muted'></div><div class='flex items-center gap-1'><div class='flex-1 grid grid-cols-4 gap-1'><div class='h-12 rounded-md border flex flex-wrap content-center justify-center gap-1 p-1'><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span></div><div class='h-12 rounded-md border flex flex-wrap content-center justify-center gap-1 p-1'><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span></div><div class='h-12 rounded-md border flex flex-wrap content-center justify-center gap-1 p-1'><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span></div><div class='h-12 rounded-md border flex flex-wrap content-center justify-center gap-1 p-1'><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span></div></div><div class='size-12 shrink-0 rounded-full border-2 border-primary flex items-center justify-center text-center leading-tight'>vein</div></div><div class='flex items-center gap-1'><div class='flex-1 h-3 border bg-muted'></div><div class='w-10 h-3 flex justify-between'><span class='w-3 h-3 rounded-full border bg-green-500/50'></span><span class='w-3 h-3 rounded-full border bg-green-500/50'></span></div><div class='flex-1 h-3 border bg-muted rounded-ee-lg'></div></div><div class='flex justify-center text-muted-foreground'>↑ Carbon dioxide enters through a pore (stoma)</div><div class='mt-2 flex flex-wrap gap-3 justify-center text-muted-foreground'><span class='flex items-center gap-1'><span class='size-2 rounded-full bg-green-500'></span> Chloroplasts</span><span class='flex items-center gap-1'><span class='size-3 rounded-full border-2 border-primary'></span> Vein carries water</span></div></div>"
+      }
+    },
+    {
+      "id": "p3",
+      "type": "hotspot",
+      "prompt": "Here's a cut-through leaf. Tap where carbon dioxide gets in.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='w-full max-w-sm flex flex-col gap-1'><div data-hotspot='top' aria-label='The top surface of the leaf' class='h-5 rounded-t-lg border bg-muted'></div><div class='flex items-center gap-1'><div data-hotspot='cells' aria-label='Cells packed with chloroplasts' class='flex-1 grid grid-cols-4 gap-1 rounded-md'><div class='h-12 rounded-md border flex flex-wrap content-center justify-center gap-1 p-1'><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span></div><div class='h-12 rounded-md border flex flex-wrap content-center justify-center gap-1 p-1'><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span></div><div class='h-12 rounded-md border flex flex-wrap content-center justify-center gap-1 p-1'><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span></div><div class='h-12 rounded-md border flex flex-wrap content-center justify-center gap-1 p-1'><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span><span class='size-2 rounded-full bg-green-500'></span></div></div><div data-hotspot='vein' aria-label='A round vein' class='size-12 shrink-0 rounded-full border-2 border-primary'></div></div><div class='flex items-center gap-1'><div class='flex-1 h-5 border bg-muted'></div><div data-hotspot='pore' aria-label='A tiny gap in the underside' class='w-14 h-8 flex items-center justify-between px-1 rounded-md'><span class='w-4 h-5 rounded-full border bg-green-500/50'></span><span class='w-4 h-5 rounded-full border bg-green-500/50'></span></div><div class='flex-1 h-5 border bg-muted rounded-ee-lg'></div></div></div>"
+      },
+      "correct": ["pore"],
+      "multiple": false,
+      "hint": "Look for a tiny opening, on the side facing away from the light.",
+      "explanation": "The gap in the underside is a stoma, a pore that opens to let carbon dioxide from the air into the leaf."
+    },
+    {
+      "id": "p4",
+      "type": "choice",
+      "prompt": "Why do most leaves look green?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Chlorophyll reflects green light instead of absorbing it"
+        },
+        {
+          "id": "b",
+          "text": "Green is the light plants use the most",
+          "feedback": "It's the other way round: chlorophyll absorbs red and blue light best. Green bounces off, so it's the light leaves use least."
+        },
+        {
+          "id": "c",
+          "text": "The sugar stored in leaves is green",
+          "feedback": "Sugar has no green color. The green comes from chlorophyll in the chloroplasts."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "We see the color of the light that bounces off something.",
+      "explanation": "Chlorophyll soaks up red and blue light and reflects green, so green is the light that reaches your eyes."
+    },
+    {
+      "id": "c3",
+      "type": "concept",
+      "title": "Two steps: split water, then build sugar",
+      "body": "So far: the leaf gathers ingredients and chlorophyll catches light. Inside each chloroplast, the work happens in two steps. **Step 1:** light energy splits water. The oxygen from the water is released as gas, and the energy is held for a moment. **Step 2:** that held energy joins carbon from carbon dioxide into sugar. Without light, step 1 stops, and step 2 soon runs out of energy too.",
+      "visual": {
+        "kind": "html",
+        "alt": "Two steps stacked: in step 1, light and water give oxygen and held energy; in step 2, held energy and carbon dioxide give sugar.",
+        "html": "<div class='w-full max-w-sm flex flex-col gap-2 text-sm'><div class='rounded-xl border p-3 flex flex-col gap-2'><span class='text-xs font-medium text-muted-foreground'>Step 1: needs light</span><div class='flex flex-wrap items-center gap-2'><span class='badge' data-variant='outline'>Light</span><span>+</span><span class='badge' data-variant='outline'>Water</span><span class='text-muted-foreground'>→</span><span class='badge' data-variant='secondary'>Oxygen (released)</span><span>+</span><span class='badge' data-variant='outline'>Held energy</span></div></div><div class='text-center text-muted-foreground'>↓ energy passes on</div><div class='rounded-xl border p-3 flex flex-col gap-2'><span class='text-xs font-medium text-muted-foreground'>Step 2: uses the held energy</span><div class='flex flex-wrap items-center gap-2'><span class='badge' data-variant='outline'>Held energy</span><span>+</span><span class='badge' data-variant='outline'>Carbon dioxide</span><span class='text-muted-foreground'>→</span><span class='badge'>Sugar</span></div></div></div>"
+      }
+    },
+    {
+      "id": "p5",
+      "type": "choice",
+      "prompt": "Where does the oxygen a plant gives off come from?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Water"
+        },
+        {
+          "id": "b",
+          "text": "Carbon dioxide",
+          "feedback": "Tempting, since carbon dioxide contains oxygen. But step 1 splits water, and that's where the released oxygen comes from. Carbon dioxide goes into the sugar in step 2."
+        },
+        {
+          "id": "c",
+          "text": "Sugar",
+          "feedback": "Sugar is what the plant makes and keeps. It isn't broken apart to release the oxygen."
+        },
+        {
+          "id": "d",
+          "text": "Sunlight",
+          "feedback": "Light is energy, not a substance, so it can't turn into oxygen gas. It provides the energy that splits water."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "What does light split in step 1?",
+      "explanation": "In step 1, light energy splits water, and the oxygen from that water is released into the air."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "Pondweed in a sunny fish tank gives off a stream of tiny bubbles. When a cloud covers the sun, the bubbles slow down. What best explains this?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Less light means less water gets split, so less oxygen is released"
+      },
+      {
+        "id": "b",
+        "text": "The bubbles are carbon dioxide, and the plant gets rid of less of it in shade",
+        "feedback": "The plant takes carbon dioxide in. The bubbles are oxygen, the leftover from splitting water."
+      },
+      {
+        "id": "c",
+        "text": "The plant is running out of water to split",
+        "feedback": "It's underwater, so water never runs short. What changed is the light."
+      },
+      {
+        "id": "d",
+        "text": "The plant is making sugar faster and keeps the oxygen for itself",
+        "feedback": "With less light there's less energy, so sugar-making slows down, not up."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "hint": "Which step needs light, and what does it release?",
+    "explanation": "The bubbles are oxygen from step 1. Less light means less energy to split water, so fewer bubbles."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Plants use light energy to turn carbon dioxide and water into sugar, and release oxygen.",
+      "Leaves gather the ingredients: pores let in carbon dioxide, veins bring water, and chlorophyll catches light.",
+      "Light splits water, which releases oxygen; the captured energy then builds sugar from carbon dioxide."
+    ],
+    "next": "Respiration: how plants and animals use sugar for energy"
+  }
+}

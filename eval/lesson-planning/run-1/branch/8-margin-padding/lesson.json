@@ -1,0 +1,204 @@
+{
+  "spec": "0.3",
+  "title": "Margin vs padding",
+  "summary": "Know which kind of space to reach for: room inside a box, or room around it.",
+  "objective": "Use padding for space inside an element's border and margin for space between elements.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 4,
+  "topic": "CSS",
+  "hook": {
+    "id": "hook",
+    "type": "compare",
+    "prompt": "Both cards got 16px of extra space. Which one got it as padding?",
+    "options": [
+      {
+        "id": "a",
+        "visual": {
+          "kind": "html",
+          "html": "<div class='rounded-lg border border-dashed border-border p-4'><div class='rounded-md bg-primary px-1 text-sm font-medium text-primary-foreground'>Card title</div></div>",
+          "alt": "A filled card whose color hugs its text tightly, with empty space all around the outside of the card."
+        },
+        "feedback": "Here the color still hugs the text. The extra space sits outside the card, which is what margin does."
+      },
+      {
+        "id": "b",
+        "visual": {
+          "kind": "html",
+          "html": "<div class='rounded-lg border border-dashed border-border p-1'><div class='rounded-md bg-primary p-4 text-sm font-medium text-primary-foreground'>Card title</div></div>",
+          "alt": "A filled card with plenty of colored space between its text and its edges, and almost no space around the outside."
+        }
+      }
+    ],
+    "correct": "b",
+    "explanation": "Same 16px, very different look. Where the space goes, inside the colored box or outside it, is the whole difference."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Padding inside, margin outside",
+      "body": "Every element on a page is a box with an edge, its **border**. **Padding** is space *inside* the border, between the content and the edge. It's part of the element: its background fills it and clicks on it count. **Margin** is space *outside* the border. It's always transparent and pushes other elements away. Give a blue button `padding: 16px` and the blue grows; give it `margin: 16px` and it stays the same size while its neighbours move away.",
+      "term": {
+        "word": "Margin",
+        "definition": "Transparent space outside an element's border that keeps other elements away."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<div class='w-full max-w-sm text-xs'><div class='relative rounded-lg border border-dashed border-muted-foreground px-6 pb-6 pt-7'><span class='absolute top-1.5 start-2 text-muted-foreground'>margin: outside, transparent</span><div class='relative rounded-md border-2 border-primary bg-primary/10 px-6 pb-7 pt-7'><span class='absolute top-1.5 start-2 font-medium text-primary'>padding: inside, filled</span><div class='rounded bg-primary p-2 text-center text-sm font-medium text-primary-foreground'>Content</div><span class='absolute bottom-1.5 end-2 font-medium text-primary'>border</span></div></div></div>",
+        "alt": "Nested boxes: the content in the middle, a filled padding area around it inside a solid border, and a dashed, empty margin area outside the border."
+      }
+    },
+    {
+      "id": "p1",
+      "type": "choice",
+      "prompt": "A card's text touches its edges, and the grey background ends right at the letters. Which property gives the text room inside the grey?",
+      "options": [
+        {
+          "id": "a",
+          "text": "`padding`"
+        },
+        {
+          "id": "b",
+          "text": "`margin`",
+          "feedback": "Margin adds space outside the border. The grey would still hug the letters; the card would just move away from its neighbours."
+        },
+        {
+          "id": "c",
+          "text": "Either one: they look the same",
+          "feedback": "They only look the same when the box has no background or border. With a grey background, padding grows the grey and margin doesn't."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Is the missing space inside the grey box or outside it?",
+      "explanation": "The text needs room inside the border, and the grey should fill that room. That's padding."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "You add `margin: 24px` to a blue button. What changes?",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='flex gap-1'><button class='btn' data-variant='outline'>Back</button><button class='btn'>Next</button></div>",
+        "alt": "Two buttons side by side: an outlined Back and a filled blue Next."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "The blue button stays the same size, and the space around it grows"
+        },
+        {
+          "id": "b",
+          "text": "The blue area grows by 24px on every side",
+          "feedback": "That's padding. Margin sits outside the border, so the blue doesn't spread into it."
+        },
+        {
+          "id": "c",
+          "text": "Nothing you can see, because margin is transparent",
+          "feedback": "Margin itself is invisible, but it pushes other elements away, so the Back button moves."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Margin lives outside the border. What does it do to the things nearby?",
+      "explanation": "Margin adds transparent space outside the border: the button keeps its size, and the Back button gets pushed 24px farther away."
+    },
+    {
+      "id": "p3",
+      "type": "sort",
+      "prompt": "Sort each styling job by the property you'd use.",
+      "groups": [
+        { "id": "pad", "label": "Padding" },
+        { "id": "mar", "label": "Margin" }
+      ],
+      "items": [
+        { "id": "a", "text": "Make a button's colored area bigger around its label", "group": "pad" },
+        { "id": "b", "text": "Keep text from touching a box's border", "group": "pad" },
+        { "id": "c", "text": "Make a small link easier to tap", "group": "pad" },
+        { "id": "d", "text": "Add a gap between two cards in a list", "group": "mar" },
+        { "id": "e", "text": "Push a footer away from the content above it", "group": "mar" },
+        { "id": "f", "text": "Leave empty space between a photo and the heading below it", "group": "mar" }
+      ],
+      "hint": "For each job, ask: is the space inside this element, or between it and something else?",
+      "explanation": "Space that belongs to the element, filled with its background and clickable, is padding. Space that separates it from its neighbours is margin."
+    },
+    {
+      "id": "p4",
+      "type": "blank",
+      "prompt": "Complete the CSS so the comments come true.",
+      "format": "code",
+      "language": "css",
+      "caseSensitive": true,
+      "template": ".card {\n  [[a]]: 16px; /* room between the text and the card's edge */\n  [[b]]: 16px; /* room between this card and the next one */\n}",
+      "blanks": [
+        {
+          "id": "a",
+          "accept": ["padding"],
+          "choices": ["padding", "margin"],
+          "mistakes": [
+            {
+              "answer": "margin",
+              "feedback": "Room between the text and the card's own edge is inside the border, so it's padding."
+            }
+          ]
+        },
+        {
+          "id": "b",
+          "accept": ["margin"],
+          "choices": ["margin", "padding"],
+          "mistakes": [
+            {
+              "answer": "padding",
+              "feedback": "Padding would make this card bigger, not move the next one away. Space between elements is margin."
+            }
+          ]
+        }
+      ],
+      "explanation": "Inside the edge is padding; between this card and the next is margin."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "With this CSS, each button's blue hugs its label tightly, yet the buttons sit far apart. What's the best fix?",
+    "visual": {
+      "kind": "code",
+      "language": "css",
+      "code": ".btn {\n  background: blue;\n  padding: 0;\n  margin: 24px;\n}"
+    },
+    "options": [
+      {
+        "id": "a",
+        "text": "Swap them: `padding: 12px` and a small `margin: 4px`"
+      },
+      {
+        "id": "b",
+        "text": "Raise `margin` to `32px`",
+        "feedback": "More margin pushes the buttons even farther apart, and the blue still hugs each label."
+      },
+      {
+        "id": "c",
+        "text": "Add `padding: 12px` and keep `margin: 24px`",
+        "feedback": "That fixes the cramped labels, but the big margin still leaves the buttons far apart."
+      },
+      {
+        "id": "d",
+        "text": "Set both to `0`",
+        "feedback": "The blue would still hug each label, and now the buttons would touch each other."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "hint": "There are two problems: one inside each button, one between them.",
+    "explanation": "The cramped look is missing padding, and the wide gaps are too much margin. Moving space from margin to padding fixes both."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Padding is space inside the border: the background fills it and it's clickable.",
+      "Margin is transparent space outside the border that pushes other elements away.",
+      "Ask whether the space belongs to the element or sits between it and its neighbours."
+    ],
+    "next": "The CSS box model and box-sizing"
+  }
+}

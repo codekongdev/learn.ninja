@@ -1,0 +1,330 @@
+{
+  "spec": "0.3",
+  "title": "The water cycle",
+  "summary": "Follow a drop of water as it rises into the sky, makes a cloud, falls as rain, and starts all over again.",
+  "objective": "Name the four steps of the water cycle and spot each one in everyday life.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 7,
+  "topic": "Science",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "After the rain, there's a puddle on the sidewalk. By the afternoon, the sun is out and the puddle is gone. Where did the water go?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Up into the air"
+      },
+      {
+        "id": "b",
+        "text": "Down into the sidewalk",
+        "feedback": "A sidewalk is hard, so the water can't sink in. It went somewhere else!"
+      },
+      {
+        "id": "c",
+        "text": "The sun burned it up",
+        "feedback": "Water can't burn. It changed into something you can't see."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "explanation": "The water floated up into the air, even though nobody saw it go. Let's find out how."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "The sun lifts water into the air",
+      "body": "When the sun warms water, some of it turns into a gas called **water vapor**. You can't see it, but it floats up into the air. This change is called **evaporation**. Water doesn't need to boil to evaporate. That's why wet swimsuits dry on a sunny day. The warmer it is, the faster water evaporates.",
+      "term": {
+        "word": "Evaporation",
+        "definition": "When liquid water turns into invisible water vapor and rises into the air."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<svg viewBox='0 0 260 150' class='w-full max-w-sm' direction='ltr'><g class='stroke-amber-400' stroke-width='3' stroke-linecap='round'><line x1='40' y1='5' x2='40' y2='12'/><line x1='40' y1='58' x2='40' y2='65'/><line x1='10' y1='35' x2='17' y2='35'/><line x1='63' y1='35' x2='70' y2='35'/><line x1='19' y1='14' x2='24' y2='19'/><line x1='56' y1='51' x2='61' y2='56'/><line x1='61' y1='14' x2='56' y2='19'/><line x1='24' y1='51' x2='19' y2='56'/></g><circle cx='40' cy='35' r='17' class='fill-amber-400'/><g class='stroke-sky-500' fill='none' stroke-width='2' stroke-dasharray='4 4' stroke-linecap='round'><path d='M120 115 q-6 -10 0 -20 q6 -10 0 -20 q-6 -10 0 -20 q6 -10 0 -16'/><path d='M150 115 q-6 -10 0 -20 q6 -10 0 -20 q-6 -10 0 -20 q6 -10 0 -16'/><path d='M180 115 q-6 -10 0 -20 q6 -10 0 -20 q-6 -10 0 -20 q6 -10 0 -16'/></g><g class='stroke-sky-500' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='114,44 120,36 126,44'/><polyline points='144,44 150,36 156,44'/><polyline points='174,44 180,36 186,44'/></g><ellipse cx='150' cy='130' rx='70' ry='12' class='fill-sky-500'/><text x='196' y='70' font-size='12' class='fill-muted-foreground'>water vapor</text><text x='150' y='148' font-size='11' text-anchor='middle' class='fill-muted-foreground'>puddle</text></svg>",
+        "alt": "The sun shines on a blue puddle, and dashed wavy arrows labelled water vapor rise up from the puddle into the air."
+      }
+    },
+    {
+      "id": "p1",
+      "type": "choice",
+      "prompt": "Two wet towels hang outside. One is in the sun, and one is in the shade. Which one dries first?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The towel in the sun"
+        },
+        {
+          "id": "b",
+          "text": "The towel in the shade",
+          "feedback": "The shade keeps the towel cooler, so its water evaporates more slowly."
+        },
+        {
+          "id": "c",
+          "text": "They dry at the same time",
+          "feedback": "Warmth speeds up evaporation, so one towel has a big head start."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Does warmth make evaporation faster or slower?",
+      "explanation": "The sun warms the towel, and warmer water evaporates faster. So the sunny towel dries first."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "A glass of water sits on a windowsill for a week. Nobody drinks from it, but the water gets lower and lower. Where did the missing water go?",
+      "options": [
+        {
+          "id": "a",
+          "text": "It evaporated into the air as water vapor"
+        },
+        {
+          "id": "b",
+          "text": "It soaked into the glass",
+          "feedback": "Glass isn't like a sponge. It can't soak up water."
+        },
+        {
+          "id": "c",
+          "text": "Nowhere: water can only leave a glass if it boils",
+          "feedback": "Water doesn't need to boil to evaporate. It slowly turns into vapor even at room temperature."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Remember the wet swimsuit drying in the sun.",
+      "explanation": "A little water evaporates every day, even without boiling. Over a week, that adds up to a lower water level."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "Cold air turns vapor into clouds",
+      "body": "Water vapor rises high into the sky, where the air is **cold**. The cold turns the vapor back into tiny drops of liquid water. This is called **condensation**. Billions of tiny drops together make a **cloud**. You can see condensation at home too. Drops appear on the outside of a cold glass of juice, because the vapor in the air touches the cold glass and turns back into water.",
+      "term": {
+        "word": "Condensation",
+        "definition": "When water vapor cools down and turns back into tiny drops of liquid water."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<svg viewBox='0 0 260 160' class='w-full max-w-sm' direction='ltr'><g class='fill-slate-300'><circle cx='90' cy='45' r='22'/><circle cx='120' cy='35' r='28'/><circle cx='152' cy='45' r='22'/><rect x='70' y='45' width='102' height='22' rx='11'/></g><g class='fill-sky-500'><circle cx='92' cy='52' r='2.5'/><circle cx='108' cy='40' r='2.5'/><circle cx='122' cy='55' r='2.5'/><circle cx='136' cy='38' r='2.5'/><circle cx='150' cy='54' r='2.5'/><circle cx='118' cy='24' r='2.5'/><circle cx='100' cy='60' r='2.5'/><circle cx='140' cy='60' r='2.5'/></g><g class='stroke-sky-500' fill='none' stroke-width='2' stroke-dasharray='4 4' stroke-linecap='round'><path d='M95 140 q-5 -10 0 -20 q5 -10 0 -20 q-5 -10 0 -20'/><path d='M145 140 q-5 -10 0 -20 q5 -10 0 -20 q-5 -10 0 -20'/></g><g class='stroke-sky-500' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='89,87 95,79 101,87'/><polyline points='139,87 145,79 151,87'/></g><line x1='20' y1='148' x2='240' y2='148' class='stroke-border' stroke-width='2'/><text x='186' y='42' font-size='12' class='fill-foreground'>Cold up high</text><text x='186' y='130' font-size='12' class='fill-foreground'>Warm down low</text><text x='186' y='58' font-size='11' class='fill-muted-foreground'>tiny drops</text><text x='186' y='114' font-size='11' class='fill-muted-foreground'>vapor rises</text></svg>",
+        "alt": "Dashed arrows of water vapor rise from the warm ground to the cold air up high, where a gray cloud is full of tiny blue drops."
+      }
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "You take a cold can of lemonade out of the fridge. Soon the outside of the can is covered in little drops. Where did the drops come from?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Water vapor in the air touched the cold can and turned into drops"
+        },
+        {
+          "id": "b",
+          "text": "Lemonade leaked out through the can",
+          "feedback": "The can is closed tight, and the drops are plain water, not lemonade."
+        },
+        {
+          "id": "c",
+          "text": "The can is sweating, like you do after running",
+          "feedback": "Cans can't sweat. The water came from the air around the can."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "What happens to water vapor when it touches something cold?",
+      "explanation": "The cold can cools the vapor in the air next to it, and the vapor condenses into drops, just like on the cold glass of juice."
+    },
+    {
+      "id": "p4",
+      "type": "choice",
+      "prompt": "Water vapor rises from the ground. High up in the sky, it turns into a cloud. What makes that happen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The air up high is cold"
+        },
+        {
+          "id": "b",
+          "text": "The air up high is hot, because it's closer to the sun",
+          "feedback": "It's actually colder up high. And it's cold, not heat, that turns vapor back into drops."
+        },
+        {
+          "id": "c",
+          "text": "The wind squashes the vapor together",
+          "feedback": "Wind pushes clouds around, but it doesn't make them. Cold air does."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Is it cold or warm that turns vapor back into water?",
+      "explanation": "High in the sky the air is cold. The cold turns the vapor into tiny drops, and lots of tiny drops make a cloud."
+    },
+    {
+      "id": "p5",
+      "type": "sort",
+      "prompt": "Is water turning into vapor, or vapor turning into drops? Sort each one.",
+      "groups": [
+        {
+          "id": "evap",
+          "label": "Evaporation"
+        },
+        {
+          "id": "cond",
+          "label": "Condensation"
+        }
+      ],
+      "items": [
+        {
+          "id": "a",
+          "text": "Wet hair drying in the sun",
+          "group": "evap"
+        },
+        {
+          "id": "b",
+          "text": "A puddle shrinking on a hot day",
+          "group": "evap"
+        },
+        {
+          "id": "c",
+          "text": "Laundry drying on a line",
+          "group": "evap"
+        },
+        {
+          "id": "d",
+          "text": "Drops on a cold glass of milk",
+          "group": "cond"
+        },
+        {
+          "id": "e",
+          "text": "A bathroom mirror getting foggy after a hot shower",
+          "group": "cond"
+        },
+        {
+          "id": "f",
+          "text": "Your breath making a cold car window foggy",
+          "group": "cond"
+        }
+      ],
+      "hint": "Is water leaving something, or are drops showing up on something cold?",
+      "explanation": "When things dry, water evaporates away. When drops or fog appear on something cold, vapor is condensing onto it."
+    },
+    {
+      "id": "c3",
+      "type": "concept",
+      "title": "Rain falls, and it all starts again",
+      "body": "Inside a cloud, tiny drops bump together and grow. When they get too heavy to float, they fall. Water falling from clouds is called **precipitation**. It can be rain, or snow and hail when it's cold enough to freeze. The water **collects** in rivers, lakes, oceans, and the ground. Then the sun warms it, and it evaporates again. Round and round it goes!",
+      "term": {
+        "word": "Water cycle",
+        "definition": "The never-ending trip water takes: evaporation, condensation, precipitation, and collection, again and again."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<svg viewBox='0 0 320 200' class='w-full max-w-sm' direction='ltr'><circle cx='35' cy='32' r='16' class='fill-amber-400'/><g class='fill-slate-300'><circle cx='190' cy='38' r='16'/><circle cx='212' cy='30' r='20'/><circle cx='236' cy='38' r='16'/><rect x='176' y='38' width='74' height='16' rx='8'/></g><g class='stroke-sky-500' stroke-width='2' stroke-linecap='round'><line x1='196' y1='64' x2='192' y2='76'/><line x1='212' y1='64' x2='208' y2='76'/><line x1='228' y1='64' x2='224' y2='76'/><line x1='204' y1='84' x2='200' y2='96'/><line x1='220' y1='84' x2='216' y2='96'/></g><path d='M170 170 L235 95 L300 170 Z' class='fill-emerald-500'/><path d='M0 170 L170 170 L170 200 L0 200 Z' class='fill-sky-500'/><path d='M170 170 L320 170 L320 200 L170 200 Z' class='fill-emerald-600'/><path d='M228 120 q-15 25 -40 35 q-12 6 -20 15' fill='none' class='stroke-sky-500' stroke-width='3' stroke-linecap='round'/><g class='stroke-sky-500' fill='none' stroke-width='2' stroke-dasharray='4 4' stroke-linecap='round'><path d='M80 160 Q90 80 170 46'/></g><polyline points='160,44 172,45 165,55' fill='none' class='stroke-sky-500' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/><text x='40' y='105' font-size='11' class='fill-foreground'>1 Evaporation</text><text x='196' y='12' font-size='11' class='fill-foreground'>2 Condensation</text><text x='244' y='82' font-size='11' class='fill-foreground'>3 Precipitation</text><text x='40' y='190' font-size='11' class='fill-foreground'>4 Collection</text></svg>",
+        "alt": "A water cycle diagram: water evaporates from the sea, condenses into a cloud, falls as rain on a hill, and flows in a river back to the sea."
+      }
+    },
+    {
+      "id": "p6",
+      "type": "choice",
+      "prompt": "Which of these are precipitation?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Rain"
+        },
+        {
+          "id": "b",
+          "text": "Snow"
+        },
+        {
+          "id": "c",
+          "text": "Hail"
+        },
+        {
+          "id": "d",
+          "text": "A cloud floating by",
+          "feedback": "A cloud's drops are still floating. Precipitation is water falling from the cloud."
+        },
+        {
+          "id": "e",
+          "text": "Drops on a cold window",
+          "feedback": "Those drops came out of the air onto something cold. That's condensation."
+        }
+      ],
+      "correct": ["a", "b", "c"],
+      "multiple": true,
+      "hint": "Precipitation is water that falls from a cloud.",
+      "explanation": "Rain, snow, and hail all fall from clouds, so they're all precipitation. Snow and hail are just frozen water."
+    },
+    {
+      "id": "p7",
+      "type": "choice",
+      "prompt": "A big rainstorm fills up a lake. What happens to that lake water next in the water cycle?",
+      "options": [
+        {
+          "id": "a",
+          "text": "The sun warms it, and some of it evaporates into the air again"
+        },
+        {
+          "id": "b",
+          "text": "It stays in the lake forever",
+          "feedback": "The sun keeps warming the lake, so some water keeps rising as vapor. That's why it's a cycle."
+        },
+        {
+          "id": "c",
+          "text": "It floats straight back up to the cloud as raindrops",
+          "feedback": "Raindrops can't float up. Water only rises after it evaporates into invisible vapor."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "The water cycle goes round and round. What step comes after collection?",
+      "explanation": "After water collects in a lake, the sun warms it and it evaporates. Then the whole cycle starts again."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "order",
+    "prompt": "You tape a closed plastic bag with a little water in it to a sunny window. Put what happens inside the bag in order.",
+    "visual": {
+      "kind": "html",
+      "html": "<svg viewBox='0 0 240 170' class='w-full max-w-sm' direction='ltr'><rect x='10' y='10' width='220' height='150' rx='6' fill='none' class='stroke-border' stroke-width='3'/><circle cx='200' cy='38' r='14' class='fill-amber-400'/><rect x='70' y='30' width='90' height='115' rx='10' fill='none' class='stroke-muted-foreground' stroke-width='2'/><line x1='70' y1='42' x2='160' y2='42' class='stroke-muted-foreground' stroke-width='2'/><path d='M71 112 L159 112 L159 135 Q159 144 150 144 L80 144 Q71 144 71 135 Z' class='fill-sky-500'/><rect x='95' y='22' width='40' height='12' rx='2' class='fill-amber-200'/></svg>",
+      "alt": "A closed plastic bag taped to a window, with a little blue water at the bottom and the sun shining outside."
+    },
+    "items": [
+      {
+        "id": "a",
+        "text": "The sun warms the water at the bottom of the bag"
+      },
+      {
+        "id": "b",
+        "text": "Invisible vapor rises up inside the bag"
+      },
+      {
+        "id": "c",
+        "text": "Tiny drops appear near the top of the bag"
+      },
+      {
+        "id": "d",
+        "text": "The drops join together and slide down"
+      },
+      {
+        "id": "e",
+        "text": "The water gathers at the bottom again"
+      }
+    ],
+    "hint": "Start with what the sun does, and follow the water all the way round.",
+    "explanation": "It's a tiny water cycle: the water evaporates, condenses into drops, falls back down, and collects at the bottom. Then it starts again."
+  },
+  "wrapup": {
+    "takeaways": [
+      "The sun warms water and turns it into invisible vapor that rises. That's evaporation.",
+      "Up high, cold air turns vapor back into tiny drops that make clouds. That's condensation.",
+      "Heavy drops fall as rain, snow, or hail, collect in lakes and oceans, and then the cycle starts again."
+    ],
+    "next": "Snow, hail, and sleet: how water freezes on the way down"
+  }
+}

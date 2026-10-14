@@ -1,0 +1,284 @@
+{
+  "spec": "0.3",
+  "title": "Nielsen's 10 usability heuristics",
+  "summary": "Learn the 10 rules of thumb designers use to spot what makes an app confusing, and name which one a problem breaks.",
+  "objective": "Name which of Nielsen's 10 heuristics a usability problem breaks.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 9,
+  "topic": "UX design",
+  "source": {
+    "title": "10 Usability Heuristics for User Interface Design (Nielsen Norman Group)",
+    "url": "https://www.nngroup.com/articles/ten-usability-heuristics/"
+  },
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "You tap **Pay** in a shopping app. For five seconds, nothing on the screen changes. What are you most likely to do?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Wait calmly; it's probably working",
+        "feedback": "Maybe, but with no sign of progress you can't tell whether it's working or stuck."
+      },
+      {
+        "id": "b",
+        "text": "Tap Pay again, or give up and leave"
+      },
+      {
+        "id": "c",
+        "text": "Open the app's help page to check",
+        "feedback": "A help page can't tell you whether this payment went through. People react to the screen in front of them."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "With no sign of progress, people guess, and a second tap could mean paying twice. Nielsen's first heuristic exists to prevent exactly this."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "1–3: Keep people informed and in control",
+      "body": "Jakob Nielsen's 10 **usability heuristics** are rules of thumb for finding problems in any interface. The first three keep people informed and in control. **1. Visibility of system status:** always show what's happening, like a spinner after tapping Pay. **2. Match between system and the real world:** use the user's words, like \"Send money\", not \"Execute transfer\". **3. User control and freedom:** give a clearly marked emergency exit, like Undo or Cancel.",
+      "term": {
+        "word": "Usability heuristic",
+        "definition": "A rule of thumb for judging whether an interface is easy to use."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><section class='flex flex-col gap-4'><div class='flex items-center gap-3'><span class='badge' data-variant='secondary'>1</span><div class='flex-1 flex flex-col gap-1'><span class='text-sm'>Processing payment…</span><div class='progress'><span class='w-3/5'></span></div></div></div><div class='flex items-center gap-3'><span class='badge' data-variant='secondary'>2</span><button class='btn' data-size='sm'>Send money</button></div><div class='flex items-center gap-3'><span class='badge' data-variant='secondary'>3</span><span class='text-sm flex-1'>Payment scheduled</span><button class='btn' data-size='sm' data-variant='outline'>Undo</button></div></section></div>",
+        "alt": "Three numbered examples: a Processing payment progress bar, a Send money button, and a Payment scheduled message with an Undo button."
+      }
+    },
+    {
+      "id": "p1",
+      "type": "choice",
+      "prompt": "An airline app asks for your **PNR** to find your booking. Travellers know it as their booking code. Which heuristic does this break?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Match between system and the real world"
+        },
+        {
+          "id": "b",
+          "text": "Visibility of system status",
+          "feedback": "The app isn't hiding what it's doing. The problem is the word it uses: PNR is the airline's term, not the traveller's."
+        },
+        {
+          "id": "c",
+          "text": "User control and freedom",
+          "feedback": "Nothing traps the traveller here. They simply don't recognise the term, which is about speaking the user's language."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Whose words is the app using: the airline's or the traveller's?",
+      "explanation": "\"PNR\" is airline jargon. Asking for the \"booking code\" uses the traveller's own words."
+    },
+    {
+      "id": "p2",
+      "type": "hotspot",
+      "prompt": "Tap the part of this screen that gives people an emergency exit.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><header><h2>Uploading 3 photos</h2></header><section class='flex flex-col gap-2'><div data-hotspot='status' class='flex flex-col gap-1 p-1'><span class='text-sm text-muted-foreground'>2 of 3 uploaded</span><div class='progress'><span class='w-2/3'></span></div></div></section><footer class='flex gap-2 flex-wrap'><button data-hotspot='add' class='btn' data-variant='outline'>Add more photos</button><button data-hotspot='cancel' class='btn' data-variant='ghost'>Cancel upload</button></footer></div>"
+      },
+      "correct": ["cancel"],
+      "multiple": false,
+      "hint": "Which element lets someone back out of something they started by mistake?",
+      "explanation": "**Cancel upload** lets people stop an upload they didn't mean to start. The progress bar is useful too, but it shows status rather than offering a way out."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "4–6: Help people get it right",
+      "body": "Next, help people get it right. **4. Consistency and standards:** the same word or icon should mean the same thing everywhere, and match what other apps do. **5. Error prevention:** stop mistakes before they happen: disable buttons that can't work yet, confirm risky actions, keep dangerous buttons away from common ones. **6. Recognition rather than recall:** show information instead of making people remember it, like a list of recent searches.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><section class='flex flex-col gap-4'><div class='flex items-center gap-3 flex-wrap'><span class='badge' data-variant='secondary'>4</span><span class='text-sm text-muted-foreground'>Profile</span><button class='btn' data-size='sm'>Save changes</button><span class='text-sm text-muted-foreground'>Billing</span><button class='btn' data-size='sm'>Save changes</button></div><div class='flex items-center gap-3'><span class='badge' data-variant='secondary'>5</span><button class='btn' data-size='sm' disabled>Book</button><span class='text-sm text-muted-foreground'>Pick a date first</span></div><div class='flex items-start gap-3'><span class='badge' data-variant='secondary'>6</span><div class='flex-1 flex flex-col gap-1'><input class='input' placeholder='Search'><span class='text-xs text-muted-foreground'>Recent: flights to Lisbon · hotels in Porto</span></div></div></section></div>",
+        "alt": "Three numbered examples: the same Save changes button on Profile and Billing, a disabled Book button saying pick a date first, and a search box listing recent searches."
+      }
+    },
+    {
+      "id": "p3",
+      "type": "compare",
+      "prompt": "You want to reorder something you bought last month. Which screen asks less of your memory?",
+      "options": [
+        {
+          "id": "a",
+          "visual": {
+            "kind": "html",
+            "html": "<div class='card w-full max-w-xs'><header><h2>Reorder</h2></header><section><div class='field'><label class='label' for='code'>Product code</label><input class='input' id='code' placeholder='e.g. 48-2213-B'></div></section><footer><button class='btn' data-size='sm'>Reorder</button></footer></div>",
+            "alt": "A Reorder screen with an empty Product code field and a Reorder button."
+          },
+          "feedback": "This screen makes you remember a product code: that's recall. Showing what you bought lets you simply recognise it."
+        },
+        {
+          "id": "b",
+          "visual": {
+            "kind": "html",
+            "html": "<div class='card w-full max-w-xs'><header><h2>Buy again</h2></header><section class='flex flex-col gap-2'><div class='flex items-center justify-between gap-2'><span class='text-sm'>Oat milk, 6 pack</span><button class='btn' data-size='sm' data-variant='outline'>Add</button></div><div class='flex items-center justify-between gap-2'><span class='text-sm'>Coffee beans, 1 kg</span><button class='btn' data-size='sm' data-variant='outline'>Add</button></div></section></div>",
+            "alt": "A Buy again screen listing Oat milk, 6 pack and Coffee beans, 1 kg, each with an Add button."
+          }
+        }
+      ],
+      "correct": "b",
+      "hint": "On which screen could you succeed without remembering anything?",
+      "explanation": "The **Buy again** list shows past purchases, so you recognise the item instead of recalling a code."
+    },
+    {
+      "id": "p4",
+      "type": "choice",
+      "prompt": "An online store puts its cart icon at the bottom left of every page. Most stores put it at the top right, and shoppers can't find it. Which heuristic does this break?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Consistency and standards"
+        },
+        {
+          "id": "b",
+          "text": "Recognition rather than recall",
+          "feedback": "The cart is on screen, ready to be recognised. The trouble is that it isn't where people expect it from other stores."
+        },
+        {
+          "id": "c",
+          "text": "Visibility of system status",
+          "feedback": "The cart can still show what's in it. The problem is its place, which breaks a habit people learned on other sites."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "What do shoppers expect from all the other stores they use?",
+      "explanation": "People expect a cart where other stores put it. Breaking that standard makes them hunt for it."
+    },
+    {
+      "id": "p5",
+      "type": "sort",
+      "prompt": "Sort each design choice by the heuristic it follows.",
+      "groups": [
+        { "id": "con", "label": "Consistency and standards" },
+        { "id": "pre", "label": "Error prevention" },
+        { "id": "rec", "label": "Recognition rather than recall" }
+      ],
+      "items": [
+        { "id": "a", "text": "Call it \"Save\" on every screen, never \"Store\" on some", "group": "con" },
+        { "id": "b", "text": "Put the logo top left, linking home, as most sites do", "group": "con" },
+        { "id": "c", "text": "Grey out Pay until the card number is complete", "group": "pre" },
+        { "id": "d", "text": "Ask \"Delete 240 photos?\" before deleting them", "group": "pre" },
+        { "id": "e", "text": "Place Delete account far from Save", "group": "pre" },
+        { "id": "f", "text": "List recently used fonts at the top of the font menu", "group": "rec" },
+        { "id": "g", "text": "Keep field labels visible while people type", "group": "rec" },
+        { "id": "h", "text": "Show saved addresses to pick from at checkout", "group": "rec" }
+      ],
+      "hint": "Ask of each: does it match what people expect, stop a slip, or save them remembering?",
+      "explanation": "Same words and familiar layouts are consistency. Disabling, confirming, and spacing stop slips. Showing fonts, labels, and addresses spares people's memory."
+    },
+    {
+      "id": "c3",
+      "type": "concept",
+      "title": "7–10: Stay lean, and help when things go wrong",
+      "body": "The last four: **7. Flexibility and efficiency of use:** offer shortcuts that speed up experts without confusing newcomers. **8. Aesthetic and minimalist design:** cut anything that doesn't help; every extra item competes for attention. **9. Help users recognize, diagnose, and recover from errors:** say in plain words what went wrong and how to fix it, with no codes. **10. Help and documentation:** ideally no help is needed, but when it is, make it easy to search and focused on steps.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><section class='flex flex-col gap-4'><div class='flex items-center gap-3'><span class='badge' data-variant='secondary'>7</span><button class='btn' data-size='sm' data-variant='outline'>Save</button><kbd class='kbd'>Ctrl S</kbd></div><div class='flex items-center gap-3'><span class='badge' data-variant='secondary'>8</span><input class='input flex-1' placeholder='Email'><button class='btn' data-size='sm'>Sign up</button></div><div class='flex items-start gap-3'><span class='badge' data-variant='secondary'>9</span><div class='field flex-1' data-invalid='true'><input class='input' aria-invalid='true' value='12 March 2019'><p role='alert'>That date has passed. Pick a date from today on.</p></div></div><div class='flex items-center gap-3'><span class='badge' data-variant='secondary'>10</span><input class='input flex-1' placeholder='Search help: how do I…'></div></section></div>",
+        "alt": "Four numbered examples: a Save button with the shortcut Ctrl S, a one-field sign-up form, a date field with a plain-language error, and a help search box."
+      }
+    },
+    {
+      "id": "p6",
+      "type": "match",
+      "prompt": "Match each heuristic to the design that follows it.",
+      "pairs": [
+        { "left": "Flexibility and efficiency of use", "right": "Ctrl+S saves for people who know it; the Save button stays for everyone" },
+        { "left": "Aesthetic and minimalist design", "right": "A sign-up screen cut from 12 fields to the 4 that matter" },
+        { "left": "Help users recognize, diagnose, and recover from errors", "right": "\"Card number is one digit short\" instead of \"Error 402\"" },
+        { "left": "Help and documentation", "right": "A searchable help page with step-by-step guides" }
+      ],
+      "hint": "Look for the key move in each design: a shortcut, a cut, a clear error, or a guide.",
+      "explanation": "Shortcuts serve experts, cutting fields removes clutter, plain errors explain the fix, and a searchable guide helps when people get stuck."
+    },
+    {
+      "id": "p7",
+      "type": "choice",
+      "prompt": "A sign-up form shows this error when an email is mistyped. Which rewrite best follows heuristic 9?",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='w-full max-w-sm'><div class='field' data-invalid='true'><label class='label' for='em'>Email</label><input class='input' id='em' aria-invalid='true' value='sam.lee.example.com'><p role='alert'>Error 0x80070057: invalid parameter.</p></div></div>",
+        "alt": "An Email field containing sam.lee.example.com with the error Error 0x80070057: invalid parameter."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "That email is missing an @. Try something like name@example.com."
+        },
+        {
+          "id": "b",
+          "text": "Something went wrong. Please try again.",
+          "feedback": "Plain words, but it says neither what's wrong nor how to fix it, so trying again gives the same error."
+        },
+        {
+          "id": "c",
+          "text": "Invalid input (error 0x80070057).",
+          "feedback": "Still a code people can't act on. A good message names the problem and the fix in plain words."
+        },
+        {
+          "id": "d",
+          "text": "Oops! That didn't work.",
+          "feedback": "Friendly, but it doesn't diagnose anything. People still don't know the @ is missing."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "A good error message answers two questions: what's wrong, and what now?",
+      "explanation": "It names the exact problem (no @) and shows how to fix it, in words anyone understands."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "A tester flags this payment screen after someone mistypes their card number. Which heuristics does it break?",
+    "visual": {
+      "kind": "html",
+      "html": "<div class='card w-full max-w-sm'><header><h2>Payment</h2></header><section class='flex flex-col gap-3'><div class='field' data-invalid='true'><label class='label' for='cn'>Card number</label><input class='input' id='cn' aria-invalid='true' value='4242 4242 4242'><p role='alert'>ERR_VALIDATION_7</p></div><div class='field'><label class='label' for='ex'>Expiry date</label><input class='input' id='ex' value='08 / 28'></div></section><footer class='flex gap-2 flex-wrap'><button class='btn'>Clear all</button><button class='btn'>Commit transaction</button></footer></div>",
+      "alt": "A Payment form: a Card number field with the error ERR_VALIDATION_7, an Expiry date field, and two identical filled buttons side by side, Clear all and Commit transaction."
+    },
+    "options": [
+      {
+        "id": "a",
+        "text": "Match between system and the real world"
+      },
+      {
+        "id": "b",
+        "text": "Error prevention"
+      },
+      {
+        "id": "c",
+        "text": "Help users recognize, diagnose, and recover from errors"
+      },
+      {
+        "id": "d",
+        "text": "Aesthetic and minimalist design",
+        "feedback": "The screen shows only the payment fields and two buttons. There's no clutter to cut."
+      },
+      {
+        "id": "e",
+        "text": "Recognition rather than recall",
+        "feedback": "Every field keeps a visible label, so nobody has to remember what goes where."
+      }
+    ],
+    "correct": ["a", "b", "c"],
+    "multiple": true,
+    "hint": "Read every label, message, and button as a first-time customer would.",
+    "explanation": "\"Commit transaction\" is system talk, \"ERR_VALIDATION_7\" explains nothing, and a same-looking Clear all beside the pay button invites a costly slip."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Check each screen against the 10 heuristics to find problems before your users do.",
+      "Keep people informed and in control: show status, use their words, and offer a way out.",
+      "Help people get it right: be consistent, prevent slips, and show instead of asking them to remember.",
+      "Stay lean and helpful: add shortcuts, cut clutter, write plain-language errors, and make help easy to search."
+    ],
+    "next": "Running a heuristic evaluation and rating how severe each problem is"
+  }
+}

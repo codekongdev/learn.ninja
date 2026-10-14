@@ -1,0 +1,271 @@
+{
+  "spec": "0.3",
+  "title": "Keep people informed, in their words",
+  "summary": "Use the first two of Nielsen's usability heuristics to make any screen say what's happening, in words people know.",
+  "objective": "Show people what's happening after every action, using everyday words instead of internal terms.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 7,
+  "topic": "UX design",
+  "source": {
+    "title": "10 Usability Heuristics for User Interface Design (Nielsen Norman Group)",
+    "url": "https://www.nngroup.com/articles/ten-usability-heuristics/"
+  },
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "You tap **Save** in an app. It takes 4 seconds to finish, and nothing on screen changes meanwhile. What are many people likely to do?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Wait calmly until it's done",
+        "feedback": "Four seconds feels long when nothing moves. Without a sign of progress, people can't tell waiting from broken."
+      },
+      {
+        "id": "b",
+        "text": "Tap Save again, thinking it didn't work"
+      },
+      {
+        "id": "c",
+        "text": "Assume it saved and close the app",
+        "feedback": "Some will, and lose their work if it hadn't finished. But with no sign of progress, most people think their tap simply didn't register."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "With no sign that anything is happening, a working app looks exactly like a broken one. So people tap again, or give up."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Heuristic 1: show what's happening",
+      "body": "Jakob Nielsen's **10 usability heuristics** are rules of thumb for spotting problems in an interface. The first is **visibility of system status**: after every action, show people what's going on, right away. Use a spinner for a short wait, a progress bar with time left for a long one, and a clear message like **Saved** when it's done.",
+      "term": {
+        "word": "Visibility of system status",
+        "definition": "The interface always tells people what's going on, with feedback that comes right away."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><header><h2>Uploading photos</h2><p>3 of 5 done · about 20 seconds left</p></header><section><div class='progress'><span class='w-3/5'></span></div></section></div>",
+        "alt": "A card titled Uploading photos, saying 3 of 5 done, about 20 seconds left, with a progress bar three-fifths full."
+      }
+    },
+    {
+      "id": "p1",
+      "type": "choice",
+      "prompt": "In a chat app, you tap **Send** and nothing changes for three seconds before the message appears. Which fix best follows the first heuristic?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Show the message at once, marked **Sending…**, then **Sent** when it arrives"
+        },
+        {
+          "id": "b",
+          "text": "Show a **Sent** label only once it's finished",
+          "feedback": "That confirms the end, but the three silent seconds are still there. People need to see something the moment they tap."
+        },
+        {
+          "id": "c",
+          "text": "Add a help page explaining that sending can take a few seconds",
+          "feedback": "Nobody reads a help page mid-message. The status has to be on screen, at the moment it matters."
+        },
+        {
+          "id": "d",
+          "text": "Make the Send button bigger",
+          "feedback": "A bigger button is easier to tap, but it still doesn't tell anyone what's happening after they tap it."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "People need to know what's going on both right away and when it's done.",
+      "explanation": "**Sending…** answers \"did my tap work?\" instantly, and **Sent** confirms the result. The status is visible from start to finish."
+    },
+    {
+      "id": "p2",
+      "type": "compare",
+      "prompt": "A large update takes several minutes to download. Which screen keeps people better informed?",
+      "options": [
+        {
+          "id": "a",
+          "visual": {
+            "kind": "html",
+            "html": "<div class='card w-full max-w-xs'><header><h2>Downloading update</h2></header><section class='flex justify-center py-2'><div class='size-8 rounded-full border-4 border-muted border-t-primary'></div></section></div>",
+            "alt": "A Downloading update card with only a spinner and no other information."
+          },
+          "feedback": "A spinner says something is happening, but not how long it will take. For a wait of minutes, people need progress and time left."
+        },
+        {
+          "id": "b",
+          "visual": {
+            "kind": "html",
+            "html": "<div class='card w-full max-w-xs'><header><h2>Downloading update</h2><p>40% · about 3 minutes left</p></header><section><div class='progress'><span class='w-2/5'></span></div></section></div>",
+            "alt": "A Downloading update card saying 40%, about 3 minutes left, with a progress bar two-fifths full."
+          }
+        }
+      ],
+      "correct": "b",
+      "hint": "Is this a short wait or a long one?",
+      "explanation": "For a long task, a progress bar with time left lets people decide whether to wait or do something else."
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "Which of these show people the system's status?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A badge showing **3** unread messages on the Inbox tab"
+        },
+        {
+          "id": "b",
+          "text": "**Step 2 of 4** above a sign-up form"
+        },
+        {
+          "id": "c",
+          "text": "**All changes saved** next to a document's title"
+        },
+        {
+          "id": "d",
+          "text": "The company logo at the top of every page",
+          "feedback": "The logo stays the same whatever happens, so it tells people nothing about what's going on."
+        },
+        {
+          "id": "e",
+          "text": "A **Contact us** link in the footer",
+          "feedback": "Useful to have, but it's a way to get help, not a sign of what the system is doing or where you are."
+        }
+      ],
+      "correct": ["a", "b", "c"],
+      "multiple": true,
+      "hint": "Which ones change as things happen?",
+      "explanation": "Status isn't only loading. Unread counts, steps in a process, and save confirmations all tell people where things stand."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "Heuristic 2: speak the user's language",
+      "body": "The second heuristic is **match between the system and the real world**. Use words and ideas your users know from everyday life, not your team's internal terms or codes. **Error 0x80070005** means nothing to most people; **You don't have permission to open this file** does. Show information in the order people expect, too: the order they'd follow in real life.",
+      "term": {
+        "word": "Match between the system and the real world",
+        "definition": "The interface uses words, ideas, and an order that are familiar to its users."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<div class='grid gap-3 w-full max-w-sm'><div class='alert' data-variant='destructive'><h2>Error 0x80070005</h2><section>Operation failed.</section></div><div class='alert'><h2>You can't open this file</h2><section>You don't have permission. Ask its owner to share it with you.</section></div></div>",
+        "alt": "Two messages: a red one saying Error 0x80070005, Operation failed; and a plain one saying You can't open this file, ask its owner to share it with you."
+      }
+    },
+    {
+      "id": "p4",
+      "type": "hotspot",
+      "prompt": "This is a shopping app's order screen. Tap the text that doesn't speak the customer's language.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><header><h2 data-hotspot='title'>Your order #4821</h2><p data-hotspot='status'>Status: FULFILLMENT_PENDING</p></header><section><p data-hotspot='arrives' class='text-sm'>Arrives Thursday</p></section><footer><button data-hotspot='track' class='btn'>Track package</button></footer></div>"
+      },
+      "correct": ["status"],
+      "multiple": false,
+      "hint": "Which line reads like it was written for the warehouse's computer, not for a shopper?",
+      "explanation": "**FULFILLMENT_PENDING** is an internal code. A shopper would understand **Preparing your order**."
+    },
+    {
+      "id": "p5",
+      "type": "match",
+      "prompt": "Match each internal term to the everyday words a user would understand.",
+      "pairs": [
+        {
+          "left": "Authenticate",
+          "right": "Sign in"
+        },
+        {
+          "left": "Purge item",
+          "right": "Delete forever"
+        },
+        {
+          "left": "Session expired",
+          "right": "You've been signed out"
+        },
+        {
+          "left": "Payment declined: code 51",
+          "right": "Your card doesn't have enough funds"
+        }
+      ],
+      "hint": "Imagine saying each term out loud to a friend who has never built software.",
+      "explanation": "Each everyday phrase says the same thing in words people already use, so nobody has to translate the screen."
+    },
+    {
+      "id": "p6",
+      "type": "choice",
+      "prompt": "A recipe app lists the steps in order, but sorts the ingredients alphabetically. In which order would a cook rather see the ingredients?",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><header><h2>Pancakes: ingredients</h2></header><section><ul class='text-sm grid gap-1'><li>Baking powder</li><li>Butter, melted</li><li>Eggs</li><li>Flour</li><li>Milk</li><li>Sugar</li></ul></section></div>",
+        "alt": "A pancake recipe card listing ingredients alphabetically: baking powder, butter, eggs, flour, milk, sugar."
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "In the order they're used in the steps"
+        },
+        {
+          "id": "b",
+          "text": "Alphabetically, as now, so each one is easy to find",
+          "feedback": "Alphabetical order is tidy for a computer, but a cook works through the recipe step by step, not from A to Z."
+        },
+        {
+          "id": "c",
+          "text": "From the largest amount to the smallest",
+          "feedback": "That's logical on paper, but it doesn't match how cooking happens: you reach for things as each step needs them."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Think about what the cook is doing while reading the list.",
+      "explanation": "In the kitchen, you add ingredients as the steps call for them. Listing them in that order matches the real task."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "scenario",
+    "prompt": "Which fix would you ship first?",
+    "situation": "In a food delivery app, people tap **Place order** and the screen stays the same for 5 seconds. Then it shows **Order status: QUEUED_FOR_DISPATCH**. Many people tap Place order twice and get two meals.",
+    "options": [
+      {
+        "id": "a",
+        "quality": "best",
+        "text": "Show **Placing your order…** the moment they tap, then **Order confirmed: the restaurant is preparing your food**",
+        "outcome": "People see their tap worked, stop ordering twice, and understand exactly where their food is."
+      },
+      {
+        "id": "b",
+        "quality": "okay",
+        "text": "Add a spinner during the 5 seconds, and keep the status text as it is",
+        "outcome": "Double orders drop, but people are left puzzling over QUEUED_FOR_DISPATCH and some contact support to ask what it means."
+      },
+      {
+        "id": "c",
+        "quality": "okay",
+        "text": "Rename the status to **Waiting for a driver**, and keep the 5 silent seconds",
+        "outcome": "The status now makes sense, but people still think their first tap failed and keep ordering twice."
+      },
+      {
+        "id": "d",
+        "quality": "poor",
+        "text": "Add an FAQ page that explains each status code",
+        "outcome": "Hardly anyone opens it while ordering. The double orders and the confusing code both stay."
+      }
+    ],
+    "hint": "There are two problems here: the silence, and the wording.",
+    "explanation": "The screen breaks both heuristics: 5 silent seconds hide the status, and the code isn't the customer's language. The best fix solves both."
+  },
+  "wrapup": {
+    "takeaways": [
+      "After every action, show right away that something is happening, and confirm when it's done.",
+      "For long waits, show progress and time left, not just a spinner.",
+      "Write labels and messages in your users' everyday words, never internal codes.",
+      "Order information the way people use it in real life."
+    ],
+    "next": "Let people undo, and keep things familiar"
+  }
+}

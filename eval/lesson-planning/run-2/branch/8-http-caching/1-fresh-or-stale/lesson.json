@@ -1,0 +1,255 @@
+{
+  "spec": "0.3",
+  "title": "Fresh or stale: how long caches reuse responses",
+  "summary": "You know HTTP requests and headers. Learn how a cache decides whether a stored response is still fresh enough to reuse without asking the server.",
+  "objective": "Work out how long a cache may reuse a response from its max-age, Age, Expires, and Last-Modified headers.",
+  "language": "en",
+  "level": "intermediate",
+  "estimatedMinutes": 7,
+  "topic": "Web development",
+  "source": {
+    "title": "HTTP caching (MDN Web Docs)",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching"
+  },
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "Your server sends `/styles.css` with `Cache-Control: max-age=604800` (one week). An hour later, you deploy a fixed `/styles.css` at the same URL. What do returning visitors get?",
+    "options": [
+      {
+        "id": "a",
+        "text": "The fixed file, because the server has it now",
+        "feedback": "The server has it, but the browser may never ask. A stored response it considers fresh is reused without a request."
+      },
+      { "id": "b", "text": "The old file, possibly for up to a week" },
+      {
+        "id": "c",
+        "text": "The browser checks whether the file changed, then gets the fixed one",
+        "feedback": "Checking with the server only happens later. For now the browser trusts its stored copy and sends nothing."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "The browser reuses its stored copy without asking the server. For a week, that response counts as fresh. How caches decide that is what this lesson is about."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Fresh responses skip the server",
+      "body": "A cache tracks each stored response's **age**: the time since the server generated it. `Cache-Control: max-age=N` sets how many **seconds** it stays **fresh**. While its age is under N, the cache answers repeat requests itself, without contacting the server, even if the file has changed there. Once its age passes N, the response is **stale** and can't be reused as it is.",
+      "term": {
+        "word": "Stale",
+        "definition": "A stored response whose age has passed its freshness lifetime (its max-age), so the cache can't simply reuse it."
+      },
+      "visual": {
+        "kind": "html",
+        "alt": "A timeline of a response's age with max-age=3600: from 0 to 3,600 seconds it is fresh and the cache answers; after that it is stale.",
+        "html": "<svg viewBox='0 0 300 104' direction='ltr' class='w-full max-w-sm mx-auto' xmlns='http://www.w3.org/2000/svg'><text x='20' y='20' class='fill-foreground text-xs font-mono'>Cache-Control: max-age=3600</text><rect x='20' y='36' width='180' height='26' rx='4' class='fill-primary'/><rect x='200' y='36' width='80' height='26' rx='4' class='fill-muted-foreground' opacity='0.3'/><text x='110' y='53' text-anchor='middle' class='fill-primary-foreground text-xs'>Fresh: cache answers</text><text x='240' y='53' text-anchor='middle' class='fill-foreground text-xs'>Stale</text><line x1='20' y1='62' x2='20' y2='72' class='stroke-border'/><line x1='200' y1='62' x2='200' y2='72' class='stroke-border'/><text x='20' y='86' text-anchor='middle' class='fill-muted-foreground text-xs'>0 s</text><text x='200' y='86' text-anchor='middle' class='fill-muted-foreground text-xs'>3,600 s</text><text x='280' y='86' text-anchor='end' class='fill-muted-foreground text-xs'>age →</text></svg>"
+      }
+    },
+    {
+      "id": "p1",
+      "type": "choice",
+      "prompt": "At 10:00 a browser stores `/app.css`, generated that moment with `Cache-Control: max-age=3600`. At 10:40 another page links to `/app.css`. What does the browser do?",
+      "options": [
+        { "id": "a", "text": "Uses its stored copy without sending a request" },
+        {
+          "id": "b",
+          "text": "Requests `/app.css` from the server again",
+          "feedback": "Its age is 40 minutes, or 2,400 seconds, under the 3,600 that max-age allows. A fresh response is answered from the cache."
+        },
+        {
+          "id": "c",
+          "text": "Treats the copy as stale, since some time has passed",
+          "feedback": "Any age counts as fresh until it passes max-age. 2,400 seconds is still under 3,600."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "Age at 10:40 is 2,400 seconds, below max-age=3600, so the response is fresh and the browser reuses it without contacting the server."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "You want `/logo.svg` to stay fresh in caches for one day. Which header does that?",
+      "options": [
+        { "id": "a", "text": "`Cache-Control: max-age=86400`" },
+        {
+          "id": "b",
+          "text": "`Cache-Control: max-age=24`",
+          "feedback": "max-age counts seconds, not hours. This keeps the logo fresh for just 24 seconds."
+        },
+        {
+          "id": "c",
+          "text": "`Cache-Control: max-age=1440`",
+          "feedback": "1,440 is the minutes in a day, but max-age counts seconds, so this lasts 24 minutes."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "max-age is in seconds: 24 × 60 × 60 = 86,400."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "A shared cache passes on its copy's age",
+      "body": "Caches between browsers and the server, like a CDN, are **shared caches**: one stored copy serves many users. When a shared cache answers, it adds an `Age` header: how many seconds old its copy already is. The browser's clock starts there, not at zero, so the response stays fresh only for what's left: `max-age` minus `Age`. Here, a week minus one day leaves 518,400 seconds, six days.",
+      "visual": {
+        "kind": "code",
+        "language": "http",
+        "code": "HTTP/1.1 200 OK\nContent-Type: text/html\nCache-Control: max-age=604800\nAge: 86400",
+        "highlight": [3, 4]
+      }
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "A CDN answers with `Cache-Control: max-age=3600` and `Age: 600`. From that moment, how long can the browser reuse the response without asking again?",
+      "options": [
+        { "id": "a", "text": "3,000 seconds" },
+        {
+          "id": "b",
+          "text": "3,600 seconds",
+          "feedback": "That starts the clock at zero in the browser. The copy is already 600 seconds old, and that time is used up."
+        },
+        {
+          "id": "c",
+          "text": "4,200 seconds",
+          "feedback": "Age doesn't add time; it's time already spent. Subtract it from max-age."
+        },
+        {
+          "id": "d",
+          "text": "600 seconds",
+          "feedback": "600 is how old the copy is, not how long it has left."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Is Age time added, or time already used?",
+      "explanation": "Remaining freshness is max-age minus Age.\n3,600 − 600 = 3,000 seconds"
+    },
+    {
+      "id": "p4",
+      "type": "choice",
+      "prompt": "A CDN stores a response with `max-age=7200`. Ana's browser gets it from the CDN 30 minutes later; Ben's gets it 90 minutes later. Whose browser can reuse it for longer?",
+      "options": [
+        { "id": "a", "text": "Ana's: 90 minutes left, against Ben's 30" },
+        {
+          "id": "b",
+          "text": "Both the same: two hours each",
+          "feedback": "That ignores the Age header. The CDN tells each browser how old the copy already is, and that time is gone."
+        },
+        {
+          "id": "c",
+          "text": "Ben's, because he received it more recently",
+          "feedback": "Freshness counts from when the server generated the response, not when a browser received it. Ben's copy is older."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "What Age does the CDN send to each of them?",
+      "explanation": "One clock for both.\nAna: Age 1,800 s → 7,200 − 1,800 = 5,400 s (90 min)\nBen: Age 5,400 s → 7,200 − 5,400 = 1,800 s (30 min)"
+    },
+    {
+      "id": "c3",
+      "type": "concept",
+      "title": "No max-age? Caches guess, or read Expires",
+      "body": "A response with no `Cache-Control` still gets reused: caches apply **heuristic caching**. If `Last-Modified` says the file last changed a year ago, the spec suggests reusing it for about 10% of that, roughly five weeks. The older `Expires` header gives a fixed date instead, which is error-prone because it depends on clocks. If both are sent, `max-age` wins. So give every response an explicit `Cache-Control`.",
+      "term": {
+        "word": "Heuristic caching",
+        "definition": "Reusing a response that has no explicit freshness lifetime, for a time the cache estimates, typically from Last-Modified."
+      },
+      "visual": {
+        "kind": "code",
+        "language": "http",
+        "code": "HTTP/1.1 200 OK\nContent-Type: text/html\nDate: Tue, 22 Feb 2022 22:22:22 GMT\nLast-Modified: Tue, 22 Feb 2021 22:22:22 GMT",
+        "highlight": [4]
+      }
+    },
+    {
+      "id": "p5",
+      "type": "choice",
+      "prompt": "An API response carries `Expires` set to next Friday and `Cache-Control: max-age=60`. How long is it fresh?",
+      "options": [
+        { "id": "a", "text": "60 seconds" },
+        {
+          "id": "b",
+          "text": "Until next Friday",
+          "feedback": "When both headers are present, max-age is preferred and Expires is ignored."
+        },
+        {
+          "id": "c",
+          "text": "Whichever lasts longer",
+          "feedback": "Caches don't pick the longer one. max-age simply takes priority over Expires."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "max-age overrides Expires, so the response goes stale after 60 seconds whatever date Expires names."
+    },
+    {
+      "id": "p6",
+      "type": "choice",
+      "prompt": "Your server sends `/pricing` with only `Date` and a `Last-Modified` from 200 days ago; no `Cache-Control`. You update the page today. What might returning visitors see?",
+      "options": [
+        { "id": "a", "text": "Possibly the old page, for up to about 20 days" },
+        {
+          "id": "b",
+          "text": "Always the new page, since nothing tells caches to store it",
+          "feedback": "That's the trap: without Cache-Control, caches still store and reuse responses by heuristic caching."
+        },
+        {
+          "id": "c",
+          "text": "Possibly the old page, for up to 200 days",
+          "feedback": "The heuristic reuses a response for a fraction of the time since Last-Modified, about 10%, not the whole span."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "What does the spec suggest when there's no max-age?",
+      "explanation": "Heuristic caching suggests about 10% of the time since the last change: 10% of 200 days is roughly 20 days. The exact time is up to each cache."
+    }
+  ],
+  "challenge": {
+    "id": "challenge",
+    "type": "choice",
+    "prompt": "A browser receives this `/app.js` response from a CDN. Five minutes later, a page needs `/app.js` again. How much freshness does the stored response have left?",
+    "visual": {
+      "kind": "code",
+      "language": "http",
+      "code": "HTTP/1.1 200 OK\nContent-Type: text/javascript\nDate: Tue, 14 Oct 2026 08:58:00 GMT\nCache-Control: max-age=600\nExpires: Wed, 15 Oct 2026 08:58:00 GMT\nAge: 120"
+    },
+    "options": [
+      { "id": "a", "text": "3 minutes" },
+      {
+        "id": "b",
+        "text": "5 minutes",
+        "feedback": "That restarts the clock when the browser received it. The copy arrived already 120 seconds old."
+      },
+      {
+        "id": "c",
+        "text": "8 minutes",
+        "feedback": "600 − 120 is right on arrival, but the five minutes since then count toward its age too."
+      },
+      {
+        "id": "d",
+        "text": "About a day, until the Expires date",
+        "feedback": "With max-age present, Expires is ignored."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "hint": "Which header wins, and how old was the copy when it arrived?",
+    "explanation": "max-age beats Expires.\nAge now: 120 + 300 = 420 s\nLeft: 600 − 420 = 180 s, so 3 minutes"
+  },
+  "wrapup": {
+    "takeaways": [
+      "While a response's age is under `max-age` (in seconds), caches reuse it without asking the server, even if the file has changed.",
+      "A shared cache's `Age` header uses up part of `max-age`; the browser gets only what's left.",
+      "If `max-age` and `Expires` are both sent, `max-age` wins.",
+      "Without `Cache-Control`, caches guess a lifetime from `Last-Modified`, so send an explicit `Cache-Control` on every response."
+    ],
+    "next": "Revalidation: ETag, If-None-Match, and 304"
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "spec": "0.3",
+  "title": "Stocks vs bonds: owner or lender?",
+  "summary": "See the one difference between a stock and a bond, and what it means for how each pays you.",
+  "objective": "Tell a stock from a bond by asking whether you own part of the issuer or lent it money, and predict how each behaves when things go badly.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 4,
+  "topic": "Personal finance",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "You pay $1,000 for a company's bond. What have you just done?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Bought a small piece of the company",
+        "feedback": "That's what buying its stock does. A bond works differently."
+      },
+      {
+        "id": "b",
+        "text": "Lent the company money"
+      },
+      {
+        "id": "c",
+        "text": "Paid a fee to join its investor club",
+        "feedback": "Your $1,000 isn't a fee: you expect to get it back."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "A bond is an IOU. The company borrows your money and owes it back, which changes everything about how you get paid."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Owner or lender",
+      "body": "A **stock** (also called a share) is a small piece of ownership in a company. Buy one and you're a part-owner. A **bond** is a loan. Buy one and you've lent money to a company or a government, which promises to pay you interest and return your money on a set date.",
+      "term": {
+        "word": "Bond",
+        "definition": "A loan you make to a company or government, repaid with interest by a set date."
+      },
+      "visual": {
+        "kind": "html",
+        "alt": "Two cards: Stock, where you own a slice of the company, and Bond, where you lend money and get interest plus your money back.",
+        "html": "<div class='grid grid-cols-2 gap-3 w-full max-w-sm'><div class='card'><header><h2>Stock</h2><p>You're an owner</p></header><section class='flex justify-center'><svg viewBox='0 0 64 64' width='64' height='64' direction='ltr'><circle cx='32' cy='32' r='28' class='fill-muted stroke-border' stroke-width='1.5'/><path d='M32 32 L32 4 A28 28 0 0 1 56.2 18 Z' class='fill-primary'/></svg></section></div><div class='card'><header><h2>Bond</h2><p>You're a lender</p></header><section class='flex flex-col gap-1 text-sm'><div class='flex items-center gap-2'><span class='badge' data-variant='outline'>Now</span><span>$1,000 out</span></div><div class='flex items-center gap-2'><span class='badge' data-variant='secondary'>Yearly</span><span>Interest in</span></div><div class='flex items-center gap-2'><span class='badge'>Due date</span><span>$1,000 back</span></div></section></div></div>"
+      }
+    },
+    {
+      "id": "p1",
+      "type": "choice",
+      "prompt": "Maya pays a city $500. The city promises her 4% interest a year and her $500 back in 10 years. What did Maya buy?",
+      "options": [
+        {
+          "id": "a",
+          "text": "A bond"
+        },
+        {
+          "id": "b",
+          "text": "A stock",
+          "feedback": "A stock is a piece of ownership. Maya owns nothing here: she lent money and is promised it back."
+        },
+        {
+          "id": "c",
+          "text": "Both: she owns part of the city and earns interest",
+          "feedback": "Interest plus a set repayment date means a loan, not ownership. Lenders don't own what they lend to."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Is Maya promised her money back on a set date?",
+      "explanation": "Maya lent the city money in return for interest and repayment in 10 years. That's a bond, and governments issue them too."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "How each one pays you",
+      "body": "Because a lender is owed money, a bond pays its set **interest** whatever the profits, then returns your money. An owner is owed nothing. A stock pays off only if the company does well: its share price rises, or it shares profits as a **dividend**. If the company fails, lenders are paid back before owners. So bonds are usually steadier, while stocks can gain or lose much more.",
+      "term": {
+        "word": "Dividend",
+        "definition": "A share of a company's profits paid to its owners. The company can cut it at any time."
+      },
+      "visual": {
+        "kind": "html",
+        "alt": "A table comparing stocks and bonds: what you are, what you get, who is paid first if the company fails, and how much the value swings.",
+        "html": "<table class='table w-full max-w-sm text-sm'><thead><tr><th></th><th>Stock</th><th>Bond</th></tr></thead><tbody><tr><td class='font-medium'>You are</td><td>Owner</td><td>Lender</td></tr><tr><td class='font-medium'>You get</td><td>Price rise, dividends (not promised)</td><td>Set interest, then your money back</td></tr><tr><td class='font-medium'>If it fails</td><td>Paid last</td><td>Paid first</td></tr><tr><td class='font-medium'>Swings</td><td>Bigger</td><td>Smaller</td></tr></tbody></table>"
+      }
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "A company has a terrible year and makes no profit. Who can still expect their regular payment?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Priya, who holds the company's bonds"
+        },
+        {
+          "id": "b",
+          "text": "Sam, who holds the company's stock",
+          "feedback": "Owners share in profits, and there are none. Sam's dividend isn't promised, so it can be cut."
+        },
+        {
+          "id": "c",
+          "text": "Neither: no profit means nobody gets paid",
+          "feedback": "Bond interest is a debt the company owes whatever its profits. Only the owners' payments depend on profit."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Which of them is owed money?",
+      "explanation": "Priya is a lender, so her interest is owed even in a bad year. Sam is an owner, and owners share only in profits."
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "A company goes bust and sells everything it has. Who is first in line for that money?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Its bondholders"
+        },
+        {
+          "id": "b",
+          "text": "Its shareholders, because they own the company",
+          "feedback": "Owning it puts them last: lenders are paid back before owners, and often nothing is left for the owners."
+        },
+        {
+          "id": "c",
+          "text": "Whoever put in the most money",
+          "feedback": "The order depends on being a lender or an owner, not on how much each person put in."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Think about who is owed money and who just owns a slice.",
+      "explanation": "Bondholders lent the company money, so their claim comes first. Shareholders get only what's left, which is often nothing."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "TechCo has a bad year: profits drop to zero and its share price falls 40%. Jo owns TechCo stock. Kim owns a TechCo bond. What most likely happens to them?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Jo's investment loses value, while Kim keeps getting her interest"
+      },
+      {
+        "id": "b",
+        "text": "Both lose 40%",
+        "feedback": "The share price is what Jo's slice is worth. Kim is a lender, so she's owed her set interest and her money back."
+      },
+      {
+        "id": "c",
+        "text": "Kim loses more, because lenders are paid last",
+        "feedback": "It's the other way round: lenders are paid before owners."
+      },
+      {
+        "id": "d",
+        "text": "Nothing changes for either of them",
+        "feedback": "Jo's slice is worth 40% less, and with no profits her dividend could be cut too."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "hint": "Ask which of them is an owner and which is a lender.",
+    "explanation": "Jo owns a slice, so she shares the drop. Kim lent money, so TechCo still owes her interest, unless it fails completely."
+  },
+  "wrapup": {
+    "takeaways": [
+      "A stock makes you a part-owner of a company; a bond makes you a lender to a company or government.",
+      "A bond promises set interest and your money back on a date; a stock promises nothing but can grow with the company.",
+      "If a company fails, bondholders are paid before shareholders, which is why bonds are usually the steadier of the two."
+    ],
+    "next": "How mixing stocks and bonds spreads risk"
+  }
+}

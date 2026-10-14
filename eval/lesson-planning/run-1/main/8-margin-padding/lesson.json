@@ -1,0 +1,200 @@
+{
+  "spec": "0.3",
+  "title": "Margin vs padding",
+  "summary": "You know both add space. Learn which side of the border each one lives on, and when vertical margins collapse.",
+  "objective": "Pick margin or padding for any spacing job, and predict the gap when vertical margins meet.",
+  "language": "en",
+  "level": "intermediate",
+  "estimatedMinutes": 5,
+  "topic": "CSS",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "This small text button is hard to tap. A teammate adds `margin: 12px` to it. What changes?",
+    "visual": {
+      "kind": "html",
+      "alt": "A tiny secondary button labelled Undo, with its label close to its edges.",
+      "html": "<div class='flex items-center gap-2 text-sm text-muted-foreground'><span>Message deleted.</span><button class='btn' data-variant='secondary' data-size='xs'>Undo</button></div>"
+    },
+    "options": [
+      {
+        "id": "a",
+        "text": "The tappable area grows by 12px on every side",
+        "feedback": "Margin sits outside the button, so the extra space isn't part of what you tap."
+      },
+      { "id": "b", "text": "The button stays the same size; only its neighbours move further away" },
+      {
+        "id": "c",
+        "text": "The label gets 12px of room inside the button",
+        "feedback": "Room inside the button's background is a different property. Margin goes outside the edge."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "Margin adds space outside the button that isn't part of it, so the tap target stays just as small. The fix lives inside the border."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Inside the border or outside it",
+      "body": "Both add space, on opposite sides of the **border**. **Padding** sits inside: it's painted with the element's background, it counts as part of the box, and people can click or tap it. **Margin** sits outside: it's always transparent, never clickable, and only pushes neighbours away. So ask: should this space *belong to* the element, or sit *between* elements?",
+      "visual": {
+        "kind": "html",
+        "alt": "Box model diagram: a dashed transparent margin ring outside a solid border, a tinted padding area inside the border, and the content in the middle.",
+        "html": "<div class='w-full max-w-sm text-xs'><div class='rounded-lg border border-dashed border-muted-foreground p-6 relative'><span class='absolute top-1.5 start-2 text-muted-foreground'>margin (transparent)</span><div class='rounded-md border-2 border-foreground bg-primary/15 p-6 relative'><span class='absolute top-1.5 start-2 font-medium'>padding (painted, clickable)</span><span class='absolute bottom-1 end-2 text-muted-foreground'>border</span><div class='rounded-sm border bg-background py-2 text-center text-sm'>content</div></div></div></div>"
+      }
+    },
+    {
+      "id": "p1",
+      "type": "sort",
+      "prompt": "Which property fits each spacing job?",
+      "groups": [
+        { "id": "pad", "label": "padding" },
+        { "id": "mar", "label": "margin" }
+      ],
+      "items": [
+        { "id": "a", "text": "Room between a button's label and its edge", "group": "pad" },
+        { "id": "b", "text": "A bigger tap target for a small icon button", "group": "pad" },
+        { "id": "c", "text": "Tinted space around the text in a banner", "group": "pad" },
+        { "id": "d", "text": "A gap between two stacked cards", "group": "mar" },
+        { "id": "e", "text": "Pushing a footer away from the content above it", "group": "mar" },
+        { "id": "f", "text": "Clear space around a logo that other elements must keep out of", "group": "mar" }
+      ],
+      "explanation": "Space that should look or feel like part of the element (tinted, tappable) is padding. Space that only keeps other elements away is margin."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "A white card with a 1px border sits on a grey page. You change its `padding: 16px` to `margin: 16px`. What does the user see?",
+      "options": [
+        { "id": "a", "text": "The text now touches the border, and grey page shows in a 16px ring around the card" },
+        {
+          "id": "b",
+          "text": "Nothing; the same 16px of space just moved",
+          "feedback": "The space moved across the border. It was white and inside the card; now it's outside, where the page shows through."
+        },
+        {
+          "id": "c",
+          "text": "The white area grows by 16px on each side",
+          "feedback": "That's what adding padding does. Margin is transparent, so it shows the grey page, not the card's white."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Which side of the border is each property on?",
+      "explanation": "Padding was the white space inside the border. As margin, it moves outside and turns transparent, so the text meets the border and grey shows around the card."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "The catch: vertical margins collapse",
+      "body": "When two vertical margins touch in normal block flow, the browser keeps only the **larger** one. A heading with `margin-bottom: 24px` above a paragraph with `margin-top: 16px` leaves a 24px gap, not 40px. A first child's top margin can also slip out through a parent with no top padding or border, landing above the parent's background. Padding never collapses, and neither do horizontal margins or the margins of flex and grid items.",
+      "term": {
+        "word": "Margin collapsing",
+        "definition": "When touching vertical margins merge into one, the size of the larger."
+      },
+      "visual": {
+        "kind": "html",
+        "alt": "A heading block with a 24px bottom margin above a paragraph block with a 16px top margin; the gap between them is labelled 24px, not 40px.",
+        "html": "<div class='w-full max-w-sm flex flex-col text-sm'><div class='rounded-md border bg-muted px-3 py-2 font-medium'>h2 <code class='text-xs text-muted-foreground'>margin-bottom: 24px</code></div><div class='flex h-12 items-center justify-center text-xs text-muted-foreground'>gap: 24px, not 40px</div><div class='rounded-md border bg-muted px-3 py-2'>p <code class='text-xs text-muted-foreground'>margin-top: 16px</code></div></div>"
+      }
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "Two cards stack in normal block flow. The upper card has `margin-bottom: 32px`; the lower card has `margin-top: 20px`. How much space separates them?",
+      "options": [
+        { "id": "a", "text": "32px" },
+        {
+          "id": "b",
+          "text": "52px",
+          "feedback": "That adds them up. Touching vertical margins in block flow collapse instead of stacking."
+        },
+        {
+          "id": "c",
+          "text": "20px",
+          "feedback": "Right idea, wrong margin: the larger one wins, not the smaller."
+        },
+        {
+          "id": "d",
+          "text": "12px",
+          "feedback": "The browser doesn't subtract one margin from the other; it keeps the larger one whole."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Do these margins add up, or does one of them win?",
+      "explanation": "The two vertical margins touch in normal flow, so they collapse to the larger one: 32px."
+    },
+    {
+      "id": "p4",
+      "type": "choice",
+      "prompt": "Which of these collapse into a single margin?",
+      "options": [
+        { "id": "a", "text": "A heading's `margin-bottom` and the next paragraph's `margin-top`, in normal block flow" },
+        { "id": "b", "text": "A first child's `margin-top` and the top of a parent that has no padding or border" },
+        {
+          "id": "c",
+          "text": "Two stacked cards' vertical margins inside a `display: grid` container",
+          "feedback": "Grid items keep their margins separate, so these add up."
+        },
+        {
+          "id": "d",
+          "text": "One block's `padding-bottom` and the next block's `padding-top`",
+          "feedback": "Padding never collapses; both amounts stay."
+        },
+        {
+          "id": "e",
+          "text": "The `margin-right` of one inline-block button and the `margin-left` of the next",
+          "feedback": "Only vertical margins collapse. Horizontal margins always add up."
+        }
+      ],
+      "correct": ["a", "b"],
+      "multiple": true,
+      "hint": "Check three things: margin, vertical, normal block flow.",
+      "explanation": "Collapsing needs vertical margins touching in normal block flow: siblings, or a parent and its first child with nothing between them."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "The designer wants 24px of tinted space above this banner's heading. Instead, the gap appears above the banner, outside its background. What's the cleanest fix?",
+    "visual": {
+      "kind": "code",
+      "language": "css",
+      "code": ".banner {\n  background: lavender;\n}\n.banner h2 {\n  margin-top: 24px;\n}"
+    },
+    "options": [
+      { "id": "a", "text": "Give `.banner` `padding-top: 24px` and set the heading's `margin-top` to 0" },
+      {
+        "id": "b",
+        "text": "Give `.banner` `padding-top: 24px` and keep the heading's margin",
+        "feedback": "The padding stops the leak, so the heading's margin now lands inside the banner too: 48px of tint, double what was asked."
+      },
+      {
+        "id": "c",
+        "text": "Raise the heading's `margin-top` to 48px",
+        "feedback": "It still slips out through the banner's top edge, so you'd get 48px of untinted gap above the banner."
+      },
+      {
+        "id": "d",
+        "text": "Give `.banner` `margin-top: 24px`",
+        "feedback": "Margin is outside and transparent, and it collapses with the heading's 24px, so the untinted gap stays 24px."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "hint": "Which property is painted with the banner's background?",
+    "explanation": "The heading's margin escapes because the banner has no top padding or border. Padding is inside the banner, so it's tinted; zeroing the margin keeps the total at 24px."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Use padding for space that belongs to the element: inside the border, painted, and clickable.",
+      "Use margin for space between elements: outside the border, transparent, and never clickable.",
+      "Touching vertical margins in normal flow collapse to the larger one; padding, horizontal margins, and flex or grid items never do.",
+      "When a child's top margin leaks out of its parent, move that space into the parent's padding."
+    ],
+    "next": "box-sizing: why padding can change an element's width"
+  }
+}

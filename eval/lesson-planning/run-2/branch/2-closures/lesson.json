@@ -1,0 +1,220 @@
+{
+  "spec": "0.3",
+  "title": "JavaScript closures refresher",
+  "summary": "You've written functions inside functions. Refresh what a closure keeps, and predict the classic loop and live-variable traps.",
+  "objective": "Predict what closure code returns or logs, including shared loop variables and variables changed after the closure was made.",
+  "language": "en",
+  "level": "intermediate",
+  "estimatedMinutes": 4,
+  "topic": "JavaScript",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "What does this log?",
+    "visual": {
+      "kind": "code",
+      "language": "javascript",
+      "code": "for (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}"
+    },
+    "options": [
+      {
+        "id": "a",
+        "text": "`0`, `1`, `2`",
+        "feedback": "That's what `let` would give. With `var`, every callback shares one `i`."
+      },
+      { "id": "b", "text": "`3`, `3`, `3`" },
+      {
+        "id": "c",
+        "text": "`2`, `2`, `2`",
+        "feedback": "The loop only stops after `i++` makes `i` equal 3, so the shared `i` ends at 3, not 2."
+      },
+      {
+        "id": "d",
+        "text": "`undefined`, three times",
+        "feedback": "The callbacks can still reach `i` after the loop ends; it hasn't gone anywhere."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "All three callbacks close over the same `var i`, and they run after the loop has pushed it to 3. Why one `i`, not three? That’s closures."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "A closure keeps the variable, not its value",
+      "body": "A closure is a function plus the variables in scope where it was made. Three rules predict almost everything:\n\n1. It holds the **variable itself, not a copy**: later changes show up when it runs.\n2. Each call of the outer function makes **fresh** variables, which outside code can reach only through the closure.\n3. In a `for` loop, `let` makes a **new binding each iteration**; `var` makes **one**, shared by every closure.",
+      "visual": {
+        "kind": "code",
+        "language": "javascript",
+        "code": "function makeCounter() {\n  let count = 0;\n  return () => ++count;\n}\n\nconst next = makeCounter();\nnext(); // 1\nnext(); // 2  same count, kept alive",
+        "highlight": [2, 3]
+      }
+    },
+    {
+      "id": "p1",
+      "type": "blank",
+      "prompt": "Fill in what the last two calls return.",
+      "format": "code",
+      "language": "javascript",
+      "caseSensitive": true,
+      "template": "const a = makeCounter();\nconst b = makeCounter();\na(); // 1\na(); // [[x]]\nb(); // [[y]]",
+      "blanks": [
+        {
+          "id": "x",
+          "accept": ["2"],
+          "choices": ["2", "1", "3"],
+          "mistakes": [
+            {
+              "answer": "1",
+              "feedback": "`a` keeps its `count` between calls; it isn't reset to 0 each time."
+            },
+            {
+              "answer": "3",
+              "feedback": "Only `a` has been called so far, twice. Its `count` is 2."
+            }
+          ]
+        },
+        {
+          "id": "y",
+          "accept": ["1"],
+          "choices": ["1", "3", "2"],
+          "mistakes": [
+            {
+              "answer": "3",
+              "feedback": "`b` came from its own call to `makeCounter`, so it has its own `count`, starting at 0."
+            },
+            {
+              "answer": "2",
+              "feedback": "`b` doesn't share `a`'s `count`. Each call of `makeCounter` makes a fresh one."
+            }
+          ]
+        }
+      ],
+      "explanation": "`a` has called twice, so its `count` is 2. `b` has its own fresh `count`, so its first call returns 1."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "What does `greet()` return?",
+      "visual": {
+        "kind": "code",
+        "language": "javascript",
+        "code": "let name = 'Ada';\nconst greet = () => `Hi, ${name}`;\nname = 'Grace';\ngreet();"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "`'Hi, Ada'`",
+          "feedback": "That assumes the closure copied `name` when it was made. It holds the variable, which now says Grace."
+        },
+        { "id": "b", "text": "`'Hi, Grace'`" },
+        {
+          "id": "c",
+          "text": "`'Hi, undefined'`",
+          "feedback": "`name` is in scope when `greet` runs and holds a string, so nothing is undefined."
+        },
+        {
+          "id": "d",
+          "text": "A `TypeError`, because `name` was reassigned",
+          "feedback": "`name` is declared with `let`, so reassigning it is fine. Only `const` would throw."
+        }
+      ],
+      "correct": ["b"],
+      "multiple": false,
+      "explanation": "`greet` reads `name` when it's called, not when it was created. By then `name` holds `'Grace'`."
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "What does the last line log?",
+      "visual": {
+        "kind": "code",
+        "language": "javascript",
+        "code": "function createWallet() {\n  let balance = 0;\n  return {\n    deposit(n) { balance += n; return balance; }\n  };\n}\n\nconst w = createWallet();\nw.balance = 50;\nconsole.log(w.deposit(10));"
+      },
+      "options": [
+        {
+          "id": "a",
+          "text": "`60`",
+          "feedback": "`w.balance` is a new property on the returned object. The `balance` that `deposit` closes over is a separate variable, still 0."
+        },
+        { "id": "b", "text": "`10`" },
+        {
+          "id": "c",
+          "text": "`NaN`",
+          "feedback": "`balance` starts at 0 and `10` is a number, so `0 + 10` is a plain number."
+        },
+        {
+          "id": "d",
+          "text": "A `TypeError`: you can't set properties on the wallet",
+          "feedback": "The returned object is ordinary, so adding `w.balance` works. It just doesn't touch the closed-over variable."
+        }
+      ],
+      "correct": ["b"],
+      "multiple": false,
+      "hint": "Is `w.balance` the same thing as the `balance` inside `createWallet`?",
+      "explanation": "Outside code can reach `balance` only through `deposit`. Setting `w.balance` adds an unrelated property, so `deposit(10)` adds to 0 and returns 10."
+    },
+    {
+      "id": "p4",
+      "type": "hotspot",
+      "prompt": "Every button logs `Clicked button 3`. Tap the line that causes it.",
+      "visual": {
+        "kind": "code",
+        "language": "javascript",
+        "code": "const buttons = document.querySelectorAll('button'); // 3 buttons\nfor (var i = 0; i < buttons.length; i++) {\n  buttons[i].addEventListener('click', () => {\n    console.log('Clicked button', i);\n  });\n}",
+        "hotspots": [
+          { "id": "l1", "line": 1 },
+          { "id": "l2", "line": 2 },
+          { "id": "l3", "line": 3 },
+          { "id": "l4", "line": 4 }
+        ]
+      },
+      "correct": ["l2"],
+      "multiple": false,
+      "hint": "Which line decides whether each handler gets its own `i`?",
+      "explanation": "`var i` on line 2 makes one `i` shared by all handlers, and it's 3 by the time anyone clicks. Changing it to `let` gives each handler its own `i`."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "What does the last line log?",
+    "visual": {
+      "kind": "code",
+      "language": "javascript",
+      "code": "const fns = [];\nlet label = 'item';\nfor (let i = 0; i < 3; i++) {\n  fns.push(() => label + i);\n}\nlabel = 'row';\nconsole.log(fns.map(f => f()));"
+    },
+    "options": [
+      {
+        "id": "a",
+        "text": "`['item0', 'item1', 'item2']`",
+        "feedback": "You got `i` right, but `label` is one variable that every closure holds. It says `'row'` by the time they run."
+      },
+      { "id": "b", "text": "`['row0', 'row1', 'row2']`" },
+      {
+        "id": "c",
+        "text": "`['row3', 'row3', 'row3']`",
+        "feedback": "You got `label` right, but this loop uses `let`, so each closure has its own `i`: 0, 1 and 2."
+      },
+      {
+        "id": "d",
+        "text": "`['item3', 'item3', 'item3']`",
+        "feedback": "Both mixed up: `let` gives each closure its own `i`, and `label` was changed to `'row'` before they ran."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "hint": "Check each variable separately: how many copies of it exist, and what it holds when the functions run?",
+    "explanation": "Each closure has its own `i` (0, 1, 2) from `let`, but all share the one `label`, which is `'row'` when `map` calls them."
+  },
+  "wrapup": {
+    "takeaways": [
+      "A closure reads its variables when it runs, so expect their latest values, not the ones at creation.",
+      "Each call of the outer function makes fresh variables, private to the closures it returns.",
+      "Closures in a loop: use `let` for one variable per iteration; `var` gives every closure the same one."
+    ],
+    "next": "Memoizing functions with closures"
+  }
+}

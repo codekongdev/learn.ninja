@@ -1,0 +1,223 @@
+{
+  "spec": "0.3",
+  "title": "Fractions, decimals and percents: conversion drill",
+  "summary": "You know what fractions and percents are. Drill switching between all three forms quickly, and dodge the slips that trip people up.",
+  "objective": "Convert any fraction, decimal, or percent into the other two forms and compare numbers written in different forms.",
+  "language": "en",
+  "level": "intermediate",
+  "estimatedMinutes": 9,
+  "topic": "Math",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "Quick, no calculator: what is 0.5% written as a decimal?",
+    "options": [
+      { "id": "a", "text": "0.005" },
+      { "id": "b", "text": "0.5", "feedback": "0.5 is a half, which is 50%. 0.5% is a hundred times smaller." },
+      { "id": "c", "text": "0.05", "feedback": "0.05 is 5%. 0.5% is ten times smaller still." },
+      { "id": "d", "text": "5", "feedback": "That multiplies by 10 instead of dividing by 100. 5 would be 500%." }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "explanation": "0.5% is half of one percent, and one percent is 0.01. So 0.5% is 0.005: the point moves two places left."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Percent and decimal: two places",
+      "body": "Percent means *per hundred*. To turn a decimal into a percent, **multiply by 100**; to go back, **divide by 100**. Both just move the decimal point two places.\n\n- 0.375 → 37.5% (point moves right)\n- 8% → 0.08 (point moves left; fill the gap with a zero)\n- 150% → 1.5 (over 100% means more than 1)\n\nThen check the size: 0.5 is a half, so it has to be 50%, never 5%.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='w-full max-w-sm grid grid-cols-3 items-center gap-2 text-center'><div class='rounded-lg border p-3 text-lg font-medium'>0.375</div><div class='flex flex-col text-xs text-muted-foreground'><span>× 100 →</span><span>← ÷ 100</span></div><div class='rounded-lg border p-3 text-lg font-medium'>37.5%</div></div>",
+        "alt": "The decimal 0.375 and the percent 37.5%, joined by arrows: times 100 goes to the percent, divide by 100 comes back."
+      }
+    },
+    {
+      "id": "p1",
+      "type": "blank",
+      "prompt": "Finish the conversion.",
+      "format": "text",
+      "template": "6% = 6 ÷ 100 = [[g]]",
+      "blanks": [
+        {
+          "id": "g",
+          "accept": ["0.06"],
+          "choices": ["0.06", "0.6", "600"],
+          "mistakes": [
+            { "answer": "0.6", "feedback": "That moves the point only one place. 0.6 is 60%." },
+            { "answer": "600", "feedback": "That multiplies by 100. Going from a percent to a decimal divides by 100." }
+          ]
+        }
+      ],
+      "explanation": "Dividing by 100 moves the point two places left, with a zero filling the gap.\n6 → 0.6 → 0.06"
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "A survey finds that 0.045 of people own a boat. What percent is that?",
+      "options": [
+        { "id": "a", "text": "4.5%" },
+        { "id": "b", "text": "45%", "feedback": "That moves the point three places. Nearly half of everyone owning a boat is far too big for 0.045." },
+        { "id": "c", "text": "0.45%", "feedback": "That moves the point only one place. Multiply by 100: two places." },
+        { "id": "d", "text": "0.045%", "feedback": "That adds a % sign without multiplying by 100, which makes the number a hundred times smaller." }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "Multiply by 100: the point moves two places right.\n0.045 × 100 = 4.5, so 4.5%"
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "A savings account pays 2.5% interest a year. Which decimal do you multiply the balance by to find the interest?",
+      "options": [
+        { "id": "a", "text": "0.025" },
+        { "id": "b", "text": "0.25", "feedback": "That moves the point only one place. 0.25 is 25%." },
+        { "id": "c", "text": "2.5", "feedback": "That drops the % sign without dividing by 100. Multiplying by 2.5 would be 250%." },
+        { "id": "d", "text": "0.0025", "feedback": "That moves the point three places. 0.0025 is 0.25%." }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Divide by 100: how many places does the point move, and which way?",
+      "explanation": "Divide by 100: the point moves two places left.\n2.5 → 0.25 → 0.025"
+    },
+    {
+      "id": "p4",
+      "type": "match",
+      "prompt": "Match each decimal to the same value as a percent.",
+      "pairs": [
+        { "left": "0.5", "right": "50%" },
+        { "left": "0.05", "right": "5%" },
+        { "left": "0.005", "right": "0.5%" },
+        { "left": "5", "right": "500%" }
+      ],
+      "hint": "Check the size first: is the decimal more than 1, about a half, or tiny?",
+      "explanation": "Each one moves the point two places right. Every step of ten smaller in the decimal is ten times smaller as a percent too."
+    },
+    {
+      "id": "p5",
+      "type": "hotspot",
+      "prompt": "A student converted four numbers. Tap the one that's wrong.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><header><h2>Homework: convert</h2></header><section class='flex flex-col gap-2 font-medium'><div data-hotspot='l1' class='rounded-md border px-3 py-2'>0.62 = 62%</div><div data-hotspot='l2' class='rounded-md border px-3 py-2'>1.5 = 150%</div><div data-hotspot='l3' class='rounded-md border px-3 py-2'>0.3 = 3%</div><div data-hotspot='l4' class='rounded-md border px-3 py-2'>9% = 0.09</div></section></div>"
+      },
+      "correct": ["l3"],
+      "multiple": false,
+      "explanation": "0.3 is 0.30, so moving the point two places gives 30%, not 3%. 3% would be 0.03."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "Fractions: divide, or scale to 100",
+      "body": "Fraction to decimal: **divide the top by the bottom**. \\( \\tfrac{3}{8} = 3 \\div 8 = 0.375 \\), so 37.5%. If the bottom goes into 100, scale instead: \\( \\tfrac{3}{20} = \\tfrac{15}{100} = 15\\% \\).\n\nBack to a fraction: put the digits over 10, 100, or 1,000 (one, two, or three decimal places), then simplify: \\( 0.35 = \\tfrac{35}{100} = \\tfrac{7}{20} \\).\n\nSome never end: \\( \\tfrac{1}{3} = 0.333\\ldots \\), a little over 33%."
+    },
+    {
+      "id": "p6",
+      "type": "blank",
+      "prompt": "Finish the conversion by scaling to hundredths.",
+      "format": "text",
+      "template": "\\( \\tfrac{7}{25} \\): multiply the top and bottom by [[m]] to get \\( \\tfrac{28}{100} \\), which is 28%.",
+      "blanks": [
+        {
+          "id": "m",
+          "accept": ["4"],
+          "choices": ["4", "75", "25"],
+          "mistakes": [
+            { "answer": "75", "feedback": "75 is what you'd add to 25 to reach 100. Scaling multiplies: 25 × 4 = 100." },
+            { "answer": "25", "feedback": "25 × 25 is 625, not 100. Find what 25 multiplies by to make 100." }
+          ]
+        }
+      ],
+      "explanation": "Multiply top and bottom by the same number, so the value stays the same.\n25 × 4 = 100\n7 × 4 = 28"
+    },
+    {
+      "id": "p7",
+      "type": "choice",
+      "prompt": "In a class vote, \\( \\tfrac{3}{5} \\) of students chose the museum trip. What percent is that?",
+      "options": [
+        { "id": "a", "text": "60%" },
+        { "id": "b", "text": "35%", "feedback": "That just writes the digits side by side. Divide 3 by 5, or scale to hundredths." },
+        { "id": "c", "text": "0.6%", "feedback": "0.6 is the decimal. To make it a percent, multiply by 100 as well." },
+        { "id": "d", "text": "About 167%", "feedback": "That divides 5 by 3. Divide the top by the bottom: 3 ÷ 5." }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "Scale to hundredths, since 5 goes into 100.\n\\( \\tfrac{3}{5} = \\tfrac{60}{100} = 60\\% \\)"
+    },
+    {
+      "id": "p8",
+      "type": "choice",
+      "prompt": "A recipe scales to 0.45 of the original. What is 0.45 as a fraction in simplest form?",
+      "options": [
+        { "id": "a", "text": "\\( \\tfrac{9}{20} \\)" },
+        { "id": "b", "text": "\\( \\tfrac{9}{2} \\)", "feedback": "That puts 45 over 10, which is 4.5. Two decimal places go over 100." },
+        { "id": "c", "text": "\\( \\tfrac{9}{200} \\)", "feedback": "That puts 45 over 1,000, which is 0.045. Two decimal places go over 100." },
+        { "id": "d", "text": "\\( \\tfrac{20}{9} \\)", "feedback": "That's the right fraction flipped, which is more than 2. 0.45 is less than 1, so the top must be smaller." }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Two decimal places: what goes on the bottom?",
+      "explanation": "Two decimal places go over 100, then divide top and bottom by 5.\n\\( 0.45 = \\tfrac{45}{100} = \\tfrac{9}{20} \\)"
+    },
+    {
+      "id": "p9",
+      "type": "hotspot",
+      "prompt": "Someone converted \\( \\tfrac{1}{8} \\) to a percent. Tap the first line with a mistake.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><header><h2>Convert 1/8 to a percent</h2></header><section class='flex flex-col gap-2 font-medium'><div data-hotspot='s1' class='rounded-md border px-3 py-2'>1 ÷ 8 = 0.125</div><div data-hotspot='s2' class='rounded-md border px-3 py-2'>0.125 × 100 = 1.25</div><div data-hotspot='s3' class='rounded-md border px-3 py-2'>So 1/8 = 1.25%</div></section></div>"
+      },
+      "correct": ["s2"],
+      "multiple": false,
+      "hint": "Check each line's size: is an eighth closer to 1% or to 10%?",
+      "explanation": "Multiplying by 100 moves the point two places, not one.\n0.125 × 100 = 12.5, so 1/8 = 12.5%"
+    },
+    {
+      "id": "p10",
+      "type": "sort",
+      "prompt": "Sort each number by the fraction it equals.",
+      "groups": [
+        { "id": "q", "label": "1/4" },
+        { "id": "t", "label": "2/5" },
+        { "id": "h", "label": "3/4" }
+      ],
+      "items": [
+        { "id": "i1", "text": "0.25", "group": "q" },
+        { "id": "i2", "text": "4/16", "group": "q" },
+        { "id": "i3", "text": "0.4", "group": "t" },
+        { "id": "i4", "text": "40%", "group": "t" },
+        { "id": "i5", "text": "8/20", "group": "t" },
+        { "id": "i6", "text": "75%", "group": "h" },
+        { "id": "i7", "text": "12/16", "group": "h" },
+        { "id": "i8", "text": "25%", "group": "q" }
+      ],
+      "hint": "Turn each one into a percent first, then compare.",
+      "explanation": "1/4 = 0.25 = 25%, and 4/16 simplifies to 1/4.\n2/5 = 0.4 = 40%, and 8/20 simplifies to 2/5.\n3/4 = 75%, and 12/16 simplifies to 3/4."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "Four friends report their quiz scores in different ways. Ana got 0.32 of the points, Ben got 33%, Cleo got \\( \\tfrac{1}{3} \\), and Dev got \\( \\tfrac{13}{40} \\). Who scored highest?",
+    "options": [
+      { "id": "a", "text": "Cleo" },
+      { "id": "b", "text": "Ben", "feedback": "Close, but 1/3 = 0.333…, which is a little over 33%. Ben's 33% is just under Cleo's score." },
+      { "id": "c", "text": "Dev", "feedback": "13 ÷ 40 = 0.325, which is 32.5%: above Ana, below Ben and Cleo." },
+      { "id": "d", "text": "Ana", "feedback": "0.32 is 32%, the lowest of the four." }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "hint": "Turn every score into a percent, and keep the decimals that never end.",
+    "explanation": "As percents:\nAna: 0.32 = 32%\nDev: 13 ÷ 40 = 32.5%\nBen: 33%\nCleo: 1/3 = 33.33…%"
+  },
+  "wrapup": {
+    "takeaways": [
+      "Percent to decimal and back: move the point two places, then check the size makes sense.",
+      "Fraction to decimal: divide the top by the bottom, or scale the bottom to 100 when it fits.",
+      "Decimal to fraction: put the digits over 10, 100, or 1,000 by the number of places, then simplify.",
+      "To compare mixed forms, convert them all to percents first, and watch for decimals like 1/3 that never end."
+    ],
+    "next": "Percentage change: increases, decreases, and reversing them"
+  }
+}

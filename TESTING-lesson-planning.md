@@ -1,6 +1,6 @@
 # Testing the lesson-planning branch
 
-This branch (`skill/lesson-planning`) changes how the learn skill plans a lesson. It's for local testing only: nothing here is deployed to learn.ninja. Delete this file before merging.
+This branch (`skill/lesson-planning`) changes how the learn skill plans a lesson. It's for local testing only: nothing here is deployed to learn.ninja. Delete this file and `eval/` before merging.
 
 Proposal with diagrams and reasons: https://claude.ai/artifact/QaHSJhToZqMFYcKgpmanyF (ask Gene for access).
 
@@ -75,3 +75,7 @@ For each lesson, also check:
 - Does it play well? Anything confusing, too long, or too thin?
 
 To compare with today's behaviour, run the same prompts with main's skill (`git switch main`, restart the dev server).
+
+## Results so far
+
+Two runs of 16 lessons each (8 prompts, this branch's skill vs main's) are in `eval/lesson-planning/`, with the scorecard in `eval/lesson-planning/RESULTS.md` and a command to publish them all to your local server. Delete `eval/` along with this file before merging.

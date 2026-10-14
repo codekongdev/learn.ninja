@@ -1,0 +1,272 @@
+{
+  "spec": "0.3",
+  "title": "Practise percentage changes",
+  "summary": "Work out how much something went up or down in percent, and apply rises and falls one after another.",
+  "objective": "Calculate a percentage change from the original value, and apply several changes in a row with multipliers.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 8,
+  "topic": "Everyday math",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "A ticket goes from $40 to $50, a 25% rise. Then it drops back to $40. What percentage drop is that?",
+    "options": [
+      {
+        "id": "a",
+        "text": "25%",
+        "feedback": "It's the same $10, but this time the price starts from $50, a bigger starting value."
+      },
+      { "id": "b", "text": "20%" },
+      {
+        "id": "c",
+        "text": "10%",
+        "feedback": "That's the change in dollars. A percentage compares the change with the starting price."
+      }
+    ],
+    "correct": ["b"],
+    "multiple": false,
+    "explanation": "The drop starts from $50, and $10 out of $50 is 20%. The same $10 is a smaller share of a bigger starting value."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Divide the change by where you started",
+      "body": "A **percentage change** compares a change with the **original value**. Subtract to find the change, divide it by the original, then multiply by 100. From $40 to $50: the change is $10, and $10 ÷ $40 = 0.25, a **25% increase**. Back from $50 to $40: $10 ÷ $50 = 0.2, a **20% decrease**, because that change starts from $50. A negative result means a decrease.",
+      "visual": {
+        "kind": "math",
+        "tex": "\\text{percentage change} = \\frac{\\text{new} - \\text{original}}{\\text{original}} \\times 100"
+      },
+      "term": {
+        "word": "Original value",
+        "definition": "The value before the change. Every percentage change is measured from it."
+      }
+    },
+    {
+      "id": "p1",
+      "type": "blank",
+      "prompt": "A price falls from $80 to $60. Pick the number to divide by.",
+      "format": "text",
+      "template": "−20 ÷ [[base]] = −0.25, so it's a 25% decrease.",
+      "blanks": [
+        {
+          "id": "base",
+          "accept": ["80"],
+          "choices": ["80", "60", "100"],
+          "mistakes": [
+            {
+              "answer": "60",
+              "feedback": "60 is the new price. Dividing by it gives about 33%. Divide by the original price, 80."
+            },
+            {
+              "answer": "100",
+              "feedback": "Dividing by 100 gives 0.2. A percentage change compares with the original price, 80, not with 100."
+            }
+          ]
+        }
+      ],
+      "hint": "Which price came first?",
+      "explanation": "The price started at $80, so the $20 drop is divided by 80.\n−20 ÷ 80 = −0.25\n−0.25 × 100 = −25%"
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "A shirt's price goes from $25 to $30. What is the percentage change?",
+      "options": [
+        { "id": "a", "text": "A 20% increase" },
+        {
+          "id": "b",
+          "text": "About a 16.7% increase",
+          "feedback": "That divides the $5 change by the new price, $30. Divide by the original price, $25."
+        },
+        {
+          "id": "c",
+          "text": "A 5% increase",
+          "feedback": "$5 is the change in dollars, not a percentage. Divide it by the original $25."
+        },
+        {
+          "id": "d",
+          "text": "A 120% increase",
+          "feedback": "30 ÷ 25 = 1.2 means the new price is 120% of the old one. Subtract first: the change is $5."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Find the change in dollars first, then divide by the starting price.",
+      "explanation": "Change: $30 − $25 = $5\n$5 ÷ $25 = 0.2\n0.2 × 100 = a 20% increase"
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "A town of 2,000 people shrinks to 1,500. What is the percentage change?",
+      "options": [
+        {
+          "id": "a",
+          "text": "About a 33% decrease",
+          "feedback": "That divides the 500-person drop by the new size, 1,500. Divide by the original 2,000."
+        },
+        { "id": "b", "text": "A 25% decrease" },
+        {
+          "id": "c",
+          "text": "A 75% decrease",
+          "feedback": "1,500 ÷ 2,000 = 0.75 means the town kept 75% of its people. The change is the 500 it lost."
+        }
+      ],
+      "correct": ["b"],
+      "multiple": false,
+      "hint": "How many people did the town lose, out of how many it started with?",
+      "explanation": "Change: 1,500 − 2,000 = −500\n−500 ÷ 2,000 = −0.25\nSo it's a 25% decrease."
+    },
+    {
+      "id": "p4",
+      "type": "match",
+      "prompt": "Match each change to its percentage change.",
+      "pairs": [
+        { "left": "From 50 to 75", "right": "+50%" },
+        { "left": "From 75 to 50", "right": "About −33%" },
+        { "left": "From 100 to 110", "right": "+10%" },
+        { "left": "From 20 to 10", "right": "−50%" }
+      ],
+      "hint": "50 to 75 and 75 to 50 differ by the same 25, but they start from different values.",
+      "explanation": "Divide each change by its starting value: 25 ÷ 50 = +50%, −25 ÷ 75 ≈ −33%, 10 ÷ 100 = +10%, −10 ÷ 20 = −50%."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "Apply changes with a multiplier",
+      "body": "To apply a change, multiply by a **multiplier**: 1 plus the change as a decimal. A 20% rise is × 1.2; a 20% fall is × 0.8. For changes in a row, multiply again, because each one starts from the value just before it. $100 up 50% is $150; then down 50% is $75, not $100. To find the value before a change, divide by its multiplier: $90 after a 10% fall was $90 ÷ 0.9 = $100.",
+      "visual": {
+        "kind": "math",
+        "tex": "100 \\times 1.5 = 150 \\qquad 150 \\times 0.5 = 75"
+      },
+      "term": {
+        "word": "Multiplier",
+        "definition": "The number you multiply by to apply a percentage change, like 1.2 for a 20% rise or 0.8 for a 20% fall."
+      }
+    },
+    {
+      "id": "p5",
+      "type": "blank",
+      "prompt": "A $60 jacket is 15% off. Pick the multiplier.",
+      "format": "text",
+      "template": "$60 × [[m]] = $51",
+      "blanks": [
+        {
+          "id": "m",
+          "accept": ["0.85"],
+          "choices": ["0.85", "0.15", "1.15"],
+          "mistakes": [
+            {
+              "answer": "0.15",
+              "feedback": "× 0.15 gives $9, which is just the discount. To get the sale price, keep the other 85%: × 0.85."
+            },
+            {
+              "answer": "1.15",
+              "feedback": "× 1.15 is a 15% rise, to $69. A 15% fall is 1 − 0.15 = 0.85."
+            }
+          ]
+        }
+      ],
+      "hint": "A fall means the multiplier is less than 1.",
+      "explanation": "15% off leaves 85% of the price.\n1 − 0.15 = 0.85\n$60 × 0.85 = $51"
+    },
+    {
+      "id": "p6",
+      "type": "choice",
+      "prompt": "Rent of $200 a week rises 10%, then rises 10% again a year later. What is the new rent?",
+      "options": [
+        {
+          "id": "a",
+          "text": "$240",
+          "feedback": "That adds 10% + 10% = 20% of $200. The second rise is 10% of the new rent, $220."
+        },
+        {
+          "id": "b",
+          "text": "$220",
+          "feedback": "That's after the first rise. Multiply by 1.1 once more."
+        },
+        { "id": "c", "text": "$242" }
+      ],
+      "correct": ["c"],
+      "multiple": false,
+      "hint": "Apply the multiplier once for each rise.",
+      "explanation": "Each rise starts from the rent just before it.\n$200 × 1.1 = $220\n$220 × 1.1 = $242"
+    },
+    {
+      "id": "p7",
+      "type": "choice",
+      "prompt": "After a 20% discount, a lamp costs $48. What was the price before the discount?",
+      "options": [
+        {
+          "id": "a",
+          "text": "$57.60",
+          "feedback": "That adds 20% of $48. The discount was 20% of the original, bigger price, so divide $48 by 0.8."
+        },
+        { "id": "b", "text": "$60" },
+        {
+          "id": "c",
+          "text": "$38.40",
+          "feedback": "That takes another 20% off. To go back to the original, divide by the multiplier instead of multiplying."
+        }
+      ],
+      "correct": ["b"],
+      "multiple": false,
+      "hint": "Which multiplier gave $48? Undo it by dividing.",
+      "explanation": "A 20% discount means × 0.8, so undo it by dividing.\n$48 ÷ 0.8 = $60\nCheck: $60 × 0.8 = $48"
+    },
+    {
+      "id": "p8",
+      "type": "choice",
+      "prompt": "A share price falls 50%. What percentage rise brings it back to where it started?",
+      "options": [
+        {
+          "id": "a",
+          "text": "50%",
+          "feedback": "50% of the lower price only gets back halfway: $100 falls to $50, and $50 × 1.5 = $75."
+        },
+        { "id": "b", "text": "100%" },
+        {
+          "id": "c",
+          "text": "It depends on the starting price",
+          "feedback": "Any starting price works the same way: a fall to half has to double to recover."
+        }
+      ],
+      "correct": ["b"],
+      "multiple": false,
+      "hint": "Try a starting price of $100. Where does it fall to, and how far is it back up?",
+      "explanation": "Say it starts at $100 and falls to $50.\nThe rise back is $50.\n$50 ÷ $50 = 1, a 100% rise."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "choice",
+    "prompt": "A shop raises an $80 price by 25%, then puts the item on sale at 20% off. What is the overall percentage change from the original $80?",
+    "options": [
+      {
+        "id": "a",
+        "text": "A 5% increase",
+        "feedback": "That adds 25% and −20% as if both came from $80. The 20% off is taken from the raised price, $100."
+      },
+      {
+        "id": "b",
+        "text": "A 20% decrease",
+        "feedback": "That's the change from the raised price, $100. The question asks about the change from the original $80."
+      },
+      { "id": "c", "text": "No overall change" }
+    ],
+    "correct": ["c"],
+    "multiple": false,
+    "hint": "Work out the price after each step, then compare the end price with $80.",
+    "explanation": "$80 × 1.25 = $100\n$100 × 0.8 = $80\nThe price ends where it started: a 0% change."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Percentage change = (new − original) ÷ original × 100: always divide by the starting value.",
+      "Apply a change by multiplying: × 1.2 for a 20% rise, × 0.8 for a 20% fall.",
+      "For changes in a row, multiply each multiplier in turn; never just add the percentages.",
+      "To find the value before a change, divide by its multiplier."
+    ],
+    "next": "Percentages vs percentage points"
+  }
+}

@@ -1,0 +1,284 @@
+{
+  "spec": "0.3",
+  "title": "Drag and drop people can predict",
+  "summary": "Learn when a drag should move or copy, how to show what a drop will do, and how to let people undo a wrong drop.",
+  "objective": "Design a drag and drop that picks the expected move or copy, shows where content can land, and lets people recover from a wrong drop.",
+  "language": "en",
+  "level": "beginner",
+  "estimatedMinutes": 7,
+  "topic": "UI design",
+  "source": {
+    "title": "Drag and drop, Apple Human Interface Guidelines",
+    "url": "https://developer.apple.com/design/human-interface-guidelines/drag-and-drop"
+  },
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "You drag a photo from one document into a different document. Afterwards, is the photo still in the first document?",
+    "options": [
+      { "id": "a", "text": "Yes, it was copied" },
+      {
+        "id": "b",
+        "text": "No, it moved to the new document",
+        "feedback": "That's what happens when you drag within one document. Across documents, the default is different."
+      },
+      {
+        "id": "c",
+        "text": "Only if you hold a key while dragging",
+        "feedback": "A key can change the result, but here the original already stays put without one."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "explanation": "It stays. Yet drag that photo to another spot in the same document and it moves. One question decides which happens."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Move or copy?",
+      "body": "Drag and drop takes selected content from a **source** to a **destination**. A **move** leaves it only in the destination; a **copy** leaves it in both. The default: within the same **container**, it moves. Into a different container, it copies, and between apps it always copies. Holding **Option** while dragging within one container makes a copy. Changing a default? Pick what people expect and what's least likely to lose their data.",
+      "term": {
+        "word": "Container",
+        "definition": "The view that holds the content, such as a text view, a list, or one document."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<div class='grid grid-cols-2 gap-3 w-full max-w-sm text-sm'><div class='flex flex-col gap-2'><p class='text-xs font-medium text-muted-foreground'>Same document</p><div class='rounded-lg border p-2 flex flex-col gap-2'><div class='rounded-md border border-dashed px-2 py-1 text-xs text-muted-foreground'>(was here)</div><div class='rounded-md bg-muted px-2 py-1'>Paragraph</div><div class='rounded-md bg-primary text-primary-foreground px-2 py-1'>Photo</div></div><span class='badge w-fit'>Moves</span></div><div class='flex flex-col gap-2'><p class='text-xs font-medium text-muted-foreground'>Two documents</p><div class='rounded-lg border p-2'><div class='rounded-md bg-primary text-primary-foreground px-2 py-1'>Photo</div></div><div class='rounded-lg border p-2'><div class='rounded-md bg-primary text-primary-foreground px-2 py-1'>Photo</div></div><span class='badge w-fit' data-variant='secondary'>Copies</span></div></div>",
+        "alt": "Two cases. Within one document, a photo moves and leaves an empty spot where it was. Between two documents, the photo appears in both."
+      }
+    },
+    {
+      "id": "p1",
+      "type": "choice",
+      "prompt": "In a to-do app, someone drags a task from the top of a list to the bottom of the same list. What should happen?",
+      "options": [
+        { "id": "a", "text": "The task moves to the bottom" },
+        {
+          "id": "b",
+          "text": "A copy appears at the bottom and the original stays at the top",
+          "feedback": "Copying is the default between different containers. One list is one container, so the task should move, not leave a duplicate."
+        },
+        {
+          "id": "c",
+          "text": "The app asks whether to move or copy it",
+          "feedback": "Asking every time slows down a common action. The default here is clear, so just apply it."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Are the source and the destination in the same container?",
+      "explanation": "The task starts and ends in the same list, so the drag moves it. That's exactly what reordering should do."
+    },
+    {
+      "id": "p2",
+      "type": "sort",
+      "prompt": "Sort each drag by what it does by default.",
+      "groups": [
+        { "id": "move", "label": "Move" },
+        { "id": "copy", "label": "Copy" }
+      ],
+      "items": [
+        { "id": "a", "text": "A word dragged to a new spot in the same paragraph", "group": "move" },
+        { "id": "b", "text": "A row dragged to a new position in the same table", "group": "move" },
+        { "id": "c", "text": "A card dragged to a new spot on the same board", "group": "move" },
+        { "id": "d", "text": "An image dragged from one document into another", "group": "copy" },
+        { "id": "e", "text": "Text dragged from Notes into a Mail message", "group": "copy" },
+        { "id": "f", "text": "A sentence dragged within one text view while holding Option", "group": "copy" }
+      ],
+      "hint": "Check where each drag starts and ends, and whether a key is held.",
+      "explanation": "Same container moves. A different container or another app copies. Holding Option turns a same-container drag into a copy."
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "A designer suggests that dragging a photo from one document into another should move it, removing it from the first. What's the main problem?",
+      "options": [
+        { "id": "a", "text": "People expect a copy, so they could lose the photo from the first document without noticing" },
+        {
+          "id": "b",
+          "text": "Moving content between documents isn't allowed",
+          "feedback": "It's allowed: the default is a guideline you can change. The catch is that this change surprises people and risks losing their data."
+        },
+        {
+          "id": "c",
+          "text": "A move takes more steps for people than a copy",
+          "feedback": "It's the same drag either way. The problem is the result, not the effort."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "What do people expect when they drop into a different container?",
+      "explanation": "Between documents people expect a copy. Silently removing the original breaks that expectation and can lose their work."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "Show what a drop will do",
+      "body": "Give feedback through the whole drag. Once the content moves about three points, show a **drag image**: a translucent picture of it, so people can still see destinations underneath. Over a destination, highlight it or show an insertion point only if it can accept the content; if it can't, show nothing or a **not-allowed** symbol. Remove the cue when the content moves away. If a drop fails, animate the item back to its source.",
+      "term": {
+        "word": "Drag image",
+        "definition": "The translucent picture of the dragged content that follows the pointer or finger until the drop."
+      },
+      "visual": {
+        "kind": "html",
+        "html": "<div class='grid grid-cols-2 gap-3 w-full max-w-sm text-sm'><div class='flex flex-col gap-2'><div class='relative h-24 rounded-lg border-2 border-primary bg-primary/10 p-3'><p class='font-medium'>Inbox</p><div class='absolute bottom-2 end-2 rounded-md border bg-card px-2 py-1 text-xs shadow-md opacity-60'>Report.pdf</div></div><p class='text-xs text-muted-foreground'>Can accept it: highlighted</p></div><div class='flex flex-col gap-2'><div class='relative h-24 rounded-lg border p-3'><p class='font-medium'>Archive</p><div class='absolute bottom-2 end-2 flex items-center gap-1 rounded-md border bg-card px-2 py-1 text-xs shadow-md opacity-60'><svg viewBox='0 0 16 16' width='14' height='14' direction='ltr' xmlns='http://www.w3.org/2000/svg'><circle cx='8' cy='8' r='6' fill='none' stroke-width='1.5' class='stroke-destructive'/><line x1='4' y1='12' x2='12' y2='4' stroke-width='1.5' class='stroke-destructive'/></svg>Report.pdf</div></div><p class='text-xs text-muted-foreground'>Can't accept it: no highlight, not-allowed symbol</p></div></div>",
+        "alt": "A translucent Report.pdf drag image over two folders: Inbox, which can accept it, is highlighted; Archive, which can't, has no highlight and shows a circle with a slash."
+      }
+    },
+    {
+      "id": "p4",
+      "type": "hotspot",
+      "prompt": "Someone is dragging a photo over the body of this email. Tap the feedback that shouldn't be showing.",
+      "visual": {
+        "kind": "html",
+        "html": "<div class='card w-full max-w-sm'><section class='relative flex flex-col gap-2 text-sm'><div data-hotspot='to' aria-label='To field with no highlight' class='rounded-md border px-3 py-2 text-muted-foreground'>To: Sam</div><div data-hotspot='subject' aria-label='Subject field with a highlight' class='rounded-md border-2 border-primary bg-primary/10 px-3 py-2'>Subject: Trip photos</div><div data-hotspot='body' aria-label='Message body with an insertion line' class='h-32 rounded-md border px-3 py-2'><p>Here's the view from the top!</p><div class='mt-1 h-0.5 w-24 bg-primary'></div></div><div data-hotspot='drag' aria-label='Translucent drag image of the photo' class='absolute bottom-4 end-4 flex h-14 w-20 items-center justify-center rounded-md border bg-muted text-xs shadow-md opacity-60'>Photo</div></section></div>",
+        "alt": "An email draft with To and Subject fields and a message body. A translucent photo is over the body, which shows an insertion line; the Subject field is highlighted."
+      },
+      "correct": ["subject"],
+      "multiple": false,
+      "hint": "Which part of the email is the photo actually over?",
+      "explanation": "Only the destination under the content should show a cue. The photo is over the body, so the highlighted Subject field misleads people."
+    },
+    {
+      "id": "p5",
+      "type": "compare",
+      "prompt": "Someone is dragging a file over this list of folders. Which drag image works better?",
+      "options": [
+        {
+          "id": "a",
+          "visual": {
+            "kind": "html",
+            "html": "<div class='relative flex w-full max-w-xs flex-col gap-2 text-sm'><div class='rounded-md border px-3 py-2'>Drafts</div><div class='rounded-md border px-3 py-2'>Clients</div><div class='rounded-md border px-3 py-2'>Archive</div><div class='absolute top-5 start-8 end-2 rounded-md border bg-card px-3 py-4 font-medium shadow-lg'>Invoice.pdf</div></div>",
+            "alt": "A solid Invoice.pdf card covering most of a list of three folders, hiding the folder underneath."
+          },
+          "feedback": "The solid image hides the folders underneath, so people can't see where they're about to drop."
+        },
+        {
+          "id": "b",
+          "visual": {
+            "kind": "html",
+            "html": "<div class='relative flex w-full max-w-xs flex-col gap-2 text-sm'><div class='rounded-md border px-3 py-2'>Drafts</div><div class='rounded-md border px-3 py-2'>Clients</div><div class='rounded-md border px-3 py-2'>Archive</div><div class='absolute top-5 start-8 end-2 rounded-md border bg-card px-3 py-4 font-medium shadow-lg opacity-50'>Invoice.pdf</div></div>",
+            "alt": "A translucent Invoice.pdf card over a list of three folders, with the folder names visible through it."
+          }
+        }
+      ],
+      "correct": "b",
+      "hint": "Can you still read the folder names under each drag image?",
+      "explanation": "The translucent image still shows what it is, and people can read the folders through it to pick the right one."
+    },
+    {
+      "id": "p6",
+      "type": "choice",
+      "prompt": "Someone drags a file over a folder that can't accept it, and hasn't let go yet. What should the folder show?",
+      "options": [
+        { "id": "a", "text": "No highlight, or a not-allowed symbol" },
+        {
+          "id": "b",
+          "text": "The same highlight as a folder that can accept it, then an error after the drop",
+          "feedback": "A highlight promises the drop will work. Show that it won't before people let go, not after."
+        },
+        {
+          "id": "c",
+          "text": "Animate the drag image back to its source right away",
+          "feedback": "Animating back is for a drop that has failed. Mid-drag, people may still move on to a folder that accepts it."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Feedback should tell people the result before they let go.",
+      "explanation": "Cues appear only where a drop can succeed. No highlight, or a not-allowed symbol, tells people to keep moving."
+    },
+    {
+      "id": "c3",
+      "type": "concept",
+      "title": "Give people a way back",
+      "body": "People sometimes drop content in the wrong place, so let them **undo** a drag and drop. When a drop can't be undone, ask for confirmation first: the Finder does this when someone drags a file into a write-only folder, which they can't open to take it back out. And offer **another way** to do the same thing, like menu commands to copy and move, because dragging is hard or impossible for some people.",
+      "term": {
+        "word": "Write-only folder",
+        "definition": "A folder people can put files into but can't open to see or remove them."
+      }
+    },
+    {
+      "id": "p7",
+      "type": "choice",
+      "prompt": "Which of these make drag and drop safer or easier to use for everyone?",
+      "options": [
+        { "id": "a", "text": "Undo for a drop that landed in the wrong place" },
+        { "id": "b", "text": "Menu commands that copy or move the same items" },
+        {
+          "id": "c",
+          "text": "A confirmation dialog before every drop",
+          "feedback": "Confirming every drop slows down routine moves. Save confirmation for drops that can't be undone."
+        },
+        {
+          "id": "d",
+          "text": "Making dragging the only way to reorder items",
+          "feedback": "Some people can't drag. Offer another way to do it, such as menu commands."
+        }
+      ],
+      "correct": ["a", "b"],
+      "multiple": true,
+      "hint": "Think about fixing mistakes, and about people who can't drag at all.",
+      "explanation": "Undo fixes a wrong drop, and menu commands let people who can't drag do the same job."
+    },
+    {
+      "id": "p8",
+      "type": "choice",
+      "prompt": "Which of these drops should ask for confirmation first?",
+      "options": [
+        { "id": "a", "text": "Dropping a file into a shared folder that people can add to but can't open" },
+        {
+          "id": "b",
+          "text": "Dragging a paragraph to a new spot in the same document",
+          "feedback": "It's a common move that Undo can reverse. A confirmation here would just get in the way."
+        },
+        {
+          "id": "c",
+          "text": "Dragging a photo from Photos into an email",
+          "feedback": "Between apps it's a copy, so the original stays in Photos. Nothing is lost if it lands wrong."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Which drop leaves people with no way to get the item back?",
+      "explanation": "Once the file is in a folder people can't open, they can't take it back out, so confirm before the drop."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "scenario",
+    "prompt": "Which fix would you ship?",
+    "situation": "In your task-board app, people drag cards between columns of one board and into other apps like Mail. A tester reports: \"I dropped a card on the wrong column. And when I dragged one into Mail, it vanished from the board.\"",
+    "options": [
+      {
+        "id": "a",
+        "quality": "best",
+        "text": "Move within the board, copy into other apps, highlight a column only while the card is over it, and support Undo",
+        "outcome": "Cards stay on the board when shared, people see the target column before they let go, and a wrong drop is one Undo away."
+      },
+      {
+        "id": "b",
+        "quality": "okay",
+        "text": "Make every drag a copy, so nothing ever disappears",
+        "outcome": "Nothing vanishes, but moving a card between columns now leaves a duplicate that people must delete by hand."
+      },
+      {
+        "id": "c",
+        "quality": "poor",
+        "text": "Ask \"Move or copy?\" and then \"Are you sure?\" after every drop",
+        "outcome": "Fewer mistakes, but every routine move now takes two extra taps, and people stop dragging altogether."
+      }
+    ],
+    "hint": "Which drags stay in one container, and how would someone fix a wrong drop?",
+    "explanation": "One board is one container, so moves fit; Mail is another app, so copy. Clear cues prevent wrong drops, and Undo fixes the rest."
+  },
+  "wrapup": {
+    "takeaways": [
+      "Within the same container a drag moves content; into another container or app it copies.",
+      "Show a translucent drag image, and highlight a destination only while content is over it and only if it can accept it.",
+      "Support Undo, confirm only drops that can't be undone, and offer a way to do it without dragging."
+    ],
+    "next": "Accepting drops: using the richest version of dropped content"
+  }
+}

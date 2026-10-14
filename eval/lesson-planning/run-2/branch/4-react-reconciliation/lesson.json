@@ -1,0 +1,219 @@
+{
+  "spec": "0.3",
+  "title": "React reconciliation: reuse or remount?",
+  "summary": "You know components, props, and state. Learn the rules React uses to decide whether a component keeps its state or starts fresh.",
+  "objective": "Predict whether a component keeps or loses its state after a render, from its type, its position, and its key.",
+  "language": "en",
+  "level": "intermediate",
+  "estimatedMinutes": 7,
+  "topic": "React",
+  "hook": {
+    "id": "hook",
+    "type": "choice",
+    "prompt": "Ana's counter shows 3. You flip `isAna` to false. What does Ben's counter show?",
+    "visual": {
+      "kind": "code",
+      "language": "jsx",
+      "code": "{isAna\n  ? <Counter person=\"Ana\" />\n  : <Counter person=\"Ben\" />}"
+    },
+    "options": [
+      { "id": "a", "text": "3" },
+      {
+        "id": "b",
+        "text": "0",
+        "feedback": "Different props feel like a different component, but React doesn't compare props to decide this."
+      },
+      {
+        "id": "c",
+        "text": "3 for a moment, then 0",
+        "feedback": "Nothing here resets the count later. React decides once, while it compares the two renders."
+      }
+    ],
+    "correct": ["a"],
+    "multiple": false,
+    "explanation": "It shows 3. To React, Ben's counter is the same component as Ana's, just with a new `person` prop. The first concept shows why."
+  },
+  "bricks": [
+    {
+      "id": "c1",
+      "type": "concept",
+      "title": "Same spot, same type: React keeps it",
+      "body": "On every render, React compares the new element tree with the previous one, slot by slot: the same position under the same parent. In each slot it checks the **type**: a tag like `'div'`, or a component function. **Same type:** React keeps the instance, its state and DOM nodes, and only passes new props. **Different type:** it unmounts the old element and everything inside it, then mounts the new one from scratch.",
+      "term": {
+        "word": "Remount",
+        "definition": "Unmounting a component and mounting a new one in its place: state is reset, effects are cleaned up and run again, and DOM nodes are replaced."
+      },
+      "visual": {
+        "kind": "html",
+        "alt": "Two before-and-after rows: Counter to Counter with a new prop is kept; Counter to Timer in the same slot is unmounted and mounted fresh.",
+        "html": "<div class='flex w-full max-w-sm flex-col gap-3 text-sm'><div class='flex items-center gap-2'><code class='rounded-md border bg-background px-2 py-1'>&lt;Counter person=\"Ana\"&gt;</code><span class='text-muted-foreground'>→</span><code class='rounded-md border bg-background px-2 py-1'>&lt;Counter person=\"Ben\"&gt;</code></div><span class='badge w-fit' data-variant='secondary'>Same type: kept, props updated</span><div class='flex items-center gap-2'><code class='rounded-md border bg-background px-2 py-1'>&lt;Counter&gt;</code><span class='text-muted-foreground'>→</span><code class='rounded-md border bg-background px-2 py-1'>&lt;Timer&gt;</code></div><span class='badge w-fit' data-variant='destructive'>New type: unmounted, then mounted fresh</span></div>"
+      }
+    },
+    {
+      "id": "p1",
+      "type": "choice",
+      "prompt": "The counter shows 5. The window narrows, so `isWide` becomes false. What does the counter show now?",
+      "visual": {
+        "kind": "code",
+        "language": "jsx",
+        "code": "{isWide\n  ? <div><Counter /></div>\n  : <section><Counter /></section>}"
+      },
+      "options": [
+        { "id": "a", "text": "0" },
+        {
+          "id": "b",
+          "text": "5",
+          "feedback": "Counter's own type didn't change, but the element in that slot did: a `div` became a `section`. Everything inside a replaced element is remounted too."
+        },
+        {
+          "id": "c",
+          "text": "5, because Counter sits at the same depth in both",
+          "feedback": "Depth alone isn't enough. React stops at the first slot where the type differs and rebuilds everything below it."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Compare the types in the outer slot before looking inside.",
+      "explanation": "The outer slot changed from `div` to `section`, so React unmounted the whole old subtree, Counter included, and mounted a new Counter at 0."
+    },
+    {
+      "id": "p2",
+      "type": "choice",
+      "prompt": "An uncontrolled `<input>` holds text the user typed. When a validation error appears, which change keeps that text?",
+      "options": [
+        { "id": "a", "text": "The input's `placeholder` prop changes" },
+        {
+          "id": "b",
+          "text": "The input gets wrapped in a `<label>`",
+          "feedback": "That slot now holds a `label`, not an `input`. Different type, so the old input is unmounted and a new, empty one is mounted inside the label."
+        },
+        {
+          "id": "c",
+          "text": "The input is swapped for a `<textarea>`",
+          "feedback": "A `textarea` is a different type from an `input`, so React replaces the DOM node and the typed text goes with it."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "Only the placeholder change leaves an `input` in the same slot. React keeps the DOM node, so the typed text stays."
+    },
+    {
+      "id": "c2",
+      "type": "concept",
+      "title": "Keys: identity that beats position",
+      "body": "So far, slots are positions. In a list of siblings, a **key** changes that: React pairs old and new children by key, so an item that moves keeps its state. Without a key, React uses the index, so state stays with the slot, not the item. A key is also part of identity in a single slot: give the same component a new key and React treats it as a new one and remounts it.",
+      "visual": {
+        "kind": "code",
+        "language": "jsx",
+        "code": "// Matched by id: state follows each todo\n{todos.map(t => <Todo key={t.id} todo={t} />)}\n\n// Matched by index: state stays in the slot\n{todos.map((t, i) => <Todo key={i} todo={t} />)}"
+      }
+    },
+    {
+      "id": "p3",
+      "type": "choice",
+      "prompt": "Each Row has an uncontrolled note field. You type “call back” in Ana's row, then Ben is added to the top of the list. Where does “call back” appear?",
+      "visual": {
+        "kind": "code",
+        "language": "jsx",
+        "code": "{people.map((person, i) => (\n  <Row key={i} person={person} />\n))}"
+      },
+      "options": [
+        { "id": "a", "text": "In Ben's row" },
+        {
+          "id": "b",
+          "text": "In Ana's row",
+          "feedback": "That's what `key={person.id}` would do. With index keys, the state belongs to key 0, not to Ana."
+        },
+        {
+          "id": "c",
+          "text": "Nowhere: every row remounts",
+          "feedback": "Key 0 exists before and after, so that Row is reused. Only the new key 1 mounts fresh."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "hint": "Which key did Ana's row have before, and who has that key now?",
+      "explanation": "Ana's row was key 0. After the insert, key 0 is Ben's row, so React reused that Row, note included, for Ben. Ana gets a fresh Row at key 1."
+    },
+    {
+      "id": "p4",
+      "type": "choice",
+      "prompt": "Switching contacts keeps the half-written message in `<ChatPanel contact={contact} />`. What's the cleanest way to give each contact a fresh panel?",
+      "options": [
+        { "id": "a", "text": "Render `<ChatPanel key={contact.id} contact={contact} />`" },
+        {
+          "id": "b",
+          "text": "Wrap ChatPanel in a `<div>`",
+          "feedback": "The `div` is the same type on every render, so React keeps it and the ChatPanel inside it."
+        },
+        {
+          "id": "c",
+          "text": "Also pass `id={contact.id}` as a prop",
+          "feedback": "A changed prop is still the same type in the same slot. React updates props; it doesn't remount."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "A new key in the same slot means a new component to React. Each contact gets its own ChatPanel, with an empty draft."
+    },
+    {
+      "id": "c3",
+      "type": "concept",
+      "title": "The type is the function itself",
+      "body": "A component's type is compared by reference: the function object, not its name or code. Defined at the top level of a module, it's the same function on every render. Defined **inside** another component, it's created again each time the parent renders. React then sees a new type in that slot, unmounts the old one, and mounts a fresh one, every time. Its state, focus, and effects reset.",
+      "visual": {
+        "kind": "html",
+        "alt": "Two renders of a parent: render 1 holds Field function number 1, render 2 holds Field function number 2; they are not equal, so Field remounts.",
+        "html": "<div class='flex w-full max-w-sm flex-col gap-2 text-sm'><div class='flex items-center justify-between rounded-lg border px-3 py-2'><span>Render 1</span><code>Field (function #1)</code></div><div class='flex items-center justify-between rounded-lg border px-3 py-2'><span>Render 2</span><code>Field (function #2)</code></div><p class='text-muted-foreground'>#1 !== #2 → new type → <span class='font-medium text-foreground'>remount</span></p></div>"
+      }
+    },
+    {
+      "id": "p5",
+      "type": "hotspot",
+      "prompt": "Clicking Like wipes whatever the user typed in the bio. Tap the line that causes it.",
+      "visual": {
+        "kind": "code",
+        "language": "jsx",
+        "code": "function Profile() {\n  const [likes, setLikes] = useState(0);\n  function Bio() {\n    const [draft, setDraft] = useState('');\n    return <textarea value={draft} onChange={e => setDraft(e.target.value)} />;\n  }\n  return (\n    <>\n      <button onClick={() => setLikes(likes + 1)}>Like {likes}</button>\n      <Bio />\n    </>\n  );\n}",
+        "hotspots": [
+          { "id": "l2", "line": 2 },
+          { "id": "l3", "line": 3 },
+          { "id": "l9", "line": 9 },
+          { "id": "l10", "line": 10 }
+        ]
+      },
+      "correct": ["l3"],
+      "multiple": false,
+      "hint": "What new thing is created each time Profile renders?",
+      "explanation": "Line 3 defines Bio inside Profile. Each Like re-renders Profile, creating a new Bio function, so React remounts Bio and its draft resets. Move Bio to the top level."
+    }
+  ],
+  "challenge": {
+    "id": "ch",
+    "type": "sort",
+    "prompt": "A `<Counter>` shows 4. Sort each change by what happens to it on the next render.",
+    "groups": [
+      { "id": "kept", "label": "Reused: still shows 4" },
+      { "id": "reset", "label": "Remounted: back to 0" }
+    ],
+    "items": [
+      { "id": "a", "text": "Its `color` prop changes from red to blue", "group": "kept" },
+      { "id": "b", "text": "It moves from the top to the bottom of a list keyed by id", "group": "kept" },
+      { "id": "c", "text": "It's in a list keyed by index, and a new item is added at the end", "group": "kept" },
+      { "id": "d", "text": "Its parent element changes from `<div>` to `<section>`", "group": "reset" },
+      { "id": "e", "text": "Its key changes from `'a'` to `'b'`", "group": "reset" },
+      { "id": "f", "text": "It's defined inside its parent component, and the parent re-renders", "group": "reset" }
+    ],
+    "hint": "For each change, ask: is it the same type, in the same slot, with the same key?",
+    "explanation": "New props, a keyed move, and an append keep type, slot, and key. A new parent type, a new key, or a re-created function each mean a different component."
+  },
+  "wrapup": {
+    "takeaways": [
+      "React reuses a component only when the same type sits in the same slot with the same key; anything else remounts it.",
+      "Key list items by a stable id, so state follows the item instead of the index.",
+      "Change a component's key on purpose when you want its state reset.",
+      "Define components at the top level, never inside another component."
+    ],
+    "next": "Where to keep state: lifting it up vs. keeping it local"
+  }
+}
