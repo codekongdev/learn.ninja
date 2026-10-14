@@ -3,13 +3,14 @@ title: Levels
 description: Who a lesson is for. The agent picks a level and reads that level's guide on top of the core skill.
 ---
 
-Every lesson has a `level`: `beginner`, `intermediate`, or `advanced`. It says who the lesson is for and shows on the lesson's first screen. The level changes what the lesson assumes, what its questions ask for, how tempting the wrong options are, and how many hints there are. It doesn't change the shape: the same hook, concepts, practice, challenge, and takeaways, within the same limits, at every level.
+Every lesson has a `level`: `beginner`, `intermediate`, or `advanced`. It says who the lesson is for and shows on the lesson's first screen. The level changes what the lesson assumes, what its questions ask for, how tempting the wrong options are, and how many hints there are. It doesn't change the shape: that's the lesson's mode (explain, balanced, or practice), within the same limits at every level.
 
 ## Pick a level
 
 1. Your words win: name a level, or an audience ("my team of senior engineers", "my kid", "people new to statistics").
-2. Otherwise the agent goes by what the input assumes: text that explains its own terms reads as beginner or intermediate, text written for people in the field as advanced.
-3. If it's unclear, the lesson is beginner.
+2. Then how you ask: terms of art and stated background point up, while a plain "explain X" is beginner however advanced X is.
+3. Then what the input assumes: text that explains its own terms reads as beginner or intermediate, text written for people in the field as intermediate or advanced.
+4. Topic depth only breaks a tie. If it's still unclear, the lesson is beginner.
 
 The agent tells you which level it chose. Ask for another and it remakes the lesson. Levels are relative to the subject, so each lesson's summary says what it assumes.
 
@@ -23,4 +24,4 @@ The agent tells you which level it chose. Ask for another and it remakes the les
 
 ## What stays the same
 
-The structure and the checker's limits are identical at every level: one hook, 1–3 concept bricks of 80 words or fewer, 2–4 question bricks after each, a harder challenge, and 2–4 takeaways, in 5–10 minutes. The level guides live in the skill at `levels/{level}.md`, next to `levels/index.md`, which says how the agent chooses.
+The structure and the checker's limits are identical at every level: one hook, 1–4 concept bricks of 80 words or fewer, 1–6 question bricks after each (the mode sets how many), a harder challenge, and 2–4 takeaways, in 3–15 minutes. The level guides live in the skill at `levels/{level}.md`, next to `levels/index.md`, which says how the agent chooses.
