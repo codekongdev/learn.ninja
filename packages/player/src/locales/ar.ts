@@ -23,7 +23,6 @@ export const ar: Strings = {
   practice: "تدريب",
   challenge: "تحدٍّ",
   fixing: "تصحيح الأخطاء",
-  keyTerm: "مصطلح أساسي",
   helper: {
     choiceOne: "اختر إجابة واحدة.",
     choiceMany: "اختر كل ما ينطبق.",

@@ -17,7 +17,7 @@ hook → bricks: concept → questions → concept → questions … (1–4 conc
 ```
 
 - **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains. Its `explanation` should make the learner want to know why.
-- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
+- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Give a concrete example or a visual. Bold a key word the first time it appears, and define it in the body.
 - **Practice:** 2–4 question bricks right after each concept brick, 3–12 in total across the lesson (`reference/planning.md` has the shape for each size).
 - **Challenge:** one harder, applied question brick that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
 - **Wrap-up:** 2–4 takeaways, each one sentence the learner could act on.

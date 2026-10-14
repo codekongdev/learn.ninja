@@ -245,9 +245,6 @@ export const conceptBrick = z
     title: z.string().min(1).max(60),
     body: richText,
     visual: visual.optional(),
-    term: z
-      .strictObject({ word: z.string().min(1), definition: richText })
-      .optional(),
   })
   .meta({ id: "ConceptBrick" })
 

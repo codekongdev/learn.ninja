@@ -80,11 +80,7 @@
       "id": "c2",
       "type": "concept",
       "title": "Goals and non-goals",
-      "body": "**Goals** say what success looks like, in numbers you can measure. **Non-goals** say what you're deliberately not doing, so scope doesn't creep in later.",
-      "term": {
-        "word": "Non-goal",
-        "definition": "Something intentionally left out of this project, written down so nobody assumes it's included."
-      }
+      "body": "**Goals** say what success looks like, in numbers you can measure. **Non-goals** say what you're deliberately not doing, so scope doesn't creep in later."
     },
     {
       "id": "p3",

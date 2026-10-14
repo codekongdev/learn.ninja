@@ -27,7 +27,6 @@ export const vi: Strings = {
   practice: "Luyện tập",
   challenge: "Thử thách",
   fixing: "Sửa lỗi",
-  keyTerm: "Thuật ngữ chính",
   helper: {
     choiceOne: "Chọn một.",
     choiceMany: "Chọn tất cả đáp án đúng.",

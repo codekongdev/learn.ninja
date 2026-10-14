@@ -189,7 +189,7 @@ const practice = (l: typeof buttons, n: number, i: number) =>
 const noState = { mode: { table: { disable: true } } } as const
 
 export const Concept: Story = {
-  name: "Concept, visual and term",
+  name: "Concept, visual",
   args: { brick: concept(buttons, 0) },
   argTypes: noState,
 }

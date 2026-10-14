@@ -33,7 +33,6 @@ export const nl: Strings = {
   practice: "Oefenen",
   challenge: "Uitdaging",
   fixing: "Fouten herstellen",
-  keyTerm: "Kernbegrip",
   helper: {
     choiceOne: "Kies er één.",
     choiceMany: "Kies alles wat van toepassing is.",

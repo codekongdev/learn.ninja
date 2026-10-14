@@ -39,10 +39,6 @@
       "type": "concept",
       "title": "Confounders: a third thing drives both",
       "body": "A **confounder** is a variable that affects both of the things you measured. Hot days push up ice cream sales *and* the number of people swimming, so sales and drownings move together even though neither causes the other. Before you read a correlation as cause, ask: **what else could move both?** If you can name one, the correlation alone can't settle it.",
-      "term": {
-        "word": "Confounder",
-        "definition": "A third variable that influences both the supposed cause and the supposed effect, producing a correlation between them."
-      },
       "visual": {
         "kind": "html",
         "alt": "Scatter plot of ice cream sales against drownings; hot months cluster high on both axes and cool months low on both.",
@@ -94,10 +90,6 @@
       "type": "concept",
       "title": "Which way does the arrow point?",
       "body": "A correlation doesn't say which variable moves first. Cities with more police officers often have more crime. Police causing crime is unlikely; crime leading cities to hire police is not. This is **reverse causation**: the supposed effect is driving the supposed cause. Ask it every time: *could Y be causing X instead?* Time order helps: a cause can't come after its effect.",
-      "term": {
-        "word": "Reverse causation",
-        "definition": "When the thing you called the effect is actually producing the thing you called the cause."
-      },
       "visual": {
         "kind": "html",
         "alt": "Two boxes, Police and Crime, with an arrow pointing each way between them.",
@@ -180,11 +172,7 @@
       "id": "c3",
       "type": "concept",
       "title": "What would make you believe it?",
-      "body": "Three kinds of evidence support a causal claim. **Randomization:** a coin flip decides who gets the treatment, so confounders balance out on average. **Natural experiments:** something outside anyone's control, like a lottery or a policy that stops at a border, does the assigning. **Time order:** the cause is measured before the effect, as in a group followed over years. Mechanism and dose-response add support; they don't settle it.",
-      "term": {
-        "word": "Randomized controlled trial",
-        "definition": "A study where chance decides who gets the treatment, so the groups differ only in the treatment, on average."
-      }
+      "body": "Three kinds of evidence support a causal claim. **Randomization:** a coin flip decides who gets the treatment, so confounders balance out on average. **Natural experiments:** something outside anyone's control, like a lottery or a policy that stops at a border, does the assigning. **Time order:** the cause is measured before the effect, as in a group followed over years. Mechanism and dose-response add support; they don't settle it."
     },
     {
       "id": "p5",

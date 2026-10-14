@@ -32,7 +32,6 @@ export const uk: Strings = {
   practice: "Практика",
   challenge: "Виклик",
   fixing: "Робота над помилками",
-  keyTerm: "Ключовий термін",
   helper: {
     choiceOne: "Виберіть один варіант.",
     choiceMany: "Виберіть усі, що підходять.",

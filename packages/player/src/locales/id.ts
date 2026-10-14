@@ -27,7 +27,6 @@ export const id: Strings = {
   practice: "Latihan",
   challenge: "Tantangan",
   fixing: "Memperbaiki kesalahan",
-  keyTerm: "Istilah kunci",
   helper: {
     choiceOne: "Pilih satu.",
     choiceMany: "Pilih semua yang sesuai.",

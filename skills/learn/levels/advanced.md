@@ -14,7 +14,7 @@ A claim most advanced learners accept that the evidence complicates, or two acco
 ## Concepts
 
 - Problem first: the case or the puzzle, then the mechanism. Don't re-explain the model; name it and go to where it bends.
-- Teach the tension: what competes, what the evidence supports, what it rules out. `term` only for a term of art the lesson turns on.
+- Teach the tension: what competes, what the evidence supports, what it rules out.
 - One real example, complications left in, beats two clean ones.
 
 ## Questions

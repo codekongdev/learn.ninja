@@ -82,7 +82,7 @@ const optionPanelStyles =
 
 // ---------- concept ----------
 
-/** Theory: one idea with an optional visual and a key term. Nothing to answer. */
+/** Theory: one idea with an optional visual. Nothing to answer. */
 export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
   return (
     <>
@@ -93,14 +93,6 @@ export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
         </p>
       </div>
       {brick.visual ? <Visual visual={brick.visual} /> : null}
-      {brick.term ? (
-        <dl className="flex flex-col gap-1 border-s-2 border-primary ps-4 text-sm">
-          <dt className="font-semibold">{brick.term.word}</dt>
-          <dd className="text-muted-foreground">
-            <RichText text={brick.term.definition} />
-          </dd>
-        </dl>
-      ) : null}
     </>
   )
 }

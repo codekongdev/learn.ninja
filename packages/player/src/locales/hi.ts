@@ -28,7 +28,6 @@ export const hi: Strings = {
   practice: "अभ्यास",
   challenge: "चुनौती",
   fixing: "गलतियाँ सुधारना",
-  keyTerm: "मुख्य शब्द",
   helper: {
     choiceOne: "एक चुनें।",
     choiceMany: "जो भी लागू हों, सब चुनें।",

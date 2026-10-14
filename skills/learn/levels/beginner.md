@@ -14,7 +14,7 @@ A guess that exposes the everyday intuition the idea corrects, in concrete terms
 
 ## Concepts
 
-- Name the idea, state the rule in one sentence, then one worked example with real values. Define every term the moment it appears, and put the key one in `term`.
+- Name the idea, state the rule in one sentence, then one worked example with real values. Define every term the moment it appears, and bold the key one.
 - Explain, don't justify: why the rule holds can wait. Skip history, variants, and exceptions.
 - A visual shows the one thing the rule is about and nothing else.
 

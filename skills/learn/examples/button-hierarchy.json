@@ -39,10 +39,6 @@
       "type": "concept",
       "title": "One primary action per view",
       "body": "The **primary button** is the action you most want people to take. Give each view only one. If everything is primary, nothing is.",
-      "term": {
-        "word": "Primary button",
-        "definition": "The most visually prominent button, used for the main action."
-      },
       "visual": {
         "kind": "html",
         "html": "<div class='flex gap-2 flex-wrap'><button class='btn'>Place order</button><button class='btn' data-variant='outline'>Back to cart</button></div>",

@@ -74,11 +74,7 @@
       "id": "c2",
       "type": "concept",
       "title": "Asking how someone is",
-      "body": "**¿Cómo estás?** asks a friend how they are. With someone older, or in a formal setting, say **¿Cómo está?** instead. A common reply is **Bien, gracias. ¿Y tú?**",
-      "term": {
-        "word": "Usted",
-        "definition": "The formal “you,” used with ¿Cómo está?"
-      }
+      "body": "**¿Cómo estás?** asks a friend how they are. With someone older, or in a formal setting, say **¿Cómo está?** or **¿Cómo está usted?** (*usted* is the formal “you”). A common reply is **Bien, gracias. ¿Y tú?**, or **¿Y usted?** when you are being formal."
     },
     {
       "id": "p3",

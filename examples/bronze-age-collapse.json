@@ -105,11 +105,7 @@
       "id": "c2",
       "type": "concept",
       "title": "What a burnt layer can and can't say",
-      "body": "A destruction layer shows a place burned, not who or what burned it. Historians read the details: bodies crushed under masonry point to earthquake; arrowheads in walls to fighting; archives and valuables removed first to a planned evacuation, as at Hattusa; local pottery above the ash to survivors returning rather than newcomers. Old stories get re-checked: Ugarit's tablets were long said to be baking in a kiln as the city fell; later study suggests they fell from an upper floor.",
-      "term": {
-        "word": "Destruction layer",
-        "definition": "A stratum of ash, collapsed walls and debris marking a violent end to a phase of occupation."
-      }
+      "body": "A destruction layer shows a place burned, not who or what burned it. Historians read the details: bodies crushed under masonry point to earthquake; arrowheads in walls to fighting; archives and valuables removed first to a planned evacuation, as at Hattusa; local pottery above the ash to survivors returning rather than newcomers. Old stories get re-checked: Ugarit's tablets were long said to be baking in a kiln as the city fell; later study suggests they fell from an upper floor."
     },
     {
       "id": "p3",
@@ -157,10 +153,6 @@
       "type": "concept",
       "title": "Systems collapse: a perfect storm",
       "body": "Eric Cline's reading, now the mainstream one: no single cause explains every site, and it didn't have to. The Late Bronze Age powers were tightly coupled: bronze needed Cypriot copper and tin from far to the east, and Egypt shipped grain to a hungry Hatti. A system like that absorbs one shock. Within a few decades it took drought, earthquakes, raids, and revolt together, and each failure made the next more likely.",
-      "term": {
-        "word": "Systems collapse",
-        "definition": "The failure of an interdependent network when several stresses arrive together, so that no single one is \"the\" cause."
-      },
       "visual": {
         "kind": "html",
         "alt": "Diagram of copper from Cyprus, tin from the east, and grain from Egypt all flowing into the palace economies.",

@@ -32,7 +32,6 @@ export const ru: Strings = {
   practice: "Практика",
   challenge: "Испытание",
   fixing: "Работа над ошибками",
-  keyTerm: "Ключевой термин",
   helper: {
     choiceOne: "Выберите один вариант.",
     choiceMany: "Выберите все подходящие.",

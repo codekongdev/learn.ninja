@@ -27,7 +27,6 @@ export const en: Strings = {
   practice: "Practice",
   challenge: "Challenge",
   fixing: "Fixing mistakes",
-  keyTerm: "Key term",
   helper: {
     choiceOne: "Pick one.",
     choiceMany: "Pick all that apply.",

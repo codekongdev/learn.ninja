@@ -32,7 +32,6 @@ export const it: Strings = {
   practice: "Pratica",
   challenge: "Sfida",
   fixing: "Correzione degli errori",
-  keyTerm: "Termine chiave",
   helper: {
     choiceOne: "Scegline una.",
     choiceMany: "Scegli tutte quelle giuste.",

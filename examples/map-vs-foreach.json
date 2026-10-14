@@ -103,11 +103,7 @@
       "id": "c2",
       "type": "concept",
       "title": "forEach is for side effects",
-      "body": "Use **forEach** when you want to *do* something with each item, like logging, saving, or sending, and don't need a result back. If you need a new array, use **map**.",
-      "term": {
-        "word": "Side effect",
-        "definition": "Something a function does beyond returning a value, like writing to the console or a database."
-      },
+      "body": "Use **forEach** for *side effects*: doing something with each item, like logging, saving, or sending, when you don't need a result back. If you need a new array, use **map**.",
       "visual": {
         "kind": "code",
         "language": "javascript",
