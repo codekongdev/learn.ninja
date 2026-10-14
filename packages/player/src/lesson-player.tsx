@@ -256,6 +256,8 @@ export interface State {
   index: number
   results: Record<string, Outcome>
   mistakes: QuestionBrick[]
+  /** Ids of the fix round's questions answered right. */
+  fixed: string[]
   inFix: boolean
   fixQueued: boolean
   question: QuestionState | null
@@ -321,6 +323,7 @@ function start(lesson: Lesson, startAt?: string, run = 0): State {
     index,
     results: {},
     mistakes: [],
+    fixed: [],
     inFix: false,
     fixQueued: false,
     question: at < 0 ? null : freshQuestion(items[index], seeded(startAt!)),
@@ -514,6 +517,7 @@ export function reducer(state: State, action: Action): State {
         return {
           ...state,
           results,
+          fixed: role === "fix" ? [...state.fixed, brick.id] : state.fixed,
           question: { ...s, result, phase: "feedback" },
         }
       }
@@ -782,7 +786,12 @@ function Player({
       {chrome ? (
         <LessonHeader
           title={lesson.title}
-          progress={progressAt(state.items, state.index, state.inFix)}
+          progress={progressAt(
+            state.items,
+            state.index,
+            state.results,
+            state.fixed
+          )}
           count={questionAt(state.items, state.index, state.inFix)}
           startedAt={clock.start}
           endedAt={clock.end}
@@ -1875,7 +1884,7 @@ function useCoarsePointer(): boolean {
   return coarse
 }
 
-/** A short bar on the content's bottom edge: click, press, or drag it to close or open the tray. */
+/** A short bar floating on the content's bottom edge: click, press, or drag it to close or open the tray. */
 function TrayNotch({
   open,
   controls,
@@ -1906,8 +1915,9 @@ function TrayNotch({
   }
   return (
     // Capture-phase handlers: the button's own press handling stops pointer events from bubbling.
+    // It floats over the content's bottom edge (centred by the auto margins) instead of taking a row.
     <div
-      className="flex shrink-0 justify-center"
+      className="absolute inset-x-0 bottom-0 z-10 mx-auto w-fit"
       style={{ touchAction: "none" }}
       onPointerDownCapture={(e) => {
         start.current = e.clientY
