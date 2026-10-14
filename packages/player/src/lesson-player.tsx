@@ -1869,14 +1869,14 @@ export function ActionArea({
           data-text-size={textSize}
           className={cn(
             TOAST,
-            "absolute end-4 z-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:w-fit sm:max-w-96",
+            "absolute end-4 z-10 rounded-es-[2px] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:w-fit sm:max-w-80",
             // Rewinding: what he said runs back out.
             rewinding &&
               "motion-safe:animate-out motion-safe:fade-out-0 motion-safe:fill-mode-forwards motion-safe:slide-out-to-bottom-2",
             // In the player the bubble sits above the ninja, behind him, so he jumps in front of it; the
             // corner over his head is squared off. Without him it takes his corner.
             tray && ninja
-              ? "start-4 bottom-17 rounded-es-sm sm:start-6 sm:bottom-19"
+              ? "start-4 bottom-17 sm:start-6 sm:bottom-19"
               : "start-4 bottom-4 sm:start-6 sm:bottom-6",
             toneClass[tone]
           )}

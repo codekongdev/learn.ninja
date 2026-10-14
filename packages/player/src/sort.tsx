@@ -12,10 +12,11 @@ import { usePlayer } from "./context"
 import { buzz, calm, fly, pulse, shake } from "./motion"
 import { RichText } from "./rich-text"
 
-// The sort brick, as lanes: the groups head the columns and every item keeps its own row. An unsorted
-// item spans the row; tap the side it belongs on (or swipe it there) and it slides into that lane. Tap a
-// placed item to take it back out, or an empty lane to move it across. Each row is a radio group, so a
-// keyboard moves the item with the arrow keys and a screen reader hears the item and its groups.
+// The sort brick, as lanes: the groups head the columns as bins (cells styled like the rows) and every
+// item keeps its own row. An unsorted item spans the row; tap the side it belongs on (or swipe it there)
+// and it slides into that lane. Tap a placed item to take it back out, or an empty lane to move it
+// across. Each row is a radio group, so a keyboard moves the item with the arrow keys and a screen
+// reader hears the item and its groups.
 
 /** Move an item to the end of a zone, taking it out of whichever zone held it. */
 export function moveItem(
@@ -230,8 +231,9 @@ export function SortBrick({
               heads.current[i] = el
             }}
             className={cn(
-              "flex items-center justify-center gap-2 px-2 py-1.5 text-sm font-semibold text-muted-foreground transition-colors",
-              aim?.lane === i && "text-foreground"
+              tileStyles,
+              "flex min-h-10 items-center justify-center gap-2 px-3 py-2.5 font-semibold transition-colors",
+              aim?.lane === i && "bg-foreground/5 dark:bg-input/50"
             )}
           >
             <span lang={g.lang} className="truncate">
