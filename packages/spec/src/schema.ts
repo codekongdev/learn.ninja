@@ -1,10 +1,10 @@
 import { z } from "zod"
 
-// Lesson spec v0.3: the shape of a lesson file.
+// Lesson spec v0.4: the shape of a lesson file.
 // Structural limits that JSON Schema can express live here; cross-field and
 // teaching-quality rules live in rules.ts.
 
-export const SPEC_VERSION = "0.3" as const
+export const SPEC_VERSION = "0.4" as const
 
 /** Who a lesson is for, from least to most prior knowledge. The skill's `levels/` guides say how each one teaches. */
 export const LEVELS = ["beginner", "intermediate", "advanced"] as const
@@ -48,8 +48,41 @@ export const mathVisual = z
   })
   .meta({ id: "MathVisual" })
 
+/** A plain number or a category name on the x axis; y is always a number. */
+const chartX = z.union([z.number(), z.string().min(1).max(40)])
+
+export const chartVisual = z
+  .strictObject({
+    kind: z.literal("chart"),
+    /** scatter: numeric x and y. bar and line: x is a category or a number, in the order given. */
+    type: z.enum(["scatter", "bar", "line"]),
+    /** One sentence saying what the chart shows, for screen readers. Required (rules.ts). */
+    alt: z.string().min(1).max(200).optional(),
+    x: z
+      .strictObject({ label: z.string().min(1).max(60).optional() })
+      .optional(),
+    y: z
+      .strictObject({ label: z.string().min(1).max(60).optional() })
+      .optional(),
+    /** The points, in order. `label` names a point on a scatter; `series` groups points into lines or colors (up to 3). */
+    data: z
+      .array(
+        z.strictObject({
+          x: chartX,
+          y: z.number(),
+          label: z.string().min(1).max(24).optional(),
+          series: z.string().min(1).max(24).optional(),
+        })
+      )
+      .min(2)
+      .max(60),
+    /** A fitted trend line through the points (scatter only). */
+    trend: z.boolean().optional(),
+  })
+  .meta({ id: "ChartVisual" })
+
 export const visual = z
-  .discriminatedUnion("kind", [htmlVisual, codeVisual, mathVisual])
+  .discriminatedUnion("kind", [htmlVisual, codeVisual, mathVisual, chartVisual])
   .meta({ id: "Visual" })
 
 // ---------- shared pieces ----------
@@ -305,3 +338,4 @@ export type Brick = z.infer<typeof brick>
 export type QuestionBrick = z.infer<typeof questionBrick>
 export type ConceptBrick = z.infer<typeof conceptBrick>
 export type Visual = z.infer<typeof visual>
+export type ChartVisual = z.infer<typeof chartVisual>

@@ -4,7 +4,7 @@
   "properties": {
     "spec": {
       "type": "string",
-      "const": "0.3"
+      "const": "0.4"
     },
     "title": {
       "type": "string",
@@ -195,6 +195,9 @@
         },
         {
           "$ref": "#/$defs/MathVisual"
+        },
+        {
+          "$ref": "#/$defs/ChartVisual"
         }
       ]
     },
@@ -298,6 +301,99 @@
       "required": [
         "kind",
         "tex"
+      ],
+      "additionalProperties": false
+    },
+    "ChartVisual": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "chart"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "scatter",
+            "bar",
+            "line"
+          ]
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "x": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          },
+          "additionalProperties": false
+        },
+        "y": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            }
+          },
+          "additionalProperties": false
+        },
+        "data": {
+          "minItems": 2,
+          "maxItems": 60,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40
+                  }
+                ]
+              },
+              "y": {
+                "type": "number"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24
+              },
+              "series": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "trend": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "type",
+        "data"
       ],
       "additionalProperties": false
     },
@@ -1077,5 +1173,5 @@
       ]
     }
   },
-  "title": "Lesson (spec 0.3)"
+  "title": "Lesson (spec 0.4)"
 }

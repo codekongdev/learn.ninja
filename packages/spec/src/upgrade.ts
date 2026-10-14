@@ -1,6 +1,9 @@
 // Older lesson files, brought up to the current spec. Published lessons and older skills can
-// still hand us spec 0.2, or 0.3 with a concept brick's `term` (since dropped), so the server
-// upgrades them before validating or playing them.
+// still hand us spec 0.2, or 0.3 (with or without a concept brick's `term`, since dropped), so the
+// server upgrades them before validating or playing them. 0.3 to 0.4 only added the chart visual,
+// so a 0.3 lesson needs nothing but its version changed.
+
+import { SPEC_VERSION } from "./schema"
 
 interface LessonV02 {
   spec: "0.2"
@@ -12,7 +15,11 @@ interface LessonV02 {
 export function canUpgrade(data: unknown): boolean {
   if (typeof data !== "object" || data === null) return false
   const { spec, bricks } = data as { spec?: unknown; bricks?: unknown }
-  return spec === "0.2" || (Array.isArray(bricks) && bricks.some(hasTerm))
+  return (
+    spec === "0.2" ||
+    spec === "0.3" ||
+    (Array.isArray(bricks) && bricks.some(hasTerm))
+  )
 }
 
 function hasTerm(brick: unknown): boolean {
@@ -25,18 +32,24 @@ function hasTerm(brick: unknown): boolean {
 }
 
 /**
- * Turns a spec 0.2 lesson into spec 0.3: each loop's concept becomes a concept brick, followed
- * by its practice bricks. Concept bricks lose their `term`. Anything else comes back unchanged,
- * for validateLesson to judge.
+ * Brings a lesson up to the current spec. From 0.2, each loop's concept becomes a concept brick,
+ * followed by its practice bricks. Concept bricks lose their `term`. Anything else comes back
+ * unchanged, for validateLesson to judge.
  */
 export function upgradeLesson(data: unknown): unknown {
   if (!canUpgrade(data)) return data
   if ((data as { spec?: unknown }).spec !== "0.2") {
-    const lesson = data as { bricks: unknown[] }
-    return { ...lesson, bricks: lesson.bricks.map(withoutTerm) }
+    const lesson = data as { bricks?: unknown[] }
+    return {
+      ...lesson,
+      spec: SPEC_VERSION,
+      bricks: Array.isArray(lesson.bricks)
+        ? lesson.bricks.map(withoutTerm)
+        : lesson.bricks,
+    }
   }
   const { loops, ...rest } = data as LessonV02
-  if (!Array.isArray(loops)) return { ...rest, spec: "0.3" }
+  if (!Array.isArray(loops)) return { ...rest, spec: SPEC_VERSION }
   const out: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(rest)) {
     if (key === "challenge")
@@ -44,7 +57,7 @@ export function upgradeLesson(data: unknown): unknown {
         conceptBrick(loop?.concept),
         ...(Array.isArray(loop?.practice) ? loop.practice : []),
       ])
-    out[key] = key === "spec" ? "0.3" : value
+    out[key] = key === "spec" ? SPEC_VERSION : value
   }
   return out
 }

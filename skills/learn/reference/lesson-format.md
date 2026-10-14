@@ -1,4 +1,4 @@
-# Lesson format (spec 0.3)
+# Lesson format (spec 0.4)
 
 A lesson is one JSON file with four slots: `hook`, `bricks`, `challenge`, `wrapup`. A brick is one screen: either a `concept` brick (theory) or a question brick (`choice`, `compare`, `hotspot`, `sort`, `order`, `match`, `blank`, `scenario`). `schema/lesson.schema.json` is the formal definition; the checker (`scripts/learn.mjs validate`) also enforces the cross-field rules listed at the end.
 
@@ -6,7 +6,7 @@ A lesson is one JSON file with four slots: `hook`, `bricks`, `challenge`, `wrapu
 
 | Field              | Required | Description                                                                                                                                                         |
 | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `spec`             | yes      | Always `"0.3"`                                                                                                                                                      |
+| `spec`             | yes      | Always `"0.4"`                                                                                                                                                      |
 | `title`            | yes      | Up to 60 characters; also used in the link                                                                                                                          |
 | `summary`          | yes      | One sentence shown before starting, up to 160 characters                                                                                                            |
 | `objective`        | yes      | What the learner can do afterwards                                                                                                                                  |
@@ -57,9 +57,13 @@ Brick ids are unique across the whole lesson, including the hook and the challen
 { "kind": "html", "html": "<div class='flex gap-2'><button class='btn'>Save</button></div>", "alt": "A single filled Save button.", "css": "optional extra CSS", "height": 200 }
 { "kind": "code", "language": "javascript", "code": "const x = 1;\nconsole.log(x);", "highlight": [2], "hotspots": [{ "id": "l2", "line": 2 }] }
 { "kind": "math", "tex": "A = P(1 + r)^n" }
+{ "kind": "chart", "type": "scatter", "alt": "Drownings rise with ice cream sales.", "x": { "label": "Ice cream sales (thousands)" }, "y": { "label": "Drownings" }, "data": [{ "x": 15, "y": 4, "label": "Jan" }, { "x": 22, "y": 6, "label": "Feb" }], "trend": true }
+{ "kind": "chart", "type": "line", "alt": "Sales peak in July.", "y": { "label": "Sales" }, "data": [{ "x": "Jan", "y": 10, "series": "2024" }, { "x": "Feb", "y": 12, "series": "2024" }, { "x": "Jan", "y": 14, "series": "2025" }, { "x": "Feb", "y": 18, "series": "2025" }] }
 ```
 
-`alt` is one sentence saying what the visual shows, for screen readers, at most 200 characters; it's required on a concept's or question's HTML visual, and on an option's HTML visual that has no caption (hotspot visuals are read through their regions, item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
+`alt` is one sentence saying what the visual shows, for screen readers, at most 200 characters; it's required on a concept's or question's HTML or chart visual, and on an option's HTML or chart visual that has no caption (hotspot visuals are read through their regions, item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
+
+A chart is drawn by the player from its `data` (2 to 60 points, in the order given): `type` is `scatter` (numbers on both axes; `label` names a point, `trend: true` fits a line), `bar`, or `line` (`x` is a category name or a number, one point per `x`). Axis labels are optional (`x.label`, `y.label`, at most 60 characters). `series` on a point groups points into up to 3 lines or colors, named in the chart; bars have no series. Colors, sizes, and fonts are the player's.
 
 ## Options
 

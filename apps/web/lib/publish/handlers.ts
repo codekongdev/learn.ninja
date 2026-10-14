@@ -27,7 +27,7 @@ import {
 // The publish API's logic, independent of Next.js so it can be tested directly.
 
 /** Spec versions the server accepts. Older skills keep working while they're listed here; older files are upgraded first. */
-export const ACCEPTED_SPECS: string[] = [SPEC_VERSION, "0.2"]
+export const ACCEPTED_SPECS: string[] = [SPEC_VERSION, "0.3", "0.2"]
 
 export {
   compareVersions,

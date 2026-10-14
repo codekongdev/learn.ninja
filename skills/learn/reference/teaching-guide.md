@@ -89,9 +89,10 @@ Mechanics of each type:
 
 ## 6. Visuals
 
-Visuals make lessons feel real. There are three kinds:
+Visuals make lessons feel real. There are four kinds:
 
-- **`html`**: UI examples, diagrams, simple charts, layouts. It runs in a sandbox with no scripts. Give it an `alt`: one sentence of at most 200 characters saying what it shows, as you'd describe it to someone who can't see it ("Two buttons: a filled Place order and an outlined Back to cart").
+- **`chart`**: any data with axes: a scatter, bar, or line chart drawn by the player from the points you give, in the lesson's own style. Give the points, axis labels, and an `alt`. Never draw a chart by hand in HTML or SVG.
+- **`html`**: UI examples, diagrams, layouts. It runs in a sandbox with no scripts. Give it an `alt`: one sentence of at most 200 characters saying what it shows, as you'd describe it to someone who can't see it ("Two buttons: a filled Place order and an outlined Back to cart").
 - **`code`**: code with syntax highlighting. Give the `language` (e.g. `javascript`, `python`, `css`).
 - **`math`**: a formula on its own line, in TeX: `{ "kind": "math", "tex": "A = P(1 + r)^n" }`.
 
@@ -140,7 +141,7 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 - **Keep visuals small and focused:** show just enough to make the point. Each visual must be under 20 KB.
 - **Not allowed** (the checker rejects them): `<script>`, event handlers like `onclick`, `<iframe>`, `<form>`, `<object>`, `<embed>`, `javascript:` links, and anything loaded from an external URL (images, fonts, stylesheets). A visual is a still picture: components show the state you write (open, checked, selected, invalid) and can't be operated.
 - **No images or photos in v1.** Draw what you need with HTML/CSS or inline SVG.
-- **Charts in inline SVG:** color strokes and text with theme classes (`stroke-primary`, `stroke-muted-foreground`, `fill-muted-foreground`, `stroke-border`) so they work in both themes, and add `direction='ltr'` to the `<svg>` so axis labels don't flip when the player is right to left (SVG ignores `dir`).
+- **Diagrams in inline SVG** (not charts: those are `chart` visuals): color strokes and text with theme classes (`stroke-primary`, `stroke-muted-foreground`, `fill-muted-foreground`, `stroke-border`) so they work in both themes, and add `direction='ltr'` to the `<svg>` so labels don't flip when the player is right to left (SVG ignores `dir`).
 
 ## 7. Languages
 

@@ -12,7 +12,7 @@ import type { Prepared } from "../src/prepared"
 import { visualKit } from "../src/stories/visual-kit"
 
 const dir = new URL("../../../examples/", import.meta.url)
-const merged: Prepared = { math: {}, code: {}, visualsCss: "" }
+const merged: Prepared = { math: {}, code: {}, visualsCss: "", charts: {} }
 const classes = new Set<string>()
 
 for (const file of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
@@ -21,6 +21,7 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   const prepared = await prepareLesson(result.lesson)
   Object.assign(merged.math, prepared.math)
   Object.assign(merged.code, prepared.code)
+  Object.assign(merged.charts!, prepared.charts)
   for (const c of visualClasses(result.lesson)) classes.add(c)
 }
 for (const c of visualClasses(visualKit)) classes.add(c)

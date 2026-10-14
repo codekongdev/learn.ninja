@@ -7,13 +7,21 @@ import {
   type Highlighter,
 } from "shiki"
 
-import type { Lesson } from "@workspace/spec"
+import type { ChartVisual, Lesson } from "@workspace/spec"
 
-import { codeKey, INLINE_MATH, mathKey, type Prepared } from "./prepared"
+import { renderChart } from "./chart"
+import {
+  chartKey,
+  codeKey,
+  INLINE_MATH,
+  mathKey,
+  type Prepared,
+} from "./prepared"
 import { visualClasses, visualsCssFor } from "./visual-css"
 
-// Server-only: renders formulas with KaTeX, highlights code with Shiki, and compiles the Tailwind CSS
-// a lesson's visuals use, once per lesson, so the learner's browser loads none of those libraries.
+// Server-only: renders formulas with KaTeX, highlights code with Shiki, draws charts with Observable
+// Plot, and compiles the Tailwind CSS a lesson's visuals use, once per lesson, so the learner's
+// browser loads none of those libraries.
 
 const THEMES = { light: "github-light", dark: "github-dark" } as const
 
@@ -43,8 +51,12 @@ export async function prepareLesson(lesson: Lesson): Promise<Prepared> {
     math: {},
     code: {},
     visualsCss: await visualsCssFor(visualClasses(lesson)),
+    charts: {},
   }
   const codeBlocks: { language: string; code: string }[] = []
+
+  for (const { chart, compact } of chartsIn(lesson))
+    prepared.charts![chartKey(chart, compact)] = renderChart(chart, compact)
 
   walk(lesson, (value, key, parent) => {
     if (typeof value === "string") {
@@ -95,6 +107,23 @@ export async function prepareLesson(lesson: Lesson): Promise<Prepared> {
   }
 
   return prepared
+}
+
+/** The lesson's chart visuals: a brick's own at full size, an option's or item's compact. */
+function chartsIn(lesson: Lesson): { chart: ChartVisual; compact: boolean }[] {
+  const out: { chart: ChartVisual; compact: boolean }[] = []
+  for (const brick of [lesson.hook, ...lesson.bricks, lesson.challenge]) {
+    if ("visual" in brick && brick.visual?.kind === "chart")
+      out.push({ chart: brick.visual, compact: false })
+    const cards = [
+      ...("options" in brick ? brick.options : []),
+      ...("items" in brick ? brick.items : []),
+    ]
+    for (const card of cards)
+      if ("visual" in card && card.visual?.kind === "chart")
+        out.push({ chart: card.visual, compact: true })
+  }
+  return out
 }
 
 function walk(

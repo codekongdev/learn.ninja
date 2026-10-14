@@ -1,5 +1,5 @@
 {
-  "spec": "0.3",
+  "spec": "0.4",
   "title": "Correlation isn't causation",
   "summary": "You can read a scatter plot. Learn the three questions that tell you whether two things that move together are cause and effect.",
   "objective": "Given a correlation, name a plausible confounder or reverse cause, and say what evidence would support a causal claim.",
@@ -12,9 +12,25 @@
     "type": "choice",
     "prompt": "Hypothetical monthly data: ice cream sales and drownings rise and fall together. What's the most likely reason?",
     "visual": {
-      "kind": "html",
+      "kind": "chart",
+      "type": "scatter",
       "alt": "Scatter plot of monthly ice cream sales against drownings, rising together.",
-      "html": "<svg viewBox='0 0 240 170' direction='ltr' class='w-full max-w-sm mx-auto' xmlns='http://www.w3.org/2000/svg'><line x1='32' y1='140' x2='230' y2='140' class='stroke-border'/><line x1='32' y1='10' x2='32' y2='140' class='stroke-border'/><text x='131' y='162' text-anchor='middle' class='fill-muted-foreground text-xs'>Ice cream sales</text><text x='12' y='75' text-anchor='middle' transform='rotate(-90 12 75)' class='fill-muted-foreground text-xs'>Drownings</text><circle cx='50' cy='125' r='4' class='fill-primary'/><circle cx='62' cy='118' r='4' class='fill-primary'/><circle cx='75' cy='122' r='4' class='fill-primary'/><circle cx='88' cy='108' r='4' class='fill-primary'/><circle cx='100' cy='100' r='4' class='fill-primary'/><circle cx='112' cy='104' r='4' class='fill-primary'/><circle cx='125' cy='88' r='4' class='fill-primary'/><circle cx='140' cy='80' r='4' class='fill-primary'/><circle cx='152' cy='84' r='4' class='fill-primary'/><circle cx='168' cy='62' r='4' class='fill-primary'/><circle cx='185' cy='55' r='4' class='fill-primary'/><circle cx='200' cy='42' r='4' class='fill-primary'/></svg>"
+      "x": { "label": "Ice cream sales (thousands)" },
+      "y": { "label": "Drownings" },
+      "data": [
+        { "x": 15, "y": 4, "label": "Jan" },
+        { "x": 22, "y": 6, "label": "Feb" },
+        { "x": 29, "y": 5, "label": "Mar" },
+        { "x": 35, "y": 7, "label": "Apr" },
+        { "x": 42, "y": 9, "label": "May" },
+        { "x": 48, "y": 8, "label": "Jun" },
+        { "x": 55, "y": 11, "label": "Jul" },
+        { "x": 63, "y": 12, "label": "Aug" },
+        { "x": 69, "y": 11, "label": "Sep" },
+        { "x": 78, "y": 15, "label": "Oct" },
+        { "x": 87, "y": 16, "label": "Nov" },
+        { "x": 95, "y": 18, "label": "Dec" }
+      ]
     },
     "options": [
       {
@@ -40,9 +56,25 @@
       "title": "Confounders: a third thing drives both",
       "body": "A **confounder** is a variable that affects both of the things you measured. Hot days push up ice cream sales *and* the number of people swimming, so sales and drownings move together even though neither causes the other. Before you read a correlation as cause, ask: **what else could move both?** If you can name one, the correlation alone can't settle it.",
       "visual": {
-        "kind": "html",
+        "kind": "chart",
+        "type": "scatter",
         "alt": "Scatter plot of ice cream sales against drownings; hot months cluster high on both axes and cool months low on both.",
-        "html": "<svg viewBox='0 0 240 170' direction='ltr' class='w-full max-w-sm mx-auto' xmlns='http://www.w3.org/2000/svg'><line x1='32' y1='140' x2='230' y2='140' class='stroke-border'/><line x1='32' y1='10' x2='32' y2='140' class='stroke-border'/><text x='131' y='162' text-anchor='middle' class='fill-muted-foreground text-xs'>Ice cream sales</text><text x='12' y='75' text-anchor='middle' transform='rotate(-90 12 75)' class='fill-muted-foreground text-xs'>Drownings</text><circle cx='50' cy='125' r='4' class='fill-muted-foreground'/><circle cx='62' cy='118' r='4' class='fill-muted-foreground'/><circle cx='75' cy='122' r='4' class='fill-muted-foreground'/><circle cx='88' cy='108' r='4' class='fill-muted-foreground'/><circle cx='100' cy='100' r='4' class='fill-muted-foreground'/><circle cx='112' cy='104' r='4' class='fill-muted-foreground'/><circle cx='125' cy='88' r='4' class='fill-primary'/><circle cx='140' cy='80' r='4' class='fill-primary'/><circle cx='152' cy='84' r='4' class='fill-primary'/><circle cx='168' cy='62' r='4' class='fill-primary'/><circle cx='185' cy='55' r='4' class='fill-primary'/><circle cx='200' cy='42' r='4' class='fill-primary'/><circle cx='48' cy='20' r='4' class='fill-primary'/><text x='56' y='24' class='fill-muted-foreground text-xs'>Hot months</text><circle cx='48' cy='36' r='4' class='fill-muted-foreground'/><text x='56' y='40' class='fill-muted-foreground text-xs'>Cool months</text></svg>"
+        "x": { "label": "Ice cream sales (thousands)" },
+        "y": { "label": "Drownings" },
+        "data": [
+          { "x": 15, "y": 4, "series": "Cool months" },
+          { "x": 22, "y": 6, "series": "Cool months" },
+          { "x": 29, "y": 5, "series": "Cool months" },
+          { "x": 35, "y": 7, "series": "Cool months" },
+          { "x": 42, "y": 9, "series": "Cool months" },
+          { "x": 48, "y": 8, "series": "Cool months" },
+          { "x": 55, "y": 11, "series": "Hot months" },
+          { "x": 63, "y": 12, "series": "Hot months" },
+          { "x": 69, "y": 11, "series": "Hot months" },
+          { "x": 78, "y": 15, "series": "Hot months" },
+          { "x": 87, "y": 16, "series": "Hot months" },
+          { "x": 95, "y": 18, "series": "Hot months" }
+        ]
       }
     },
     {
@@ -183,8 +215,23 @@
           "id": "a",
           "text": "Tutoring hours and test score, same term",
           "visual": {
-            "kind": "html",
-            "html": "<svg viewBox='0 0 240 150' direction='ltr' class='w-full' xmlns='http://www.w3.org/2000/svg'><line x1='32' y1='120' x2='230' y2='120' class='stroke-border'/><line x1='32' y1='10' x2='32' y2='120' class='stroke-border'/><text x='131' y='142' text-anchor='middle' class='fill-muted-foreground text-xs'>Tutoring hours this term</text><text x='12' y='65' text-anchor='middle' transform='rotate(-90 12 65)' class='fill-muted-foreground text-xs'>Score</text><circle cx='48' cy='30' r='3' class='fill-primary'/><circle cx='62' cy='48' r='3' class='fill-primary'/><circle cx='78' cy='36' r='3' class='fill-primary'/><circle cx='95' cy='60' r='3' class='fill-primary'/><circle cx='110' cy='52' r='3' class='fill-primary'/><circle cx='128' cy='74' r='3' class='fill-primary'/><circle cx='145' cy='66' r='3' class='fill-primary'/><circle cx='162' cy='90' r='3' class='fill-primary'/><circle cx='180' cy='80' r='3' class='fill-primary'/><circle cx='198' cy='102' r='3' class='fill-primary'/><circle cx='214' cy='94' r='3' class='fill-primary'/></svg>"
+            "kind": "chart",
+            "type": "scatter",
+            "x": { "label": "Tutoring hours this term" },
+            "y": { "label": "Score" },
+            "data": [
+              { "x": 0.8, "y": 82 },
+              { "x": 1.5, "y": 65 },
+              { "x": 2.3, "y": 76 },
+              { "x": 3.2, "y": 55 },
+              { "x": 3.9, "y": 62 },
+              { "x": 4.8, "y": 42 },
+              { "x": 5.7, "y": 49 },
+              { "x": 6.6, "y": 27 },
+              { "x": 7.5, "y": 36 },
+              { "x": 8.4, "y": 16 },
+              { "x": 9.2, "y": 24 }
+            ]
           },
           "feedback": "Both were measured at once. Low scorers may have been sent to tutoring, so this plot can't tell which came first."
         },
@@ -192,8 +239,23 @@
           "id": "b",
           "text": "Tutoring hours in autumn and score change by spring",
           "visual": {
-            "kind": "html",
-            "html": "<svg viewBox='0 0 240 150' direction='ltr' class='w-full' xmlns='http://www.w3.org/2000/svg'><line x1='32' y1='120' x2='230' y2='120' class='stroke-border'/><line x1='32' y1='10' x2='32' y2='120' class='stroke-border'/><text x='131' y='142' text-anchor='middle' class='fill-muted-foreground text-xs'>Tutoring hours in autumn</text><text x='12' y='65' text-anchor='middle' transform='rotate(-90 12 65)' class='fill-muted-foreground text-xs'>Score change</text><circle cx='48' cy='100' r='3' class='fill-primary'/><circle cx='62' cy='88' r='3' class='fill-primary'/><circle cx='78' cy='96' r='3' class='fill-primary'/><circle cx='95' cy='76' r='3' class='fill-primary'/><circle cx='110' cy='82' r='3' class='fill-primary'/><circle cx='128' cy='62' r='3' class='fill-primary'/><circle cx='145' cy='70' r='3' class='fill-primary'/><circle cx='162' cy='48' r='3' class='fill-primary'/><circle cx='180' cy='56' r='3' class='fill-primary'/><circle cx='198' cy='34' r='3' class='fill-primary'/><circle cx='214' cy='40' r='3' class='fill-primary'/></svg>"
+            "kind": "chart",
+            "type": "scatter",
+            "x": { "label": "Tutoring hours in autumn" },
+            "y": { "label": "Score change" },
+            "data": [
+              { "x": 0.8, "y": 0 },
+              { "x": 1.5, "y": 4 },
+              { "x": 2.3, "y": 2 },
+              { "x": 3.2, "y": 7 },
+              { "x": 3.9, "y": 5 },
+              { "x": 4.8, "y": 11 },
+              { "x": 5.7, "y": 9 },
+              { "x": 6.6, "y": 15 },
+              { "x": 7.5, "y": 12 },
+              { "x": 8.4, "y": 18 },
+              { "x": 9.2, "y": 17 }
+            ]
           }
         }
       ],

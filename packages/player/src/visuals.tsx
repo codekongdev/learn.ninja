@@ -2,13 +2,13 @@
 
 import * as React from "react"
 
-import type { Visual as VisualSpec } from "@workspace/spec"
+import type { ChartVisual, Visual as VisualSpec } from "@workspace/spec"
 import { Selectable } from "@workspace/ui/components/selectable"
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { Mark } from "./check"
 import { useIsDark, usePlayer } from "./context"
-import { codeKey, mathKey, type CodeLines } from "./prepared"
+import { chartKey, codeKey, mathKey, type CodeLines } from "./prepared"
 
 /** Hotspot wiring for interactive visuals: which regions are selected or marked, and what a tap does. */
 export interface HotspotControl {
@@ -53,7 +53,9 @@ export function Visual({
         plain={plain}
       />
     )
-  return <MathBlock tex={visual.tex} plain={plain} />
+  if (visual.kind === "math")
+    return <MathBlock tex={visual.tex} plain={plain} />
+  return <ChartBlock chart={visual} label={label} plain={plain} />
 }
 
 // ---------- HTML: a sandboxed iframe with no scripts ----------
@@ -468,6 +470,49 @@ function CodeBlock({
 
 // KaTeX's display mode adds 1em above and below the formula; the box's padding is enough. KaTeX's
 // stylesheet is unlayered, so it beats Tailwind's utilities layer without the !.
+// ---------- Chart: SVG drawn on the server from the lesson's data ----------
+
+/**
+ * The server draws charts (prepare.ts) at two sizes: full, and compact for the option and item
+ * cards, which show their visuals `plain`. Before it's drawn (a lesson without prepared data),
+ * the alt stands in.
+ */
+function ChartBlock({
+  chart,
+  label,
+  plain,
+}: {
+  chart: ChartVisual
+  label?: string
+  plain: boolean
+}) {
+  const { prepared, t } = usePlayer()
+  const alt = chart.alt ?? label ?? t.visual
+  const svg = prepared.charts?.[chartKey(chart, plain)]
+  return (
+    <div
+      role="img"
+      aria-label={alt}
+      dir="ltr"
+      className={cn(
+        "flex justify-center overflow-hidden [&_svg]:h-auto [&_svg]:max-w-full",
+        !plain && "rounded-xl border bg-background px-4 py-6"
+      )}
+    >
+      {svg ? (
+        <div
+          className={cn("w-full", plain ? "max-w-xs" : "max-w-[480px]")}
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+      ) : (
+        <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+          {alt}
+        </p>
+      )}
+    </div>
+  )
+}
+
 function MathBlock({ tex, plain }: { tex: string; plain: boolean }) {
   const { prepared } = usePlayer()
   const html = prepared.math[mathKey(tex, true)]

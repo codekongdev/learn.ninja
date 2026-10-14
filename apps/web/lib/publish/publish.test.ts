@@ -133,7 +133,7 @@ describe("publishing", () => {
     )
     expect(reply).toMatchObject({
       status: 201,
-      body: { spec: "0.3", skill: { updateAvailable: true } },
+      body: { spec: "0.4", skill: { updateAvailable: true } },
     })
     const stored = await deps.store.get(reply.body.id as string)
     expect(stored?.lesson).toEqual(JSON.parse(buttons))
@@ -189,7 +189,7 @@ describe("checking", () => {
     const reply = await checkLesson({ text: buttons, client: "x" }, deps)
     expect(reply).toMatchObject({
       status: 200,
-      body: { ok: true, spec: "0.3", skill: { updateAvailable: false } },
+      body: { ok: true, spec: "0.4", skill: { updateAvailable: false } },
     })
     expect(reply.body).not.toHaveProperty("id")
     expect(reply.body).not.toHaveProperty("editToken")

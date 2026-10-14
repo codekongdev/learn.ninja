@@ -98,7 +98,146 @@ describe("schema", () => {
   it("requires the current spec version", () => {
     const l = buttons()
     l.spec = "0.1"
-    expectIssue(l, { path: "spec", message: /0\.3/ })
+    expectIssue(l, { path: "spec", message: /0\.4/ })
+  })
+})
+
+describe("chart visuals", () => {
+  const chart = (over: Record<string, unknown>) => ({
+    kind: "chart",
+    type: "scatter",
+    alt: "A chart.",
+    data: [
+      { x: 1, y: 2 },
+      { x: 2, y: 3 },
+    ],
+    ...over,
+  })
+  function withChart(over: Record<string, unknown>) {
+    const l = buttons()
+    l.bricks[0].visual = chart(over)
+    return l
+  }
+
+  it("accepts a scatter, a bar, and a line", () => {
+    expect(validateLesson(withChart({})).ok).toBe(true)
+    expect(
+      validateLesson(
+        withChart({
+          type: "bar",
+          data: [
+            { x: "A", y: 1 },
+            { x: "B", y: 2 },
+          ],
+        })
+      ).ok
+    ).toBe(true)
+    expect(
+      validateLesson(
+        withChart({
+          type: "line",
+          data: [
+            { x: "Jan", y: 1, series: "a" },
+            { x: "Jan", y: 2, series: "b" },
+          ],
+        })
+      ).ok
+    ).toBe(true)
+  })
+
+  it("wants alt text, like an HTML visual", () => {
+    const l = withChart({})
+    delete l.bricks[0].visual.alt
+    expectIssue(l, { path: "bricks[0].visual", message: /chart has no "alt"/ })
+  })
+
+  it("wants numbers on a scatter's x axis", () => {
+    expectIssue(
+      withChart({
+        data: [
+          { x: "A", y: 1 },
+          { x: 2, y: 2 },
+        ],
+      }),
+      { path: "bricks[0].visual", message: /number for every point/ }
+    )
+  })
+
+  it("keeps bars and lines to one kind of x, one point per x, and bars to one series", () => {
+    expectIssue(
+      withChart({
+        type: "bar",
+        data: [
+          { x: "A", y: 1 },
+          { x: 2, y: 2 },
+        ],
+      }),
+      { message: /same kind of "x"/ }
+    )
+    expectIssue(
+      withChart({
+        type: "line",
+        data: [
+          { x: "A", y: 1 },
+          { x: "A", y: 2 },
+        ],
+      }),
+      { message: /"A" appears more than once/ }
+    )
+    expectIssue(
+      withChart({
+        type: "bar",
+        data: [
+          { x: "A", y: 1, series: "s" },
+          { x: "B", y: 2 },
+        ],
+      }),
+      { message: /one series/ }
+    )
+  })
+
+  it("keeps labels and the trend line to scatters, and series to three", () => {
+    expectIssue(
+      withChart({
+        type: "line",
+        data: [
+          { x: 1, y: 1, label: "a" },
+          { x: 2, y: 2 },
+        ],
+      }),
+      { message: /labels are only for scatter/ }
+    )
+    expectIssue(
+      withChart({
+        type: "bar",
+        trend: true,
+        data: [
+          { x: "A", y: 1 },
+          { x: "B", y: 2 },
+        ],
+      }),
+      { message: /"trend" is only for scatter/ }
+    )
+    expectIssue(
+      withChart({
+        data: ["a", "b", "c", "d"].map((s, i) => ({ x: i, y: i, series: s })),
+      }),
+      { message: /at most 3 series/ }
+    )
+  })
+
+  it("checks charts on options too", () => {
+    const l = buttons()
+    l.bricks[1].options[0].visual = chart({
+      data: [
+        { x: "A", y: 1 },
+        { x: 2, y: 2 },
+      ],
+    })
+    expectIssue(l, {
+      path: "bricks[1].options[0].visual",
+      message: /number for every point/,
+    })
   })
 })
 

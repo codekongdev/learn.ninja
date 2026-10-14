@@ -1,6 +1,6 @@
 import katex from "katex"
 
-import type { Lesson, QuestionBrick, Visual } from "./schema"
+import type { Brick, Lesson, QuestionBrick, Visual } from "./schema"
 
 // Rules the schema can't express: cross-references, teaching quality, v1 limits, and safety.
 // Every message says what's wrong and how to fix it, so an LLM can correct the lesson on its own.
@@ -14,6 +14,8 @@ export interface Issue {
 }
 
 export const LIMITS = {
+  /** Series a chart visual can show (lines on a line chart, colors on a scatter). */
+  chartSeries: 3,
   concepts: { min: 1, max: 4 },
   /** Question bricks after each concept brick. */
   practicePerConcept: { min: 2, max: 4 },
@@ -207,11 +209,11 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   ]
   for (const { brick, path } of withVisuals) {
     const v = brick.visual
-    if (v?.kind === "html" && !v.alt)
+    if ((v?.kind === "html" || v?.kind === "chart") && !v.alt)
       add(
         "teaching",
         `${path}.visual`,
-        `This HTML visual has no "alt". Add one sentence saying what it shows, for people using a screen reader.`
+        `This ${v.kind === "html" ? "HTML visual" : "chart"} has no "alt". Add one sentence saying what it shows, for people using a screen reader.`
       )
   }
 
@@ -220,13 +222,66 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   for (const { brick, path } of questions) {
     if (brick.type !== "choice" && brick.type !== "compare") continue
     brick.options.forEach((o, j) => {
-      if (o.visual?.kind === "html" && !o.visual.alt && !o.text)
+      if (
+        (o.visual?.kind === "html" || o.visual?.kind === "chart") &&
+        !o.visual.alt &&
+        !o.text
+      )
         add(
           "teaching",
           `${path}.options[${j}].visual`,
-          `This option's HTML visual has no "alt" and no caption. Add an "alt": one sentence saying what it shows, for people using a screen reader.`
+          `This option's ${o.visual.kind === "html" ? "HTML visual" : "chart"} has no "alt" and no caption. Add an "alt": one sentence saying what it shows, for people using a screen reader.`
         )
     })
+  }
+
+  // Charts: the data has to fit the chart type, or it can't be drawn as meant.
+  for (const { visual, path } of everyVisual(lesson)) {
+    if (visual.kind !== "chart") continue
+    const { type, data } = visual
+    const numeric = data.filter((d) => typeof d.x === "number").length
+    if (type === "scatter" && numeric < data.length)
+      add(
+        "structure",
+        path,
+        `A scatter chart needs a number for every point's "x".`
+      )
+    if (type !== "scatter" && numeric > 0 && numeric < data.length)
+      add(
+        "structure",
+        path,
+        `Give every point the same kind of "x": all numbers or all category names.`
+      )
+    if (type !== "scatter" && data.some((d) => d.label))
+      add("structure", path, `Point labels are only for scatter charts.`)
+    if (type !== "scatter" && visual.trend)
+      add("structure", path, `"trend" is only for scatter charts.`)
+    const series = new Set(data.map((d) => d.series ?? ""))
+    if (type === "bar" && data.some((d) => d.series))
+      add(
+        "structure",
+        path,
+        `A bar chart has one series: drop "series" from its points.`
+      )
+    if (series.size > LIMITS.chartSeries)
+      add(
+        "structure",
+        path,
+        `A chart can have at most ${LIMITS.chartSeries} series; this one has ${series.size}.`
+      )
+    if (type !== "scatter")
+      for (const name of series) {
+        const xs = data
+          .filter((d) => (d.series ?? "") === name)
+          .map((d) => String(d.x))
+        const twice = duplicates(xs)
+        if (twice.length)
+          add(
+            "structure",
+            path,
+            `${type === "bar" ? "A bar" : "A line"} chart has one point per "x"${name ? ` in series "${name}"` : ""}; "${twice[0]}" appears more than once.`
+          )
+      }
   }
 
   lesson.bricks.forEach((brick, i) => {
@@ -633,4 +688,29 @@ function walkVisuals(lesson: Lesson, visit: (v: Visual, path: string) => void) {
     if (obj.kind === "html" || obj.kind === "code" || obj.kind === "math")
       visit(obj as unknown as Visual, path)
   })
+}
+
+/** Every visual in the lesson with its path: on bricks, on options, and on items. */
+function everyVisual(lesson: Lesson): { visual: Visual; path: string }[] {
+  const out: { visual: Visual; path: string }[] = []
+  const bricks: { brick: Brick; path: string }[] = [
+    { brick: lesson.hook, path: "hook" },
+    ...lesson.bricks.map((brick, i) => ({ brick, path: `bricks[${i}]` })),
+    { brick: lesson.challenge, path: "challenge" },
+  ]
+  for (const { brick, path } of bricks) {
+    if ("visual" in brick && brick.visual)
+      out.push({ visual: brick.visual, path: `${path}.visual` })
+    if ("options" in brick)
+      brick.options.forEach((o, j) => {
+        if ("visual" in o && o.visual)
+          out.push({ visual: o.visual, path: `${path}.options[${j}].visual` })
+      })
+    if ("items" in brick)
+      brick.items.forEach((it, j) => {
+        if ("visual" in it && it.visual)
+          out.push({ visual: it.visual, path: `${path}.items[${j}].visual` })
+      })
+  }
+  return out
 }
