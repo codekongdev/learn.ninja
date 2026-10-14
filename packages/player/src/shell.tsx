@@ -225,8 +225,9 @@ export function LessonHeader({
         >
           <LearnLogo className="size-5.5" />
         </LinkButton>
-        {/* The mark sits 3px inside its box and the title text 10px inside its button, so the slash's
-            margins are uneven on purpose: the visible gaps come out the same on both sides. */}
+        {/* The mark sits 3px inside its box and the title text 10px in (a 4px margin plus the button's
+            6px padding), so the slash's margins are uneven on purpose: the visible gaps come out the
+            same on both sides. */}
         <span aria-hidden="true" className="ms-2 text-xs text-muted-foreground">
           /
         </span>
@@ -307,10 +308,10 @@ function LessonTitle({
       // text (the hidden copy underneath sets the size). Nothing moves when editing starts.
       // The field floats over an invisible copy of the text, so only the text sets the width: an
       // input in the flow would widen the box to its own default size on short titles.
-      <span className="relative inline-block max-w-40 min-w-0 shrink sm:max-w-80">
+      <span className="relative ms-1 inline-block max-w-40 min-w-0 shrink sm:max-w-80">
         <span
           aria-hidden="true"
-          className="invisible block h-7 border border-transparent px-2.5 text-sm font-medium whitespace-pre"
+          className="invisible block h-7 border border-transparent px-1.5 text-sm font-medium whitespace-pre"
         >
           {draft || " "}
         </span>
@@ -325,7 +326,7 @@ function LessonTitle({
             if (e.key === "Enter") commit()
             if (e.key === "Escape") setDraft(null)
           }}
-          className="absolute inset-0 h-7 w-full min-w-0 border-transparent bg-muted px-2.5 text-sm font-medium shadow-none md:text-sm dark:bg-muted"
+          className="absolute inset-0 h-7 w-full min-w-0 border-transparent bg-muted px-1.5 text-sm font-medium shadow-none md:text-sm dark:bg-muted"
         />
       </span>
     )
@@ -336,7 +337,7 @@ function LessonTitle({
       aria-label={t.renameLesson}
       onPress={() => setDraft(title)}
       // Hugs the title up to a cap, then truncates (titles are at most 60 characters).
-      className="max-w-40 min-w-0 shrink sm:max-w-80"
+      className="ms-1 max-w-40 min-w-0 shrink px-1.5 sm:max-w-80"
     >
       <span className="truncate">{title}</span>
     </Button>
