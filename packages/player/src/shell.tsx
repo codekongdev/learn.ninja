@@ -950,14 +950,6 @@ export function TheoryPanel({
               <li key={c.id} className="flex flex-col gap-2">
                 <h3 className="text-lg font-semibold">{c.title}</h3>
                 <RichText text={c.body} className="block text-sm" />
-                {c.term ? (
-                  <dl className="mt-1 flex flex-col gap-1 border-s-2 border-primary ps-4">
-                    <dt className="text-sm font-semibold">{c.term.word}</dt>
-                    <dd className="text-sm text-muted-foreground">
-                      <RichText text={c.term.definition} />
-                    </dd>
-                  </dl>
-                ) : null}
               </li>
             ))}
           </ol>

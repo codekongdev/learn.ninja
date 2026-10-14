@@ -23,7 +23,6 @@ export const zh: Strings = {
   practice: "练习",
   challenge: "挑战",
   fixing: "订正错题",
-  keyTerm: "关键术语",
   helper: {
     choiceOne: "选一个。",
     choiceMany: "选出所有符合的。",

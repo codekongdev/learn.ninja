@@ -28,6 +28,21 @@ describe("upgradeLesson", () => {
     expect(validateLesson(upgraded).ok).toBe(true)
   })
 
+  it("drops the term from concept bricks, in 0.2 and 0.3 files", () => {
+    const lesson = loadExample("button-hierarchy.json")
+    const term = { word: "Primary button", definition: "The main action." }
+    const withTerm = {
+      ...lesson,
+      bricks: lesson.bricks.map((b: { type: string }) =>
+        b.type === "concept" ? { ...b, term } : b
+      ),
+    }
+    expect(canUpgrade(withTerm)).toBe(true)
+    expect(upgradeLesson(withTerm)).toEqual(lesson)
+    expect(upgradeLesson(asV02(withTerm))).toEqual(lesson)
+    expect(validateLesson(upgradeLesson(withTerm)).ok).toBe(true)
+  })
+
   it("leaves current and unknown files alone", () => {
     const lesson = loadExample("button-hierarchy.json")
     expect(canUpgrade(lesson)).toBe(false)

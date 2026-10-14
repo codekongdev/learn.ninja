@@ -28,7 +28,6 @@ export const tr: Strings = {
   practice: "Alıştırma",
   challenge: "Meydan okuma",
   fixing: "Hataları düzeltme",
-  keyTerm: "Anahtar terim",
   helper: {
     choiceOne: "Birini seç.",
     choiceMany: "Uygun olanların hepsini seç.",

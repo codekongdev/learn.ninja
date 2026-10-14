@@ -439,24 +439,6 @@
         },
         "visual": {
           "$ref": "#/$defs/Visual"
-        },
-        "term": {
-          "type": "object",
-          "properties": {
-            "word": {
-              "type": "string",
-              "minLength": 1
-            },
-            "definition": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [
-            "word",
-            "definition"
-          ],
-          "additionalProperties": false
         }
       },
       "required": [

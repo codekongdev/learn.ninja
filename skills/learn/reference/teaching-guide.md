@@ -19,7 +19,7 @@ hook → bricks: concept → questions → concept → questions … (1–4 conc
 ```
 
 - **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains, ideally a gut answer most people get wrong ("A price rises 50%, then falls 50%. Is it back where it started?") or an assumption the learner brings with them. Its `explanation` should make the learner want to know why.
-- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Add a `term` when there's a key word to remember. How to write them:
+- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Bold a key word the first time it appears, and define it in the body. How to write them:
   - **Concrete before general.** Show one real case first (a worked example with real numbers, two lines of dialogue, a real screen), then state the rule it follows in one sentence.
   - **One step per line** in a worked example or procedure, so the learner sees where each part comes from.
   - **Say why, briefly.** One sentence on why it works beats a rule to memorise.

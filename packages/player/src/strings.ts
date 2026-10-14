@@ -34,7 +34,6 @@ export type Strings = {
   practice: string
   challenge: string
   fixing: string
-  keyTerm: string
   helper: {
     choiceOne: string
     choiceMany: string

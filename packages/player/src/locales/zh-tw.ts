@@ -23,7 +23,6 @@ export const zhTw: Strings = {
   practice: "練習",
   challenge: "挑戰",
   fixing: "訂正錯題",
-  keyTerm: "關鍵詞",
   helper: {
     choiceOne: "選一個。",
     choiceMany: "選出所有符合的。",

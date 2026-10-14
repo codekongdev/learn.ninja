@@ -27,7 +27,6 @@ export const th: Strings = {
   practice: "ฝึกฝน",
   challenge: "ท้าทาย",
   fixing: "แก้ไขข้อผิดพลาด",
-  keyTerm: "คำสำคัญ",
   helper: {
     choiceOne: "เลือกหนึ่งข้อ",
     choiceMany: "เลือกทุกข้อที่ถูกต้อง",

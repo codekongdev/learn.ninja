@@ -33,7 +33,6 @@ export const de: Strings = {
   practice: "Übung",
   challenge: "Herausforderung",
   fixing: "Fehler korrigieren",
-  keyTerm: "Schlüsselbegriff",
   helper: {
     choiceOne: "Wähle eine Antwort.",
     choiceMany: "Wähle alle zutreffenden.",

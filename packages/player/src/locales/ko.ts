@@ -23,7 +23,6 @@ export const ko: Strings = {
   practice: "연습",
   challenge: "도전",
   fixing: "오답 다시 풀기",
-  keyTerm: "핵심 용어",
   helper: {
     choiceOne: "하나를 고르세요.",
     choiceMany: "해당하는 것을 모두 고르세요.",

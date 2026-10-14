@@ -32,7 +32,6 @@ export const he: Strings = {
   practice: "תרגול",
   challenge: "אתגר",
   fixing: "תיקון טעויות",
-  keyTerm: "מושג מפתח",
   helper: {
     choiceOne: "בחרו תשובה אחת.",
     choiceMany: "בחרו את כל התשובות המתאימות.",

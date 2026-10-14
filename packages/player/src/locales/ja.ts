@@ -23,7 +23,6 @@ export const ja: Strings = {
   practice: "練習",
   challenge: "チャレンジ",
   fixing: "間違いの復習",
-  keyTerm: "キーワード",
   helper: {
     choiceOne: "1つ選んでください。",
     choiceMany: "当てはまるものをすべて選んでください。",

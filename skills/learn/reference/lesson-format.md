@@ -36,18 +36,14 @@ Brick ids are unique across the whole lesson, including the hook and the challen
 
 ## Concept bricks
 
-`{ "id", "type": "concept", "title" (≤60 chars), "body" (rich text, ≤80 words), "visual"?, "term"?: { "word", "definition" } }`
+`{ "id", "type": "concept", "title" (≤60 chars), "body" (rich text, ≤80 words), "visual"? }`
 
 ```json
 {
   "id": "c1",
   "type": "concept",
   "title": "Buttons do, links go",
-  "body": "Ask whether the action **does** something or **goes** somewhere.",
-  "term": {
-    "word": "Link",
-    "definition": "An element with an address (href) that takes people somewhere."
-  }
+  "body": "Ask whether the action **does** something or **goes** somewhere."
 }
 ```
 

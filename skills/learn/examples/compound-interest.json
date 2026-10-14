@@ -42,10 +42,6 @@
       "visual": {
         "kind": "math",
         "tex": "A = P(1 + r)^n"
-      },
-      "term": {
-        "word": "Principal",
-        "definition": "The amount you start with, written \\( P \\)."
       }
     },
     {

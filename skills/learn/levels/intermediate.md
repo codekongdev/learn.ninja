@@ -14,7 +14,7 @@ A realistic case where the basic rule, applied naively, gives the wrong answer. 
 ## Concepts
 
 - Skip the definitions; a half-sentence reminder is enough ("a correlation: the two move together"). Spend the words on the method, when it applies, and the trap.
-- Use the field's terms without introducing them. `term` only for a word that's new at this level.
+- Use the field's terms without introducing them. Define only a word that's new at this level.
 - One example that isn't the textbook one.
 
 ## Questions
