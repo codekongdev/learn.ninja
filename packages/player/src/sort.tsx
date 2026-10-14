@@ -325,11 +325,14 @@ export function SortBrick({
                 className={cn(
                   "z-10 min-h-10 rounded-md outline-none",
                   !locked && "cursor-pointer",
-                  !locked &&
-                    (lane < 0 || lane === i
-                      ? "hover:bg-foreground/5"
-                      : // An empty lane stays outlined, so it's clear the item can still move there.
-                        "border border-dashed border-foreground/20 bg-muted/60 transition-colors hover:border-foreground/40 hover:bg-muted dark:bg-input/10 dark:hover:bg-input/30")
+                  lane < 0 || lane === i
+                    ? !locked && "hover:bg-foreground/5"
+                    : // An empty lane stays outlined, even after checking, so every row shows both bins.
+                      cn(
+                        "border border-dashed border-foreground/20 bg-muted/60 dark:bg-input/10",
+                        !locked &&
+                          "transition-colors hover:border-foreground/40 hover:bg-muted dark:hover:bg-input/30"
+                      )
                 )}
               />
             ))}
