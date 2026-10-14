@@ -53,15 +53,18 @@ export function SiteFooter({ className }: { className?: string }) {
               {SITE.name}
             </Link>
             <span className="text-muted-foreground">by</span>
-            <LinkButton
-              variant="secondary"
-              size="sm"
-              href={SITE.makerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <bdi dir="ltr">{SITE.maker}</bdi>
-            </LinkButton>
+            {SITE.makers.map((m) => (
+              <LinkButton
+                key={m.handle}
+                variant="secondary"
+                size="sm"
+                href={m.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <bdi dir="ltr">{m.handle}</bdi>
+              </LinkButton>
+            ))}
           </div>
           <p className="text-sm text-muted-foreground">{SITE.tagline}</p>
         </div>

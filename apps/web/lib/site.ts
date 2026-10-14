@@ -8,8 +8,14 @@ export const SITE = {
   description:
     "Give your AI agent an article, notes, docs, a transcript, or code. It writes one short, interactive lesson and gives you a link to share. Free, no account.",
   repo: "https://github.com/learn-ninja/learn.ninja",
+  /** The contact named on the Privacy and Terms pages. */
   maker: "@cmicpace",
   makerUrl: "https://x.com/cmicpace",
+  /** The X handles credited in the footer. */
+  makers: [
+    { handle: "@cmicpace", url: "https://x.com/cmicpace" },
+    { handle: "@gkamenz", url: "https://x.com/gkamenz" },
+  ],
   /** Placeholder until the learn.ninja account exists. */
   xUrl: "https://x.com",
 }
