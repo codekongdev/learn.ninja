@@ -1906,8 +1906,13 @@ export function ActionArea({
               <RichText text={title} />
             </p>
           ) : null}
-          {message
-            ? message
+          {message ? (
+            // Keyed by the text, so a line added later (Why?) fades up into the bubble.
+            <div
+              key={message}
+              className="motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1"
+            >
+              {message
                 .split("\n")
                 .filter((line) => line.trim())
                 .map((line, i) => (
@@ -1916,8 +1921,9 @@ export function ActionArea({
                     text={line}
                     className={cn("block text-sm", (title || i > 0) && "mt-1")}
                   />
-                ))
-            : null}
+                ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </>

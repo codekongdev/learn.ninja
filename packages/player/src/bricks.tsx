@@ -692,9 +692,9 @@ export function BlankBrick({
               className={cn(
                 "flex items-center gap-2",
                 gone
-                  ? // A soft ghost holds its place, so the other chips don't move.
+                  ? // An outlined slot holds its place, so the other chips don't move (like the sort brick's empty lanes).
                     cn(
-                      "rounded-md border border-transparent bg-muted py-1 ps-3 pe-2 text-transparent dark:bg-input/30",
+                      "rounded-md border border-dashed border-foreground/20 bg-muted/60 py-1 ps-3 pe-2 text-transparent dark:bg-input/10",
                       size
                     )
                   : cn(
