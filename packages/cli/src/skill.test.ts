@@ -1,5 +1,4 @@
 import { spawnSync } from "node:child_process"
-import { createHash } from "node:crypto"
 import { readdirSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 
@@ -63,91 +62,7 @@ describe("skills/learn", () => {
   })
 })
 
-// Subjects are open to contributions, so these checks keep one from breaking the skill or bloating it.
-const MAX_SUBJECT_WORDS = 1200
-const subjects = readdirSync(new URL("skills/learn/subjects", root), {
-  withFileTypes: true,
-})
-  .filter((e) => e.isDirectory())
-  .map((e) => e.name)
-const versions: Record<string, { version: string; hash: string }> = JSON.parse(
-  read("skills/learn/subjects/versions.json")
-)
-
-describe.each(subjects)("subject %s", (name) => {
-  const guide = read(`skills/learn/subjects/${name}/guide.md`)
-  const frontmatter = /^---\n([\s\S]*?)\n---\n/.exec(guide)?.[1] ?? ""
-  const field = (key: string) =>
-    new RegExp(`^${key}: *(.*)$`, "m").exec(frontmatter)?.[1]?.trim() ?? ""
-
-  it("has a name matching its folder, and a description", () => {
-    expect(field("name")).toBe(name)
-    expect(field("description")).not.toBe("")
-    // The header is YAML (the docs parse it), so a ": " in a value breaks it.
-    expect(frontmatter, 'use no ": " inside a value').not.toMatch(/^\w+: .*: /m)
-  })
-
-  it("names example lessons that exist", () => {
-    for (const x of field("examples")
-      .split(",")
-      .filter((x) => x.trim()))
-      expect(
-        readdirSync(new URL("skills/learn/examples", root)),
-        `${name}: no example lesson ${x.trim()}`
-      ).toContain(`${x.trim()}.json`)
-  })
-
-  it(`stays under ${MAX_SUBJECT_WORDS} words`, () => {
-    expect(guide.split(/\s+/).length).toBeLessThanOrEqual(MAX_SUBJECT_WORDS)
-  })
-
-  it("is listed in subjects/index.md", () => {
-    const index = read("skills/learn/subjects/index.md")
-    expect(index).toContain(
-      `| \`${name}\` | ${field("description")} | \`subjects/${name}/guide.md\` | ${field("version")} |`
-    )
-  })
-
-  // Each subject is versioned on its own, so improvements to a guide can be tracked.
-  it("has a semver version and a changelog entry for it", () => {
-    expect(field("version")).toMatch(/^\d+\.\d+\.\d+$/)
-    expect(read(`skills/learn/subjects/${name}/CHANGELOG.md`)).toContain(
-      `## ${field("version")}`
-    )
-  })
-
-  it("bumped its version since the last build, if it changed", () => {
-    const recorded = versions[name]
-    if (!recorded) throw new Error(`${name}: run skill:build`)
-    const hash = createHash("sha256").update(guide).digest("hex").slice(0, 16)
-    if (recorded.hash !== hash)
-      expect(
-        recorded.version,
-        `${name}/guide.md changed: bump its version, describe the change in its CHANGELOG.md, and run skill:build`
-      ).not.toBe(field("version"))
-    expect(recorded.version, `${name}: run skill:build`).toBe(field("version"))
-    expect(recorded.hash, `${name}: run skill:build`).toBe(hash)
-  })
-
-  it("is listed on the docs' subjects page", () => {
-    expect(read("docs/subjects.md")).toContain(`subjects/${name}/guide.md`)
-  })
-})
-
-it("subjects/index.md lists only subjects that exist", () => {
-  const listed = [
-    ...read("skills/learn/subjects/index.md").matchAll(
-      /`subjects\/([^/]+)\/guide\.md`/g
-    ),
-  ].map((m) => m[1])
-  expect(listed.sort()).toEqual([...subjects].sort())
-})
-
-it("subjects/versions.json records only subjects that exist", () => {
-  expect(Object.keys(versions).sort()).toEqual([...subjects].sort())
-})
-
-// Levels are core, not contributed: one short file per level, read only when it applies.
+// Levels: one short file per level, read only when it applies.
 const MAX_LEVEL_WORDS = 400
 
 it("levels/ has index.md and exactly one file per level", () => {

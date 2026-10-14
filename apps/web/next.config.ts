@@ -152,7 +152,6 @@ const nextConfig: NextConfig = {
       { source: "/create", destination: "/docs", permanent: false },
       ...section("/docs/lessons/lesson-format", "lesson-format"),
       ...section("/docs/lessons/levels", "levels"),
-      ...section("/docs/subjects", "subjects"),
       ...section("/docs/reference/cli", "cli"),
       ...section("/docs/reference/api", "api"),
       ...section("/docs/reference/json-schema", "json-schema"),
@@ -170,30 +169,22 @@ const nextConfig: NextConfig = {
         "/docs/lessons/lesson-format",
         "the-question-bricks"
       ),
-      ...moved("/docs/skills", "/docs/subjects", "subjects"),
-      ...moved(
-        "/docs/subjects/write-a-subject",
-        "/docs/subjects",
-        "add-a-subject"
-      ),
+      // Subjects were folded into the skill's teaching guide.
+      ...moved("/docs/subjects", "/docs", "introduction"),
+      ...moved("/docs/skills", "/docs", "introduction"),
       {
         source: "/docs/bricks/:path+",
         destination: "/docs#the-question-bricks",
         permanent: true,
       },
       {
-        source: "/docs/skills/:path+",
-        destination: "/docs#subjects",
+        source: "/docs/:dir(skills|subjects)/:path+.md",
+        destination: "/docs.md",
         permanent: true,
       },
       {
-        source: "/docs/subjects/:path+.md",
-        destination: "/docs/subjects.md",
-        permanent: true,
-      },
-      {
-        source: "/docs/subjects/:path+",
-        destination: "/docs#subjects",
+        source: "/docs/:dir(skills|subjects)/:path+",
+        destination: "/docs#introduction",
         permanent: true,
       },
     ]

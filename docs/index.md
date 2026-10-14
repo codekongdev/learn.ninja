@@ -22,7 +22,7 @@ The agent names are `claude-code`, `codex`, `cursor`, `gemini-cli`, `github-copi
 ## If you're an agent
 
 1. Install the skill with the command above.
-2. Read its `SKILL.md`, then the guides it points to: the teaching guide, the [lesson format](/docs/lessons/lesson-format), the [level](/docs/lessons/levels) the lesson is for, and the [subject](/docs/subjects) that fits.
+2. Read its `SKILL.md`, then the guides it points to: the teaching guide, the [lesson format](/docs/lessons/lesson-format), and the [level](/docs/lessons/levels) the lesson is for.
 3. Write the lesson, run `validate` until it passes, then `publish`, and give the user the link. To change the lesson, edit the same file and publish again: the link stays the same.
 
 ## Without a shell

@@ -5,7 +5,9 @@ How to turn the user's input into a lesson that's genuinely good to play. Read t
 ## 1. Choose one idea
 
 - A lesson teaches **one core idea**, in 3–15 minutes depending on its size (`reference/planning.md`). Set `estimatedMinutes` honestly.
+- **One idea, not a chapter:** "Find a percentage change", "Order a coffee in Spanish", "Give each view one primary action". Not "Fractions", "Spanish verbs", or "Buttons".
 - Write the `objective` as something the learner can _do_ afterwards: "Give each view one clear primary action", not "Learn about buttons".
+- Keep new material small: at most 5–8 new terms, words, or phrases. Fewer, practised well, beats a long list.
 - Set `level` for who the lesson is for (`levels/index.md` says how to choose) and read `levels/{level}.md` before writing: it sets what to assume, what the questions ask for, and how much help to give. The size (`reference/planning.md`) sets how many concepts the shape in the next section has.
 - If the input covers several ideas, `reference/planning.md` says whether to pick the one everything else depends on or to plan a path of lessons. Either way, you can name the next lesson in `wrapup.next`.
 - Stay faithful to the source. If the input is an article, teach what it says; don't add claims it doesn't support.
@@ -16,9 +18,14 @@ How to turn the user's input into a lesson that's genuinely good to play. Read t
 hook → bricks: concept → questions → concept → questions … (1–4 concepts) → challenge → wrap-up
 ```
 
-- **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains. Its `explanation` should make the learner want to know why.
-- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Give a concrete example or a visual. Bold a key word the first time it appears, and define it in the body.
-- **Practice:** 2–4 question bricks right after each concept brick, 3–12 in total across the lesson (`reference/planning.md` has the shape for each size).
+- **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains, ideally a gut answer most people get wrong ("A price rises 50%, then falls 50%. Is it back where it started?") or an assumption the learner brings with them. Its `explanation` should make the learner want to know why.
+- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Bold a key word the first time it appears, and define it in the body. How to write them:
+  - **Concrete before general.** Show one real case first (a worked example with real numbers, two lines of dialogue, a real screen), then state the rule it follows in one sentence.
+  - **One step per line** in a worked example or procedure, so the learner sees where each part comes from.
+  - **Say why, briefly.** One sentence on why it works beats a rule to memorise.
+  - **Say when it applies:** the conditions, context, or setting where it holds, and where it doesn't.
+  - **Keep it easy to follow in the player.** There's no calculator, notepad, or audio: pick friendly numbers (10%, 200, ¼) and nothing that needs to be heard.
+- **Practice:** 2–4 question bricks right after each concept brick, 3–12 in total across the lesson (`reference/planning.md` has the shape for each size). Take support away as you go: **recognise** it (what does this mean, which is right), then **recall with support** (fill the missing step, word, or term from chips), then **do it** (solve, build, or decide the whole thing), then **vary it** (new context, new numbers, or run backwards).
 - **Challenge:** one harder, applied question brick that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
 - **Wrap-up:** 2–4 takeaways, each one sentence the learner could act on.
 
@@ -48,18 +55,23 @@ Mechanics of each type:
 - **compare:** exactly 2 options. Best with an HTML visual on each (two screens, two layouts, two charts), which show as cards side by side. Two short texts work too, but they show as plain rows, like a `choice`.
 - **choice:** 2–5 options, one correct (or `multiple: true` for "pick all that apply"; the player adds that instruction under the prompt, so don't write it in the prompt). When the question is about something to look at (a chart, a screen, a diagram), put it in the brick's `visual`, above text options. When the answers themselves are something to look at (which layouts, charts, or components get it right), give every option an HTML visual: they show as cards in two columns, like `compare`.
 - **Option visuals (`choice` and `compare`):** give each one an `alt` for screen readers. A `text` caption under the visual is optional: add one only when it says something the visual can't, such as a name to refer to it by ("Plan A") or context a chart doesn't show. Never repeat text the visual already shows, like an error message or a button label.
-- **hotspot:** tap the part of a visual that matters. In HTML, mark tappable elements with `data-hotspot="id"`; in code, list `hotspots` by line number.
+- **hotspot:** tap the part of a visual that matters. In HTML, mark tappable elements with `data-hotspot="id"`; in code, list `hotspots` by line number. Good for finding the mistake: one hotspot per line of a worked solution, or per word or phrase of a short message.
 - **sort:** 4–8 items into 2–3 groups. Every group should get at least one item, and every group needs a name of its own. If a group would be "Not X" or "Other", ask "Which of these are X?" as a `choice` with `multiple: true` instead.
 - **order:** 3–6 items written in the correct order (the player shuffles them). Use `alsoAccept` if another order is genuinely right too.
 - **match:** 3–5 pairs.
-- **blank:** fill gaps in a sentence or code from word chips. Each gap's `choices` include the right answer plus 1–2 believable decoys.
+- **blank:** fill gaps in a sentence, formula, or code from word chips. Each gap's `choices` include the right answer plus 1–2 believable decoys. Use `numeric` for a number gap and `strictAccents` when accents change the meaning (_si_ and _sí_).
 - **scenario:** a short situation and 2–4 options, each with a `quality` (`best`, `okay`, `poor`) and an `outcome` that shows the consequence.
 
 ## 4. Feedback that teaches
 
 - **Feedback explains; it never introduces.** All of it shows in the ninja's speech bubble: after a miss, the question's hint (or, without one, the wrong option's feedback); after a right answer, the explanation only if the learner taps Why?. A learner who answers right may never see any of it. If a question needs a term, fact, or method, a concept brick before it teaches it. Feedback can name a mistake only in words the lesson has already taught.
 - **Every wrong option gets `feedback`** that explains _why_ it's wrong, in a sentence or two. Name the misconception: "That's simple interest. Year 2 also earns interest on year 1's $50."
-- **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting.
+- **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting. Each should come from one specific slip its feedback names. Common sources:
+  - a rule carried over from where it doesn't apply (a literal translation, simple interest where it compounds)
+  - near neighbours mixed up (false friends, percent and percentage points, mean and median)
+  - a step missed, or done in the wrong order
+  - the wrong base, unit, or scale
+- **The right answer shouldn't stand out:** not the only round number, always the middle value, or the longest option.
 - **Name answers by what they say, not where they sit.** The player shuffles options and a match's right column, so "the second statement" or "option B" can point at the wrong one. Write "the nurses' statement" or "the many-causes explanation" instead. The checker rejects position words in explanations, hints, feedback, and outcomes.
 - **Every question brick gets an `explanation`** of why the right answer is right, in 30 words or fewer; aim for about 25, since the checker counts every word (the checker enforces it). It shows in the ninja's speech bubble, so apply the idea to this question; don't restate the concept the learner just read. It shows when the learner taps Why? after a right answer, and by itself once a missed answer is revealed. The warm-up shows no explanation: the concept after it does the explaining. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
 - **Blanks:** add a `mistakes` entry for each decoy chip, explaining it.
@@ -71,6 +83,7 @@ Mechanics of each type:
 - Prompts: 40 words at most, one clear task. Questions end with a question mark.
 - Plain, friendly, specific language. Short sentences. No filler ("In this lesson we will…").
 - Rich text supports `**bold**`, `*italic*`, `` `code` ``, and inline formulas `\( ... \)`. A `$` is always a plain dollar sign.
+- In formulas, name a quantity before its symbol ("the interest rate, `\( r \)`"), use `\times` or `\cdot` (never `*`) and `\frac`, and follow the lesson language's decimal mark (`3{,}5` in TeX).
 - Don't reveal the answer in the prompt or the concept brick's wording.
 
 ## 6. Visuals
@@ -131,16 +144,24 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 ## 7. Languages
 
 - Write all learner-facing text in the lesson's `language` (a BCP 47 code such as `en`, `es`, `ar`, `pt-BR`).
-- **Language-learning lessons:** `language` is the language you're teaching _in_ and `targetLanguage` is the one being learned. Mark every phrase in the target language with `lang`: on options, `order` and `sort` items, `sort` group labels, `blank` bricks, and `leftLang` / `rightLang` on `match` pairs.
+- **Language-learning lessons:** `language` is the language you're teaching _in_ and `targetLanguage` is the one being learned, with a region when the variety matters (`es-MX`, `pt-PT`). Mark every phrase in the target language with `lang`: on options, `order` and `sort` items, `sort` group labels, `blank` bricks, and `leftLang` / `rightLang` on `match` pairs. Keep each chip in one language. For beginners in a non-Latin script, add a romanisation the first time a word appears, e.g. こんにちは (konnichiwa), except in a brick that tests reading it.
 - **Never translate code**, identifiers, or program output, whatever the lesson's language.
 
-## 8. v1 limits
+## 8. Accuracy
+
+- **Work every answer yourself, step by step, before writing the options.** Then check each wrong option: is it really wrong, and does it come from the slip its feedback names?
+- **Many things have more than one right answer.** If a variant is acceptable (another phrasing, another order, another regional form), accept it (`accept`, `alsoAccept`) or say which one the lesson teaches.
+- **State what the answer depends on** in the prompt: rounding, units, assumptions ("to the nearest dollar", "if the rate stays the same"), so exactly one option is right.
+- **Use what people really say and do today**, not textbook versions nobody uses, unless that's the point of the lesson.
+- **Get the details right:** notation, units, accents, capitalisation, punctuation.
+
+## 9. v1 limits
 
 - No `number` bricks. Ask numeric questions as `choice` with 3–4 options built from common slips (wrong formula, one step short, wrong unit), each with feedback.
 - Every `blank` has `choices` (word chips); there's no free typing yet.
 - No images, audio, or free-text answers.
 
-## 9. Before you publish
+## 10. Before you publish
 
 - Run `validate` and fix every issue. The messages say exactly what to change.
 - Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Is every term, fact, and method each question needs taught in an earlier concept brick, not only in feedback, a hint, or an explanation? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`.
