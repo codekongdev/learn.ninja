@@ -17,7 +17,7 @@ A lesson is one JSON file with four slots: `hook`, `bricks`, `challenge`, `wrapu
 | `topic`            | no       | A short label, e.g. "UI design"                                                                                                                                     |
 | `source`           | no       | `{ "title": "…", "url": "https://…" }` credit for the material                                                                                                      |
 | `hook`             | yes      | One `choice` or `compare` brick; not scored                                                                                                                         |
-| `bricks`           | yes      | The lesson in play order: 1–4 `concept` bricks, each followed by 1–6 question bricks that practise it (the mode sets how many); 3–12 question bricks in total, at most 20 bricks. The first brick is a `concept` |
+| `bricks`           | yes      | The lesson in play order: 1–4 `concept` bricks, each followed by 2–4 question bricks that practise it; 3–12 question bricks in total, at most 20 bricks. The first brick is a `concept` |
 | `challenge`        | yes      | One question brick of any type except `number`                                                                                                                      |
 | `wrapup`           | yes      | `{ "takeaways": [2–4 strings], "next": "suggested next lesson" }` (`next` is optional)                                                                              |
 
@@ -110,7 +110,7 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
 
 ## Rules the checker enforces
 
-- Hook is `choice` or `compare`; the first brick is a `concept`; 1–4 concept bricks; 1–6 question bricks after each concept brick; 3–12 question bricks in `bricks` in total; at most 20 bricks; the challenge is a question brick.
+- Hook is `choice` or `compare`; the first brick is a `concept`; 1–4 concept bricks; 2–4 question bricks after each concept brick; 3–12 question bricks in `bricks` in total; at most 20 bricks; the challenge is a question brick.
 - Unique ids; every reference points to something real (`correct`, `group`, `alsoAccept`, `[[gap]]` ids, hotspot ids, code hotspot lines).
 - Every `choice` has `multiple`, even when it's `false`; every wrong `choice`/`compare` option has `feedback`; every question brick has an `explanation`; a `choice` has at least one wrong option; a `scenario` has a `best` option.
 - Prompts ≤40 words; concept bodies ≤80 words.

@@ -1,24 +1,23 @@
 # Planning
 
-Before writing, read the user's input once for four choices: **scope** (one lesson or a path), **size**, **reading age**, and then, from their own guides, **level** (`levels/index.md`) and **mode** (`modes/index.md`). Usually the request says enough: decide from what they wrote and what they gave you, and tell them your choices after publishing, with an offer to remake.
+Before writing, read the user's input once for four choices: **scope** (one lesson or a path), **size**, **reading age**, and, from its own guide, **level** (`levels/index.md`). Usually the request says enough: decide from what they wrote and what they gave you, and tell them your choices after publishing, with an offer to remake.
 
 ## When to ask first
 
-Ask only when the request is just a topic, with nothing else to go on: no audience, no level or background, no word about what they want (explain, practise, test), no length, and no source material. "How vaccines work", "the Roman Empire", and "teach me budgeting" are just topics; "teach me" and "make a lesson on" only say that a lesson is wanted.
+Ask only when the request is just a topic, with nothing else to go on: no audience, no level or background, no length, and no source material. "How vaccines work", "the Roman Empire", and "teach me budgeting" are just topics; "teach me" and "make a lesson on" only say that a lesson is wanted.
 
-Then, before writing, send one short message with up to three questions, each with the default you'd use, so the user can answer in a few words or just say "go":
+Then, before writing, send one short message with up to two questions, each with the default you'd use, so the user can answer in a few words or just say "go":
 
 > Before I make it:
 > 1. Who's it for: you, a child (what age?), or a group? (I'll assume you.)
-> 2. What for: to understand it, to practise it, to test yourself, or a bit of both? (I'll assume a bit of both.)
-> 3. How long: quick (3–5 min), standard (5–10), or in depth (10–15)? (I'll assume standard.)
+> 2. How long: quick (3–5 min), standard (5–10), or in depth (10–15)? (I'll assume standard.)
 
 If the topic holds several ideas (a whole period of history, a field, a long framework), add one line after the questions: "It's a big topic, so I'll make one lesson on its central idea; say if you'd rather have a short series."
 
-- Ask who it's for and what they want, never "what's your level?": people rate their own level poorly, but they know who the lesson is for and what they want from it. If they say what they already know, use it for the level.
+- Ask who it's for, never "what's your level?": people rate their own level poorly, but they know who the lesson is for. If they say what they already know, use it for the level.
 - Ask once. Anything the reply leaves open takes its default. If there's no one to answer, use the defaults without asking.
-- Map the answers with the table below: "for me" is an adult reader, "understand" is `explain`, "practise" and "test myself" are `practice`, "a bit of both" (or no answer) is `balanced`, the length is the size, and "a series" is a path. Saying "go" gives the same lesson as not asking.
-- One clear signal is enough to go without asking. "Explain how vaccines work" says what they want; "quiz my 8-year-old on vaccines" says who and what. Fill the rest with defaults.
+- Map the answers with the table below: "for me" is an adult reader, the length is the size, and "a series" is a path. Saying "go" gives the same lesson as not asking.
+- One clear signal is enough to go without asking. "A quick one on vaccines" says how long; "quiz my 8-year-old on vaccines" says who. Fill the rest with defaults.
 
 ## Words people use
 
@@ -26,9 +25,6 @@ What people say, and what it sets. These are examples, not a closed list: read f
 
 | They say | It means | Sets |
 | --- | --- | --- |
-| practical, hands-on, practice, exercises, problems to solve, let me try, drill me, train me, worksheet, reps, get better at, apply it | They want to do it | mode `practice` |
-| quiz me, test me, test my knowledge, check my understanding, how well do I know, exam prep, am I ready for | They want to be tested | mode `practice` (an assessment mode is planned) |
-| explain, help me understand, walk me through, break it down, why does, how does … work, the intuition behind, overview, intro to, in plain English | They want to understand it | mode `explain` |
 | quick, quick one, brief, short, in 5 minutes, TL;DR | They want it short | size `short` |
 | deep dive, in depth, thorough, everything about, comprehensive, master | They want depth | size `long`, or a path if it's several ideas |
 | refresher, brush up, remind me, review, revisit, I already know, I've used | They've met it before | level at least `intermediate`; often size `short` |
@@ -49,15 +45,15 @@ Stay faithful to the source. If the input is an article, teach what it says; don
 
 ## Size
 
-Pick the size from how much the input covers, not from the level. `modes/index.md` gives the exact shape for each size in each mode.
+Pick the size from how much the input covers, not from the level. Every size has the same rhythm: each concept brick is followed by 2–4 question bricks.
 
-| Size | When | `estimatedMinutes` |
-| --- | --- | --- |
-| `short` | One term, rule, or fact; a refresher; the user asks for something quick | 3–5 |
-| `standard` | One idea with two or three parts. **The default.** | 5–10 |
-| `long` | One idea with four parts that only make sense together, or the user asks for depth | 10–15 |
+| Size | When | Shape | `estimatedMinutes` |
+| --- | --- | --- | --- |
+| `short` | One term, rule, or fact; a refresher; the user asks for something quick | 1 concept × 3–4 questions | 3–5 |
+| `standard` | One idea with two or three parts. **The default.** | 2–3 concepts × 2–4 (at most 8 questions) | 5–10 |
+| `long` | One idea with four parts that only make sense together, or the user asks for depth | 4 concepts × 2–3 (at most 12) | 10–15 |
 
-The checker's hard limits hold for every size: 1–4 concept bricks, 1–6 question bricks after each, 3–12 question bricks in total, at most 20 bricks in `bricks`, 3–15 minutes. Anything bigger than a long lesson becomes a path. Set `estimatedMinutes` honestly.
+The checker's hard limits hold for every size: 1–4 concept bricks, 2–4 question bricks after each, 3–12 question bricks in total, at most 20 bricks in `bricks`, 3–15 minutes. Anything bigger than a long lesson becomes a path. Set `estimatedMinutes` honestly.
 
 ## Paths
 
@@ -75,9 +71,9 @@ Each lesson's link expires 24 hours after it's published, like any lesson.
 Who reads the lesson is separate from how much they know.
 
 - **Adult** is the default.
-- **Child** when the user mentions a child or an age under about 13 ("for my kid", "my 7-year-old", "a class of third graders"). Then: beginner level unless they say otherwise; short sentences and everyday words; examples from a child's world (school, games, pets, food, sport); no sarcasm, idioms, money, or workplace examples unless the topic is about them; visuals that are bright and simple. Fixed bright colours (`bg-amber-400`, `fill-sky-500`) are fine for filled shapes like pizza slices or counters, since they read on light and dark backgrounds; keep text, outlines, and backgrounds on theme colours (`text-foreground`, `border-border`, `bg-muted`). The mode is `balanced` unless the user asks for another (`modes/index.md`).
+- **Child** when the user mentions a child or an age under about 13 ("for my kid", "my 7-year-old", "a class of third graders"). Then: beginner level unless they say otherwise; short sentences and everyday words; examples from a child's world (school, games, pets, food, sport); no sarcasm, idioms, money, or workplace examples unless the topic is about them; visuals that are bright and simple. Fixed bright colours (`bg-amber-400`, `fill-sky-500`) are fine for filled shapes like pizza slices or counters, since they read on light and dark backgrounds; keep text, outlines, and backgrounds on theme colours (`text-foreground`, `border-border`, `bg-muted`).
 - **"Explain like I'm 5", "in simple terms", "for a non-expert"** from an adult mean beginner level for an adult reader: plain words and everyday examples, with no talking down.
 
 ## The report line
 
-After publishing, give the four choices in one line, then offer a remake: "Beginner · standard · balanced · adult. I can remake it at another level, size, or mode, or for a child." For a path, add the lessons still to make.
+After publishing, give the three choices in one line, then offer a remake: "Beginner · standard · adult. I can remake it at another level or size, or for a child." For a path, add the lessons still to make.

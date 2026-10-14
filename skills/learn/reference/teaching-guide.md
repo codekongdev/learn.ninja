@@ -6,7 +6,7 @@ How to turn the user's input into a lesson that's genuinely good to play. Read t
 
 - A lesson teaches **one core idea**, in 3–15 minutes depending on its size (`reference/planning.md`). Set `estimatedMinutes` honestly.
 - Write the `objective` as something the learner can _do_ afterwards: "Give each view one clear primary action", not "Learn about buttons".
-- Set `level` for who the lesson is for (`levels/index.md` says how to choose) and read `levels/{level}.md` before writing: it sets what to assume, what the questions ask for, and how much help to give. Set the mode the same way (`modes/index.md`): it sets how many concept and question bricks the shape in the next section has.
+- Set `level` for who the lesson is for (`levels/index.md` says how to choose) and read `levels/{level}.md` before writing: it sets what to assume, what the questions ask for, and how much help to give. The size (`reference/planning.md`) sets how many concepts the shape in the next section has.
 - If the input covers several ideas, `reference/planning.md` says whether to pick the one everything else depends on or to plan a path of lessons. Either way, you can name the next lesson in `wrapup.next`.
 - Stay faithful to the source. If the input is an article, teach what it says; don't add claims it doesn't support.
 
@@ -18,7 +18,7 @@ hook → bricks: concept → questions → concept → questions … (1–4 conc
 
 - **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains. Its `explanation` should make the learner want to know why.
 - **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
-- **Practice:** question bricks right after each concept brick: 1–2 in `explain` mode, 2–4 in `balanced`, 3–6 in `practice` (`modes/index.md` has the shape for each size). The checker allows 1–6 after each concept and 3–12 in total.
+- **Practice:** 2–4 question bricks right after each concept brick, 3–12 in total across the lesson (`reference/planning.md` has the shape for each size).
 - **Challenge:** one harder, applied question brick that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
 - **Wrap-up:** 2–4 takeaways, each one sentence the learner could act on.
 
@@ -143,4 +143,4 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 ## 9. Before you publish
 
 - Run `validate` and fix every issue. The messages say exactly what to change.
-- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Is every term, fact, and method each question needs taught in an earlier concept brick, not only in feedback, a hint, or an explanation? Does it hold its level and its mode? Run the "You've drifted if…" checks in `levels/{level}.md` and `modes/{mode}.md`.
+- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Is every term, fact, and method each question needs taught in an earlier concept brick, not only in feedback, a hint, or an explanation? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`.

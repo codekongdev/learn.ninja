@@ -109,22 +109,22 @@ describe("structure rules", () => {
     expectIssue(l, { path: "bricks[0]", message: /must be a concept brick/ })
   })
 
-  it("requires at least 1 question brick after each concept brick", () => {
+  it("requires at least 2 question bricks after each concept brick", () => {
     const l = buttons()
-    l.bricks.splice(1, 2)
+    l.bricks.splice(2, 1)
     expectIssue(l, {
       path: "bricks[0]",
-      message: /"c1" is followed by 0 question bricks; it needs 1–6/,
+      message: /"c1" is followed by 1 question bricks; it needs 2–4/,
     })
   })
 
-  it("allows at most 6 question bricks after a concept brick", () => {
+  it("allows at most 4 question bricks after a concept brick", () => {
     const l = buttons()
-    const extra = [0, 1, 2, 3, 4].map((n) => ({ ...l.bricks[1], id: `x${n}` }))
+    const extra = [0, 1, 2].map((n) => ({ ...l.bricks[1], id: `x${n}` }))
     l.bricks = [l.bricks[0], ...extra, ...l.bricks.slice(1, 3)]
     expectIssue(l, {
       path: "bricks[0]",
-      message: /"c1" is followed by 7 question bricks; it needs 1–6/,
+      message: /"c1" is followed by 5 question bricks; it needs 2–4/,
     })
   })
 

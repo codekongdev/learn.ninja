@@ -293,7 +293,7 @@ export const lesson = z.strictObject({
   hook: hookBrick,
   /**
    * The teaching part, in play order: each concept brick is followed by the 1–6 question bricks
-   * that practise it (the lesson's mode sets how many). The rhythm is checked in rules.ts.
+   * that practise it. The rhythm is checked in rules.ts.
    */
   bricks: z.array(brick).min(3).max(20),
   challenge: questionBrick,

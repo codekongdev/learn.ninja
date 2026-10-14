@@ -192,36 +192,6 @@ describe.each(LEVELS)("level %s", (name) => {
   })
 })
 
-// Modes set a lesson's mix of teaching and questions: one short file per mode, like levels.
-const MODES = ["explain", "balanced", "practice"]
-const MAX_MODE_WORDS = 400
-
-it("modes/ has index.md and exactly one file per mode", () => {
-  expect(readdirSync(new URL("skills/learn/modes", root)).sort()).toEqual(
-    [...MODES.map((m) => `${m}.md`), "index.md"].sort()
-  )
-})
-
-it("SKILL.md points at modes/index.md and reference/planning.md", () => {
-  const skill = read("skills/learn/SKILL.md")
-  expect(skill).toContain("`modes/index.md`")
-  expect(skill).toContain("`reference/planning.md`")
-})
-
-describe.each(MODES)("mode %s", (name) => {
-  const guide = read(`skills/learn/modes/${name}.md`)
-
-  it(`stays under ${MAX_MODE_WORDS} words`, () => {
-    expect(guide.split(/\s+/).length).toBeLessThanOrEqual(MAX_MODE_WORDS)
-  })
-
-  it("ends with a drift check", () => {
-    expect(guide).toContain("## You've drifted if")
-  })
-
-  it("is listed in modes/index.md", () => {
-    expect(read("skills/learn/modes/index.md")).toContain(
-      `\`modes/${name}.md\``
-    )
-  })
+it("SKILL.md points at reference/planning.md", () => {
+  expect(read("skills/learn/SKILL.md")).toContain("`reference/planning.md`")
 })

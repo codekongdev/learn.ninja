@@ -6,13 +6,12 @@ Proposal with diagrams and reasons: https://claude.ai/artifact/QaHSJhToZqMFYcKgp
 
 ## What changed
 
-- **Questions only for a bare topic.** The agent reads the input and decides four things, then reports them in one line after publishing ("Beginner · standard · balanced · adult"), with an offer to remake. Only when the request is just a topic ("how a car works") does it ask first: one message, up to three questions, each with a default.
+- **Questions only for a bare topic.** The agent reads the input and decides three things, then reports them in one line after publishing ("Beginner · standard · adult"), with an offer to remake. Only when the request is just a topic ("how a car works") does it ask first: one message, up to two questions, each with a default.
   - **Level:** ranked signals (`skills/learn/levels/index.md`). A plain "explain X" is beginner however advanced X is.
   - **Size:** short, standard, or long (`skills/learn/reference/planning.md`).
-  - **Mode:** explain, balanced, or practice (`skills/learn/modes/`). It sets how many concept bricks there are and how many questions follow each.
   - **Reading age:** adult or child (`reference/planning.md`).
 - **Paths.** A topic too big for one lesson becomes a path of 2–6 lessons. The agent writes lesson 1, keeps a `path.md` plan, lists the rest, and makes the next one only when asked.
-- **Limits** (`packages/spec`): 1–4 concept bricks (was 1–3), 1–6 questions after each (was 2–4), 3–12 in total (was 4–8), at most 20 bricks (was 15), 3–15 minutes (was 5–10).
+- **Limits** (`packages/spec`): 1–4 concept bricks (was 1–3), 2–4 questions after each (unchanged), 3–12 in total (was 4–8), at most 20 bricks (was 15), 3–15 minutes (was 5–10).
 - Skill version 0.6.0.
 
 ## Run it
@@ -48,8 +47,8 @@ Each prompt checks one decision. Note what the agent reports in its one-line sum
 | 2 | How Bell tests closed the locality and detection loopholes | Advanced |
 | 3 | Make a lesson from https://developer.apple.com/design/human-interface-guidelines/drag-and-drop | Intermediate, and a path (lesson 1 only) |
 | 4 | Teach fractions to my 9-year-old | Beginner, child reading age |
-| 5 | Just explain how photosynthesis works | Explain mode |
-| 6 | Give me practice on percentage changes | Practice mode |
+| 5 | Just explain how photosynthesis works | Beginner, standard |
+| 6 | Give me practice on percentage changes | Standard |
 | 7 | Make a lesson on Nielsen's 10 usability heuristics | A path: lesson 1 plus the list of the rest |
 | 8 | Quick refresher: what's the difference between margin and padding? | Short size |
 
@@ -61,9 +60,9 @@ The first set's prompts ended up too close to examples in the skill, so these ei
 | --- | --- | --- |
 | 1 | How does a blockchain work? | Beginner |
 | 2 | Refresher on JavaScript closures | Intermediate (a refresher) |
-| 3 | Teach my 10-year-old about the water cycle | Beginner, child, balanced |
-| 4 | Walk me through how React's reconciliation decides when to reuse or remount a component, given keys and element types | Intermediate or advanced, explain |
-| 5 | Drill me on converting between fractions, decimals and percentages | Practice |
+| 3 | Teach my 10-year-old about the water cycle | Beginner, child |
+| 4 | Walk me through how React's reconciliation decides when to reuse or remount a component, given keys and element types | Intermediate or advanced |
+| 5 | Drill me on converting between fractions, decimals and percentages | Standard |
 | 6 | Teach me the Gestalt principles of visual perception | A path |
 | 7 | Quick one: what's the difference between a stock and a bond? | Short, beginner |
 | 8 | Make a lesson from https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching | Intermediate; a path or a long lesson |
@@ -74,19 +73,19 @@ The agent should ask first only for a bare topic. When it asks, answer as shown 
 
 | # | Prompt | Expect | If it asks, answer |
 | --- | --- | --- | --- |
-| 1 | How a car works | Asks first | "For my 12-year-old, to understand it" → child, explain |
+| 1 | How a car works | Asks first | "For my 12-year-old" → beginner, child |
 | 2 | Make a lesson about the French Revolution | Asks first | "For me, I know the basics. Quick one." → intermediate, short |
-| 3 | Teach me compound interest | Asks first | "go" → beginner, standard, balanced, adult |
-| 4 | Explain how a car works | No question; beginner, explain | |
-| 5 | Quiz my 10-year-old on how a car works | No question; child, practice | |
-| 6 | Give me some hands-on practice with Git branching | No question; practice | |
-| 7 | Make it practical: SQL window functions | No question; practice, intermediate or above | |
-| 8 | Check my understanding of supply and demand | No question; practice | |
+| 3 | Teach me compound interest | Asks first | "go" → beginner, standard, adult |
+| 4 | Explain how a car works | No question; beginner | |
+| 5 | Quiz my 10-year-old on how a car works | No question; beginner, child | |
+| 6 | Give me some hands-on practice with Git branching | No question | |
+| 7 | Make it practical: SQL window functions | No question; intermediate or above | |
+| 8 | Check my understanding of supply and demand | No question | |
 
 For each lesson, also check:
 
 - Did `validate` pass on the first or second try?
-- Does the lesson match its mode's shape (`skills/learn/modes/index.md`)?
+- Does the lesson match its size's shape (`skills/learn/reference/planning.md`)?
 - Does it play well? Anything confusing, too long, or too thin?
 
 To compare with today's behaviour, run the same prompts with main's skill (`git switch main`, restart the dev server).
