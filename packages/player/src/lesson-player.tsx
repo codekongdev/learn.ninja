@@ -62,7 +62,12 @@ import {
   type NinjaCue,
 } from "./ninja"
 import { emptyPrepared, type Prepared } from "./prepared"
-import { fingerprint, loadProgress, saveProgress } from "./progress"
+import {
+  fingerprint,
+  loadProgress,
+  resumeScript,
+  saveProgress,
+} from "./progress"
 import { seeded } from "./random"
 import { plainText, RichText } from "./rich-text"
 import {
@@ -182,7 +187,10 @@ export function LessonPlayer({
           ref={root}
           dir={dir}
           lang={ui}
-          className="flex h-full min-h-0 flex-col bg-background text-foreground"
+          // Hidden while the resume script (in Player) has marked it before hydration: see
+          // progress.ts. React must not report that mark as a mismatch.
+          suppressHydrationWarning
+          className="flex h-full min-h-0 flex-col bg-background text-foreground data-resuming:invisible"
         >
           <Player
             lesson={shown}
@@ -605,17 +613,23 @@ function Player({
   const [state, dispatch] = React.useReducer(reducer, lesson, (l) =>
     start(l, startAt)
   )
-  // Saved progress comes back before the first paint, so a reload lands on the same screen without
-  // flashing the intro. A demo (startAt) never saves. The fingerprint, not the lesson, keys the
-  // effects: a rename changes the lesson object but not what was saved.
+  // Saved progress comes back before the first paint after hydration, so a reload lands on the same
+  // screen. The server's HTML still shows the intro until then; the inline script below (parsed
+  // before the rest of the player) marks its parent, the player's root, to hide it when there's
+  // progress to resume, and the effect clears the mark once the saved screen is in. The mark is
+  // reached through the script's ref: the root's own ref isn't attached yet when this effect runs.
+  // A demo (startAt) never saves. The fingerprint, not the lesson, keys the effects: a rename
+  // changes the lesson object but not what was saved.
   const print = React.useMemo(() => fingerprint(lesson), [lesson])
   const remember = progressKey && !startAt ? progressKey : null
   const loaded = React.useRef(false)
+  const mark = React.useRef<HTMLScriptElement>(null)
   React.useLayoutEffect(() => {
     if (!remember) return
     const saved = loadProgress(localStorage, remember, lesson)
     if (saved) dispatch({ type: "resume", state: saved })
     loaded.current = true
+    mark.current?.parentElement?.removeAttribute("data-resuming")
     // The lesson is covered by its fingerprint.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remember, print])
@@ -816,6 +830,12 @@ function Player({
 
   return (
     <>
+      {remember ? (
+        <script
+          ref={mark}
+          dangerouslySetInnerHTML={{ __html: resumeScript(remember, lesson) }}
+        />
+      ) : null}
       {chrome ? (
         <LessonHeader
           title={lesson.title}

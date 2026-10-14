@@ -86,6 +86,25 @@ export function saveProgress(
   }
 }
 
+/**
+ * An inline script for the server-rendered page, placed first inside the player's root: before
+ * anything paints, it marks the root `data-resuming` when the browser holds progress for this
+ * lesson, so the intro the server rendered stays hidden (`data-resuming:invisible`) until
+ * `loadProgress` has put the saved screen in its place and the player clears the mark. A fresh
+ * visit, blocked storage, or a changed lesson leaves the root alone.
+ */
+export function resumeScript(key: string, lesson: Lesson): string {
+  const name = JSON.stringify(PREFIX + key).replace(/</g, "\\u003c")
+  const print = JSON.stringify(fingerprint(lesson))
+  return (
+    "(function(){try{" +
+    `var s=JSON.parse(localStorage.getItem(${name}));` +
+    `if(s&&s.v===1&&s.fingerprint===${print})` +
+    'document.currentScript.parentNode.setAttribute("data-resuming","")' +
+    "}catch(e){}})()"
+  )
+}
+
 function prune(storage: Storage) {
   const stale: string[] = []
   for (let i = 0; i < storage.length; i++) {

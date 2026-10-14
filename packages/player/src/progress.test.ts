@@ -5,7 +5,12 @@ import { describe, expect, it } from "vitest"
 import type { Lesson } from "@workspace/spec"
 
 import { reducer, type State } from "./lesson-player"
-import { fingerprint, loadProgress, saveProgress } from "./progress"
+import {
+  fingerprint,
+  loadProgress,
+  resumeScript,
+  saveProgress,
+} from "./progress"
 
 // Progress saved in the browser: a reload lands on the same screen, a changed lesson starts over.
 
@@ -126,5 +131,50 @@ describe("saved progress", () => {
       })
     )
     expect(loadProgress(storage, "l/x", lesson)).toBeNull()
+  })
+})
+
+describe("resume script", () => {
+  /** Runs the script as the browser would, with a stub page and storage; returns the root's mark. */
+  function run(storage: Storage, key = "l/a-1", content = lesson) {
+    const attrs = new Map<string, string>()
+    const document = {
+      currentScript: {
+        parentNode: { setAttribute: (k: string, v: string) => attrs.set(k, v) },
+      },
+    }
+    new Function("localStorage", "document", resumeScript(key, content))(
+      storage,
+      document
+    )
+    return attrs.has("data-resuming")
+  }
+
+  it("marks the player when there's progress for this lesson", () => {
+    const storage = fakeStorage()
+    saveProgress(storage, "l/a-1", lesson, midway())
+    expect(run(storage)).toBe(true)
+    expect(run(storage, "l/b-2")).toBe(false)
+    const edited: Lesson = {
+      ...lesson,
+      challenge: { ...lesson.challenge, prompt: "Something else?" },
+    }
+    expect(run(storage, "l/a-1", edited)).toBe(false)
+  })
+
+  it("leaves it alone on a fresh visit, or when storage fails", () => {
+    expect(run(fakeStorage())).toBe(false)
+    const broken = fakeStorage()
+    broken.getItem = () => {
+      throw new Error("blocked")
+    }
+    expect(run(broken)).toBe(false)
+    const junk = fakeStorage()
+    junk.setItem("learn:progress:l/a-1", "{nope")
+    expect(run(junk)).toBe(false)
+  })
+
+  it("can't break out of its script tag", () => {
+    expect(resumeScript("l/</script>", lesson)).not.toContain("</")
   })
 })
