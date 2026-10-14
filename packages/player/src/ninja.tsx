@@ -688,61 +688,78 @@ export function NinjaStage({
     }
   }, [area])
 
-  // On each new screen: find the slot, then leap from wherever he was to wherever he goes.
+  // On each new screen: find the slot, place him, and set up the leap from wherever he was. The
+  // leap itself starts in the effect below, once the placement is in the DOM.
+  const pending = React.useRef<{
+    first: DOMRect
+    brisk: boolean
+    landed: () => void
+  } | null>(null)
   React.useLayoutEffect(() => {
     const el = float.current
     const mark = svg.current
     if (!el || !mark) return
     const first = el.getBoundingClientRect()
     const next = measure()
+    const brisk = slotKind.current === "brief" || next?.kind === "brief"
+    const inCorner = slotKind.current === null
+    slotKind.current = next ? next.kind : null
     setSlot(next)
     setPlaced(true)
-    const brisk = slotKind.current === "brief" || next?.kind === "brief"
-    slotKind.current = next ? next.kind : null
     const firstTime = lastScreen.current === null
+    // The same screen again: React re-running the effect (twice in development) or the character
+    // changing. He's already where he belongs; on the intro, the new character makes his entrance.
+    const again = lastScreen.current === screen
     lastScreen.current = screen
-    if (firstTime) {
+    if (firstTime || again) {
       // The intro's entrance, in character. Demos that open mid-lesson just appear.
-      if (next && screen === 0 && !reducedMotion()) {
-        const undo = enter(mark, life, level)
-        // Undo everything if the effect is cut short (React runs it twice in development), or
-        // the entrance class stays on him and blocks every later whole-body move.
-        return () => {
-          undo()
-          lastScreen.current = null
-        }
-      }
+      if (next && screen === 0 && !reducedMotion())
+        return enter(mark, life, level)
       return
     }
     if (reducedMotion()) return
-    // The leap is decided on the next frame, but reactions and the send-off wait on it from now,
-    // or they'd find nothing to wait for and play while he's still in the air.
+    // Corner to corner: the placement doesn't change, so there's no re-render to leap from.
+    if (!next && inCorner) return
+    // Reactions and the send-off wait on the leap from now, or they'd find nothing to wait for and
+    // play while he's still in the air.
     let settle = () => {}
-    leaping.current = new Promise<void>((resolve) => {
+    const promise = new Promise<void>((resolve) => {
       settle = resolve
     })
+    leaping.current = promise
     const landed = () => {
       settle()
-      leaping.current = null
+      if (leaping.current === promise) leaping.current = null
     }
-    // FLIP: the placement above lands after this effect, so measure the end spot on the next frame.
-    const frame = requestAnimationFrame(() => {
-      const last = el.getBoundingClientRect()
-      if (
-        Math.abs(first.left - last.left) < 2 &&
-        Math.abs(first.top - last.top) < 2 &&
-        Math.abs(first.width - last.width) < 2
-      ) {
-        landed()
-        return
-      }
-      void leap(el, mark, life, first, last, level, brisk).then(landed)
-    })
+    pending.current = { first, brisk, landed }
     return () => {
-      cancelAnimationFrame(frame)
+      pending.current = null
       landed()
     }
   }, [screen, measure, life, level])
+
+  // FLIP: the placement above re-renders him synchronously, still before the browser paints, so
+  // measuring his end spot here and starting the leap at once means he never shows up there
+  // early. (Waiting a frame would paint him in the corner first, for longer the heavier the screen.)
+  React.useLayoutEffect(() => {
+    const el = float.current
+    const mark = svg.current
+    const job = pending.current
+    if (!el || !mark || !job) return
+    pending.current = null
+    const last = el.getBoundingClientRect()
+    if (
+      Math.abs(job.first.left - last.left) < 2 &&
+      Math.abs(job.first.top - last.top) < 2 &&
+      Math.abs(job.first.width - last.width) < 2
+    ) {
+      job.landed()
+      return
+    }
+    void leap(el, mark, life, job.first, last, level, job.brisk).then(
+      job.landed
+    )
+  }, [slot, life, level])
 
   // Keep him on the slot when the card or its content resizes or scrolls. The content is the
   // slot's parent: it grows with the text size while the card stays put, moving the slot.
