@@ -20,12 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function LessonPage({ params }: Props) {
-  const lesson = getLesson((await params).slug)
+  const { slug } = await params
+  const lesson = getLesson(slug)
   if (!lesson) notFound()
   const prepared = await prepareLesson(lesson)
   return (
     <div className="h-svh">
-      <LessonView lesson={lesson} prepared={prepared} />
+      <LessonView
+        lesson={lesson}
+        prepared={prepared}
+        progressKey={`lessons/${slug}`}
+      />
     </div>
   )
 }

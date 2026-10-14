@@ -71,4 +71,4 @@ A lesson is made of **bricks**, one per screen: `concept` bricks (theory) and qu
 
 ## v1 scope reminders
 
-No accounts, no saved progress, lessons expire after 24 hours, no typed answers (word chips instead), no `number` bricks (multiple choice instead), no images. Multiple languages and right-to-left matter from day one.
+No accounts (progress is kept in the browser only, per lesson page), lessons expire after 24 hours, no typed answers (word chips instead), no `number` bricks (multiple choice instead), no images. Multiple languages and right-to-left matter from day one.

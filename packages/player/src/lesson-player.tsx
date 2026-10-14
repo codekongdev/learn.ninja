@@ -62,6 +62,7 @@ import {
   type NinjaCue,
 } from "./ninja"
 import { emptyPrepared, type Prepared } from "./prepared"
+import { fingerprint, loadProgress, saveProgress } from "./progress"
 import { seeded } from "./random"
 import { plainText, RichText } from "./rich-text"
 import {
@@ -124,6 +125,11 @@ export interface LessonPlayerProps {
   scopeKeys?: boolean
   /** For product shots: just the lesson window, without the header and footer. */
   chrome?: boolean
+  /**
+   * Save where the learner is in the browser under this key (one per lesson page), so reopening or
+   * reloading the page carries on from the same screen. Omit it to start fresh every time.
+   */
+  progressKey?: string
 }
 
 export function LessonPlayer({
@@ -143,6 +149,7 @@ export function LessonPlayer({
   startAt,
   scopeKeys = false,
   chrome = true,
+  progressKey,
 }: LessonPlayerProps) {
   const root = React.useRef<HTMLDivElement>(null)
   // The title as shown, which a rename in the header changes.
@@ -180,6 +187,7 @@ export function LessonPlayer({
           <Player
             lesson={shown}
             startAt={startAt}
+            progressKey={progressKey}
             onRename={(next) => {
               setTitle(next)
               onRename?.(next)
@@ -391,6 +399,8 @@ export function cueKindFor(
 export type Action =
   | { type: "next" }
   | { type: "restart"; lesson: Lesson }
+  /** Progress saved in the browser, loaded after mounting. */
+  | { type: "resume"; state: State }
   | { type: "answer"; answer: Answer }
   | { type: "why" }
   | { type: "briefed" }
@@ -404,6 +414,8 @@ export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "restart":
       return start(action.lesson, undefined, state.run + 1)
+    case "resume":
+      return action.state
     case "next": {
       let index = state.index + 1
       if (
@@ -568,6 +580,7 @@ function Player({
   expiresAt,
   homeHref,
   shareUrl,
+  progressKey,
 }: {
   lesson: Lesson
   prefs: Preferences
@@ -584,6 +597,7 @@ function Player({
   expiresAt?: number
   homeHref: string
   shareUrl?: string
+  progressKey?: string
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const { textSize } = prefs
@@ -591,6 +605,25 @@ function Player({
   const [state, dispatch] = React.useReducer(reducer, lesson, (l) =>
     start(l, startAt)
   )
+  // Saved progress comes back before the first paint, so a reload lands on the same screen without
+  // flashing the intro. A demo (startAt) never saves. The fingerprint, not the lesson, keys the
+  // effects: a rename changes the lesson object but not what was saved.
+  const print = React.useMemo(() => fingerprint(lesson), [lesson])
+  const remember = progressKey && !startAt ? progressKey : null
+  const loaded = React.useRef(false)
+  React.useLayoutEffect(() => {
+    if (!remember) return
+    const saved = loadProgress(localStorage, remember, lesson)
+    if (saved) dispatch({ type: "resume", state: saved })
+    loaded.current = true
+    // The lesson is covered by its fingerprint.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remember, print])
+  React.useEffect(() => {
+    if (!remember || !loaded.current) return
+    saveProgress(localStorage, remember, lesson, state)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remember, print, state])
   // One line picker for the whole run. It must not live in ActionArea: that remounts with every
   // screen (the keyed div below), and a fresh picker's first draw is always the same line.
   const pickLine = React.useMemo(

@@ -26,7 +26,8 @@ export default async function PublishedLessonPage({
   params,
   searchParams,
 }: Props) {
-  const record = await loadPublished((await params).slugId)
+  const { slugId } = await params
+  const record = await loadPublished(slugId)
   if (!record) notFound()
   const { ui } = await searchParams
   return (
@@ -36,6 +37,7 @@ export default async function PublishedLessonPage({
         prepared={record.prepared}
         uiLanguage={ui}
         expiresAt={record.expiresAt}
+        progressKey={`l/${slugId}`}
       />
     </div>
   )
