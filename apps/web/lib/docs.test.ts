@@ -4,7 +4,13 @@ import path from "node:path"
 import { describe, expect, it } from "vitest"
 
 import { getLesson } from "./lessons"
-import { contentTypeFor, skillFiles, skillIndex } from "./skill-files"
+import {
+  contentTypeFor,
+  skillBundle,
+  skillFiles,
+  skillIndex,
+  syncedFiles,
+} from "./skill-files"
 
 // Checks on the docs/ folder and the served skill, so a docs edit can't ship a broken demo or page.
 
@@ -85,6 +91,19 @@ describe("served skill", () => {
     expect(skill!.files).toEqual(skillFiles())
     expect(skill!.files).toContain("SKILL.md")
     expect(skill!.files).toContain("scripts/learn.mjs")
+  })
+
+  it("bundles the guides for `learn sync`, never the CLI or the bootstrap", () => {
+    const synced = syncedFiles()
+    expect(synced).toContain("steps.md")
+    expect(synced).toContain("reference/teaching-guide.md")
+    expect(synced).toContain("schema/lesson.schema.json")
+    expect(synced).not.toContain("SKILL.md")
+    expect(synced.some((f) => f.startsWith("scripts/"))).toBe(false)
+    const bundle = skillBundle()
+    expect(Object.keys(bundle.files)).toEqual(synced)
+    expect(bundle.hash).toMatch(/^[0-9a-f]{16}$/)
+    expect(skillBundle().hash).toBe(bundle.hash)
   })
 
   it("serves files with sensible types", () => {

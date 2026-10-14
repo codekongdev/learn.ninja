@@ -17,6 +17,7 @@ import {
   tokenMatches,
 } from "./ids"
 import type { RateLimiter } from "./rate-limit"
+import { SKILL_UPDATE_COMMAND, skillInfo } from "../skill-version"
 import {
   LESSON_TTL_SECONDS,
   type LessonStore,
@@ -28,9 +29,11 @@ import {
 /** Spec versions the server accepts. Older skills keep working while they're listed here; older files are upgraded first. */
 export const ACCEPTED_SPECS: string[] = [SPEC_VERSION, "0.2"]
 
-/** The current skill version. Bump it when the skill changes; older skills are told to update. */
-export const LATEST_SKILL_VERSION = "0.8.0"
-export const SKILL_UPDATE_COMMAND = "npx skills add https://learn.ninja -g"
+export {
+  compareVersions,
+  LATEST_SKILL_VERSION,
+  SKILL_UPDATE_COMMAND,
+} from "../skill-version"
 
 export interface Deps {
   store: LessonStore
@@ -52,26 +55,6 @@ interface PublishRequest {
   client: string
   /** The installed skill's version, from the x-learn-skill-version header. */
   skillVersion?: string | null
-}
-
-function skillInfo(version?: string | null) {
-  const updateAvailable =
-    Boolean(version) && compareVersions(version!, LATEST_SKILL_VERSION) < 0
-  return {
-    latest: LATEST_SKILL_VERSION,
-    updateAvailable,
-    ...(updateAvailable ? { updateCommand: SKILL_UPDATE_COMMAND } : {}),
-  }
-}
-
-export function compareVersions(a: string, b: string): number {
-  const pa = a.split(".").map(Number)
-  const pb = b.split(".").map(Number)
-  for (let i = 0; i < 3; i++) {
-    const d = (pa[i] ?? 0) - (pb[i] ?? 0)
-    if (d !== 0) return d
-  }
-  return 0
 }
 
 /** Checks size, JSON, spec version, and the spec's rules. Returns the lesson or an error reply. */
@@ -132,6 +115,29 @@ function checkLessonText(text: string, skillVersion?: string | null) {
     }
   }
   return { lesson: result.lesson, skill }
+}
+
+/** POST /api/validate: the checks publishing runs, without storing anything. Older CLIs get the newest rules this way. */
+export async function checkLesson(
+  req: PublishRequest,
+  deps: Pick<Deps, "limiter">
+): Promise<Reply> {
+  if (!(await deps.limiter.allow(req.client))) {
+    return {
+      status: 429,
+      body: {
+        ok: false,
+        error: "rate_limited",
+        message: "Too many checks from here recently. Try again later.",
+      },
+    }
+  }
+  const checked = checkLessonText(req.text, req.skillVersion)
+  if ("error" in checked) return checked.error!
+  return {
+    status: 200,
+    body: { ok: true, spec: checked.lesson.spec, skill: checked.skill },
+  }
 }
 
 export async function publishLesson(

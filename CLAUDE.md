@@ -14,9 +14,9 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `packages/ui`: shadcn/ui components on React Aria (`--base aria`), shared Tailwind styles and theme
 - `packages/spec`: the lesson spec v0.3: Zod schema, exported JSON Schema, validation rules, and the 0.2 → 0.3 upgrade (single source of truth)
 - `packages/player`: React components for every lesson screen and brick
-- `packages/cli`: the `learn` command (validate, publish, schema) the skill runs; bundled into `skills/learn/scripts/learn.mjs`
+- `packages/cli`: the `learn` command (sync, validate, publish, schema) the skill runs; bundled into `skills/learn/scripts/learn.mjs`
 - `packages/eslint-config`, `packages/typescript-config`: shared configs
-- `skills/learn/`: the installable skill (`npx skills add https://learn.ninja -g`, served by `apps/web` at `/.well-known/skills/`): SKILL.md, teaching guide, format reference (also shown in the docs through `<include>`), and generated copies of the schema, examples, and bundled CLI
+- `skills/learn/`: the installable skill (`npx skills add https://learn.ninja -g`, served by `apps/web` at `/.well-known/skills/`): a short SKILL.md that runs `sync`, then `steps.md`, the teaching guide, format reference (also shown in the docs through `<include>`), and generated copies of the schema, examples, and bundled CLI. Everything but SKILL.md and the CLI is also served as one bundle at `/api/skill`, which `sync` downloads into a project's `.learn/skill/`, so guide changes reach every install on deploy
 - `examples/`: the seven test lessons as JSON (five beginner, one intermediate, one advanced), used as fixtures
 - `spikes/`: throwaway test builds, git-ignored; never import from here
 
@@ -61,7 +61,7 @@ A lesson is made of **bricks**, one per screen: `concept` bricks (theory) and qu
 - Storage goes through `LessonStore` (`apps/web/lib/publish/store.ts`): Upstash Redis when `UPSTASH_REDIS_REST_URL`/`TOKEN` (or Vercel's `KV_REST_API_URL`/`TOKEN`) are set, otherwise a local folder (`apps/web/.data/lessons`) in development.
 - Lessons expire 24 hours after publishing; updates keep the expiry. Edit tokens are only stored hashed.
 - `prepareLesson()` runs at publish time: KaTeX, Shiki, and Tailwind utilities for the lesson's HTML. The result is stored with the lesson.
-- Bump `LATEST_SKILL_VERSION` (`apps/web/lib/publish/handlers.ts`) and `SKILL_VERSION` (`packages/cli/src/cli.ts`) together when the skill changes; older skills are told to update with `npx skills add https://learn.ninja -g`.
+- Guide, example, and checker changes need no version bump: they go live on deploy through `sync` and `/api/validate`. Bump `LATEST_SKILL_VERSION` (`apps/web/lib/skill-version.ts`) and `SKILL_VERSION` (`packages/cli/src/cli.ts`) together only when the CLI or the installed `SKILL.md` changes; older installs are then told to run `npx skills add https://learn.ninja -g`. Raise `MIN_SKILL_VERSION` only when a guide relies on new CLI behavior: `sync` refuses to run below it.
 
 ## Storybook
 

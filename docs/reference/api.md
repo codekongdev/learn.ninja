@@ -37,18 +37,35 @@ Authorization: Bearer <editToken>
 
 The body is the new lesson file. The link and the expiry stay the same. Returns `200` with the same fields as publishing, without `editToken`.
 
+## Check a lesson
+
+```http
+POST /api/validate
+Content-Type: application/json
+```
+
+The body is the lesson file. Runs the checks publishing runs and stores nothing. A valid lesson returns `200` with `{ "ok": true, "spec": "0.3" }`; an invalid one returns the same errors as publishing. The skill's `validate` command uses this.
+
+## The skill's guides
+
+```http
+GET /api/skill
+```
+
+The skill's steps, guides, examples, and schema as one JSON bundle: `version` (the current skill), `minVersion` (the oldest skill the guides work with), `hash` (changes whenever a file does), and `files`, a map from path to text. `GET /api/skill/version` returns the same without `files`. The skill's `sync` command uses both.
+
 ## Errors
 
 Errors return `"ok": false` with an `error` code and a `message`.
 
-| Status | `error` | Meaning |
-| --- | --- | --- |
-| 401 | `unauthorized` | The edit token doesn't match this lesson |
-| 404 | `not_found` | The lesson doesn't exist or has expired |
-| 413 | `too_large` | The lesson file is too big |
-| 422 | `invalid_lesson` | The lesson breaks the format; the response lists each issue |
-| 422 | `unsupported_spec` | The lesson's `spec` version isn't supported |
-| 429 | `rate_limited` | Too many publishes from one place; try again later |
+| Status | `error`            | Meaning                                                     |
+| ------ | ------------------ | ----------------------------------------------------------- |
+| 401    | `unauthorized`     | The edit token doesn't match this lesson                    |
+| 404    | `not_found`        | The lesson doesn't exist or has expired                     |
+| 413    | `too_large`        | The lesson file is too big                                  |
+| 422    | `invalid_lesson`   | The lesson breaks the format; the response lists each issue |
+| 422    | `unsupported_spec` | The lesson's `spec` version isn't supported                 |
+| 429    | `rate_limited`     | Too many publishes from one place; try again later          |
 
 ## Limits
 

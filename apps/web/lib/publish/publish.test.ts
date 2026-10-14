@@ -5,6 +5,7 @@ import { join } from "node:path"
 import { beforeEach, describe, expect, it } from "vitest"
 
 import {
+  checkLesson,
   compareVersions,
   LATEST_SKILL_VERSION,
   publishLesson,
@@ -180,6 +181,46 @@ describe("publishing", () => {
     } finally {
       Date.now = realNow
     }
+  })
+})
+
+describe("checking", () => {
+  it("accepts a valid lesson without storing it", async () => {
+    const reply = await checkLesson({ text: buttons, client: "x" }, deps)
+    expect(reply).toMatchObject({
+      status: 200,
+      body: { ok: true, spec: "0.3", skill: { updateAvailable: false } },
+    })
+    expect(reply.body).not.toHaveProperty("id")
+    expect(reply.body).not.toHaveProperty("editToken")
+  })
+
+  it("lists the same issues publishing would", async () => {
+    const broken = JSON.parse(buttons)
+    delete broken.bricks[1].options[1].feedback
+    const text = JSON.stringify(broken)
+    const checked = await checkLesson({ text, client: "x" }, deps)
+    const published = await publishLesson({ text, client: "x" }, deps)
+    expect(checked.status).toBe(422)
+    expect(checked.body.issues).toEqual(published.body.issues)
+  })
+
+  it("tells an old skill to update", async () => {
+    const reply = await checkLesson(
+      { text: buttons, client: "x", skillVersion: "0.1.0" },
+      deps
+    )
+    expect(reply.body.skill).toMatchObject({ updateAvailable: true })
+  })
+
+  it("has its own rate limit", async () => {
+    deps.limiter = new MemoryRateLimiter(1)
+    expect(
+      (await checkLesson({ text: buttons, client: "a" }, deps)).status
+    ).toBe(200)
+    expect(
+      (await checkLesson({ text: buttons, client: "a" }, deps)).status
+    ).toBe(429)
   })
 })
 
