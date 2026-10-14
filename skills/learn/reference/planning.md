@@ -7,7 +7,7 @@ Before writing, read the user's input once for four choices: **scope** (one less
 A lesson teaches **one core idea**. Find it: the idea everything else in the input depends on.
 
 - **One lesson** when the input is one idea, even one with several parts (a method and its exception, a rule and when it breaks).
-- **A path** when the input holds several ideas that each deserve teaching and don't fit one long lesson: a list of principles (10 usability heuristics), a long guideline page with separate topics, a course outline, a whole field ("Spanish", "statistics").
+- **A path** when the input holds several ideas that each deserve teaching and don't fit one long lesson: a list of principles (the SOLID principles, the 12 principles of animation), a long reference page with separate topics, a course outline, a whole field ("Italian", "statistics").
 - If the user asks for one lesson on something big, make one lesson on its central idea and mention the rest as follow-ups.
 
 Stay faithful to the source. If the input is an article, teach what it says; don't add claims it doesn't support.
@@ -40,7 +40,7 @@ Each lesson's link expires 24 hours after it's published, like any lesson.
 Who reads the lesson is separate from how much they know.
 
 - **Adult** is the default.
-- **Child** when the user mentions a child or an age under about 13 ("for my kid", "my 9-year-old", "a class of fifth graders"). Then: beginner level unless they say otherwise; short sentences and everyday words; examples from a child's world (school, games, pets, food, sport); no sarcasm, idioms, money, or workplace examples unless the topic is about them; visuals that are bright and simple.
+- **Child** when the user mentions a child or an age under about 13 ("for my kid", "my 7-year-old", "a class of third graders"). Then: beginner level unless they say otherwise; short sentences and everyday words; examples from a child's world (school, games, pets, food, sport); no sarcasm, idioms, money, or workplace examples unless the topic is about them; visuals that are bright and simple. Fixed bright colours (`bg-amber-400`, `fill-sky-500`) are fine for filled shapes like pizza slices or counters, since they read on light and dark backgrounds; keep text, outlines, and backgrounds on theme colours (`text-foreground`, `border-border`, `bg-muted`). The mode is `balanced` unless the user asks for another (`modes/index.md`).
 - **"Explain like I'm 5", "in simple terms", "for a non-expert"** from an adult mean beginner level for an adult reader: plain words and everyday examples, with no talking down.
 
 ## The report line

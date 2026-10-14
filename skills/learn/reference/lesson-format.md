@@ -63,7 +63,7 @@ Brick ids are unique across the whole lesson, including the hook and the challen
 { "kind": "math", "tex": "A = P(1 + r)^n" }
 ```
 
-`alt` is one sentence saying what the visual shows, for screen readers; it's required on a concept's or question's HTML visual, and on an option's HTML visual that has no caption (hotspot visuals are read through their regions, item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
+`alt` is one sentence saying what the visual shows, for screen readers, at most 200 characters; it's required on a concept's or question's HTML visual, and on an option's HTML visual that has no caption (hotspot visuals are read through their regions, item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
 
 ## Options
 

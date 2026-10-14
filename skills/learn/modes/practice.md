@@ -9,7 +9,7 @@ For learning to do something: a calculation, a piece of code, a grammar form, ap
 
 ## Questions
 
-- 3–6 after each concept, ordered so the support fades:
+- 4–6 after each concept (more than a balanced lesson has), ordered so the support fades:
   1. **Finish a worked example:** a `blank` for the missing step.
   2. **Do a whole one** on new values or a new screen: a `choice` with options built from real slips.
   3. **Vary it:** a new context, a twist, or the problem run backwards.

@@ -7,9 +7,10 @@ A lesson's mode sets the mix: how much of it teaches and how much it asks. The l
 Go down this list and stop at the first signal you find:
 
 1. **The user's words.** "Just explain", "help me understand", "walk me through" → `explain`. "Give me practice", "drill me", "let me try" → `practice`. "Quiz me" or "test my knowledge" → `practice` for now.
-2. **The kind of knowledge.** Understanding how or why something works (a mechanism, a principle, a historical cause, a scientific idea) leans `explain`. Carrying out a method (a calculation, code, a grammar form, applying a design rule to a screen) leans `practice`.
-3. **The level.** A beginner meeting a new idea learns more from explanation and worked examples; an intermediate or advanced learner with the basics learns more from solving problems. When steps 1 and 2 give no answer, beginners lean `explain` and the others lean `practice` only for a method.
-4. **If still unclear, `balanced`.**
+2. **A child reader** (`reference/planning.md`) → `balanced`. Children keep an idea by using it often, and a lesson that's mostly reading loses them.
+3. **The kind of knowledge.** Understanding how or why something works (a mechanism, a principle, a historical cause, a scientific idea) leans `explain`. Carrying out a method (a calculation, code, a grammar form, applying a design rule to a screen) leans `practice`.
+4. **The level.** A beginner meeting a new idea learns more from explanation and worked examples; an intermediate or advanced learner with the basics learns more from solving problems. When steps 1–3 give no answer, beginners lean `explain` and the others lean `practice` only for a method.
+5. **If still unclear, `balanced`.**
 
 ## Shape for each mode and size
 
@@ -19,7 +20,7 @@ Concept bricks × question bricks after each. Pick the size from `reference/plan
 | ---------- | -------------------------------- | ------------------------------ | --------------------------- |
 | `explain`  | 2 concepts, 3 questions in total | 3 concepts × 1–2               | 4 concepts × 1–2            |
 | `balanced` | 1 concept × 3–4                  | 2–3 concepts × 2–4 (max 8)     | 4 concepts × 2–3 (max 12)   |
-| `practice` | 1 concept × 4–5                  | 1–2 concepts × 3–5 (max 8)     | 2 concepts × 4–6 (max 12)   |
+| `practice` | 1 concept × 4–5                  | 1–2 concepts × 4–5 (max 10)    | 2 concepts × 5–6 (max 12)   |
 
 The checker allows anything within 1–4 concept bricks, 1–6 question bricks after each, and 3–12 in total; the table is what each mode aims for.
 

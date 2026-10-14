@@ -17,7 +17,7 @@ hook → bricks: concept → questions → concept → questions … (1–4 conc
 ```
 
 - **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains. Its `explanation` should make the learner want to know why.
-- **Concept bricks:** one idea each, 80 words at most. The first brick is always a concept. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
+- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Give a concrete example or a visual. Add a `term` when there's a key word to remember.
 - **Practice:** question bricks right after each concept brick: 1–2 in `explain` mode, 2–4 in `balanced`, 3–6 in `practice` (`modes/index.md` has the shape for each size). The checker allows 1–6 after each concept and 3–12 in total.
 - **Challenge:** one harder, applied question brick that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
 - **Wrap-up:** 2–4 takeaways, each one sentence the learner could act on.
@@ -77,7 +77,7 @@ Mechanics of each type:
 
 Visuals make lessons feel real. There are three kinds:
 
-- **`html`**: UI examples, diagrams, simple charts, layouts. It runs in a sandbox with no scripts. Give it an `alt`: one sentence saying what it shows, as you'd describe it to someone who can't see it ("Two buttons: a filled Place order and an outlined Back to cart").
+- **`html`**: UI examples, diagrams, simple charts, layouts. It runs in a sandbox with no scripts. Give it an `alt`: one sentence of at most 200 characters saying what it shows, as you'd describe it to someone who can't see it ("Two buttons: a filled Place order and an outlined Back to cart").
 - **`code`**: code with syntax highlighting. Give the `language` (e.g. `javascript`, `python`, `css`).
 - **`math`**: a formula on its own line, in TeX: `{ "kind": "math", "tex": "A = P(1 + r)^n" }`.
 

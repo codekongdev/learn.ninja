@@ -7,19 +7,20 @@ A lesson's `level` says who it's for. It changes what the lesson assumes, how ha
 Go down this list and stop at the first signal you find:
 
 1. **An audience the user names.** A named level, or who it's for: "for my kid" or "for people new to statistics" is `beginner`; "for my team of senior engineers" is `advanced`.
-2. **How the request is worded.** Terms of art, a named method, or stated background ("I already use flexbox; teach me grid areas") point up. A plain "explain X", "how does X work", or "what is X" points to `beginner`, however advanced X is: people who ask that way are usually new to it. "Explain like I'm 5" and "in simple terms" are `beginner` too.
-3. **What the source assumes**, when the user gives you a document. Text that explains its own terms is `beginner` or `intermediate`; text written for people already in the field, like a platform's design guidelines for a specific interaction, is `intermediate` or `advanced`.
+2. **How the request is worded.** Terms of art, a named method, or stated background ("I already use flexbox; teach me grid areas") point up. So do "refresher", "brush up on", "remind me", and "review": the learner has met the idea before, so the lesson is at least `intermediate` and spends its words on what's easy to forget, not on first definitions. A plain "explain X", "how does X work", or "what is X" points to `beginner`, however advanced X is: people who ask that way are usually new to it. "Explain like I'm 5" and "in simple terms" are `beginner` too.
+3. **What the source assumes**, when the user gives you a document. Text that explains its own terms is `beginner` or `intermediate`; text written for people already in the field, like a framework's API reference or a standard's specification, is `intermediate` or `advanced`.
 4. **How deep the topic is**, only to break a tie: a topic that needs several other ideas first leans up.
 5. **If still unclear, `beginner`.**
 
 | Request | Level |
 | --- | --- |
-| "Explain simple equations" | `beginner` |
-| "Explain quantum entanglement" | `beginner`: an advanced topic asked in plain words |
-| "How Bell tests closed the locality and detection loopholes" | `advanced`: terms of art |
+| "What is a budget?" | `beginner` |
+| "How do black holes form?" | `beginner`: an advanced topic asked in plain words |
+| "How the Kalman gain trades off process and measurement noise" | `advanced`: terms of art |
 | "Solve quadratics by completing the square" | `intermediate`: a named method that assumes algebra |
-| A link to a design-guidelines page on drag and drop | `intermediate`: the page assumes the reader designs interfaces |
-| "Fractions for my 9-year-old" | `beginner`, child reading age (`reference/planning.md`) |
+| "Brush up on SQL joins" | `intermediate`: met before, needs the details back |
+| A link to a database's documentation on index types | `intermediate`: the page assumes the reader builds software |
+| "Telling the time, for my 6-year-old" | `beginner`, child reading age (`reference/planning.md`) |
 
 Tell the user which level you chose, and that you can remake the lesson at another.
 

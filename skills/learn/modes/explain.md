@@ -6,7 +6,7 @@ For understanding how or why something works, when the learner wants the idea mo
 
 - Use the extra concept bricks to build the idea in steps. Each one adds one piece and says how it connects to the last: "So far, X. Now, what happens when…"
 - Let the visual carry the explanation: a diagram, a before-and-after, a labelled mechanism, a script-free animated SVG with a still frame for reduced motion. The body says what to look at.
-- Still 80 words per concept. Split a long explanation into two concepts rather than cramming one.
+- Still 80 words per concept, and the checker counts every word. Aim for 60–70 so edits don't push you over, and split a long explanation into two concepts rather than cramming one. Explanations stay at 30 words or fewer.
 
 ## Questions
 

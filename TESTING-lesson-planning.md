@@ -53,6 +53,21 @@ Each prompt checks one decision. Note what the agent reports in its one-line sum
 | 7 | Make a lesson on Nielsen's 10 usability heuristics | A path: lesson 1 plus the list of the rest |
 | 8 | Quick refresher: what's the difference between margin and padding? | Short size |
 
+### Second set
+
+The first set's prompts ended up too close to examples in the skill, so these eight are new. Don't copy any of them into the skill's examples.
+
+| # | Prompt | Expect |
+| --- | --- | --- |
+| 1 | How does a blockchain work? | Beginner |
+| 2 | Refresher on JavaScript closures | Intermediate (a refresher) |
+| 3 | Teach my 10-year-old about the water cycle | Beginner, child, balanced |
+| 4 | Walk me through how React's reconciliation decides when to reuse or remount a component, given keys and element types | Intermediate or advanced, explain |
+| 5 | Drill me on converting between fractions, decimals and percentages | Practice |
+| 6 | Teach me the Gestalt principles of visual perception | A path |
+| 7 | Quick one: what's the difference between a stock and a bond? | Short, beginner |
+| 8 | Make a lesson from https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching | Intermediate; a path or a long lesson |
+
 For each lesson, also check:
 
 - Did `validate` pass on the first or second try?
