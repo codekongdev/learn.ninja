@@ -19,8 +19,8 @@
     "@observablehq/plot": "^0.6.17",
     "@workspace/spec": "^0.0.0",
     "@workspace/ui": "^0.0.0",
-    "jsdom": "^29.1.1",
     "katex": "^0.19.0",
+    "linkedom": "^0.18.13",
     "lucide-react": "^1.52.0",
     "react": "^19.3.0",
     "react-aria-components": "^1.21.1",
@@ -30,7 +30,6 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@types/jsdom": "^30.0.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@workspace/eslint-config": "^0.0.0",

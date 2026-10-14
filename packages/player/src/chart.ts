@@ -1,7 +1,7 @@
 import "server-only"
 
 import * as Plot from "@observablehq/plot"
-import { JSDOM } from "jsdom"
+import { parseHTML } from "linkedom"
 
 import type { ChartVisual } from "@workspace/spec"
 
@@ -17,8 +17,11 @@ const SERIES_COLORS = [
 ]
 const TREND_COLOR = "var(--chart-2)"
 
-let dom: JSDOM | null = null
-const documentFor = () => (dom ??= new JSDOM("")).window.document
+// linkedom, not jsdom: jsdom crashed the publish routes on Vercel, and Plot only needs to build elements.
+let doc: Document | null = null
+const documentFor = () =>
+  (doc ??= parseHTML("<!doctype html><html><body></body></html>")
+    .document as unknown as Document)
 
 /** The chart as an SVG string. `compact` is for option and item cards, which are narrower. */
 export function renderChart(chart: ChartVisual, compact = false): string {
