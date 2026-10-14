@@ -21,6 +21,22 @@
         "storybook"
       ],
       "port": 6006
+    },
+    {
+      "name": "storybook-6007",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "exec",
+        "-w",
+        "@workspace/storybook",
+        "--",
+        "storybook",
+        "dev",
+        "-p",
+        "6007",
+        "--no-open"
+      ],
+      "port": 6007
     }
   ]
 }
