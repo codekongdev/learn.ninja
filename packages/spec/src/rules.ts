@@ -14,10 +14,10 @@ export interface Issue {
 }
 
 export const LIMITS = {
-  concepts: { min: 1, max: 3 },
-  /** Question bricks after each concept brick. */
-  practicePerConcept: { min: 2, max: 4 },
-  practiceTotal: { min: 4, max: 8 },
+  concepts: { min: 1, max: 4 },
+  /** Question bricks after each concept brick. The skill's mode guides set the usual range. */
+  practicePerConcept: { min: 1, max: 6 },
+  practiceTotal: { min: 3, max: 12 },
   promptWords: 40,
   /** An explanation is shown in the ninja's speech bubble, so it stays short. */
   explanationWords: 30,

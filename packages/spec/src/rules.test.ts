@@ -109,33 +109,43 @@ describe("structure rules", () => {
     expectIssue(l, { path: "bricks[0]", message: /must be a concept brick/ })
   })
 
-  it("requires 2–4 question bricks after each concept brick", () => {
+  it("requires at least 1 question brick after each concept brick", () => {
     const l = buttons()
-    l.bricks.splice(2, 1)
+    l.bricks.splice(1, 2)
     expectIssue(l, {
       path: "bricks[0]",
-      message: /"c1" is followed by 1 question bricks; it needs 2–4/,
+      message: /"c1" is followed by 0 question bricks; it needs 1–6/,
     })
   })
 
-  it("allows at most 3 concept bricks", () => {
+  it("allows at most 6 question bricks after a concept brick", () => {
     const l = buttons()
-    const loop = l.bricks.slice(0, 3)
-    l.bricks = [0, 1, 2, 3].flatMap((n) =>
+    const extra = [0, 1, 2, 3, 4].map((n) => ({ ...l.bricks[1], id: `x${n}` }))
+    l.bricks = [l.bricks[0], ...extra, ...l.bricks.slice(1, 3)]
+    expectIssue(l, {
+      path: "bricks[0]",
+      message: /"c1" is followed by 7 question bricks; it needs 1–6/,
+    })
+  })
+
+  it("allows at most 4 concept bricks", () => {
+    const l = buttons()
+    const loop = l.bricks.slice(0, 2)
+    l.bricks = [0, 1, 2, 3, 4].flatMap((n) =>
       loop.map((b: { id: string }) => ({ ...b, id: `${b.id}-${n}` }))
     )
     expectIssue(l, {
       path: "bricks",
-      message: /4 concept bricks; it needs 1–3/,
+      message: /5 concept bricks; it needs 1–4/,
     })
   })
 
-  it("requires 4–8 practice bricks in total", () => {
+  it("requires 3–12 practice bricks in total", () => {
     const l = buttons()
     l.bricks = l.bricks.slice(0, 3)
     expectIssue(l, {
       path: "bricks",
-      message: /2 practice bricks in total; it needs 4–8/,
+      message: /2 practice bricks in total; it needs 3–12/,
     })
   })
 
