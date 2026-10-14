@@ -1981,9 +1981,10 @@ function TrayNotch({
         // The hit area stays generous but invisible; only the bar reacts, like a grabber on iOS.
         className="h-7 w-24 cursor-ns-resize px-0 hover:bg-transparent active:translate-y-0 aria-expanded:bg-transparent dark:hover:bg-transparent"
       >
+        {/* Frosted glass: a faint tint with a hairline, and content scrolling under it shows through, blurred. */}
         <span
           aria-hidden="true"
-          className="h-1.5 w-16 rounded-full bg-border transition-colors group-hover/button:bg-muted-foreground/60 group-active/button:bg-muted-foreground"
+          className="h-1.5 w-16 rounded-full bg-foreground/20 shadow-xs ring-1 ring-foreground/10 transition-colors group-hover/button:bg-foreground/35 group-active/button:bg-foreground/50 supports-backdrop-filter:bg-foreground/10 supports-backdrop-filter:backdrop-blur-sm supports-backdrop-filter:group-hover/button:bg-foreground/25 supports-backdrop-filter:group-active/button:bg-foreground/40"
         />
       </Button>
     </div>
