@@ -5,6 +5,7 @@ import { prepareLesson } from "@workspace/player/prepare"
 
 import { LessonView } from "@/components/lesson-view"
 import { getLesson, LESSON_SLUGS } from "@/lib/lessons"
+import { shareMetadata } from "@/lib/metadata"
 
 // Prerendered at build time. Nothing here reads the request, so the Tailwind compile in
 // prepareLesson() runs once per lesson, not per visit.
@@ -15,8 +16,15 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const lesson = getLesson((await params).slug)
-  return lesson ? { title: lesson.title, description: lesson.summary } : {}
+  const { slug } = await params
+  const lesson = getLesson(slug)
+  return lesson
+    ? {
+        title: lesson.title,
+        description: lesson.summary,
+        ...shareMetadata(`/lessons/${slug}`, lesson.language),
+      }
+    : {}
 }
 
 export default async function LessonPage({ params }: Props) {

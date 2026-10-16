@@ -27,14 +27,10 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   applicationName: SITE.name,
-  openGraph: { siteName: SITE.name, type: "website" },
-  twitter: { card: "summary_large_image" },
-  alternates: {
-    types: {
-      "text/markdown": "/index.md",
-      "text/plain": "/llms.txt",
-    },
-  },
+  // Lesson pages extend this through shareMetadata(), with their URL and language.
+  openGraph: { siteName: SITE.name, type: "website", locale: "en_US" },
+  // Published lessons set their own, without the maker's handle.
+  twitter: { card: "summary_large_image", creator: SITE.maker },
 }
 
 export default function RootLayout({
