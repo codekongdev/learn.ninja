@@ -1,8 +1,11 @@
 import { ButtonLink } from "@/components/site/button-link"
 import { Wordmark } from "@/components/site/wordmark"
 
-/** An expired or unknown lesson link (HTTP 404). */
-export default function LessonNotFound() {
+/**
+ * An expired or unknown lesson link. Sent with HTTP 200, not 404: chat apps and social sites show no
+ * card for a 404, and the expired card is how someone sees the link died before they click.
+ */
+export function LessonExpired() {
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col justify-center gap-6 px-6">
       <Wordmark className="self-start" />

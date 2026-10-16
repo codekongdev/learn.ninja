@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
-import { notFound } from "next/navigation"
 
 import { LessonView } from "@/components/lesson-view"
+import { LessonExpired } from "@/components/site/lesson-expired"
+import { shareMetadata } from "@/lib/metadata"
+import { OG_SIZE } from "@/lib/og"
 import { loadPublished } from "@/lib/published"
 
 // A published lesson, at /l/{slug}-{id}. Lessons expire 24 hours after they're published.
@@ -12,15 +14,37 @@ type Props = {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const record = await loadPublished((await params).slugId)
-  return record
-    ? {
-        title: record.lesson.title,
-        description: record.lesson.summary,
-        robots: { index: false },
-      }
-    : { title: "Lesson unavailable" }
+  const { slugId } = await params
+  const record = await loadPublished(slugId)
+  const share = shareMetadata(`/l/${slugId}`, record?.lesson.language)
+  return {
+    ...(record
+      ? {
+          title: record.lesson.title,
+          description: record.lesson.summary,
+        }
+      : {
+          title: "Lesson unavailable",
+          description: EXPIRED_DESCRIPTION,
+        }),
+    ...share,
+    openGraph: {
+      ...share.openGraph,
+      images: {
+        url: `/l/${slugId}/card`,
+        ...OG_SIZE,
+        type: "image/png",
+        alt: record?.lesson.title ?? "This lesson has expired",
+      },
+    },
+    // Anyone can publish a lesson, so it isn't credited to the site's maker.
+    twitter: { card: "summary_large_image" },
+    robots: { index: false },
+  }
 }
+
+const EXPIRED_DESCRIPTION =
+  "Lessons expire 24 hours after they're published. Ask whoever shared it for a new link."
 
 export default async function PublishedLessonPage({
   params,
@@ -28,7 +52,7 @@ export default async function PublishedLessonPage({
 }: Props) {
   const { slugId } = await params
   const record = await loadPublished(slugId)
-  if (!record) notFound()
+  if (!record) return <LessonExpired />
   const { ui } = await searchParams
   return (
     <div className="h-svh">

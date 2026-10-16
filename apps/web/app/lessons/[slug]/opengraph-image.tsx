@@ -1,12 +1,22 @@
 import { lessonImage, OG_SIZE } from "@/lib/og"
-import { getLesson, LESSON_SLUGS } from "@/lib/lessons"
+import { getLesson } from "@/lib/lessons"
 
-export const alt = "Lesson preview"
-export const size = OG_SIZE
-export const contentType = "image/png"
-
-export function generateStaticParams() {
-  return LESSON_SLUGS.map((slug) => ({ slug }))
+// One image, described by the lesson's own title. Next derives this route's static params from it and
+// the page's generateStaticParams, so it can't export its own.
+export function generateImageMetadata({
+  params,
+}: {
+  params: { slug: string }
+}) {
+  const lesson = getLesson(params.slug)
+  return [
+    {
+      id: "card",
+      alt: lesson?.title ?? "",
+      size: OG_SIZE,
+      contentType: "image/png",
+    },
+  ]
 }
 
 export default async function Image({
