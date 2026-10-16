@@ -86,6 +86,8 @@ const nextConfig: NextConfig = {
       "../../node_modules/tailwindcss/*.css",
       "../../node_modules/tailwindcss/package.json",
     ],
+    // The site's link preview card reads the agent logos from public/ (lib/og.tsx).
+    "/opengraph-image": ["./public/agents/*.svg"],
   },
   async rewrites() {
     return {

@@ -1,23 +1,30 @@
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
+
 import { ImageResponse } from "next/og"
 
 import { plainText, stringsFor, type Strings } from "@workspace/player"
 import type { Lesson } from "@workspace/spec"
 
-import { getLesson } from "./lessons"
-import { INSTALL_COMMAND, SITE } from "./site"
+import { AGENTS, INSTALL_COMMAND, SITE } from "./site"
 
 // Link preview images (Open Graph), drawn with next/og: the site's card, one per lesson, and one for
 // expired links. They mirror the player: a bordered window showing the lesson's first question.
+// The site's card also renders at other sizes for the files in brand/ (scripts/build-share-images.tsx).
 
 export const OG_SIZE = { width: 1200, height: 630 }
 
+export type Size = { width: number; height: number }
+
 // The dark theme's tokens, as fixed colors (next/og can't read CSS variables).
 const C = {
-  page: "#151515",
+  page: "#171717",
   window: "#1f1f1f",
   card: "#262626",
+  chip: "#303030",
   border: "#2e2e33",
   borderStrong: "#3f3f46",
+  ring: "rgba(250,250,250,0.12)",
   foreground: "#fafafa",
   body: "#d4d4d8",
   muted: "#a1a1aa",
@@ -27,10 +34,11 @@ const C = {
 
 // ---------- fonts ----------
 
-// Inter, the site's font, fetched from Google Fonts as TTF (the only format next/og reads) and kept for
-// the life of the process. If the fetch fails, next/og falls back to its bundled font.
+// The site's fonts (Inter, and Geist Mono for the chip and the command), fetched from Google Fonts as
+// TTF (the only format next/og reads) and kept for the life of the process. If the fetch fails,
+// next/og falls back to its bundled font.
 const FONT_CSS =
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600"
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@500;600"
 /** An old browser, so Google serves TTF instead of woff2. */
 const TTF_USER_AGENT =
   "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; de-at) AppleWebKit/533.21.1 (KHTML, like Gecko) Version/5.0.5 Safari/533.21.1"
@@ -47,11 +55,13 @@ function loadFonts(): Promise<Font[]> {
         headers: { "user-agent": TTF_USER_AGENT },
       }).then((r) => r.text())
       const faces = [
-        ...css.matchAll(/font-weight:\s*(400|500|600);[^}]*?url\(([^)]+)\)/g),
+        ...css.matchAll(
+          /font-family:\s*'([^']+)';[^}]*?font-weight:\s*(400|500|600);[^}]*?url\(([^)]+)\)/g
+        ),
       ]
       return await Promise.all(
-        faces.map(async ([, weight, url]) => ({
-          name: "Inter",
+        faces.map(async ([, name, weight, url]) => ({
+          name: name!,
           data: await fetch(url!).then((r) => r.arrayBuffer()),
           weight: Number(weight) as Weight,
           style: "normal" as const,
@@ -64,10 +74,10 @@ function loadFonts(): Promise<Font[]> {
   return fonts
 }
 
-async function respond(element: React.ReactElement) {
+async function respond(element: React.ReactElement, size: Size = OG_SIZE) {
   const loaded = await loadFonts()
   return new ImageResponse(element, {
-    ...OG_SIZE,
+    ...size,
     fonts: loaded.length ? loaded : undefined,
   })
 }
@@ -100,9 +110,11 @@ function Mark({
 function Page({
   children,
   dir = "ltr",
+  padding = "52px 64px",
 }: {
   children: React.ReactNode
   dir?: "ltr" | "rtl"
+  padding?: string
 }) {
   return (
     <div
@@ -110,7 +122,7 @@ function Page({
         ...column,
         width: "100%",
         height: "100%",
-        padding: "48px 64px",
+        padding,
         background: C.page,
         color: C.foreground,
         fontFamily: "Inter",
@@ -122,41 +134,34 @@ function Page({
   )
 }
 
-function Header({ end }: { end?: string }) {
+function Header({ k = 1 }: { k?: number }) {
   return (
-    <div style={{ ...row, justifyContent: "space-between" }}>
-      <div style={{ ...row, gap: 12 }}>
-        <Mark size={34} />
-        <div
-          style={{
-            display: "flex",
-            fontSize: 26,
-            fontWeight: 600,
-            letterSpacing: -0.5,
-          }}
-        >
-          {SITE.name}
-        </div>
+    <div style={{ ...row, gap: 12 * k }}>
+      <Mark size={36 * k} />
+      <div
+        style={{
+          display: "flex",
+          fontSize: 28 * k,
+          fontWeight: 600,
+          letterSpacing: -0.5 * k,
+        }}
+      >
+        {SITE.name}
       </div>
-      {end ? (
-        <div style={{ display: "flex", fontSize: 22, color: C.muted }}>
-          {end}
-        </div>
-      ) : null}
     </div>
   )
 }
 
-function Pill({ children }: { children: string }) {
+function Pill({ children, k = 1 }: { children: string; k?: number }) {
   return (
     <div
       style={{
         display: "flex",
-        padding: "8px 16px",
+        padding: `${8 * k}px ${16 * k}px`,
         borderRadius: 999,
         border: `1.5px solid ${C.borderStrong}`,
         background: C.card,
-        fontSize: 20,
+        fontSize: 20 * k,
         fontWeight: 500,
         color: C.body,
       }}
@@ -166,91 +171,143 @@ function Pill({ children }: { children: string }) {
   )
 }
 
-/** The player's progress bar: four parts, the first under way. */
-function Progress() {
+/** The install command, as the terminal line it is. */
+function Command({ k = 1 }: { k?: number }) {
   return (
-    <div style={{ ...row, gap: 6 }}>
-      <div
-        style={{
-          display: "flex",
-          width: 150,
-          height: 8,
-          borderRadius: 999,
-          background: C.border,
-        }}
-      >
+    <div
+      style={{
+        ...row,
+        alignSelf: "flex-start",
+        gap: 12 * k,
+        padding: `${12 * k}px ${20 * k}px`,
+        borderRadius: 12 * k,
+        border: `1.5px solid ${C.borderStrong}`,
+        background: C.card,
+        fontFamily: "Geist Mono",
+        fontSize: 21 * k,
+        fontWeight: 500,
+        color: C.body,
+      }}
+    >
+      <span style={{ color: C.faint }}>$</span>
+      {INSTALL_COMMAND}
+    </div>
+  )
+}
+
+/** The first few agents from the home page, as the muted marks shown there. */
+const SHOWN_AGENTS = AGENTS.slice(0, 6)
+
+/**
+ * An agent's logo as a data URL for an <img>, in the given color. The SVGs are drawn with
+ * currentColor, which an image can't inherit. Read from public/agents (traced into the image route
+ * by next.config.ts); if a file is missing, the logo is skipped.
+ */
+function agentLogo(logo: string, color: string): string | null {
+  try {
+    const svg = readFileSync(
+      join(process.cwd(), "public", "agents", `${logo}.svg`),
+      "utf8"
+    ).replaceAll("currentColor", color)
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`
+  } catch {
+    return null
+  }
+}
+
+/** A quiet row of agent marks, shown over the chat: it could be any of them. */
+function Agents({ k = 1 }: { k?: number }) {
+  const logos = SHOWN_AGENTS.map((a) => agentLogo(a.logo, C.muted)).filter(
+    (src): src is string => src !== null
+  )
+  if (!logos.length) return null
+  return (
+    <div
+      style={{ ...row, justifyContent: "center", gap: 24 * k, opacity: 0.8 }}
+    >
+      {logos.map((src, i) => (
+        <img key={i} src={src} width={26 * k} height={26 * k} alt="" />
+      ))}
+    </div>
+  )
+}
+
+/** The player's progress bar: four parts, the first under way. */
+function Progress({ k }: { k: number }) {
+  const dot = { height: 8 * k, borderRadius: 999, background: C.border }
+  return (
+    <div style={{ ...row, gap: 6 * k }}>
+      <div style={{ display: "flex", width: 150 * k, ...dot }}>
         <div
           style={{
             display: "flex",
-            width: 40,
-            height: 8,
+            width: 40 * k,
+            height: 8 * k,
             borderRadius: 999,
             background: C.primary,
           }}
         />
       </div>
       {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          style={{
-            display: "flex",
-            width: 8,
-            height: 8,
-            borderRadius: 999,
-            background: C.border,
-          }}
-        />
+        <div key={i} style={{ display: "flex", width: 8 * k, ...dot }} />
       ))}
     </div>
   )
 }
 
-/** A lesson's first question, as the player shows it: a bordered window with option rows. */
+/**
+ * A lesson's first question, as the player shows it: a bordered window with option rows.
+ * `k` scales every measure, so the same window fits a 630px card and a 1080px square.
+ */
 function Window({
   prompt,
   options,
   t,
+  k = 1,
+  width = 420,
 }: {
   prompt: string
   options: string[]
   t: Strings
+  k?: number
+  width?: number
 }) {
   return (
     <div
       style={{
         ...column,
-        width: 440,
-        padding: 28,
-        gap: 22,
-        borderRadius: 24,
+        width,
+        padding: 26 * k,
+        gap: 20 * k,
+        borderRadius: 28 * k,
         border: `1.5px solid ${C.borderStrong}`,
         background: C.window,
-        boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
+        boxShadow: "0 16px 40px rgba(0,0,0,0.35)",
       }}
     >
-      <Progress />
+      <Progress k={k} />
       <div
         style={{
           display: "flex",
-          fontSize: 22,
+          fontSize: 22 * k,
           fontWeight: 600,
           lineHeight: 1.3,
-          letterSpacing: -0.3,
-          lineClamp: 2,
+          letterSpacing: -0.3 * k,
+          lineClamp: 3,
         }}
       >
         {prompt}
       </div>
-      <div style={{ ...column, gap: 10 }}>
+      <div style={{ ...column, gap: 10 * k }}>
         {options.map((text, i) => (
           <div
             key={i}
             style={{
               ...row,
               justifyContent: "space-between",
-              gap: 12,
-              padding: "12px 14px",
-              borderRadius: 10,
+              gap: 12 * k,
+              padding: `${11 * k}px ${14 * k}px`,
+              borderRadius: 10 * k,
               border: `1.5px solid ${C.border}`,
               background: C.card,
             }}
@@ -258,7 +315,7 @@ function Window({
             <div
               style={{
                 display: "flex",
-                fontSize: 18,
+                fontSize: 18 * k,
                 fontWeight: 500,
                 color: C.body,
                 lineClamp: 1,
@@ -270,11 +327,11 @@ function Window({
               style={{
                 ...row,
                 justifyContent: "center",
-                width: 24,
-                height: 24,
-                borderRadius: 6,
+                width: 24 * k,
+                height: 24 * k,
+                borderRadius: 6 * k,
                 border: `1px solid ${C.borderStrong}`,
-                fontSize: 13,
+                fontSize: 13 * k,
                 color: C.muted,
               }}
             >
@@ -287,11 +344,11 @@ function Window({
         style={{
           display: "flex",
           alignSelf: "flex-start",
-          padding: "9px 16px",
-          borderRadius: 8,
+          padding: `${9 * k}px ${16 * k}px`,
+          borderRadius: 8 * k,
           background: C.primary,
           color: C.page,
-          fontSize: 16,
+          fontSize: 16 * k,
           fontWeight: 600,
         }}
       >
@@ -315,7 +372,7 @@ function peek(lesson: Lesson) {
 function Headline({
   title,
   text,
-  size = 60,
+  size = 64,
 }: {
   title: string
   text?: string
@@ -352,39 +409,214 @@ function Headline({
   )
 }
 
-// ---------- cards ----------
+/** The hero's headline, "Vibe learn [anything] with your agent", the word in the hero's pill. */
+function Tagline({ size }: { size: number }) {
+  const text = {
+    display: "flex",
+    fontSize: size,
+    fontWeight: 600,
+    lineHeight: 1.05,
+    letterSpacing: -size * 0.035,
+    whiteSpace: "nowrap",
+  } as const
+  return (
+    <div style={{ ...column, alignItems: "flex-start", gap: size * 0.1 }}>
+      <div style={text}>Vibe learn</div>
+      <div
+        style={{
+          ...text,
+          padding: `${size * 0.08}px ${size * 0.14}px`,
+          borderRadius: size * 0.2,
+          background: C.chip,
+          border: `2px solid ${C.ring}`,
+          fontFamily: "Geist Mono",
+          letterSpacing: -size * 0.02,
+        }}
+      >
+        anything
+      </div>
+      <div style={text}>with your agent</div>
+    </div>
+  )
+}
 
-/** The site's card: the tagline beside one of the example lessons. */
-export function siteImage() {
-  const t = stringsFor("en")
-  const example = getLesson("compound-interest")
-  const shown = example ? peek(example) : null
-  return respond(
-    <Page>
-      <Header />
-      <div style={{ ...row, flex: 1, gap: 56 }}>
-        <div style={{ ...column, flex: 1, gap: 32 }}>
-          <Headline title={SITE.tagline} size={64} />
+/** The lesson the site's card pretends to have made. */
+const EXAMPLE = {
+  ask: "How can I get started with vibe coding?",
+  reply: "I made you a short lesson to get you started:",
+  title: "How vibe coding works",
+  link: "learn.ninja/l/vibe-coding-k3x9a2mq",
+  minutes: 6,
+  level: "beginner",
+} as const
+
+/**
+ * The ask and the answer: you tell your agent what to teach, it replies with the lesson's link.
+ * `k` scales every measure.
+ */
+function Chat({
+  t,
+  k = 1,
+  width = 420,
+}: {
+  t: Strings
+  k?: number
+  width?: number
+}) {
+  const facts = [t.minutes(EXAMPLE.minutes), t.levels[EXAMPLE.level]]
+  return (
+    <div
+      style={{
+        ...column,
+        width,
+        gap: 22 * k,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div
+          style={{
+            display: "flex",
+            maxWidth: 400 * k,
+            padding: `${12 * k}px ${16 * k}px`,
+            borderRadius: 18 * k,
+            borderBottomRightRadius: 6 * k,
+            border: `1.5px solid ${C.border}`,
+            background: C.card,
+            fontSize: 17 * k,
+            fontWeight: 500,
+            lineHeight: 1.35,
+          }}
+        >
+          {EXAMPLE.ask}
+        </div>
+      </div>
+      <div style={{ ...column, gap: 14 * k }}>
+        <div
+          style={{
+            display: "flex",
+            fontSize: 17 * k,
+            lineHeight: 1.35,
+            color: C.body,
+          }}
+        >
+          {EXAMPLE.reply}
+        </div>
+        <div
+          style={{
+            ...column,
+            maxWidth: 520 * k,
+            gap: 16 * k,
+            padding: 20 * k,
+            borderRadius: 16 * k,
+            border: `1.5px solid ${C.border}`,
+            background: C.card,
+          }}
+        >
+          <div style={{ ...row, gap: 8 * k }}>
+            <Mark size={18 * k} color={C.muted} />
+            <div
+              style={{
+                display: "flex",
+                fontFamily: "Geist Mono",
+                fontSize: 13 * k,
+                color: C.muted,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {EXAMPLE.link}
+            </div>
+          </div>
           <div
             style={{
-              ...row,
-              alignSelf: "flex-start",
-              gap: 12,
-              padding: "12px 20px",
-              borderRadius: 10,
-              border: `1.5px solid ${C.borderStrong}`,
-              background: C.card,
-              fontSize: 22,
-              color: C.body,
+              display: "flex",
+              fontSize: 20 * k,
+              fontWeight: 600,
+              lineHeight: 1.25,
+              letterSpacing: -0.3 * k,
+              lineClamp: 2,
             }}
           >
-            <span style={{ color: C.faint }}>$</span>
-            {INSTALL_COMMAND}
+            {EXAMPLE.title}
+          </div>
+          <div style={{ ...row, gap: 10 * k }}>
+            {facts.map((f) => (
+              <Pill key={f} k={0.8 * k}>
+                {f}
+              </Pill>
+            ))}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignSelf: "flex-start",
+              marginTop: 4 * k,
+              padding: `${10 * k}px ${16 * k}px`,
+              borderRadius: 8 * k,
+              background: C.primary,
+              color: C.page,
+              fontSize: 15 * k,
+              fontWeight: 600,
+            }}
+          >
+            {t.start}
           </div>
         </div>
-        {shown ? <Window {...shown} t={t} /> : null}
       </div>
-    </Page>
+    </div>
+  )
+}
+
+/** The agent marks over the chat. */
+function Demo({ k, width }: { k: number; width: number }) {
+  const t = stringsFor("en")
+  return (
+    <div style={{ ...column, alignItems: "center", gap: 20 * k }}>
+      <Agents k={k} />
+      <Chat t={t} k={k} width={width} />
+    </div>
+  )
+}
+
+// ---------- cards ----------
+
+/**
+ * The site's card: the tagline beside the ask-and-answer chat. Wide sizes put the chat beside the
+ * tagline; a square stacks them.
+ */
+export function siteImage(size: Size = OG_SIZE) {
+  const aspect = size.width / size.height
+  const stacked = aspect < 1.4
+  const banner = aspect > 2.5
+  const k = size.width / 1200
+
+  if (stacked) {
+    return respond(
+      <Page padding={`${60 * k}px ${72 * k}px`}>
+        <Header k={k} />
+        <div
+          style={{ ...column, flex: 1, justifyContent: "center", gap: 44 * k }}
+        >
+          <Tagline size={76 * k} />
+          <Demo k={1.3 * k} width={size.width - 144 * k} />
+          <Command k={k} />
+        </div>
+      </Page>,
+      size
+    )
+  }
+
+  return respond(
+    <Page padding={banner ? "40px 72px" : `${48 * k}px ${56 * k}px`}>
+      <Header k={banner ? 1 : k} />
+      <div style={{ ...row, flex: 1, gap: 40 * k }}>
+        <div style={{ ...column, flex: 1, gap: 32 * k }}>
+          <Tagline size={banner ? 60 : 64 * k} />
+          <Command k={banner ? 1 : k} />
+        </div>
+        <Demo k={banner ? 1.05 : 1.18 * k} width={banner ? 440 : 500 * k} />
+      </div>
+    </Page>,
+    size
   )
 }
 

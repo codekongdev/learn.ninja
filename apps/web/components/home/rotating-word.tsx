@@ -40,7 +40,7 @@ export function RotatingWord({
   }, [index])
 
   return (
-    <span className="inline-flex rounded-lg bg-muted px-2 ring-1 ring-foreground/10">
+    <span className="inline-flex rounded-lg bg-muted px-2 font-mono tracking-normal ring-1 ring-foreground/10">
       <span
         className="relative inline-flex overflow-x-clip transition-[width] duration-500 ease-out"
         style={{ width }}
