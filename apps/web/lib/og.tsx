@@ -34,7 +34,7 @@ const C = {
 
 // ---------- fonts ----------
 
-// The site's fonts (Inter, and Geist Mono for the chip and the command), fetched from Google Fonts as
+// The site's fonts (Inter, and Geist Mono for the tagline and the command), fetched from Google Fonts as
 // TTF (the only format next/og reads) and kept for the life of the process. If the fetch fails,
 // next/og falls back to its bundled font.
 const FONT_CSS =
@@ -416,8 +416,9 @@ function Tagline({ size }: { size: number }) {
     fontSize: size,
     fontWeight: 600,
     lineHeight: 1.05,
-    letterSpacing: -size * 0.035,
+    letterSpacing: -size * 0.02,
     whiteSpace: "nowrap",
+    fontFamily: "Geist Mono",
   } as const
   return (
     <div style={{ ...column, alignItems: "flex-start", gap: size * 0.1 }}>
@@ -429,8 +430,6 @@ function Tagline({ size }: { size: number }) {
           borderRadius: size * 0.2,
           background: C.chip,
           border: `2px solid ${C.ring}`,
-          fontFamily: "Geist Mono",
-          letterSpacing: -size * 0.02,
         }}
       >
         anything
