@@ -8,12 +8,12 @@ import type { ExploreApi } from "@/lib/explore/browser"
 import type { LessonSummary } from "@/lib/explore/queries"
 
 import { ExploreTabs } from "./explore-tabs"
-import { LessonCard } from "./lesson-card"
 import { LessonFeed } from "./lesson-feed"
+import { LessonRow } from "./lesson-row"
 import { LikeButton } from "./like-button"
 import { ReportDialog } from "./report-dialog"
 
-// Explore's cards and controls with a fake server: likes go through, a report with "fail" in it
+// Explore's rows and controls with a fake server: likes go through, a report with "fail" in it
 // fails, and listing a lesson whose title has "fail" in it is refused.
 
 const wait = (ms = 400) => new Promise((r) => setTimeout(r, ms))
@@ -138,38 +138,44 @@ type Story = StoryObj
 const signedOut = { signedIn: false, liked: new Set<string>() }
 const signedIn = { signedIn: true, liked: new Set(["k3x9a2mq"]) }
 
-export const Card: Story = {
+export const Row: Story = {
   render: () => (
-    <div className="mx-auto max-w-sm">
-      <LessonCard lesson={LESSONS[0]!} viewer={signedOut} />
+    <div className="mx-auto max-w-2xl">
+      <LessonRow lesson={LESSONS[0]!} viewer={signedOut} />
     </div>
   ),
 }
 
-export const CardStates: Story = {
-  name: "Card states",
+export const RowStates: Story = {
+  name: "Row states",
   render: () => (
-    <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-      <Labeled label="Read-only (home page strip)">
-        <LessonCard lesson={LESSONS[0]!} />
+    <div className="grid max-w-5xl gap-x-8 gap-y-4 sm:grid-cols-2">
+      <Labeled label="Read-only (home page)">
+        <LessonRow lesson={LESSONS[0]!} />
       </Labeled>
       <Labeled label="Signed out: pressing the heart asks to sign in">
-        <LessonCard lesson={LESSONS[0]!} viewer={signedOut} />
+        <LessonRow lesson={LESSONS[0]!} viewer={signedOut} />
       </Labeled>
       <Labeled label="Signed in, liked">
-        <LessonCard lesson={LESSONS[0]!} viewer={signedIn} />
+        <LessonRow lesson={LESSONS[0]!} viewer={signedIn} />
       </Labeled>
       <Labeled label="Signed in, not liked">
-        <LessonCard lesson={LESSONS[1]!} viewer={signedIn} />
+        <LessonRow lesson={LESSONS[1]!} viewer={signedIn} />
       </Labeled>
       <Labeled label="No topic, big numbers">
-        <LessonCard lesson={LESSONS[5]!} viewer={signedIn} />
+        <LessonRow lesson={LESSONS[5]!} viewer={signedIn} />
       </Labeled>
       <Labeled label="Owner has no handle yet">
-        <LessonCard lesson={LESSONS[4]!} viewer={signedIn} />
+        <LessonRow lesson={LESSONS[4]!} viewer={signedIn} />
       </Labeled>
       <Labeled label="Right-to-left lesson">
-        <LessonCard lesson={LESSONS[3]!} viewer={signedIn} />
+        <LessonRow lesson={LESSONS[3]!} viewer={signedIn} />
+      </Labeled>
+      <Labeled label="Ranked (Top tab)">
+        <LessonRow lesson={LESSONS[5]!} viewer={signedIn} rank={1} />
+      </Labeled>
+      <Labeled label="On a profile: no author">
+        <LessonRow lesson={LESSONS[0]!} viewer={signedIn} showAuthor={false} />
       </Labeled>
     </div>
   ),
@@ -178,8 +184,22 @@ export const CardStates: Story = {
 export const Feed: Story = {
   render: () => (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">
-      <ExploreTabs sort="trending" />
+      <ExploreTabs sort="new" />
       <LessonFeed lessons={LESSONS} viewer={signedIn} />
+    </div>
+  ),
+}
+
+export const FeedTop: Story = {
+  name: "Feed, Top tab (ranked)",
+  render: () => (
+    <div className="mx-auto flex max-w-2xl flex-col gap-8">
+      <ExploreTabs sort="top" />
+      <LessonFeed
+        lessons={[...LESSONS].sort((a, b) => b.likes - a.likes)}
+        viewer={signedIn}
+        ranked
+      />
     </div>
   ),
 }

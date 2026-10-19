@@ -98,6 +98,7 @@ export default async function ProfilePage({ params }: Props) {
           <LessonFeed
             lessons={profile.lessons}
             viewer={{ signedIn: actor !== null, liked }}
+            showAuthor={false}
           />
         ) : (
           <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">

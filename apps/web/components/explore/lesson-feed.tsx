@@ -2,23 +2,35 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { LessonSummary } from "@/lib/explore/queries"
 
-import { LessonCard, type Viewer } from "./lesson-card"
+import { LessonRow, type Viewer } from "./lesson-row"
 
-/** The feed: cards stacked in one column, newest or best first, read by scrolling. */
+/**
+ * The feed: one row per lesson between hairlines, newest or best first, read by scrolling.
+ * `ranked` numbers the rows (the Top tab); `showAuthor={false}` drops the handle (profiles).
+ */
 export function LessonFeed({
   lessons,
   viewer,
+  ranked = false,
+  showAuthor = true,
   className,
 }: {
   lessons: LessonSummary[]
   viewer?: Viewer
+  ranked?: boolean
+  showAuthor?: boolean
   className?: string
 }) {
   return (
-    <ul className={cn("flex flex-col gap-4", className)}>
-      {lessons.map((lesson) => (
-        <li key={lesson.id} className="flex">
-          <LessonCard lesson={lesson} viewer={viewer} className="flex-1" />
+    <ul className={cn("flex flex-col divide-y", className)}>
+      {lessons.map((lesson, i) => (
+        <li key={lesson.id} className="flex flex-col">
+          <LessonRow
+            lesson={lesson}
+            viewer={viewer}
+            rank={ranked ? i + 1 : undefined}
+            showAuthor={showAuthor}
+          />
         </li>
       ))}
     </ul>
