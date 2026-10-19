@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import type { KeySummary } from "@/lib/auth/account"
 import type { AccountApi } from "@/lib/auth/browser"
+import { SiteHeader } from "@/components/site/site-header"
 
-import { AccountLink } from "./account-link"
 import { ApiKeys } from "./api-keys"
 import { HandleForm } from "./handle-form"
 import { KeepForm, type KeepResult } from "./keep-form"
@@ -170,12 +170,14 @@ export const KeepFails: Story = {
 }
 
 export const HeaderLinks: Story = {
-  name: "Header link states",
+  name: "Header states",
   render: () => (
-    <div className="flex flex-col items-start gap-2">
-      <AccountLink handle={null} />
-      <AccountLink handle="" />
-      <AccountLink handle="ada-lovelace" />
+    // Signed out, signed in without a handle, signed in: Explore only shows for visitors, and
+    // the wordmark links there once signed in.
+    <div className="flex flex-col gap-2 [&_header]:static">
+      <SiteHeader handle={null} />
+      <SiteHeader handle="" />
+      <SiteHeader handle="ada-lovelace" />
     </div>
   ),
 }

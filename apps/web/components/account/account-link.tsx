@@ -9,20 +9,18 @@ import { ButtonLink } from "@/components/site/button-link"
 import { forgetAccount, readAccount, rememberAccount } from "@/lib/auth/browser"
 
 /**
- * The header's account control: "Sign in", or the handle once signed in (read from the marker
- * cookie, so static pages need no session request). Pages that know the session pass `handle` to
- * correct the marker.
+ * What the header knows about the visitor: the handle, "1" for a signed-in user without one,
+ * null when nobody is signed in, or undefined until the marker cookie has been read.
  */
-export function AccountLink({
-  handle,
-  className,
-}: {
-  /** The signed-in user's handle, "" for a user without one, null when nobody is signed in, or undefined when the page doesn't know. */
-  handle?: string | null
-  className?: string
-}) {
-  // The handle, "1" for a signed-in user without one, null when signed out, undefined until known.
-  const [account, setAccount] = React.useState<string | null | undefined>(
+export type Account = string | null | undefined
+
+/**
+ * The visitor's account, from the marker cookie (so static pages need no session request).
+ * Pages that checked the session pass `handle` to correct the marker: the handle, "" for a user
+ * without one, or null when nobody is signed in.
+ */
+export function useAccount(handle?: string | null): Account {
+  const [account, setAccount] = React.useState<Account>(
     handle === undefined ? undefined : handle === null ? null : handle || "1"
   )
   React.useEffect(() => {
@@ -30,7 +28,17 @@ export function AccountLink({
     else if (handle === null) forgetAccount()
     else rememberAccount(handle || null)
   }, [handle])
+  return account
+}
 
+/** The header's account control: "Sign in", or the handle once signed in. */
+export function AccountLink({
+  account,
+  className,
+}: {
+  account: Account
+  className?: string
+}) {
   // Until the cookie is read (after hydration), an invisible "Sign in" holds the space so the
   // header doesn't shift for the many visitors who aren't signed in.
   if (account === null || account === undefined) {
