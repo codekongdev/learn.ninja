@@ -5,12 +5,14 @@ import type { AccountApi } from "@/lib/auth/browser"
 import { SiteHeader } from "@/components/site/site-header"
 
 import { ApiKeys } from "./api-keys"
+import { AvatarForm } from "./avatar-form"
 import { HandleForm } from "./handle-form"
 import { KeepForm, type KeepResult } from "./keep-form"
 import { SignInForm } from "./sign-in-form"
 import { SignOutButton } from "./sign-out-button"
 
-// The account screens with a fake server: any code "123456" works, the handle "taken" is taken.
+// The account screens with a fake server: any code "123456" works, the handle "taken" is taken,
+// and a picture named "big" is refused by the server (the browser refuses real oversized files first).
 
 const wait = (ms = 400) => new Promise((r) => setTimeout(r, ms))
 
@@ -22,7 +24,7 @@ const fakeApi = (over: Partial<AccountApi> = {}): AccountApi => ({
   async verifyCode(_email, code) {
     await wait()
     return code === "123456"
-      ? { handle: null }
+      ? { account: { handle: null, image: null } }
       : { error: "That code isn't right. 2 tries left." }
   },
   async signInWithGitHub() {
@@ -34,6 +36,16 @@ const fakeApi = (over: Partial<AccountApi> = {}): AccountApi => ({
     return handle === "taken"
       ? { error: "Someone already has that handle." }
       : { handle }
+  },
+  async uploadAvatar(file) {
+    await wait(800)
+    return file.name.startsWith("big")
+      ? { error: "That picture is over 5 MB. Choose a smaller one." }
+      : { image: URL.createObjectURL(file) }
+  },
+  async removeAvatar() {
+    await wait()
+    return {}
   },
   async signOut() {
     await wait()
@@ -119,7 +131,9 @@ export const SignInWithHandle: Story = {
       github
       callback="/settings"
       api={fakeApi({
-        verifyCode: async () => ({ handle: "ada" }),
+        verifyCode: async () => ({
+          account: { handle: "ada", image: PICTURE },
+        }),
       })}
       navigate={navigate}
     />
@@ -128,6 +142,27 @@ export const SignInWithHandle: Story = {
 
 export const Handle: Story = {
   render: () => <HandleForm initial="ada" api={fakeApi()} />,
+}
+
+/** A stand-in picture: a two-tone SVG, so the story needs no file. */
+const PICTURE =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#2563eb"/><circle cx="32" cy="26" r="12" fill="#fff"/><path d="M10 60c2-14 12-20 22-20s20 6 22 20z" fill="#fff"/></svg>'
+  )
+
+export const Picture: Story = {
+  render: () => <AvatarForm initial={PICTURE} handle="ada" api={fakeApi()} />,
+}
+
+export const PictureNone: Story = {
+  name: "Picture, none yet",
+  render: () => <AvatarForm initial={null} handle="ada" api={fakeApi()} />,
+}
+
+export const PictureNoHandle: Story = {
+  name: "Picture, no handle either",
+  render: () => <AvatarForm initial={null} handle={null} api={fakeApi()} />,
 }
 
 export const HandleNew: Story = {
@@ -172,12 +207,13 @@ export const KeepFails: Story = {
 export const HeaderLinks: Story = {
   name: "Header states",
   render: () => (
-    // Signed out, signed in without a handle, signed in: Explore only shows for visitors, and
-    // the wordmark links there once signed in.
+    // Signed out, signed in without a handle, signed in with and without a picture: Explore only
+    // shows for visitors, and the wordmark links there once signed in.
     <div className="flex flex-col gap-2 [&_header]:static">
-      <SiteHeader handle={null} />
-      <SiteHeader handle="" />
-      <SiteHeader handle="ada-lovelace" />
+      <SiteHeader account={null} />
+      <SiteHeader account={{ handle: null, image: null }} />
+      <SiteHeader account={{ handle: "ada-lovelace", image: null }} />
+      <SiteHeader account={{ handle: "ada-lovelace", image: PICTURE }} />
     </div>
   ),
 }

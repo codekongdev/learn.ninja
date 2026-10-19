@@ -1,20 +1,21 @@
 import { SiteFooter } from "@/components/site/site-footer"
 import { SiteHeader } from "@/components/site/site-header"
+import type { AccountInfo } from "@/lib/auth/account-info"
 
 /** The frame for the sign-in, settings, and keep pages: a narrow centered column. */
 export function AccountPage({
-  handle,
+  account,
   wide = false,
   children,
 }: {
-  /** The signed-in user's handle, "" without one, or null when nobody is signed in. */
-  handle: string | null
+  /** The signed-in user, or null when nobody is signed in. */
+  account: AccountInfo | null
   wide?: boolean
   children: React.ReactNode
 }) {
   return (
     <div className="flex min-h-svh flex-col">
-      <SiteHeader handle={handle} />
+      <SiteHeader account={account} />
       <main
         className={
           wide

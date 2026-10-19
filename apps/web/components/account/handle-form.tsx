@@ -48,7 +48,7 @@ export function HandleForm({
     setValue(result.handle)
     setSaved(result.handle)
     setDone(true)
-    rememberAccount(result.handle)
+    rememberAccount({ handle: result.handle })
     onSaved?.(result.handle)
   }
 

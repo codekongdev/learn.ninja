@@ -25,7 +25,7 @@ export default async function SignInPage({
   const callback = safeCallback((await searchParams).callback)
   if (await currentActor()) redirect(callback)
   return (
-    <AccountPage handle={null}>
+    <AccountPage account={null}>
       <SignInForm github={githubFromEnv() !== null} callback={callback} />
     </AccountPage>
   )

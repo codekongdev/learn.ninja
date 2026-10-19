@@ -3,6 +3,7 @@
 import { cn } from "@workspace/ui/lib/utils"
 
 import { AccountLink, useAccount } from "@/components/account/account-link"
+import type { AccountInfo } from "@/lib/auth/account-info"
 
 import { ButtonLink } from "./button-link"
 import { Wordmark } from "./wordmark"
@@ -11,7 +12,7 @@ import { Wordmark } from "./wordmark"
  * The bar at the top of every page. Visitors get Explore · Docs · Sign in and a wordmark that
  * links home; once signed in, Explore is home, so the wordmark goes there and the links are Docs
  * and the account. `start` adds page-specific controls before the wordmark (the docs menu),
- * `action` a button after it (copy prompt). `handle` is what a page that checked the session
+ * `action` a button after it (copy prompt). `account` is what a page that checked the session
  * knows about the user; static pages leave it out and the marker cookie decides after hydration.
  * Until then Explore is kept but invisible, like "Sign in", so the header doesn't shift for the
  * many visitors who aren't signed in.
@@ -19,13 +20,14 @@ import { Wordmark } from "./wordmark"
 export function SiteHeader({
   start,
   action,
-  handle,
+  account: known,
 }: {
   start?: React.ReactNode
   action?: React.ReactNode
-  handle?: string | null
+  /** The signed-in user, or null when nobody is. */
+  account?: AccountInfo | null
 }) {
-  const account = useAccount(handle)
+  const account = useAccount(known)
   const visitor = account === null || account === undefined
   return (
     <header className="sticky top-0 z-40 bg-background/90 backdrop-blur supports-backdrop-filter:bg-background/70">

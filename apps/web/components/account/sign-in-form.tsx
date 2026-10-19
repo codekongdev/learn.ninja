@@ -13,6 +13,7 @@ import {
 import { Label } from "@workspace/ui/components/label"
 
 import { GitHubLogo } from "@/components/site/social-icons"
+import type { AccountInfo } from "@/lib/auth/account-info"
 import { accountApi, rememberAccount, type AccountApi } from "@/lib/auth/browser"
 
 import { HandleForm } from "./handle-form"
@@ -43,8 +44,10 @@ export function SignInForm({
   const [busy, setBusy] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
+  const [account, setAccount] = React.useState<AccountInfo | null>(null)
+
   const finish = (handle: string | null) => {
-    rememberAccount(handle)
+    rememberAccount({ handle, image: account?.image ?? null })
     navigate(callback)
   }
 
@@ -69,7 +72,8 @@ export function SignInForm({
       setCode("")
       return setError(result.error)
     }
-    if (result.handle) finish(result.handle)
+    setAccount(result.account ?? null)
+    if (result.account?.handle) finish(result.account.handle)
     else setStep("handle")
   }
 

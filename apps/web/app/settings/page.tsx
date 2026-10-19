@@ -4,11 +4,13 @@ import { redirect } from "next/navigation"
 
 import { AccountPage } from "@/components/account/account-page"
 import { ApiKeys } from "@/components/account/api-keys"
+import { AvatarForm } from "@/components/account/avatar-form"
 import { HandleForm } from "@/components/account/handle-form"
 import { SignOutButton } from "@/components/account/sign-out-button"
 import { YourLessons } from "@/components/account/your-lessons"
 import { ButtonLink } from "@/components/site/button-link"
 import { listKeys } from "@/lib/auth/account"
+import { accountOf } from "@/lib/auth/account-info"
 import { getAuth } from "@/lib/auth/auth"
 import { currentActor } from "@/lib/auth/session"
 import type { KeySummary } from "@/lib/auth/account"
@@ -24,7 +26,7 @@ export const metadata: Metadata = {
 // exist on a build machine.
 export const dynamic = "force-dynamic"
 
-/** The account: handle, API keys, and sign out. */
+/** The account: picture, handle, lessons, API keys, and sign out. */
 export default async function SettingsPage() {
   const actor = await currentActor()
   if (!actor) redirect("/sign-in?callback=/settings")
@@ -35,7 +37,7 @@ export default async function SettingsPage() {
     lessonsOwnedBy(await getDb(), actor.userId),
   ])
   return (
-    <AccountPage handle={actor.handle ?? ""} wide>
+    <AccountPage account={accountOf(actor)} wide>
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
@@ -46,6 +48,11 @@ export default async function SettingsPage() {
           .
         </p>
       </div>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xl font-semibold tracking-tight">Picture</h2>
+        <AvatarForm initial={actor.image} handle={actor.handle} />
+      </section>
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2">

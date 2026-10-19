@@ -1,37 +1,49 @@
 "use client"
 
 import * as React from "react"
-import { UserRoundIcon } from "lucide-react"
+import Link from "next/link"
 
 import { cn } from "@workspace/ui/lib/utils"
 
 import { ButtonLink } from "@/components/site/button-link"
-import { forgetAccount, readAccount, rememberAccount } from "@/lib/auth/browser"
+import type { AccountInfo } from "@/lib/auth/account-info"
+import {
+  ACCOUNT_EVENT,
+  forgetAccount,
+  readAccount,
+  rememberAccount,
+} from "@/lib/auth/browser"
+
+import { UserAvatar } from "./user-avatar"
 
 /**
- * What the header knows about the visitor: the handle, "1" for a signed-in user without one,
- * null when nobody is signed in, or undefined until the marker cookie has been read.
+ * What the header knows about the visitor: the signed-in user's handle and picture, null when
+ * nobody is signed in, or undefined until the marker cookie has been read.
  */
-export type Account = string | null | undefined
+export type Account = AccountInfo | null | undefined
 
 /**
  * The visitor's account, from the marker cookie (so static pages need no session request).
- * Pages that checked the session pass `handle` to correct the marker: the handle, "" for a user
- * without one, or null when nobody is signed in.
+ * Pages that checked the session pass `known` to correct the marker: the account, or null when
+ * nobody is signed in. Changes made on the page (a new picture, signing out) come through
+ * ACCOUNT_EVENT, so the header follows without a reload.
  */
-export function useAccount(handle?: string | null): Account {
-  const [account, setAccount] = React.useState<Account>(
-    handle === undefined ? undefined : handle === null ? null : handle || "1"
-  )
+export function useAccount(known?: AccountInfo | null): Account {
+  const [account, setAccount] = React.useState<Account>(known)
   React.useEffect(() => {
-    if (handle === undefined) setAccount(readAccount())
-    else if (handle === null) forgetAccount()
-    else rememberAccount(handle || null)
-  }, [handle])
+    if (known === undefined) setAccount(readAccount())
+    else if (known === null) forgetAccount()
+    else rememberAccount(known)
+  }, [known])
+  React.useEffect(() => {
+    const sync = () => setAccount(readAccount())
+    window.addEventListener(ACCOUNT_EVENT, sync)
+    return () => window.removeEventListener(ACCOUNT_EVENT, sync)
+  }, [])
   return account
 }
 
-/** The header's account control: "Sign in", or the handle once signed in. */
+/** The header's account control: "Sign in", or the profile picture once signed in, linking to settings. */
 export function AccountLink({
   account,
   className,
@@ -54,22 +66,18 @@ export function AccountLink({
       </ButtonLink>
     )
   }
+  const name = account.handle ? `@${account.handle}` : "Account"
   return (
-    <ButtonLink
+    <Link
       href="/settings"
-      variant="ghost"
-      size="sm"
-      className={className}
-      aria-label={account === "1" ? "Account settings" : undefined}
-    >
-      <UserRoundIcon data-icon="inline-start" />
-      {account === "1" ? (
-        <span className="max-sm:sr-only">Account</span>
-      ) : (
-        <bdi dir="ltr" className="max-sm:sr-only">
-          @{account}
-        </bdi>
+      aria-label={`${name}: settings`}
+      title={name}
+      className={cn(
+        "ms-1 flex size-8 shrink-0 items-center justify-center rounded-full outline-none hover:opacity-90 focus-visible:ring-3 focus-visible:ring-ring/50",
+        className
       )}
-    </ButtonLink>
+    >
+      <UserAvatar image={account.image} handle={account.handle} size="header" />
+    </Link>
   )
 }

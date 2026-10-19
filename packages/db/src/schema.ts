@@ -1,5 +1,6 @@
 import {
   boolean,
+  customType,
   index,
   integer,
   jsonb,
@@ -18,6 +19,21 @@ import {
 export const visibility = pgEnum("visibility", ["public", "unlisted", "team"])
 
 const time = (name: string) => timestamp(name, { withTimezone: true })
+
+/**
+ * Raw bytes. Handed to the driver as a Buffer, which Neon over HTTP and PGlite both encode for a
+ * bytea parameter; read back as whatever the driver returns (a Buffer, a Uint8Array, or hex text).
+ */
+const bytea = customType<{ data: Uint8Array; driverData: unknown }>({
+  dataType: () => "bytea",
+  toDriver: (value) => Buffer.from(value),
+  fromDriver: (value) => {
+    if (value instanceof Uint8Array) return value
+    if (typeof value === "string" && value.startsWith("\\x"))
+      return Buffer.from(value.slice(2), "hex")
+    throw new TypeError("Unexpected bytea value from the driver")
+  },
+})
 
 // ---------- accounts ----------
 // Better Auth owns user, session, account, verification, and apikey: the property names are the
@@ -137,6 +153,24 @@ export const apikey = pgTable(
     index("apikey_reference_id_idx").on(t.referenceId),
     index("apikey_config_id_idx").on(t.configId),
   ]
+)
+
+/**
+ * A profile picture, as uploaded through settings and resized to one small WebP. Each upload gets
+ * a fresh id, so its URL (/avatars/{id}, kept in user.image) can be cached forever; replacing or
+ * removing the picture deletes the row.
+ */
+export const avatar = pgTable(
+  "avatar",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    data: bytea("data").notNull(),
+    createdAt: time("created_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("avatar_user_id_idx").on(t.userId)]
 )
 
 // ---------- lessons ----------

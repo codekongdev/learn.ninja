@@ -93,7 +93,14 @@ GET /api/account
 x-api-key: <key>
 ```
 
-Returns `{ "ok": true, "email": "…", "handle": "…", "name": "…" }` for the key's account (`learn whoami`). `PATCH /api/account` with `{ "handle": "…" }` sets the handle: 3 to 30 lowercase letters, numbers, and hyphens.
+Returns `{ "ok": true, "email": "…", "handle": "…", "name": "…", "image": "…" }` for the key's account (`learn whoami`); `image` is the profile picture's URL, or null. `PATCH /api/account` with `{ "handle": "…" }` sets the handle: 3 to 30 lowercase letters, numbers, and hyphens.
+
+```http
+POST /api/account/avatar
+DELETE /api/account/avatar
+```
+
+Set or remove the profile picture. `POST` takes multipart form data with the picture in a `file` field: PNG, JPEG, WebP, or GIF, up to 5 MB (`413 file_too_large` and `415 unsupported_type` otherwise). The picture is cropped to a square, resized to 256 pixels, and served as WebP at the URL the reply's `image` gives; 20 uploads an hour per account.
 
 ```http
 GET /api/keys

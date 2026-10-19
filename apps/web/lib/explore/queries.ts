@@ -172,6 +172,7 @@ export interface Profile {
   id: string
   handle: string
   name: string
+  image: string | null
   bio: string | null
   joinedAt: number
   /** The person's listed lessons, newest first. */
@@ -192,6 +193,7 @@ export async function profileByHandle(
       id: user.id,
       handle: user.handle,
       name: user.name,
+      image: user.image,
       bio: user.bio,
       createdAt: user.createdAt,
     })
@@ -209,6 +211,7 @@ export async function profileByHandle(
     id: person.id,
     handle: person.handle,
     name: person.name,
+    image: person.image,
     bio: person.bio,
     joinedAt: person.createdAt.getTime(),
     lessons,
