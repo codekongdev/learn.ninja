@@ -50,6 +50,7 @@ export default async function ExplorePage({
           <LessonFeed
             lessons={lessons}
             viewer={{ signedIn: actor !== null, liked }}
+            ranked={sort === "top"}
           />
         ) : (
           <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
