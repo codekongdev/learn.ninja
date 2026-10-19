@@ -65,9 +65,9 @@ ${SITE.name} is a skill for AI agents. The agent turns what the user gives it (a
 ${INSTALL_COMMAND}
 \`\`\`
 
-Then read the skill's SKILL.md and follow it: write the lesson, run \`validate\` until it passes, then \`publish\`, and give the user the link.
+Then read the skill's SKILL.md and follow it: write the lesson, run \`validate\` until it passes, then \`publish\`, and give the user the link. Lessons are free and need no account. They last 7 days, or forever once the user keeps them in an account (\`learn login\`, which the steps describe; offer it once, in one sentence). Kept lessons are link-only until their owner lists them in Explore (${SITE.url}/explore) from their settings.
 
-No shell (a chat app, or a locked-down host)? Connect to the MCP server at ${MCP_URL} instead: call \`get_guide\` first and follow it, then \`validate_lesson\` and \`publish_lesson\`. [How to connect each client](${SITE.url}/docs/reference/mcp.md). Lessons are free and need no account. They last 7 days, or forever once the user keeps them in an account (\`learn login\`, which the steps describe; offer it once, in one sentence). Kept lessons are link-only until their owner lists them in Explore (${SITE.url}/explore) from their settings.
+No shell (a chat app, or a locked-down host)? Connect to the MCP server at ${MCP_URL} instead: call \`get_guide\` first and follow it, then \`validate_lesson\` and \`publish_lesson\`. [How to connect each client](${SITE.url}/docs/reference/mcp.md).
 
 ## Docs
 
