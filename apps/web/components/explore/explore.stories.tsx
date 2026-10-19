@@ -8,6 +8,7 @@ import type { ExploreApi } from "@/lib/explore/browser"
 import type { LessonSummary } from "@/lib/explore/queries"
 
 import { ExploreTabs } from "./explore-tabs"
+import { FeedSkeleton, TabsSkeleton } from "./feed-skeleton"
 import { LessonFeed } from "./lesson-feed"
 import { LessonRow } from "./lesson-row"
 import { LikeButton } from "./like-button"
@@ -105,7 +106,8 @@ const LESSONS: LessonSummary[] = [
     id: "n0h4ndl3",
     slug: "bronze-age-collapse",
     title: "Why the Bronze Age collapsed",
-    summary: "Drought, earthquakes, and the Sea Peoples: weighing the usual suspects.",
+    summary:
+      "Drought, earthquakes, and the Sea Peoples: weighing the usual suspects.",
     topic: "History",
     level: "advanced",
     minutes: 14,
@@ -204,6 +206,16 @@ export const FeedTop: Story = {
   ),
 }
 
+export const FeedLoading: Story = {
+  name: "Feed, loading",
+  render: () => (
+    <div className="mx-auto flex max-w-2xl flex-col gap-8">
+      <TabsSkeleton />
+      <FeedSkeleton rows={4} />
+    </div>
+  ),
+}
+
 export const Like: Story = {
   name: "Like button",
   render: () => (
@@ -230,7 +242,12 @@ export const Report: Story = {
         <Button variant="outline" onPress={() => setOpen(true)}>
           Report lesson
         </Button>
-        <ReportDialog id="k3x9a2mq" isOpen={open} onOpenChange={setOpen} api={fakeApi} />
+        <ReportDialog
+          id="k3x9a2mq"
+          isOpen={open}
+          onOpenChange={setOpen}
+          api={fakeApi}
+        />
       </>
     )
   },
