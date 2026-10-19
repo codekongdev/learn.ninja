@@ -2,9 +2,6 @@ import type { Metadata } from "next"
 
 import { ExploreTabs } from "@/components/explore/explore-tabs"
 import { LessonFeed } from "@/components/explore/lesson-feed"
-import { SiteFooter } from "@/components/site/site-footer"
-import { SiteHeader } from "@/components/site/site-header"
-import { accountOf } from "@/lib/auth/account-info"
 import { currentActor } from "@/lib/auth/session"
 import { cachedLessons } from "@/lib/explore/cache"
 import { EXPLORE_SORTS, likedIds } from "@/lib/explore/queries"
@@ -18,7 +15,8 @@ export const metadata: Metadata = {
 }
 
 // The lists come from the data cache (lib/explore/cache.ts); only the session and "liked by me"
-// are read per request.
+// are read per request. The frame around the list is the (feed) layout's; loading.tsx beside this
+// file stands in for the list until it arrives.
 export const dynamic = "force-dynamic"
 
 export default async function ExplorePage({
@@ -40,26 +38,22 @@ export default async function ExplorePage({
       )
     : new Set<string>()
   return (
-    <div className="flex min-h-svh flex-col">
-      <SiteHeader account={accountOf(actor)} />
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 py-12 sm:px-6 sm:py-16">
-        {/* The list is the page: no heading or blurb, only a name for assistive tech. */}
-        <h1 className="sr-only">Explore</h1>
-        <ExploreTabs sort={sort} />
-        {lessons.length ? (
-          <LessonFeed
-            lessons={lessons}
-            viewer={{ signedIn: actor !== null, liked }}
-            ranked={sort === "top"}
-          />
-        ) : (
-          <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Nothing here yet. Be the first: ask your agent for a lesson, keep
-            it, and list it from your settings.
-          </p>
-        )}
-      </main>
-      <SiteFooter className="max-w-2xl" />
-    </div>
+    <>
+      {/* The list is the page: no heading or blurb, only a name for assistive tech. */}
+      <h1 className="sr-only">Explore</h1>
+      <ExploreTabs sort={sort} />
+      {lessons.length ? (
+        <LessonFeed
+          lessons={lessons}
+          viewer={{ signedIn: actor !== null, liked }}
+          ranked={sort === "top"}
+        />
+      ) : (
+        <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+          Nothing here yet. Be the first: ask your agent for a lesson, keep it,
+          and list it from your settings.
+        </p>
+      )}
+    </>
   )
 }

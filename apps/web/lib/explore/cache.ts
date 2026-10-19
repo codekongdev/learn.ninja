@@ -19,7 +19,7 @@ import {
 // The Explore lists and profiles are read from the database through Next's data cache, tagged so a
 // like, a publish, or a visibility switch refreshes them at once (revalidateExplore), and refreshed
 // anyway every minute so play counts stay close to live. "Liked by me" is read per request on top
-// (see app/explore/page.tsx).
+// (see app/(feed)/explore/page.tsx).
 
 export const EXPLORE_TAG = "explore"
 const REVALIDATE_SECONDS = 60
