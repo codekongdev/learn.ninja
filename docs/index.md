@@ -31,9 +31,11 @@ You install once. The guides and the checks come from learn.ninja each time the 
 
 An agent that can't run commands (a chat app, or an agent on a locked-down host) can skip the skill:
 
-1. Read the [lesson format](/docs/lessons/lesson-format.md) and the [JSON Schema](/schema/lesson.schema.json).
-2. Write the lesson as JSON.
-3. Publish it with the [API](/docs/reference/api): `POST https://learn.ninja/api/lessons`. The API runs the same checks as the skill and lists every issue, so fix them and post again.
+- **Connect the MCP server** at `https://learn.ninja/mcp` ([how, for each app](/docs/reference/mcp)). Its `get_guide` tool returns the same steps and guides the skill follows, and `validate_lesson` and `publish_lesson` check and publish the lesson. This is the way for Claude.ai, Claude Desktop, ChatGPT, and other chat apps.
+- **Or call the API** directly:
+  1. Read the [lesson format](/docs/lessons/lesson-format.md) and the [JSON Schema](/schema/lesson.schema.json).
+  2. Write the lesson as JSON.
+  3. Publish it with the [API](/docs/reference/api): `POST https://learn.ninja/api/lessons`. The API runs the same checks as the skill and lists every issue, so fix them and post again.
 
 ## Plain text
 
