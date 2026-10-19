@@ -89,6 +89,15 @@ const nextConfig: NextConfig = {
       "../../node_modules/tailwindcss/*.css",
       "../../node_modules/tailwindcss/package.json",
     ],
+    // The MCP server also serves the skill's guides at runtime (get_guide reads skills/learn/).
+    "/mcp": [
+      "../../node_modules/tailwindcss/*.css",
+      "../../node_modules/tailwindcss/package.json",
+      "../../skills/learn/*.md",
+      "../../skills/learn/levels/*.md",
+      "../../skills/learn/reference/*.md",
+      "../../skills/learn/schema/*.json",
+    ],
     "/lessons/[slug]": [
       "../../node_modules/tailwindcss/*.css",
       "../../node_modules/tailwindcss/package.json",
