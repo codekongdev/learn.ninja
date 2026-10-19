@@ -2,10 +2,12 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { HeartIcon, PlayIcon } from "lucide-react"
 
+import { UserAvatar } from "@/components/account/user-avatar"
 import { LessonFeed } from "@/components/explore/lesson-feed"
 import { SiteFooter } from "@/components/site/site-footer"
 import { SiteHeader } from "@/components/site/site-header"
 import { normalizeHandle } from "@/lib/auth/handle-rules"
+import { accountOf } from "@/lib/auth/account-info"
 import { currentActor } from "@/lib/auth/session"
 import { compact } from "@/lib/explore/browser"
 import { cachedProfile } from "@/lib/explore/cache"
@@ -57,12 +59,19 @@ export default async function ProfilePage({ params }: Props) {
   })
   return (
     <div className="flex min-h-svh flex-col">
-      <SiteHeader handle={actor ? (actor.handle ?? "") : null} />
+      <SiteHeader account={accountOf(actor)} />
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 py-12 sm:px-6 sm:py-16">
         <div className="flex flex-col gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {name || <bdi dir="ltr">@{profile.handle}</bdi>}
-          </h1>
+          <div className="flex items-center gap-4 sm:gap-5">
+            <UserAvatar
+              image={profile.image}
+              handle={profile.handle}
+              size="profile"
+            />
+            <h1 className="min-w-0 text-3xl font-semibold tracking-tight sm:text-4xl">
+              {name || <bdi dir="ltr">@{profile.handle}</bdi>}
+            </h1>
+          </div>
           <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-base text-muted-foreground">
             {name ? <bdi dir="ltr">@{profile.handle}</bdi> : null}
             <span>

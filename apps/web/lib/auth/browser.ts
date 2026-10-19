@@ -2,6 +2,7 @@ import { emailOTPClient } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
 
 import type { KeySummary } from "./account"
+import { decodeAccount, encodeAccount, type AccountInfo } from "./account-info"
 
 // What the sign-in and settings pages call from the browser: Better Auth's client for sign-in
 // and sign-out, and the account API (lib/auth/account.ts) for handles and keys. The components
@@ -30,10 +31,13 @@ export interface AccountApi {
   verifyCode(
     email: string,
     code: string
-  ): Promise<Outcome & { handle?: string | null }>
+  ): Promise<Outcome & { account?: AccountInfo }>
   /** Sends the browser to GitHub, and back to `callback` afterwards. */
   signInWithGitHub(callback: string): Promise<Outcome>
   setHandle(handle: string): Promise<Outcome & { handle?: string }>
+  /** Uploads a profile picture (PNG, JPEG, WebP, or GIF, up to 5 MB); `image` is its new URL. */
+  uploadAvatar(file: File): Promise<Outcome & { image?: string }>
+  removeAvatar(): Promise<Outcome>
   signOut(): Promise<void>
   listKeys(): Promise<KeySummary[]>
   createKey(name: string): Promise<Outcome & { key?: NewKey }>
@@ -68,8 +72,12 @@ export const accountApi: AccountApi = {
   async verifyCode(email, otp) {
     const { data, error } = await authClient.signIn.emailOtp({ email, otp })
     if (error) return { error: error.message ?? FAILED }
-    const user = data?.user as { handle?: string | null } | undefined
-    return { handle: user?.handle ?? null }
+    const user = data?.user as
+      | { handle?: string | null; image?: string | null }
+      | undefined
+    return {
+      account: { handle: user?.handle ?? null, image: user?.image ?? null },
+    }
   },
   async signInWithGitHub(callback) {
     const { error } = await authClient.signIn.social({
@@ -84,6 +92,22 @@ export const accountApi: AccountApi = {
       body: JSON.stringify({ handle }),
     })
     return reply.ok ? { handle: reply.handle } : { error: reply.message }
+  },
+  async uploadAvatar(file) {
+    const body = new FormData()
+    body.append("file", file, file.name)
+    // No content-type header: the browser sets multipart/form-data with its boundary.
+    const res = await fetch("/api/account/avatar", { method: "POST", body })
+    const reply = (await res.json().catch(() => null)) as
+      | { ok: true; image: string }
+      | { ok: false; message: string }
+      | null
+    if (!reply) return { error: `The server replied HTTP ${res.status}.` }
+    return reply.ok ? { image: reply.image } : { error: reply.message }
+  },
+  async removeAvatar() {
+    const reply = await call("/api/account/avatar", { method: "DELETE" })
+    return reply.ok ? {} : { error: reply.message }
   },
   async signOut() {
     await authClient.signOut()
@@ -107,23 +131,32 @@ export const accountApi: AccountApi = {
 
 // ---------- the "signed in" marker ----------
 // The session cookie is httpOnly, so the header can't read it. A plain cookie says whether to
-// show "Sign in" or the account link, without a request on every page. It can go stale (an expired
-// session); /settings then redirects to sign in.
+// show "Sign in" or the account's picture, without a request on every page. It can go stale (an
+// expired session); /settings then redirects to sign in. Every change fires ACCOUNT_EVENT on
+// window, so a header already on the page follows along.
 
 const MARKER = "learn.account"
+export const ACCOUNT_EVENT = "learn:account"
 
-export function rememberAccount(handle: string | null) {
-  document.cookie = `${MARKER}=${encodeURIComponent(handle ?? "1")}; path=/; max-age=${30 * 24 * 3600}; samesite=lax`
+/** Records a signed-in user. A partial patch keeps what the cookie already knows (a new handle keeps the picture). */
+export function rememberAccount(patch: Partial<AccountInfo>) {
+  const current = readAccount() ?? { handle: null, image: null }
+  const value = encodeURIComponent(encodeAccount({ ...current, ...patch }))
+  document.cookie = `${MARKER}=${value}; path=/; max-age=${30 * 24 * 3600}; samesite=lax`
+  window.dispatchEvent(new Event(ACCOUNT_EVENT))
 }
 
 export function forgetAccount() {
   document.cookie = `${MARKER}=; path=/; max-age=0; samesite=lax`
+  window.dispatchEvent(new Event(ACCOUNT_EVENT))
 }
 
-/** The handle, "1" for a user without one, or null when nobody is signed in. */
-export function readAccount(): string | null {
+/** The signed-in user as the cookie remembers them, or null when nobody is signed in. */
+export function readAccount(): AccountInfo | null {
   const match = document.cookie
     .split("; ")
     .find((c) => c.startsWith(`${MARKER}=`))
-  return match ? decodeURIComponent(match.slice(MARKER.length + 1)) : null
+  if (!match) return null
+  const value = decodeURIComponent(match.slice(MARKER.length + 1))
+  return value ? decodeAccount(value) : null
 }

@@ -18,6 +18,7 @@ export function whoami(actor: Actor): Reply {
       email: actor.email,
       handle: actor.handle,
       name: actor.name,
+      image: actor.image,
     },
   }
 }

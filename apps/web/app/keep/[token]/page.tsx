@@ -4,6 +4,7 @@ import { AccountPage } from "@/components/account/account-page"
 import { KeepForm } from "@/components/account/keep-form"
 import { SignInForm } from "@/components/account/sign-in-form"
 import { ButtonLink } from "@/components/site/button-link"
+import { accountOf } from "@/lib/auth/account-info"
 import { githubFromEnv } from "@/lib/auth/auth"
 import { currentActor } from "@/lib/auth/session"
 import { hashToken } from "@/lib/publish/ids"
@@ -34,11 +35,11 @@ export default async function KeepPage({
     currentActor(),
     (await getLessonStore()).getByClaimTokenHash(hashToken(token)),
   ])
-  const handle = actor ? (actor.handle ?? "") : null
+  const account = accountOf(actor)
 
   if (!record) {
     return (
-      <AccountPage handle={handle}>
+      <AccountPage account={account}>
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">
             Nothing to keep here
@@ -57,7 +58,7 @@ export default async function KeepPage({
 
   if (!actor) {
     return (
-      <AccountPage handle={null}>
+      <AccountPage account={null}>
         <p className="text-sm text-muted-foreground">
           To keep{" "}
           <span className="font-medium text-foreground">
@@ -74,7 +75,7 @@ export default async function KeepPage({
   }
 
   return (
-    <AccountPage handle={handle}>
+    <AccountPage account={account}>
       <KeepForm token={token} title={record.lesson.title} action={keepLesson} />
     </AccountPage>
   )
