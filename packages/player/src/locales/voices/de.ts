@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// Deutsch (du). Default ist kurz und klar, Sensei ein ruhiger Lehrmeister, und Unhinged ein
+// Deutsch (du). Casual ist kurz und klar, Sensei ein ruhiger Lehrmeister, und Unhinged ein
 // Nervenbündel, das redet, wie man redet, nicht wie man übersetzt.
 
 export const de: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Richtig.", "Genau so."],
       flavor: [

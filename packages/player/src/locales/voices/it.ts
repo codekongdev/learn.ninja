@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// Italiano (tu). Default è breve e chiaro, Sensei è un maestro pacato, e Unhinged è un fascio di nervi
+// Italiano (tu). Casual è breve e chiaro, Sensei è un maestro pacato, e Unhinged è un fascio di nervi
 // che parla come si parla, non come si traduce.
 
 export const it: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Corretto.", "Proprio così."],
       flavor: [

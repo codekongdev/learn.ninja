@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// Türkçe (sen). Default kısa ve net, Sensei sakin bir usta, Unhinged ise çeviri gibi değil, insan gibi
+// Türkçe (sen). Casual kısa ve net, Sensei sakin bir usta, Unhinged ise çeviri gibi değil, insan gibi
 // konuşan bir sinir küpü.
 
 export const tr: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Doğru.", "Aynen öyle."],
       flavor: [

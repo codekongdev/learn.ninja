@@ -124,7 +124,7 @@ export interface Preferences {
   tray?: "open" | "closed"
   /** Sound effects (on until muted). */
   sound?: "on" | "off"
-  /** The ninja's character (Default until changed). */
+  /** The ninja's character (Sensei until changed). */
   ninja?: NinjaLevel
 }
 
@@ -137,9 +137,10 @@ export function usePreferences() {
       const saved = JSON.parse(
         localStorage.getItem(PREFERENCES_KEY) ?? "{}"
       ) as Partial<Preferences> & { ninja?: string }
-      // The characters were renamed: Normal became Default, and Sensei took Caffeinated's place.
+      // The characters were renamed: Normal became Default (now Casual), and Sensei took Caffeinated's place.
       const renamed: Record<string, NinjaLevel> = {
-        normal: "default",
+        normal: "casual",
+        default: "casual",
         caffeinated: "sensei",
       }
       if (saved.ninja && saved.ninja in renamed)
@@ -735,16 +736,16 @@ const SHOW_SOUND = false
 
 export const NINJA_LEVELS = [
   "off",
-  "default",
   "sensei",
+  "casual",
   "unhinged",
 ] as const satisfies readonly NinjaLevel[]
 
 /** The signature move the preview plays when you land on each level. */
 const NINJA_PREVIEW: Record<NinjaLevel, NinjaMood> = {
   off: "closed",
-  default: "happy",
   sensei: "bow",
+  casual: "happy",
   unhinged: "flip",
 }
 
@@ -762,7 +763,7 @@ export function PlayerSettings({
   t: Strings
 }) {
   const sound = prefs.sound ?? "on"
-  const ninja = prefs.ninja ?? "default"
+  const ninja = prefs.ninja ?? "sensei"
   return (
     <>
       <NinjaSetting

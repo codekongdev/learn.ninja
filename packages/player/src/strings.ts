@@ -133,7 +133,7 @@ export type Strings = {
 export type TextSize = "sm" | "md" | "lg"
 export type Theme = "system" | "light" | "dark"
 /** The ninja's character: hidden, plain and short, a calm mentor, or a nervous wreck. */
-export type NinjaLevel = "off" | "default" | "sensei" | "unhinged"
+export type NinjaLevel = "off" | "sensei" | "casual" | "unhinged"
 
 /**
  * Languages the player's own text is translated into: the code, the language's name in itself (for

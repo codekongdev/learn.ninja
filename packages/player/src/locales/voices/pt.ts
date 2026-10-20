@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// Português do Brasil, sem regionalismos marcados. Default é curto e claro, Sensei é um mestre sereno e
+// Português do Brasil, sem regionalismos marcados. Casual é curto e claro, Sensei é um mestre sereno e
 // Unhinged é um pilha de nervos que fala como a gente fala, não como tradução.
 
 export const pt: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Correto.", "Isso mesmo."],
       flavor: [

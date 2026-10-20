@@ -93,13 +93,13 @@ export const zh: Strings = {
   ninja: "忍者",
   ninjaLevels: {
     off: "关闭",
-    default: "默认",
+    casual: "轻松",
     sensei: "师父",
     unhinged: "失控",
   },
   ninjaHints: {
     off: "他躲起来不出现",
-    default: "简短明了",
+    casual: "简短明了",
     sensei: "沉稳耐心",
     unhinged: "替你慌张",
   },

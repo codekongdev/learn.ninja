@@ -112,12 +112,12 @@ type Reactions = Record<"happy" | "sad", Record<string, Beat[]>> &
   Partial<Record<CueKind, Record<string, Beat[]>>>
 
 /**
- * Each setting is a different character. Default is small and warm. Sensei is slow and
+ * Each setting is a different character. Casual is small and warm. Sensei is slow and
  * composed. Unhinged is theatrical. At every level he's sorry with the learner, never at them: the
  * sad moves are all self-directed. Several variants per mood, so the same answer never feels canned.
  */
 export const REACTIONS: Record<NinjaEnergy, Reactions> = {
-  default: {
+  casual: {
     happy: {
       smile: [["happy", 1300]],
       cheer: [["cheer", 1100]],
@@ -236,14 +236,14 @@ export const REACTIONS: Record<NinjaEnergy, Reactions> = {
 
 /** How far the keyframes go at each setting (as --ninja-energy). The bigger sets are already big. */
 export const NINJA_ENERGY: Record<NinjaEnergy, number> = {
-  default: 1,
+  casual: 1,
   sensei: 0.85,
   unhinged: 1.6,
 }
 
 /** Things he does on his own while waiting, at the livelier settings. */
 export const ANTICS: Record<NinjaEnergy, Beat[][]> = {
-  default: [],
+  casual: [],
   // The sensei waits without fidgeting.
   sensei: [],
   unhinged: [
@@ -256,14 +256,14 @@ export const ANTICS: Record<NinjaEnergy, Beat[][]> = {
 
 /** How often the antics come (ms), at random in this range. */
 const ANTIC_EVERY: Record<NinjaEnergy, [number, number]> = {
-  default: [0, 0],
+  casual: [0, 0],
   sensei: [0, 0],
   unhinged: [9000, 16000],
 }
 
 /** How long his own glances take (as --ninja-gaze); following the pointer is quick for everyone. The sensei is unhurried. */
 export const NINJA_GAZE: Record<NinjaEnergy, string> = {
-  default: "0.38s",
+  casual: "0.38s",
   sensei: "0.6s",
   unhinged: "0.3s",
 }
@@ -286,7 +286,7 @@ export const IDLE: Record<
     meditate: { every: [number, number]; lasting: [number, number] } | null
   }
 > = {
-  default: {
+  casual: {
     blink: [2600, 6500],
     blinkMs: 120,
     doubleBlink: 0.25,
@@ -317,14 +317,14 @@ export const IDLE: Record<
 
 /**
  * The intro's entrance: a whole-body class (keyframes in globals.css), moods along the way, and
- * when it's over. Default and Unhinged bounce in twice and grin; the sensei settles, closes his
+ * when it's over. Casual and Unhinged bounce in twice and grin; the sensei settles, closes his
  * eyes, and bows in.
  */
 export const ENTRANCE: Record<
   NinjaEnergy,
   { className: string; beats: [at: number, mood: NinjaMood][]; ends: number }
 > = {
-  default: { className: "is-enter", beats: [[760, "happy"]], ends: 1660 },
+  casual: { className: "is-enter", beats: [[760, "happy"]], ends: 1660 },
   sensei: {
     className: "is-settle",
     beats: [
@@ -338,14 +338,14 @@ export const ENTRANCE: Record<
 
 /** The leap between the slot and the corner: how high the arc goes, and whether he grins through it. */
 export const LEAP: Record<NinjaEnergy, { arc: number; grin: boolean }> = {
-  default: { arc: 120, grin: true },
+  casual: { arc: 120, grin: true },
   sensei: { arc: 60, grin: false },
   unhinged: { arc: 120, grin: true },
 }
 
 /** The wrap-up, once he's landed: a cheer for most, a bow out for the sensei, deeper after a perfect run. */
 export const WRAP: Record<NinjaEnergy, { done: Beat[]; perfect: Beat[] }> = {
-  default: { done: [["cheer", 1200]], perfect: [["cheer", 1200]] },
+  casual: { done: [["cheer", 1200]], perfect: [["cheer", 1200]] },
   sensei: {
     done: [["bow", 2000]],
     perfect: [
@@ -466,7 +466,7 @@ export function reducedMotion(): boolean {
 export function useNinjaLife(
   svg: React.RefObject<SVGSVGElement | null>,
   area: React.RefObject<HTMLElement | null>,
-  level: NinjaEnergy = "default"
+  level: NinjaEnergy = "sensei"
 ): NinjaLife {
   const held = React.useRef(false)
   const pointer = React.useRef(false)
@@ -641,7 +641,7 @@ export function NinjaStage({
   cue,
   celebrate,
   onLanded,
-  level = "default",
+  level = "sensei",
   vanishing = false,
 }: {
   /** The lesson card: he's positioned inside it and follows the pointer over it. */
@@ -903,7 +903,7 @@ async function leap(
   life: NinjaLife,
   first: DOMRect,
   last: DOMRect,
-  level: NinjaEnergy = "default",
+  level: NinjaEnergy = "sensei",
   brisk = false
 ) {
   life.hold(true)

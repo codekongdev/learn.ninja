@@ -71,10 +71,10 @@ export const Reactions: StoryObj<{ level: NinjaEnergy }> = {
   argTypes: {
     level: {
       control: "inline-radio",
-      options: ["default", "sensei", "unhinged"],
+      options: ["sensei", "casual", "unhinged"],
     },
   },
-  args: { level: "default" },
+  args: { level: "sensei" },
   render: ({ level }) => <ReactionsDemo key={level} level={level} />,
 }
 

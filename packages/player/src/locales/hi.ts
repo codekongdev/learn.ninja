@@ -107,13 +107,13 @@ export const hi: Strings = {
   ninja: "निंजा",
   ninjaLevels: {
     off: "बंद",
-    default: "डिफ़ॉल्ट",
+    casual: "सहज",
     sensei: "सेंसेई",
     unhinged: "बेकाबू",
   },
   ninjaHints: {
     off: "छिपा रहता है",
-    default: "छोटा और साफ़",
+    casual: "छोटा और साफ़",
     sensei: "शांत और धैर्यवान",
     unhinged: "आपकी जगह खुद घबरा जाता है",
   },

@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// Bahasa Indonesia santai (kamu). Default singkat dan jelas, Sensei guru yang tenang, dan Unhinged
+// Bahasa Indonesia santai (kamu). Casual singkat dan jelas, Sensei guru yang tenang, dan Unhinged
 // gugup berat dan bicara seperti orang bicara, bukan seperti terjemahan.
 
 export const id: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Benar.", "Tepat."],
       flavor: [

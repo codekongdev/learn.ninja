@@ -104,13 +104,13 @@ export const tr: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Kapalı",
-    default: "Varsayılan",
+    casual: "Rahat",
     sensei: "Sensei",
     unhinged: "Zıvanadan çıkmış",
   },
   ninjaHints: {
     off: "Gizli kalır",
-    default: "Kısa ve net",
+    casual: "Kısa ve net",
     sensei: "Sakin ve sabırlı",
     unhinged: "Sen panik yapma diye o yapar",
   },

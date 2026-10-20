@@ -1,4 +1,4 @@
-// The ninja's feedback lines for each character. Off and Default share the Default lines, short and
+// The ninja's feedback lines for each character. Off and Casual share the Casual lines, short and
 // plain; Sensei is a dojo teacher of few words, patient and a little firm, who would rather show than
 // explain; Unhinged is a jittery bundle of nerves, sure everything is about to go wrong and hugely
 // relieved when it doesn't. On a miss he panics at the situation, never at the learner.
@@ -61,7 +61,7 @@ export type Voices = Record<Character, Voice>
 export type Slot = keyof Lines
 /** How each character rations flavor: the slot for the nth time a moment comes up in a run. */
 export const CADENCE: Record<Character, readonly Slot[]> = {
-  default: ["plain", "plain", "flavor"],
+  casual: ["plain", "plain", "flavor"],
   // A sensei who says something wise every other answer stops sounding wise.
   sensei: ["plain", "plain", "flavor"],
   unhinged: ["flavor", "flavor", "plain"],
@@ -91,9 +91,9 @@ const VOICES: Record<UiLanguage, Voices> = {
   "zh-tw": zhTw,
 }
 
-/** The character a setting plays: Off shows nobody, but his lines are the Default ones. */
+/** The character a setting plays: Off shows nobody, but his lines are the Casual ones. */
 export function characterFor(level: NinjaLevel): Character {
-  return level === "off" ? "default" : level
+  return level === "off" ? "casual" : level
 }
 
 /** The character's lines for a moment, in the player's language (English for one it doesn't have). */

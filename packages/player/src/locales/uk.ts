@@ -126,13 +126,13 @@ export const uk: Strings = {
   ninja: "Ніндзя",
   ninjaLevels: {
     off: "Вимкнено",
-    default: "За замовчуванням",
+    casual: "Легкий",
     sensei: "Сенсей",
     unhinged: "Божевільний",
   },
   ninjaHints: {
     off: "Не показується",
-    default: "Коротко і ясно",
+    casual: "Коротко і ясно",
     sensei: "Спокійний і терплячий",
     unhinged: "Панікує замість вас",
   },

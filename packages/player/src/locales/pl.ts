@@ -121,13 +121,13 @@ export const pl: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Wyłączony",
-    default: "Domyślny",
+    casual: "Swobodny",
     sensei: "Sensei",
     unhinged: "Rozszalały",
   },
   ninjaHints: {
     off: "Pozostaje w ukryciu",
-    default: "Krótko i jasno",
+    casual: "Krótko i jasno",
     sensei: "Spokojny i cierpliwy",
     unhinged: "Panikuje za ciebie",
   },

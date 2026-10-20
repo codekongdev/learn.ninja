@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// עברית (אתה). Default קצר וברור, Sensei מורה רגוע, ו-Unhinged פקעת עצבים שמדברת כמו שמדברים,
+// עברית (אתה). Casual קצר וברור, Sensei מורה רגוע, ו-Unhinged פקעת עצבים שמדברת כמו שמדברים,
 // לא כמו שמתרגמים.
 
 export const he: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["נכון.", "בדיוק."],
       flavor: [

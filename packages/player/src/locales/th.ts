@@ -97,13 +97,13 @@ export const th: Strings = {
   ninja: "นินจา",
   ninjaLevels: {
     off: "ปิด",
-    default: "ค่าเริ่มต้น",
+    casual: "สบายๆ",
     sensei: "เซนเซ",
     unhinged: "หลุดโลก",
   },
   ninjaHints: {
     off: "ซ่อนตัวอยู่",
-    default: "สั้นและชัดเจน",
+    casual: "สั้นและชัดเจน",
     sensei: "ใจเย็นและอดทน",
     unhinged: "ตื่นตระหนกแทนคุณ",
   },

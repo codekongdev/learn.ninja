@@ -113,5 +113,5 @@ export const NinjaOff: Story = {
 export const ScenarioStoryMode: Story = {
   name: "Scenario story mode",
   args: { lesson: lessons.buttons, startAt: "ch" },
-  loaders: withPrefs({ ninja: "default" }),
+  loaders: withPrefs({ ninja: "casual" }),
 }
