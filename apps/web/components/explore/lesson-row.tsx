@@ -29,7 +29,9 @@ const t = stringsFor("en")
  * down the feed. Then the title, up to two lines of summary, and one meta line with the subject,
  * length and level (after a green check when the viewer has finished it), and the plays and likes
  * at its end. The whole row opens the lesson; the author, the check, and the heart are their own
- * targets. Rows sit between hairlines (the list adds them), not in cards. `rank` puts a number
+ * targets. Rows aren't cards or between hairlines: space separates them, and hovering one fills a
+ * rounded tile that reaches past the column into the gutter (negative margin, matching padding),
+ * so the text stays lined up with the page and the tile still has room around it. `rank` puts a number
  * in the margin on the Top tab; `showAuthor={false}` drops the author on a profile, where every
  * row shares it, leaving the age alone on the byline.
  */
@@ -82,7 +84,7 @@ export function LessonRow({
   return (
     <div
       className={cn(
-        "relative flex gap-3 py-4 transition-colors has-[[data-slot=row-link]:hover]:bg-muted/50 dark:has-[[data-slot=row-link]:hover]:bg-input/30",
+        "relative -mx-3 flex gap-3 rounded-xl px-3 py-5 transition-colors sm:-mx-4 sm:px-4 has-[[data-slot=row-link]:hover]:bg-muted/50 dark:has-[[data-slot=row-link]:hover]:bg-input/30",
         className
       )}
     >
@@ -117,11 +119,11 @@ export function LessonRow({
         <p
           lang={lesson.language}
           dir="auto"
-          className="mt-0.5 line-clamp-2 text-sm text-muted-foreground"
+          className="mt-1 line-clamp-2 text-sm text-muted-foreground"
         >
           {lesson.summary}
         </p>
-        <div className="mt-2 flex items-center justify-between gap-3 text-sm text-muted-foreground">
+        <div className="mt-3 flex items-center justify-between gap-3 text-sm text-muted-foreground">
           <p className="flex min-w-0 flex-1 basis-0 flex-wrap items-center gap-x-1.5">
             {facts.map((fact, i) => (
               <span key={i} className="contents">

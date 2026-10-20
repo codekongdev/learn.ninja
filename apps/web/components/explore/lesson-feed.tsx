@@ -5,7 +5,7 @@ import type { LessonSummary } from "@/lib/explore/queries"
 import { LessonRow, type Viewer } from "./lesson-row"
 
 /**
- * The feed: one row per lesson between hairlines, newest or best first, read by scrolling.
+ * The feed: one row per lesson, spaced apart rather than between hairlines, newest or best first, read by scrolling.
  * `ranked` numbers the rows (the Top tab); `showAuthor={false}` drops the handle (profiles).
  */
 export function LessonFeed({
@@ -22,7 +22,7 @@ export function LessonFeed({
   className?: string
 }) {
   return (
-    <ul className={cn("flex flex-col divide-y", className)}>
+    <ul className={cn("flex flex-col gap-1", className)}>
       {lessons.map((lesson, i) => (
         <li key={lesson.id} className="flex flex-col">
           <LessonRow
