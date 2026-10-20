@@ -5,7 +5,7 @@ import type { Voices } from "../../voices"
 // each character's personality rather than the exact words. Every line ends in punctuation.
 
 export const en: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Correct.", "That's right."],
       flavor: [

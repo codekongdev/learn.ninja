@@ -129,13 +129,13 @@ export const pt: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Desligado",
-    default: "Padrão",
+    casual: "Descontraído",
     sensei: "Sensei",
     unhinged: "Descontrolado",
   },
   ninjaHints: {
     off: "Fica escondido",
-    default: "Curto e claro",
+    casual: "Curto e claro",
     sensei: "Calmo e paciente",
     unhinged: "Entra em pânico para você não precisar",
   },

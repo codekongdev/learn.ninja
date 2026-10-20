@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// हिन्दी (तुम)। Default छोटा और साफ़, Sensei शांत गुरु, और Unhinged घबराया हुआ साथी जो वैसे बोलता है
+// हिन्दी (तुम)। Casual छोटा और साफ़, Sensei शांत गुरु, और Unhinged घबराया हुआ साथी जो वैसे बोलता है
 // जैसे लोग बोलते हैं, अनुवाद की तरह नहीं।
 
 export const hi: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["सही।", "बिल्कुल।"],
       flavor: [

@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// Nederlands (je). Default is kort en duidelijk, Sensei een kalme leermeester, en Unhinged een
+// Nederlands (je). Casual is kort en duidelijk, Sensei een kalme leermeester, en Unhinged een
 // zenuwpees die praat zoals mensen praten, niet zoals je vertaalt.
 
 export const nl: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Goed.", "Dat klopt."],
       flavor: [

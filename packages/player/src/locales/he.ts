@@ -140,13 +140,13 @@ export const he: Strings = {
   ninja: "נינג'ה",
   ninjaLevels: {
     off: "כבוי",
-    default: "ברירת מחדל",
+    casual: "קליל",
     sensei: "סנסיי",
     unhinged: "יצא מדעתו",
   },
   ninjaHints: {
     off: "נשאר מוסתר",
-    default: "קצר וברור",
+    casual: "קצר וברור",
     sensei: "רגוע וסבלני",
     unhinged: "נלחץ במקומך",
   },

@@ -144,13 +144,13 @@ export const ru: Strings = {
   ninja: "Ниндзя",
   ninjaLevels: {
     off: "Выключен",
-    default: "По умолчанию",
+    casual: "Лёгкий",
     sensei: "Сэнсэй",
     unhinged: "Безумный",
   },
   ninjaHints: {
     off: "Не показывается",
-    default: "Коротко и ясно",
+    casual: "Коротко и ясно",
     sensei: "Спокойный и терпеливый",
     unhinged: "Паникует за вас",
   },

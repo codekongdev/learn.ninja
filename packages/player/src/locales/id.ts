@@ -119,13 +119,13 @@ export const id: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Mati",
-    default: "Bawaan",
+    casual: "Santai",
     sensei: "Sensei",
     unhinged: "Lepas kendali",
   },
   ninjaHints: {
     off: "Tetap bersembunyi",
-    default: "Singkat dan jelas",
+    casual: "Singkat dan jelas",
     sensei: "Tenang dan sabar",
     unhinged: "Panik supaya kamu tidak perlu",
   },

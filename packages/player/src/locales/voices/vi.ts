@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// Tiếng Việt thân mật (bạn). Default ngắn gọn rõ ràng, Sensei là người thầy điềm tĩnh, còn Unhinged
+// Tiếng Việt thân mật (bạn). Casual ngắn gọn rõ ràng, Sensei là người thầy điềm tĩnh, còn Unhinged
 // là một bó dây thần kinh nói như người ta nói, không phải như bản dịch.
 
 export const vi: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Đúng rồi.", "Chính xác."],
       flavor: [

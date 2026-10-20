@@ -134,13 +134,13 @@ export const fr: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Désactivé",
-    default: "Par défaut",
+    casual: "Décontracté",
     sensei: "Sensei",
     unhinged: "Déchaîné",
   },
   ninjaHints: {
     off: "Il reste caché",
-    default: "Court et clair",
+    casual: "Court et clair",
     sensei: "Calme et patient",
     unhinged: "Il panique à votre place",
   },

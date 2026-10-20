@@ -116,13 +116,13 @@ export const vi: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Tắt",
-    default: "Mặc định",
+    casual: "Thoải mái",
     sensei: "Sensei",
     unhinged: "Mất kiểm soát",
   },
   ninjaHints: {
     off: "Ẩn mình",
-    default: "Ngắn gọn và rõ ràng",
+    casual: "Ngắn gọn và rõ ràng",
     sensei: "Điềm tĩnh và kiên nhẫn",
     unhinged: "Hoảng loạn thay cho bạn",
   },

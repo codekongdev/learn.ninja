@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// 日本語。Default は短く明快、Sensei（先生）は落ち着いた師、Unhinged（暴走）は翻訳調ではなく
+// 日本語。Casual は短く明快、Sensei（先生）は落ち着いた師、Unhinged（暴走）は翻訳調ではなく
 // 人がしゃべるようにしゃべる、びくびくした相棒。句点・感嘆符・疑問符で必ず終える。
 
 export const ja: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["正解。", "その通り。"],
       flavor: [

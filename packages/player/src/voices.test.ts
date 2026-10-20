@@ -22,7 +22,7 @@ const MOMENTS: Moment[] = [
   "last",
   "perfect",
 ]
-const CHARACTERS = ["default", "sensei", "unhinged"] as const
+const CHARACTERS = ["sensei", "casual", "unhinged"] as const
 
 describe("voices", () => {
   it("has plain and flavor English lines for every character and moment, with no repeats", () => {
@@ -78,7 +78,7 @@ describe("voices", () => {
         isPlain(pick(`k${i}`, "praise", lines, cadence)) ? "plain" : "flavor"
       )
     }
-    expect(heard(CADENCE.default)).toEqual([
+    expect(heard(CADENCE.casual)).toEqual([
       "plain",
       "plain",
       "flavor",
@@ -106,10 +106,10 @@ describe("voices", () => {
 
   it("counts each moment on its own", () => {
     const pick = createLinePicker("lesson")
-    pick("a", "praise", lines, CADENCE.default)
-    pick("b", "praise", lines, CADENCE.default)
+    pick("a", "praise", lines, CADENCE.casual)
+    pick("b", "praise", lines, CADENCE.casual)
     // The first nudge is still the plain one, however many praises came before.
-    expect(isPlain(pick("c", "nudge", lines, CADENCE.default))).toBe(true)
+    expect(isPlain(pick("c", "nudge", lines, CADENCE.casual))).toBe(true)
   })
 
   it("plays every flavor line once before repeating, and never twice in a row", () => {
@@ -140,7 +140,7 @@ describe("voices", () => {
   })
 
   it("starts a replay somewhere else", () => {
-    const praise = voiceLines("en", "default", "praise")
+    const praise = voiceLines("en", "casual", "praise")
     const openers = [0, 1, 2].map((run) =>
       createLinePicker(`Compound interest:${run}`)(
         "1-0-feedback-praise",
@@ -154,7 +154,7 @@ describe("voices", () => {
 
   it("keeps the same line for the same feedback", () => {
     const pick = createLinePicker("lesson")
-    const first = pick("q1", "praise", lines, CADENCE.default)
-    expect(pick("q1", "praise", lines, CADENCE.default)).toBe(first)
+    const first = pick("q1", "praise", lines, CADENCE.casual)
+    expect(pick("q1", "praise", lines, CADENCE.casual)).toBe(first)
   })
 })

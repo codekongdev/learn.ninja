@@ -134,13 +134,13 @@ export const it: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Spento",
-    default: "Predefinito",
+    casual: "Rilassato",
     sensei: "Sensei",
     unhinged: "Fuori controllo",
   },
   ninjaHints: {
     off: "Resta nascosto",
-    default: "Breve e chiaro",
+    casual: "Breve e chiaro",
     sensei: "Calmo e paziente",
     unhinged: "Va nel panico al posto tuo",
   },

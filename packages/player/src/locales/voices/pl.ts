@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// Polski (ty). Default jest krótki i jasny, Sensei to spokojny mistrz, a Unhinged to kłębek nerwów,
+// Polski (ty). Casual jest krótki i jasny, Sensei to spokojny mistrz, a Unhinged to kłębek nerwów,
 // który mówi tak, jak się mówi, a nie jak się tłumaczy.
 
 export const pl: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["Dobrze.", "Zgadza się."],
       flavor: [

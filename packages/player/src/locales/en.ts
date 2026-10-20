@@ -115,13 +115,13 @@ export const en: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Off",
-    default: "Default",
+    casual: "Casual",
     sensei: "Sensei",
     unhinged: "Unhinged",
   },
   ninjaHints: {
     off: "He stays hidden",
-    default: "Short and clear",
+    casual: "Short and clear",
     sensei: "Calm and patient",
     unhinged: "Panics so you don't have to",
   },

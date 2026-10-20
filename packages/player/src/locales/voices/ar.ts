@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// العربية الفصحى المبسّطة، بلا لهجة محلية بارزة. Default قصير وواضح، Sensei معلّم هادئ، و Unhinged
+// العربية الفصحى المبسّطة، بلا لهجة محلية بارزة. Casual قصير وواضح، Sensei معلّم هادئ، و Unhinged
 // حزمة أعصاب تتكلم كما يتكلم الناس، لا كما تُترجم الجمل.
 
 export const ar: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["صحيح.", "هذا هو."],
       flavor: [

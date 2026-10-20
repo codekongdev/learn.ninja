@@ -132,13 +132,13 @@ export const nl: Strings = {
   ninja: "Ninja",
   ninjaLevels: {
     off: "Uit",
-    default: "Standaard",
+    casual: "Ontspannen",
     sensei: "Sensei",
     unhinged: "Doorgedraaid",
   },
   ninjaHints: {
     off: "Hij blijft verborgen",
-    default: "Kort en duidelijk",
+    casual: "Kort en duidelijk",
     sensei: "Kalm en geduldig",
     unhinged: "Raakt in paniek zodat jij dat niet hoeft",
   },

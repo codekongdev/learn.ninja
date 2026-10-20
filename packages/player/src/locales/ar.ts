@@ -131,13 +131,13 @@ export const ar: Strings = {
   ninja: "النينجا",
   ninjaLevels: {
     off: "متوقف",
-    default: "افتراضي",
+    casual: "عفوي",
     sensei: "سنسي",
     unhinged: "خارج عن السيطرة",
   },
   ninjaHints: {
     off: "يبقى مختفيًا",
-    default: "قصير وواضح",
+    casual: "قصير وواضح",
     sensei: "هادئ وصبور",
     unhinged: "يفزع بدلًا عنك",
   },

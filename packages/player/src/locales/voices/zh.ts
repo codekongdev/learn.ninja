@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// 简体中文。Default 简短明了，Sensei（师父）是沉稳的师长，Unhinged（失控）是个紧张兮兮的搭档，
+// 简体中文。Casual 简短明了，Sensei（师父）是沉稳的师长，Unhinged（失控）是个紧张兮兮的搭档，
 // 说的是人话，不是翻译腔。每句以句号、感叹号或问号结尾。
 
 export const zh: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["正确。", "没错。"],
       flavor: [

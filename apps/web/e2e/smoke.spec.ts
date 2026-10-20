@@ -32,7 +32,7 @@ test("a bundled lesson plays", async ({ page }) => {
   await page.getByText("$1,700").click()
   await page.getByRole("button", { name: "Check answer" }).click()
   await expect(
-    page.getByText("Not quite, and that's fine").first()
+    page.getByText("Not yet. We begin here.").first()
   ).toBeVisible()
   await page.getByRole("button", { name: "Continue" }).click()
   await expect(

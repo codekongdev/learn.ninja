@@ -1,10 +1,10 @@
 import type { Voices } from "../../voices"
 
-// 한국어(해요체). Default는 짧고 분명하게, Sensei(사부)는 차분한 스승, Unhinged(폭주)는 번역투가 아니라
+// 한국어(해요체). Casual는 짧고 분명하게, Sensei(사부)는 차분한 스승, Unhinged(폭주)는 번역투가 아니라
 // 사람이 말하듯 말하는 잔뜩 긴장한 친구.
 
 export const ko: Voices = {
-  default: {
+  casual: {
     praise: {
       plain: ["정답.", "맞아요."],
       flavor: [

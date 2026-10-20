@@ -111,13 +111,13 @@ export const ko: Strings = {
   ninja: "닌자",
   ninjaLevels: {
     off: "끄기",
-    default: "기본",
+    casual: "편안한",
     sensei: "사부",
     unhinged: "폭주",
   },
   ninjaHints: {
     off: "숨어 있어요",
-    default: "짧고 분명하게",
+    casual: "짧고 분명하게",
     sensei: "차분하고 참을성 있게",
     unhinged: "대신 당황해 줘요",
   },
