@@ -2,13 +2,23 @@
 
 import * as React from "react"
 
-import type { ChartVisual, Visual as VisualSpec } from "@workspace/spec"
+import type {
+  ChartVisual,
+  DiagramVisual,
+  Visual as VisualSpec,
+} from "@workspace/spec"
 import { Selectable } from "@workspace/ui/components/selectable"
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { Mark } from "./check"
 import { useIsDark, usePlayer } from "./context"
-import { chartKey, codeKey, mathKey, type CodeLines } from "./prepared"
+import {
+  chartKey,
+  codeKey,
+  diagramKey,
+  mathKey,
+  type CodeLines,
+} from "./prepared"
 
 /** Hotspot wiring for interactive visuals: which regions are selected or marked, and what a tap does. */
 export interface HotspotControl {
@@ -55,6 +65,8 @@ export function Visual({
     )
   if (visual.kind === "math")
     return <MathBlock tex={visual.tex} plain={plain} />
+  if (visual.kind === "diagram")
+    return <DiagramBlock diagram={visual} label={label} plain={plain} />
   return <ChartBlock chart={visual} label={label} plain={plain} />
 }
 
@@ -113,6 +125,20 @@ function HtmlFrame({
     observer.observe(doc.body)
     return () => observer.disconnect()
   }, [loaded, height])
+
+  // Drawings sit in the middle of their own canvas: a viewBox with empty space on one side would
+  // push the drawing off-center however the frame lays it out. Runs before the hotspots are measured.
+  React.useEffect(() => {
+    const doc = ref.current?.contentDocument
+    if (!doc?.body) return
+    for (const svg of doc.body.querySelectorAll<SVGSVGElement>("svg")) {
+      if (svg.parentElement?.closest("svg")) continue
+      const box = svg.viewBox.baseVal
+      if (!box || !box.width || !box.height) continue
+      const centered = centeredViewBox(box, svg.getBBox())
+      if (centered) svg.setAttribute("viewBox", centered)
+    }
+  }, [loaded])
 
   React.useEffect(() => {
     const doc = ref.current?.contentDocument
@@ -280,6 +306,24 @@ interface SpotBox {
  * its box runs to the card's edges, and a frame outside it would sit outside the card. The whole box
  * stays the tap target either way.
  */
+type Box = { x: number; y: number; width: number; height: number }
+
+/**
+ * The viewBox that keeps the canvas's size and scale but moves its drawing to the middle, or null when
+ * it's already there, empty, or larger than the canvas (moving it would only change what's cut off).
+ */
+export function centeredViewBox(view: Box, drawing: Box): string | null {
+  if (!drawing.width || !drawing.height) return null
+  if (drawing.width > view.width || drawing.height > view.height) return null
+  const x = drawing.x + drawing.width / 2 - view.width / 2
+  const y = drawing.y + drawing.height / 2 - view.height / 2
+  const tolerance = Math.max(view.width, view.height) / 200
+  if (Math.abs(x - view.x) < tolerance && Math.abs(y - view.y) < tolerance)
+    return null
+  const round = (n: number) => Math.round(n * 100) / 100
+  return [x, y, view.width, view.height].map(round).join(" ")
+}
+
 function frameInset(el: HTMLElement) {
   const cs = getComputedStyle(el)
   const side = (padding: string, border: string) => {
@@ -509,6 +553,41 @@ function ChartBlock({
           {alt}
         </p>
       )}
+    </div>
+  )
+}
+
+// ---------- Diagram: laid out and drawn by D2 on the server ----------
+
+/**
+ * The server draws the D2 into SVG in theme tokens (diagram.ts). It goes in the same sandboxed
+ * frame as HTML visuals, since D2's Markdown labels can carry HTML. Before it's drawn (a lesson
+ * without prepared data), the alt stands in.
+ */
+function DiagramBlock({
+  diagram,
+  label,
+  plain,
+}: {
+  diagram: DiagramVisual
+  label?: string
+  plain: boolean
+}) {
+  const { prepared, t } = usePlayer()
+  const svg = prepared.diagrams?.[diagramKey(diagram.d2)]
+  if (svg)
+    return (
+      <HtmlFrame html={svg} alt={diagram.alt} label={label} plain={plain} />
+    )
+  return (
+    <div
+      role="img"
+      aria-label={diagram.alt ?? label ?? t.visual}
+      className={cn(!plain && "rounded-xl border bg-background")}
+    >
+      <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+        {diagram.alt ?? label ?? t.visual}
+      </p>
     </div>
   )
 }

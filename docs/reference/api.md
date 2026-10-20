@@ -24,7 +24,7 @@ The body is the lesson file. A valid lesson returns `201`:
   "claimUrl": "https://learn.ninja/keep/…",
   "owned": false,
   "expiresAt": "2026-10-26T09:00:00.000Z",
-  "spec": "0.4"
+  "spec": "0.5"
 }
 ```
 
@@ -119,7 +119,7 @@ POST /api/validate
 Content-Type: application/json
 ```
 
-The body is the lesson file. Runs the checks publishing runs and stores nothing. A valid lesson returns `200` with `{ "ok": true, "spec": "0.4" }`; an invalid one returns the same errors as publishing. The skill's `validate` command uses this.
+The body is the lesson file. Runs the checks publishing runs and stores nothing. A valid lesson returns `200` with `{ "ok": true, "spec": "0.5" }`; an invalid one returns the same errors as publishing. The skill's `validate` command uses this.
 
 ## The skill's guides
 
