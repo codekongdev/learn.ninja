@@ -26,13 +26,14 @@ const t = stringsFor("en")
 /**
  * A lesson as one row of the Explore feed or a profile. A byline first: who made it (their
  * picture and handle) at the start and how long ago at the end, so the ages line up as a column
- * down the feed. Then the title, up to two lines of summary, and one meta line with the subject,
- * length and level (after a green check when the viewer has finished it), and the plays and likes
- * at its end. The whole row opens the lesson; the author, the check, and the heart are their own
- * targets. Rows sit between hairlines (the list adds them), not in cards. Hovering one turns it into
- * a bordered, filled tile that reaches past the column into the gutter (negative margin, matching
- * padding), so the text stays lined up with the page and the tile has room around it; the list
- * hides the two hairlines it would touch. `rank` puts a number
+ * down the feed. Then the title, up to two lines of summary, and one meta line with the lesson's
+ * first two tags (its label, then the product or field, as the agent wrote them), length and level
+ * (after a green check when the viewer has finished it), and the plays and likes at its end. The
+ * subject is never shown: it's for filters. The whole row opens the lesson; the author, the check,
+ * and the heart are their own targets. Rows sit between hairlines (the list adds them), not in
+ * cards. Hovering one turns it into a bordered, filled tile that reaches past the column into the
+ * gutter (negative margin, matching padding), so the text stays lined up with the page and the
+ * tile has room around it; the list hides the two hairlines it would touch. `rank` puts a number
  * in the margin on the Top tab; `showAuthor={false}` drops the author on a profile, where every
  * row shares it, leaving the age alone on the byline.
  */
@@ -72,9 +73,15 @@ export function LessonRow({
       )
     ) : null
   const facts: React.ReactNode[] = [
-    <span key="subject" className="min-w-0 truncate">
-      {t.subjects[lesson.subject]}
-    </span>,
+    ...lesson.tags.slice(0, 2).map((tag, i) => (
+      <bdi
+        key={`tag-${i}`}
+        lang={lesson.language}
+        className="min-w-0 truncate"
+      >
+        {tag}
+      </bdi>
+    )),
     <span key="minutes" className="shrink-0">
       {t.minutes(lesson.minutes)}
     </span>,
