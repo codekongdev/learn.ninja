@@ -20,7 +20,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Do I need an account?",
-    a: "No. Not to make lessons, and not to play them. Lessons last 7 days. If you'd like one to stay, your agent can save it to your email in a minute: say so, and it signs you in with a code.",
+    a: "No. Not to make lessons, and not to play them. Lessons last 7 days. To keep one, ask your agent for a lesson and say keep it: it saves the lesson under your email (a code, no password) and lists it in Explore under your handle.",
   },
   {
     q: "How long do lessons last?",

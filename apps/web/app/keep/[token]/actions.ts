@@ -12,6 +12,10 @@ export interface KeepResult {
   message: string
   url?: string
   title?: string
+  /** The owner's handle, or null when they haven't picked one yet. */
+  handle?: string | null
+  /** Whether the kept lesson is listed in Explore. */
+  listed?: boolean
 }
 
 /** The Keep button on /keep/{token}: claims the lesson for the signed-in user. */
@@ -30,7 +34,8 @@ export async function keepLesson(
     `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`
   const reply = await claimLesson(
     { claimToken: token, ownerId: actor.userId },
-    { store: await getLessonStore(), origin }
+    // The keeper is the signed-in user, so their handle needs no lookup.
+    { store: await getLessonStore(), origin, handleOf: async () => actor.handle }
   )
   if (!reply.body.ok)
     return { ok: false, message: reply.body.message as string }
@@ -41,5 +46,7 @@ export async function keepLesson(
     message: "Kept.",
     url: reply.body.url as string,
     title: reply.body.title as string,
+    handle: actor.handle,
+    listed: reply.body.visibility === "public",
   }
 }

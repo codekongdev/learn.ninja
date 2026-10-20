@@ -9,18 +9,19 @@ import { respond } from "@/lib/publish/respond"
 
 export async function POST(req: Request) {
   return respond(async () => {
-    const ownerId = (await actorFor(req))?.userId ?? null
+    const actor = await actorFor(req)
     const reply = await publishLesson(
       {
         text: await req.text(),
         client: clientKey(req),
         skillVersion: req.headers.get("x-learn-skill-version"),
-        ownerId,
+        ownerId: actor?.userId ?? null,
+        ownerHandle: actor?.handle ?? null,
       },
       await depsFor(req)
     )
     // An owned lesson is listed straight away.
-    if (ownerId && reply.status === 201) revalidateExplore()
+    if (actor && reply.status === 201) revalidateExplore()
     return reply
   })
 }

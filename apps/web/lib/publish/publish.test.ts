@@ -4,6 +4,7 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest"
 
 import { connectPglite, lesson, user, type Db } from "@workspace/db"
 
+import { handleOf } from "../auth/handles"
 import {
   checkLesson,
   claimLesson,
@@ -12,6 +13,7 @@ import {
   isCronRequest,
   LATEST_SKILL_VERSION,
   publishLesson,
+  reissueClaimToken,
   updateLesson,
   type Deps,
 } from "./handlers"
@@ -35,12 +37,13 @@ const buttons = example("button-hierarchy.json")
 let db: Db
 beforeAll(async () => {
   db = await connectPglite()
-  // Owners must exist: lesson.owner_id references the user table.
+  // Owners must exist: lesson.owner_id references the user table. Only user_1 has picked a handle.
   await db.insert(user).values(
     ["user_1", "user_2", "user_3"].map((id) => ({
       id,
       name: id,
       email: `${id}@example.com`,
+      handle: id === "user_1" ? "one" : null,
     }))
   )
 }, 30_000)
@@ -54,6 +57,7 @@ beforeEach(() => {
     limiter: new MemoryRateLimiter(100),
     origin: "https://learn.test",
     now: () => now,
+    handleOf: (id) => handleOf(db, id),
   }
 })
 
@@ -100,6 +104,8 @@ describe("publishing", () => {
       claimUrl: expect.stringMatching(/^https:\/\/learn\.test\/keep\/[\w-]+$/),
       owned: false,
       expiresAt: new Date(now + LESSON_TTL_SECONDS * 1000).toISOString(),
+      owner: null,
+      visibility: "unlisted",
       skill: { latest: LATEST_SKILL_VERSION, updateAvailable: false },
     })
     expect(reply.body.claimUrl).toBe(
@@ -109,17 +115,39 @@ describe("publishing", () => {
     expect(stored?.lesson.title).toBe("Button hierarchy")
     expect(stored?.prepared.visualsCss).toContain(".flex-wrap")
     expect(stored?.editTokenHash).not.toBe(reply.body.editToken)
-    expect(stored?.claimTokenHash).toBe(hashToken(reply.body.claimToken as string))
+    expect(stored?.claimTokenHash).toBe(
+      hashToken(reply.body.claimToken as string)
+    )
     expect(stored?.visibility).toBe("unlisted")
     expect(stored?.ownerId).toBeNull()
   })
 
-  it("publishes an owned lesson listed, with no expiry and no claim token", async () => {
+  it("publishes an owned lesson listed, with no expiry and no claim token, naming the owner", async () => {
     const reply = await publishLesson(
       { text: buttons, client: "x", ownerId: "user_1" },
       deps
     )
-    expect(reply.body).toMatchObject({ owned: true, expiresAt: null })
+    expect(reply.body).toMatchObject({
+      owned: true,
+      expiresAt: null,
+      owner: { handle: "one" },
+      visibility: "public",
+    })
+    // An owner without a handle yet is still named, so clients can say where to pick one.
+    const unnamed = await publishLesson(
+      { text: buttons, client: "x", ownerId: "user_2" },
+      deps
+    )
+    expect(unnamed.body.owner).toEqual({ handle: null })
+    // A route that already has the actor passes the handle, and no lookup runs.
+    deps.handleOf = async () => {
+      throw new Error("looked up")
+    }
+    const known = await publishLesson(
+      { text: buttons, client: "x", ownerId: "user_2", ownerHandle: "two" },
+      deps
+    )
+    expect(known.body.owner).toEqual({ handle: "two" })
     expect(reply.body).not.toHaveProperty("claimToken")
     expect(reply.body).not.toHaveProperty("claimUrl")
     const stored = await deps.store.get(reply.body.id as string)
@@ -268,6 +296,8 @@ describe("claiming", () => {
         title: "Button hierarchy",
         owned: true,
         expiresAt: null,
+        owner: { handle: "one" },
+        visibility: "public",
       },
     })
     const stored = await deps.store.get(body.id as string)
@@ -277,15 +307,24 @@ describe("claiming", () => {
       claimTokenHash: null,
       visibility: "public",
     })
+    // The reply describes the row as claiming left it, not as it was read before.
+    expect(reply.body.visibility).toBe(stored?.visibility)
     // The token is spent: nobody else can use it, and the /keep page no longer finds the lesson.
     expect(
       await deps.store.getByClaimTokenHash(hashToken(body.claimToken as string))
     ).toBeNull()
     const again = await claimLesson(
-      { id: body.id as string, claimToken: body.claimToken as string, ownerId: "user_2" },
+      {
+        id: body.id as string,
+        claimToken: body.claimToken as string,
+        ownerId: "user_2",
+      },
       deps
     )
-    expect(again).toMatchObject({ status: 409, body: { error: "already_claimed" } })
+    expect(again).toMatchObject({
+      status: 409,
+      body: { error: "already_claimed" },
+    })
     // The owner asking again is fine.
     const mine = await claimLesson(
       { id: body.id as string, claimToken: "whatever", ownerId: "user_1" },
@@ -331,6 +370,176 @@ describe("claiming", () => {
     ).toMatchObject({ status: 404 })
   })
 
+  it("keeps a lesson with its edit token instead of the claim token", async () => {
+    const { body } = await anonymous()
+    const wrong = await claimLesson(
+      { id: body.id as string, editToken: "wrong", ownerId: "user_1" },
+      deps
+    )
+    expect(wrong).toMatchObject({
+      status: 401,
+      body: {
+        error: "unauthorized",
+        message: expect.stringContaining("edit token"),
+      },
+    })
+    // The edit token alone needs the id: there's no lookup by it.
+    expect(
+      await claimLesson(
+        { editToken: body.editToken as string, ownerId: "user_1" },
+        deps
+      )
+    ).toMatchObject({ status: 404 })
+    const reply = await claimLesson(
+      {
+        id: body.id as string,
+        editToken: body.editToken as string,
+        ownerId: "user_2",
+      },
+      deps
+    )
+    expect(reply).toMatchObject({
+      status: 200,
+      body: { owned: true, expiresAt: null, owner: { handle: null } },
+    })
+    expect((await deps.store.get(body.id as string))?.ownerId).toBe("user_2")
+    // Another account with the same edit token is still refused: ownership is settled.
+    expect(
+      await claimLesson(
+        {
+          id: body.id as string,
+          editToken: body.editToken as string,
+          ownerId: "user_1",
+        },
+        deps
+      )
+    ).toMatchObject({ status: 409, body: { error: "already_claimed" } })
+    // Both tokens together: either one matching is enough.
+    const other = await anonymous()
+    expect(
+      (
+        await claimLesson(
+          {
+            id: other.body.id as string,
+            claimToken: "stale",
+            editToken: other.body.editToken as string,
+            ownerId: "user_1",
+          },
+          deps
+        )
+      ).status
+    ).toBe(200)
+  })
+
+  it("re-issues a claim token to the edit token's holder, and the old one stops working", async () => {
+    const { body } = await anonymous()
+    const client = "1.2.3.4"
+    expect(
+      await reissueClaimToken(
+        { id: body.id as string, editToken: "wrong", client },
+        deps
+      )
+    ).toMatchObject({ status: 401, body: { error: "unauthorized" } })
+    expect(
+      await reissueClaimToken(
+        { id: "nope1234", editToken: body.editToken as string, client },
+        deps
+      )
+    ).toMatchObject({ status: 404, body: { error: "not_found" } })
+
+    const reply = await reissueClaimToken(
+      { id: body.id as string, editToken: body.editToken as string, client },
+      deps
+    )
+    expect(reply).toMatchObject({
+      status: 200,
+      body: {
+        ok: true,
+        id: body.id,
+        url: body.url,
+        title: "Button hierarchy",
+        claimToken: expect.any(String),
+        claimUrl: expect.stringMatching(/^https:\/\/learn\.test\/keep\//),
+        expiresAt: body.expiresAt,
+      },
+    })
+    const fresh = reply.body.claimToken as string
+    expect(fresh).not.toBe(body.claimToken)
+    expect(reply.body.claimUrl).toBe(`https://learn.test/keep/${fresh}`)
+    // The publish-time token is gone; the /keep page finds the lesson by the new one.
+    expect(
+      await deps.store.getByClaimTokenHash(hashToken(body.claimToken as string))
+    ).toBeNull()
+    expect((await deps.store.getByClaimTokenHash(hashToken(fresh)))?.id).toBe(
+      body.id
+    )
+    expect(
+      await claimLesson(
+        {
+          id: body.id as string,
+          claimToken: body.claimToken as string,
+          ownerId: "user_1",
+        },
+        deps
+      )
+    ).toMatchObject({ status: 401 })
+    expect(
+      (await claimLesson({ claimToken: fresh, ownerId: "user_1" }, deps)).status
+    ).toBe(200)
+    // Once kept, there's nothing to re-issue, even for the edit token's holder.
+    expect(
+      await reissueClaimToken(
+        { id: body.id as string, editToken: body.editToken as string, client },
+        deps
+      )
+    ).toMatchObject({ status: 409, body: { error: "already_claimed" } })
+  })
+
+  it("answers already_claimed when the lesson is claimed between the read and the write", async () => {
+    const { body } = await anonymous()
+    const slow = { ...deps.store } as typeof deps.store
+    // The store's view is still anonymous when the handler reads, but claimed by the time it writes.
+    slow.get = async (id) =>
+      (await deps.store.get(id)) && {
+        ...(await deps.store.get(id))!,
+        ownerId: null,
+      }
+    slow.setClaimToken = deps.store.setClaimToken.bind(deps.store)
+    await claimLesson(
+      {
+        id: body.id as string,
+        claimToken: body.claimToken as string,
+        ownerId: "user_1",
+      },
+      deps
+    )
+    const reply = await reissueClaimToken(
+      {
+        id: body.id as string,
+        editToken: body.editToken as string,
+        client: "y",
+      },
+      { ...deps, store: slow }
+    )
+    expect(reply).toMatchObject({
+      status: 409,
+      body: { error: "already_claimed" },
+    })
+    expect((await deps.store.get(body.id as string))?.claimTokenHash).toBeNull()
+  })
+
+  it("rate-limits re-issuing by client", async () => {
+    const { body } = await anonymous()
+    deps.limiter = new MemoryRateLimiter(1)
+    const req = {
+      id: body.id as string,
+      editToken: body.editToken as string,
+      client: "z",
+    }
+    expect((await reissueClaimToken(req, deps)).status).toBe(200)
+    expect((await reissueClaimToken(req, deps)).status).toBe(429)
+  })
+
   it("keeps the edit token working after a claim", async () => {
     const { body } = await anonymous()
     await claimLesson(
@@ -348,7 +557,7 @@ describe("claiming", () => {
     )
     expect(reply).toMatchObject({
       status: 200,
-      body: { owned: true, expiresAt: null },
+      body: { owned: true, expiresAt: null, owner: { handle: "one" } },
     })
   })
 })
