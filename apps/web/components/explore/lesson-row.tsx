@@ -29,9 +29,10 @@ const t = stringsFor("en")
  * down the feed. Then the title, up to two lines of summary, and one meta line with the subject,
  * length and level (after a green check when the viewer has finished it), and the plays and likes
  * at its end. The whole row opens the lesson; the author, the check, and the heart are their own
- * targets. Rows aren't cards or between hairlines: space separates them, and hovering one fills a
- * rounded tile that reaches past the column into the gutter (negative margin, matching padding),
- * so the text stays lined up with the page and the tile still has room around it. `rank` puts a number
+ * targets. Rows sit between hairlines (the list adds them), not in cards. Hovering one turns it into
+ * a bordered, filled tile that reaches past the column into the gutter (negative margin, matching
+ * padding), so the text stays lined up with the page and the tile has room around it; the list
+ * hides the two hairlines it would touch. `rank` puts a number
  * in the margin on the Top tab; `showAuthor={false}` drops the author on a profile, where every
  * row shares it, leaving the age alone on the byline.
  */
@@ -84,7 +85,7 @@ export function LessonRow({
   return (
     <div
       className={cn(
-        "relative -mx-3 flex gap-3 rounded-xl px-3 py-5 transition-colors sm:-mx-4 sm:px-4 has-[[data-slot=row-link]:hover]:bg-muted/50 dark:has-[[data-slot=row-link]:hover]:bg-input/30",
+        "relative -mx-3 flex gap-3 rounded-xl border border-transparent px-3 py-5 transition-colors has-[[data-slot=row-link]:hover]:border-border has-[[data-slot=row-link]:hover]:bg-muted/50 sm:-mx-4 sm:px-4 dark:has-[[data-slot=row-link]:hover]:bg-input/30",
         className
       )}
     >
