@@ -1,7 +1,8 @@
+import { oauthProviderClient } from "@better-auth/oauth-provider/client"
 import { emailOTPClient } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
 
-import type { KeySummary, McpConnection } from "./account"
+import type { ConnectedApp, KeySummary, McpConnection } from "./account"
 import { decodeAccount, encodeAccount, type AccountInfo } from "./account-info"
 
 // What the sign-in and settings pages call from the browser: Better Auth's client for sign-in
@@ -9,7 +10,7 @@ import { decodeAccount, encodeAccount, type AccountInfo } from "./account-info"
 // take it as a prop so Storybook can hand them a fake.
 
 export const authClient = createAuthClient({
-  plugins: [emailOTPClient()],
+  plugins: [emailOTPClient(), oauthProviderClient()],
 })
 
 export interface Outcome {
@@ -46,6 +47,15 @@ export interface AccountApi {
   connectChat(): Promise<Outcome & { connection?: NewMcpConnection }>
   /** Revokes the personal MCP URL. */
   disconnectChat(): Promise<Outcome>
+  /** The chat apps that signed in over OAuth and were allowed. */
+  listApps(): Promise<ConnectedApp[]>
+  /** Disconnects one of them: its tokens stop working at once. */
+  disconnectApp(id: string): Promise<Outcome>
+  /**
+   * Answers the consent page for the OAuth request in the page's query (a chat app signing in);
+   * `url` is where to send the browser next: back to the app, with a code or a refusal.
+   */
+  consent(accept: boolean): Promise<Outcome & { url?: string }>
 }
 
 export interface NewMcpConnection extends McpConnection {
@@ -150,6 +160,22 @@ export const accountApi: AccountApi = {
   async disconnectChat() {
     const reply = await call("/api/account/mcp", { method: "DELETE" })
     return reply.ok ? {} : { error: reply.message }
+  },
+  async listApps() {
+    const reply = await call<{ apps: ConnectedApp[] }>("/api/account/apps")
+    return reply.ok ? reply.apps : []
+  },
+  async disconnectApp(id) {
+    const reply = await call(`/api/account/apps/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    })
+    return reply.ok ? {} : { error: reply.message }
+  },
+  async consent(accept) {
+    const { data, error } = await authClient.oauth2.consent({ accept })
+    if (error) return { error: error.message ?? FAILED }
+    const url = (data as { url?: string } | null)?.url
+    return url ? { url } : { error: FAILED }
   },
 }
 
