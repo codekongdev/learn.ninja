@@ -8,7 +8,6 @@ import { AvatarForm } from "@/components/account/avatar-form"
 import { ConnectChatFallback } from "@/components/account/connect-chat"
 import { ConnectedApps } from "@/components/account/connected-apps"
 import { HandleForm } from "@/components/account/handle-form"
-import { LogOutButton } from "@/components/account/log-out-button"
 import { ButtonLink } from "@/components/site/button-link"
 import { connectedApps, listKeys, mcpConnection } from "@/lib/auth/account"
 import { accountOf } from "@/lib/auth/account-info"
@@ -26,7 +25,7 @@ export const metadata: Metadata = {
 // exist on a build machine.
 export const dynamic = "force-dynamic"
 
-/** The account: picture, handle, connected chat apps, API keys, and log out. */
+/** The account: picture, handle, connected chat apps, and API keys. */
 export default async function SettingsPage() {
   const actor = await currentActor()
   if (!actor) redirect("/login?callback=/settings")
@@ -81,10 +80,6 @@ export default async function SettingsPage() {
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold tracking-tight">API keys</h2>
         <ApiKeys initial={keys} />
-      </section>
-
-      <section className="flex flex-col gap-4 border-t pt-8">
-        <LogOutButton />
       </section>
     </AccountPage>
   )

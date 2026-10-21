@@ -18,7 +18,6 @@ import { AuthHeading, AuthPanel, LegalConsent } from "./auth-panel"
 import { ConsentForm } from "./consent-form"
 import { HandleForm } from "./handle-form"
 import { LoginForm } from "./login-form"
-import { LogOutButton } from "./log-out-button"
 
 // The account screens with a fake server: any code "123456" works, the handle "taken" is taken,
 // and a picture named "big" is refused by the server (the browser refuses real oversized files first).
@@ -345,10 +344,6 @@ export const ConnectChatAppFails: Story = {
       })}
     />
   ),
-}
-
-export const LogOut: Story = {
-  render: () => <LogOutButton api={fakeApi()} navigate={navigate} />,
 }
 
 export const HeaderLinks: Story = {
