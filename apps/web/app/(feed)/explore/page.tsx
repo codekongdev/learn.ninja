@@ -1,8 +1,11 @@
 import type { Metadata } from "next"
+import { headers } from "next/headers"
 
+import { ExploreGreeting } from "@/components/explore/explore-greeting"
 import { LessonFeed } from "@/components/explore/lesson-feed"
 import { currentActor } from "@/lib/auth/session"
 import { cachedLessons } from "@/lib/explore/cache"
+import { greetingFor, localHour } from "@/lib/explore/greeting"
 import { completedAt, likedIds } from "@/lib/explore/queries"
 import { getDb } from "@/lib/publish/store"
 import { SITE } from "@/lib/site"
@@ -21,10 +24,15 @@ export const dynamic = "force-dynamic"
 // Newest first, for now: Trending and Top are still in lib/explore/queries.ts for when the feed
 // is big enough to need them.
 export default async function ExplorePage() {
-  const [actor, lessons] = await Promise.all([
+  const [actor, lessons, h] = await Promise.all([
     currentActor(),
     cachedLessons("new"),
+    headers(),
   ])
+  // Vercel names the visitor's time zone from their IP, so the greeting fits their hour.
+  const greeting = greetingFor(
+    localHour(new Date(), h.get("x-vercel-ip-timezone"))
+  )
   const ids = lessons.map((l) => l.id)
   const [liked, completed] = actor
     ? await getDb().then((db) =>
@@ -36,8 +44,9 @@ export default async function ExplorePage() {
     : [new Set<string>(), new Map<string, number>()]
   return (
     <>
-      {/* The list is the page: no heading or blurb, only a name for assistive tech. */}
+      {/* The list is the page: a greeting over it, and a name only for assistive tech. */}
       <h1 className="sr-only">Explore</h1>
+      <ExploreGreeting greeting={greeting} />
       {lessons.length ? (
         <LessonFeed
           lessons={lessons}

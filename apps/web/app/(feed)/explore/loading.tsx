@@ -1,3 +1,4 @@
+import { ExploreGreetingSkeleton } from "@/components/explore/explore-greeting"
 import { FeedSkeleton } from "@/components/explore/feed-skeleton"
 
 /**
@@ -9,6 +10,7 @@ export default function ExploreLoading() {
   return (
     <>
       <h1 className="sr-only">Explore</h1>
+      <ExploreGreetingSkeleton />
       <FeedSkeleton />
     </>
   )

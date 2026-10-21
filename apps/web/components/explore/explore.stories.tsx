@@ -7,6 +7,9 @@ import { Button } from "@workspace/ui/components/button"
 import type { ExploreApi } from "@/lib/explore/browser"
 import type { LessonSummary } from "@/lib/explore/queries"
 
+import { greetingFor } from "@/lib/explore/greeting"
+
+import { ExploreGreeting, ExploreGreetingSkeleton } from "./explore-greeting"
 import { FeedSkeleton } from "./feed-skeleton"
 import { LessonFeed } from "./lesson-feed"
 import { LessonMenuView } from "./lesson-menu"
@@ -336,6 +339,18 @@ export const FeedLoading: Story = {
   render: () => (
     <div className="mx-auto max-w-2xl">
       <FeedSkeleton rows={4} />
+    </div>
+  ),
+}
+
+/** The greeting at each part of the day, and while the page loads. */
+export const Greeting: Story = {
+  render: () => (
+    <div className="mx-auto flex max-w-2xl flex-col gap-8">
+      {[9, 14, 19, 23].map((hour) => (
+        <ExploreGreeting key={hour} greeting={greetingFor(hour)} />
+      ))}
+      <ExploreGreetingSkeleton />
     </div>
   ),
 }
