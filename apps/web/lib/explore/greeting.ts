@@ -1,9 +1,10 @@
-// The line at the top of Explore: the Japanese greeting for the time of day, then a short sensei
-// line under it. Pure, so it's tested without a request.
+// The line at the top of Explore: the Japanese greeting for the time of day and two words after
+// it, as in "Konbanwa, still time." Pure, so it's tested without a request.
 
 export interface Greeting {
   /** The greeting in romaji: shown with lang="ja-Latn" so screen readers say it as Japanese. */
   word: string
+  /** What follows the comma, lowercase and without the full stop. */
   line: string
 }
 
@@ -32,9 +33,9 @@ export function localHour(now: Date, timeZone: string | null): number {
  * evening in Japanese: oyasumi is only said when leaving for bed, never on arriving.
  */
 export function greetingFor(hour: number): Greeting {
-  if (hour >= 5 && hour < 12) return { word: "Ohayō", line: "Fresh mind." }
+  if (hour >= 5 && hour < 12) return { word: "Ohayō", line: "fresh mind" }
   if (hour >= 12 && hour < 18)
-    return { word: "Konnichiwa", line: "Welcome back." }
-  if (hour >= 18 && hour < 22) return { word: "Konbanwa", line: "Still time." }
-  return { word: "Konbanwa", line: "Quiet hours." }
+    return { word: "Konnichiwa", line: "welcome back" }
+  if (hour >= 18 && hour < 22) return { word: "Konbanwa", line: "still time" }
+  return { word: "Konbanwa", line: "quiet hours" }
 }
