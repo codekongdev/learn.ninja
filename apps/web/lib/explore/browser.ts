@@ -1,6 +1,7 @@
 import type { Visibility } from "./queries"
 
-// What the like button, the report dialog, the owner's row menu, and the settings page call from the browser. The
+// What the like button, the report dialog, the owner's row menu, and the owner's lesson list call
+// from the browser. The
 // components take it as a prop so Storybook can hand them a fake.
 
 export interface Outcome {
