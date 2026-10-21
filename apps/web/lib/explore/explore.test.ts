@@ -19,6 +19,7 @@ import { PostgresLessonStore } from "@/lib/publish/store"
 import {
   flushPendingViews,
   completeLesson,
+  liveViewCounts,
   deleteLesson,
   likeLesson,
   recordView,
@@ -527,6 +528,20 @@ describe("views", () => {
     const rows = await listLessons(db, "top", 10, { now })
     expect(rows.find((l) => l.id === a)?.views).toBe(7)
     expect(rows.find((l) => l.id === b)?.views).toBe(1)
+  })
+
+  it("counts pending views in the live counts before they're flushed", async () => {
+    const a = await published("ada", { visibility: "public", views: 5 })
+    const b = await published("bob", { visibility: "public" })
+    const counter = new MemoryViewCounter()
+    const batched = { ...deps, views: counter }
+    await recordView(a, batched)
+    await recordView(a, batched)
+    const live = () => liveViewCounts([a, b], batched)
+    expect(Object.fromEntries(await live())).toEqual({ [a]: 7, [b]: 0 })
+    await flushPendingViews(batched)
+    expect(Object.fromEntries(await live())).toEqual({ [a]: 7, [b]: 0 })
+    expect((await liveViewCounts([], batched)).size).toBe(0)
   })
 })
 

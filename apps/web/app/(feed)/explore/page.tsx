@@ -3,9 +3,11 @@ import { headers } from "next/headers"
 
 import { ExploreGreeting } from "@/components/explore/explore-greeting"
 import { LessonFeed } from "@/components/explore/lesson-feed"
+import { RefreshAfterView } from "@/components/explore/refresh-after-view"
 import { currentActor } from "@/lib/auth/session"
-import { cachedLessons } from "@/lib/explore/cache"
+import { cachedLessons, getViewCounter } from "@/lib/explore/cache"
 import { greetingFor, localHour } from "@/lib/explore/greeting"
+import { liveViewCounts } from "@/lib/explore/handlers"
 import { completedAt, likedIds } from "@/lib/explore/queries"
 import { getDb } from "@/lib/publish/store"
 import { SITE } from "@/lib/site"
@@ -16,8 +18,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/explore" },
 }
 
-// The lists come from the data cache (lib/explore/cache.ts); only the session and what the viewer
-// liked and finished are read per request. The frame around the list is the (feed) layout's;
+// The lists come from the data cache (lib/explore/cache.ts); only the session, the view counts, and
+// what the viewer liked and finished are read per request. The frame around the list is the (feed) layout's;
 // loading.tsx beside this file stands in for the list until it arrives.
 export const dynamic = "force-dynamic"
 
@@ -34,22 +36,24 @@ export default async function ExplorePage() {
     localHour(new Date(), h.get("x-vercel-ip-timezone"))
   )
   const ids = lessons.map((l) => l.id)
-  const [liked, completed] = actor
-    ? await getDb().then((db) =>
-        Promise.all([
-          likedIds(db, actor.userId, ids),
-          completedAt(db, actor.userId, ids),
-        ])
-      )
-    : [new Set<string>(), new Map<string, number>()]
+  const db = await getDb()
+  const [views, liked, completed] = await Promise.all([
+    liveViewCounts(ids, { db, views: await getViewCounter() }),
+    actor ? likedIds(db, actor.userId, ids) : new Set<string>(),
+    actor ? completedAt(db, actor.userId, ids) : new Map<string, number>(),
+  ])
   return (
     <>
       {/* The list is the page: a greeting over it, and a name only for assistive tech. */}
       <h1 className="sr-only">Explore</h1>
       <ExploreGreeting greeting={greeting} />
+      <RefreshAfterView />
       {lessons.length ? (
         <LessonFeed
-          lessons={lessons}
+          lessons={lessons.map((l) => ({
+            ...l,
+            views: views.get(l.id) ?? l.views,
+          }))}
           viewer={{
             signedIn: actor !== null,
             liked,

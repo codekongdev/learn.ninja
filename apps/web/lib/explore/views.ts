@@ -7,13 +7,15 @@ import { lesson, type Db } from "@workspace/db"
 // components/explore/view-beacon.tsx), counted after the response is sent.
 // With Redis the views pile up in a hash and are added to lesson.views in one write when the Explore
 // lists revalidate or the daily cron runs; without it (development, tests) each view is written
-// through to Postgres at once.
+// through to Postgres at once. Explore shows lesson.views plus what's pending, so a view shows at once.
 
 export interface ViewCounter {
   /** One more view for `id`. */
   record(id: string): Promise<void>
   /** Takes every view not yet in Postgres, as lesson id → count, and forgets it. */
   drain(): Promise<Record<string, number>>
+  /** The views of `ids` not yet in Postgres, without taking them. Ids with none are left out. */
+  pending(ids: string[]): Promise<Map<string, number>>
 }
 
 // The keys keep the names they had when these were plays, so nothing pending is lost on deploy.
@@ -41,6 +43,20 @@ export class RedisViewCounter implements ViewCounter {
     for (const [id, n] of Object.entries(counts ?? {})) out[id] = Number(n)
     return out
   }
+
+  async pending(ids: string[]) {
+    // A batch a drain has moved aside but not yet written is in neither place for those few
+    // milliseconds, so a count can dip by its views for one request.
+    if (!ids.length) return new Map()
+    const counts = await this.redis.hmget<Record<string, number | null>>(
+      PENDING,
+      ...ids
+    )
+    const out = new Map<string, number>()
+    for (const [id, n] of Object.entries(counts ?? {}))
+      if (n) out.set(id, Number(n))
+    return out
+  }
 }
 
 /** Without Redis: every view goes straight to lesson.views. */
@@ -57,6 +73,10 @@ export class WriteThroughViewCounter implements ViewCounter {
   async drain() {
     return {}
   }
+
+  async pending() {
+    return new Map<string, number>()
+  }
 }
 
 /** Keeps views in memory until drained; for tests of the flush. */
@@ -71,6 +91,15 @@ export class MemoryViewCounter implements ViewCounter {
     const out = Object.fromEntries(this.counts)
     this.counts.clear()
     return out
+  }
+
+  async pending(ids: string[]) {
+    return new Map(
+      ids.flatMap((id) => {
+        const n = this.counts.get(id)
+        return n ? [[id, n] as const] : []
+      })
+    )
   }
 }
 

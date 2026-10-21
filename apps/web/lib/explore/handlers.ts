@@ -8,7 +8,7 @@ import type { RateLimiter } from "@/lib/publish/rate-limit"
 
 import { REASON_MAX, TITLE_MAX } from "./browser"
 import { flushViews, type ViewCounter } from "./views"
-import type { Visibility } from "./queries"
+import { viewCounts, type Visibility } from "./queries"
 import type { ReportSender } from "./report-email"
 
 export { REASON_MAX, TITLE_MAX }
@@ -330,4 +330,20 @@ export async function flushPendingViews(
   deps: Pick<ExploreDeps, "db" | "views">
 ): Promise<number> {
   return flushViews(deps.db, deps.views)
+}
+
+/**
+ * The current view counts of `ids`: the stored ones plus those still pending. Explore reads these
+ * per request over its cached lists, so a view shows when the visitor comes back to the list.
+ */
+export async function liveViewCounts(
+  ids: string[],
+  deps: Pick<ExploreDeps, "db" | "views">
+): Promise<Map<string, number>> {
+  const [stored, pending] = await Promise.all([
+    viewCounts(deps.db, ids),
+    deps.views.pending(ids),
+  ])
+  for (const [id, n] of pending) stored.set(id, (stored.get(id) ?? 0) + n)
+  return stored
 }

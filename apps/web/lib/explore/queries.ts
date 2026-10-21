@@ -285,6 +285,19 @@ export async function completedAt(
   return new Map(rows.map((r) => [r.id, r.at.getTime()]))
 }
 
+/** The stored view counts of `ids`, as lesson id → views. */
+export async function viewCounts(
+  db: Db,
+  ids: string[]
+): Promise<Map<string, number>> {
+  if (!ids.length) return new Map()
+  const rows = await db
+    .select({ id: lesson.id, views: lesson.views })
+    .from(lesson)
+    .where(inArray(lesson.id, ids))
+  return new Map(rows.map((r) => [r.id, r.views]))
+}
+
 export interface Profile {
   id: string
   handle: string
