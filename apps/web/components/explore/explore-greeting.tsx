@@ -10,7 +10,7 @@ import type { Greeting } from "@/lib/explore/greeting"
  * thick, packed tight, so this sets its own: 2px round dots, 6px apart, at the bottom of the padding.
  */
 const DOTS =
-  "bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-muted-foreground)_60%,transparent)_1px,transparent_1.5px)] bg-size-[6px_2px] bg-bottom-left bg-repeat-x pb-1"
+  "bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-muted-foreground)_35%,transparent)_1px,transparent_1.5px)] bg-size-[6px_2px] bg-bottom-left bg-repeat-x pb-1"
 
 /**
  * The sensei's hello above the feed, on one line: "Konbanwa, still time." The Japanese word has a
