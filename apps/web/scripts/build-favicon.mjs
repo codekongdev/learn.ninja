@@ -1,6 +1,7 @@
-// Builds app/favicon.ico from app/icon.svg, for browsers without SVG favicons. The renderer doesn't
-// match prefers-color-scheme, so the .ico gets the SVG's fallback: the mark on a white disc. Run it
-// after changing icon.svg.
+// Builds app/favicon.ico from app/icon.svg, for browsers without SVG favicons. The icon is the mark on
+// a white disc in every colour scheme: Safari uses the .ico whenever one is linked and ignores an SVG
+// favicon's prefers-color-scheme rules, so a scheme-aware SVG only ever reached Chrome and Firefox.
+// Run it after changing icon.svg.
 
 import { readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"

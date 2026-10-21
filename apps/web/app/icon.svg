@@ -1,23 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="3.5 3.5 57 57" fill="none">
-  <!-- Browsers that read the color scheme show the bare mark; the rest show it on a white disc, so they don't add a square plate of their own. -->
-  <style>
-    .bare { display: none; color: #0a0a0a; } .plated { color: #0a0a0a; }
-    @media (prefers-color-scheme: light) { .plated { display: none; } .bare { display: inline; } }
-    @media (prefers-color-scheme: dark) { .plated { display: none; } .bare { display: inline; color: #fafafa; } }
-  </style>
-  <defs>
-    <g id="mark">
-      <g stroke="currentColor" stroke-width="5" stroke-linejoin="round">
-        <path d="M7.01 24.83A26 26 0 0 1 56.99 24.83Q32 15.17 7.01 24.83Z"/>
-        <path d="M56.99 39.17Q32 48.83 7.01 39.17A26 26 0 0 0 56.99 39.17Z"/>
-      </g>
-      <ellipse fill="currentColor" cx="25" cy="32" rx="2.9" ry="4.6"/>
-      <ellipse fill="currentColor" cx="39" cy="32" rx="2.9" ry="4.6"/>
-    </g>
-  </defs>
-  <g class="plated">
-    <circle fill="#fff" cx="32" cy="32" r="28.5"/>
-    <use href="#mark" transform="translate(32 32) scale(0.78) translate(-32 -32)"/>
-  </g>
-  <use class="bare" href="#mark"/>
+<svg width="78" height="78" viewBox="0 0 78 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="78" height="78" rx="39" fill="white"/>
+<path d="M9.1875 30.446C11.046 23.9743 14.9599 18.2831 20.3381 14.2319C25.7164 10.1808 32.2668 7.98975 39.0001 7.98975C45.7334 7.98975 52.2839 10.1808 57.6621 14.2319C63.0404 18.2831 66.9543 23.9743 68.8128 30.446C48.9377 22.7632 29.0626 22.7632 9.1875 30.446Z" stroke-width="5.96491" stroke-linejoin="round" stroke="#0A0A0A"/>
+<path d="M68.8128 47.5537C48.9377 55.2365 29.0626 55.2365 9.1875 47.5537C11.046 54.0254 14.9599 59.7167 20.3381 63.7678C25.7164 67.819 32.2668 70.01 39.0001 70.01C45.7334 70.01 52.2839 67.819 57.6621 63.7678C63.0404 59.7167 66.9543 54.0254 68.8128 47.5537Z" stroke-width="5.96491" stroke-linejoin="round" stroke="#0A0A0A"/>
+<path d="M30.655 44.4876C32.5657 44.4876 34.1146 42.0307 34.1146 38.9999C34.1146 35.9691 32.5657 33.5122 30.655 33.5122C28.7442 33.5122 27.1953 35.9691 27.1953 38.9999C27.1953 42.0307 28.7442 44.4876 30.655 44.4876Z" fill="#0A0A0A"/>
+<path d="M47.3425 44.4876C49.2532 44.4876 50.8021 42.0307 50.8021 38.9999C50.8021 35.9691 49.2532 33.5122 47.3425 33.5122C45.4318 33.5122 43.8828 35.9691 43.8828 38.9999C43.8828 42.0307 45.4318 44.4876 47.3425 44.4876Z" fill="#0A0A0A"/>
 </svg>
