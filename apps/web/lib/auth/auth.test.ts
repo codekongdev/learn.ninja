@@ -423,3 +423,56 @@ describe("with Redis holding sessions", () => {
     expect(metadata.status).toBe(200)
   })
 })
+
+describe("the reviewers' test account", () => {
+  it("signs in with the fixed code and gets no email; everyone else is unchanged", async () => {
+    const sent: string[] = []
+    const reviewed = createAuth({
+      db,
+      env: { NODE_ENV: "test" } as NodeJS.ProcessEnv,
+      sendCode: async (email, code) => {
+        sent.push(email)
+        codes.set(email, code)
+      },
+      codeLimiter: new MemoryRateLimiter(100),
+      reviewSignIn: { email: "reviewer@example.com", code: "246810" },
+    })
+    await reviewed.api.sendVerificationOTP({
+      body: { email: "Reviewer@example.com", type: "sign-in" },
+    })
+    expect(sent).toEqual([])
+    const wrong = await reviewed.api.signInEmailOTP({
+      body: { email: "reviewer@example.com", otp: "000000" },
+      asResponse: true,
+    })
+    expect(wrong.status).not.toBe(200)
+    const ok = await reviewed.api.signInEmailOTP({
+      body: { email: "reviewer@example.com", otp: "246810" },
+      asResponse: true,
+    })
+    expect(ok.status).toBe(200)
+
+    await reviewed.api.sendVerificationOTP({
+      body: { email: "someone@example.com", type: "sign-in" },
+    })
+    expect(sent).toEqual(["someone@example.com"])
+    expect(codes.get("someone@example.com")).not.toBe("246810")
+  })
+
+  it("is off unless both variables are set and the code has six digits", async () => {
+    const { reviewSignInFromEnv } = await import("./auth")
+    const env = (vars: Record<string, string>) => vars as NodeJS.ProcessEnv
+    expect(reviewSignInFromEnv(env({}))).toBeNull()
+    expect(reviewSignInFromEnv(env({ REVIEW_SIGN_IN_EMAIL: "r@example.com" }))).toBeNull()
+    expect(
+      reviewSignInFromEnv(
+        env({ REVIEW_SIGN_IN_EMAIL: "r@example.com", REVIEW_SIGN_IN_CODE: "12" })
+      )
+    ).toBeNull()
+    expect(
+      reviewSignInFromEnv(
+        env({ REVIEW_SIGN_IN_EMAIL: " R@Example.com ", REVIEW_SIGN_IN_CODE: "123456" })
+      )
+    ).toEqual({ email: "r@example.com", code: "123456" })
+  })
+})
