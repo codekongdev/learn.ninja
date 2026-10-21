@@ -25,6 +25,12 @@ describe("greetingFor", () => {
     expect(greetingFor(18).word).toBe("Konbanwa")
   })
 
+  it("says what the word means in English", () => {
+    expect(greetingFor(9).meaning).toBe("Good morning")
+    expect(greetingFor(14).meaning).toBe("Hello")
+    expect(greetingFor(23).meaning).toBe("Good evening")
+  })
+
   it("keeps saying konbanwa late at night, with its own line", () => {
     expect(greetingFor(23).word).toBe("Konbanwa")
     expect(greetingFor(4).word).toBe("Konbanwa")
