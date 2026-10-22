@@ -496,7 +496,7 @@ describe("keep_lesson", () => {
 })
 
 describe("/mcp/{key}, the personal URL", () => {
-  it("publishes to the account, unlisted, and the owner updates without a token", async () => {
+  it("publishes to the account, listed, and the owner updates without a token", async () => {
     const key = await mcpKeyFor("owner@example.com")
     const { tools } = await personal(key).rpc("tools/list", {})
     const publish = tools.find(
@@ -514,7 +514,7 @@ describe("/mcp/{key}, the personal URL", () => {
       ok: true,
       expiresAt: null,
       owner: { handle: null },
-      visibility: "unlisted",
+      visibility: "public",
     })
     expect(body).not.toHaveProperty("claimUrl")
     // Nor the edit token: the account edits, and a shared chat shouldn't carry a secret.
@@ -525,11 +525,11 @@ describe("/mcp/{key}, the personal URL", () => {
       .where(eq(user.email, "owner@example.com"))
     expect(await deps.store.get(body.id as string)).toMatchObject({
       ownerId: account!.id,
-      visibility: "unlisted",
+      visibility: "public",
       expiresAt: null,
     })
-    // Nothing became listed: no cache refresh.
-    expect(listed).toBe(0)
+    // Listed straight away, so Explore's cached lists refresh.
+    expect(listed).toBe(1)
 
     const updated = await personal(key).call("update_lesson", {
       id: body.id,

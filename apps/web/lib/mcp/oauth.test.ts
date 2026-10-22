@@ -386,14 +386,15 @@ describe("the gate in front of /mcp", () => {
       ok: true,
       expiresAt: null,
       owner: { handle: null },
-      visibility: "unlisted",
+      visibility: "public",
     })
     expect(body).not.toHaveProperty("editToken")
     expect(body).not.toHaveProperty("claimUrl")
     const [ada] = await db.select().from(user).where(eq(user.email, "ada@example.com"))
     const store = new PostgresLessonStore(db)
     expect((await store.get(body.id as string))?.ownerId).toBe(ada!.id)
-    expect(listed).toBe(0)
+    // Listed straight away, so Explore's cached lists refresh.
+    expect(listed).toBe(1)
 
     // The logged-in app edits its lessons by account, no token in the chat.
     const updated = await resultOf(

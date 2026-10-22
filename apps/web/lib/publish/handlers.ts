@@ -75,11 +75,6 @@ interface PublishRequest {
   ownerId?: string | null
   /** The owner's handle when the caller already knows it (the route has the actor), so the reply needn't look it up. */
   ownerHandle?: string | null
-  /**
-   * Where an owned lesson starts: listed in Explore (the default) or link-only. A personal MCP URL
-   * publishes unlisted, so half-finished drafts don't land in Explore. Ignored for anonymous lessons.
-   */
-  visibility?: "public" | "unlisted"
   /** The app or agent publishing (an MCP client's name, or the CLI's x-learn-agent header), shown on cards. */
   origin?: string | null
 }
@@ -212,9 +207,9 @@ export async function publishLesson(
     editTokenHash: hashToken(editToken),
     claimTokenHash: claimToken ? hashToken(claimToken) : null,
     ownerId: owner,
-    // An owned lesson is listed in Explore straight away unless the caller says otherwise (the
-    // owner can switch it in their settings); an anonymous one stays link-only until it's kept.
-    visibility: owner ? (req.visibility ?? "public") : "unlisted",
+    // An owned lesson is listed in Explore straight away (the owner can unlist it on their
+    // profile); an anonymous one stays link-only until it's kept.
+    visibility: owner ? "public" : "unlisted",
     hidden: false,
     views: 0,
     likes: 0,

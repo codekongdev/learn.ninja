@@ -869,10 +869,10 @@ describe("updating", () => {
 
   it("lets the owner update without a token, and nobody else", async () => {
     const created = await publishLesson(
-      { text: buttons, client: "x", ownerId: "user_1", visibility: "unlisted" },
+      { text: buttons, client: "x", ownerId: "user_1" },
       deps
     )
-    expect(created.body).toMatchObject({ owned: true, visibility: "unlisted" })
+    expect(created.body).toMatchObject({ owned: true, visibility: "public" })
     const id = created.body.id as string
     const changed = JSON.stringify({ ...JSON.parse(buttons), title: "Mine" })
     const asOwner = await updateLesson(
@@ -903,14 +903,10 @@ describe("updating", () => {
       deps
     )
     expect(noToken.status).toBe(401)
-    // Visibility is only a choice for owned lessons.
+    // Only owned lessons are listed; an anonymous one stays link-only.
     expect(
-      (
-        await publishLesson(
-          { text: buttons, client: "x", visibility: "public" },
-          deps
-        )
-      ).body.visibility
+      (await publishLesson({ text: buttons, client: "x" }, deps)).body
+        .visibility
     ).toBe("unlisted")
   })
 })

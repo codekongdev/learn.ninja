@@ -28,7 +28,7 @@ import { applyPatches, PatchError, type DraftStore, type Patch } from "./drafts"
 // in front of the route (gate.ts) answers `keep_lesson` from a logged-out app with a 401 that
 // makes the app run OAuth against Better Auth, and from then on every call carries a token and
 // `actor` is the account. At /mcp/{key}, a personal URL from the settings page, the key in the
-// path is the account instead. Either way, lessons are published to it, unlisted.
+// path is the account instead. Either way, lessons are published to it and listed in Explore.
 
 export interface McpDeps extends Deps {
   /** The looser limit checks use, as /api/validate does. */
@@ -39,7 +39,7 @@ export interface McpDeps extends Deps {
   drafts: DraftStore
   /** The logged-in account (an OAuth token, or a personal URL's key); null or absent when anonymous. */
   actor?: McpActor | null
-  /** Called when a lesson becomes listed in Explore (a keep), so cached lists refresh. */
+  /** Called when a lesson becomes listed in Explore (a logged-in publish, or a keep), so cached lists refresh. */
   exploreChanged?: () => void
 }
 
@@ -219,7 +219,7 @@ function registerTools(server: McpServer, deps: McpDeps) {
   )
 
   const owned = actor
-    ? `Lessons are saved to ${actor.handle ? `@${actor.handle}` : "the user's account"} (this connection is theirs) and start unlisted, so drafts don't show in Explore; ${actor.handle ? `the switch is on their profile, learn.ninja/u/${actor.handle}` : "once they pick a handle at learn.ninja/settings, the switch is on their profile"}.`
+    ? `Lessons are saved to ${actor.handle ? `@${actor.handle}` : "the user's account"} (this connection is theirs) and listed in Explore straight away; ${actor.handle ? `they can unlist one on their profile, learn.ninja/u/${actor.handle}` : "they can unlist one on their profile once they pick a handle at learn.ninja/settings"}.`
     : null
 
   server.registerTool(
@@ -260,12 +260,12 @@ function registerTools(server: McpServer, deps: McpDeps) {
               client,
               ownerId: actor?.userId ?? null,
               ownerHandle: actor?.handle ?? null,
-              // A personal URL publishes everything, drafts included: keep them out of Explore.
-              visibility: actor ? "unlisted" : undefined,
               origin: originOf(ctx),
             },
             deps
           )
+          // A lesson published to an account is listed straight away.
+          if (actor && reply.status === 201) deps.exploreChanged?.()
           return { reply, keepDraft: reply.body.ok !== true }
         },
         [
