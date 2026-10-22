@@ -9,7 +9,7 @@ How to turn the user's input into a lesson that's genuinely good to play. Read t
 - Write the `objective` as something the learner can _do_ afterwards: "Give each view one clear primary action", not "Learn about buttons".
 - Keep new material small: at most 5–8 new terms, words, or phrases. Fewer, practised well, beats a long list.
 - Set `level` for who the lesson is for (`levels/index.md` says how to choose) and read `levels/{level}.md` before writing: it sets what to assume, what the questions ask for, and how much help to give. The size (`reference/planning.md`) sets how many concepts the shape in the next section has.
-- If the input covers several ideas, `reference/planning.md` says whether to pick the one everything else depends on or to plan a path of lessons. Either way, you can name the next lesson in `wrapup.next`.
+- If the input covers several ideas, `reference/planning.md` says whether to pick the one everything else depends on or to plan a path of lessons. Either way, name the next lesson in `wrapup.next`: the wrap-up suggests it, and you offer it when you report the link.
 - Stay faithful to the source. If the input is an article, teach what it says; don't add claims it doesn't support.
 
 ## 2. Shape: interleaved, not "read then quiz"
