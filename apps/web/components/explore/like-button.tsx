@@ -42,10 +42,10 @@ export function LikeButton({
         href={`/login?callback=${encodeURIComponent(here)}`}
         variant="link"
         size="xs"
-        className={cn("px-0", className)}
+        className={cn("px-0 text-sm", className)}
         autoFocus
       >
-        <HeartIcon data-icon="inline-start" />
+        <HeartIcon data-icon="inline-start" className="size-3.5" />
         Log in to like
       </LinkButton>
     )
@@ -82,14 +82,14 @@ export function LikeButton({
         aria-label={`${state.likes} ${state.likes === 1 ? "like" : "likes"}${state.liked ? ", liked" : ""}`}
         onPress={() => void toggle()}
         className={cn(
-          "tabular-nums",
+          "text-sm tabular-nums",
           state.liked && "text-destructive hover:text-destructive",
           className
         )}
       >
         <HeartIcon
           data-icon="inline-start"
-          className={cn(state.liked && "fill-current")}
+          className={cn("size-3.5", state.liked && "fill-current")}
         />
         {compact(state.likes)}
       </Button>

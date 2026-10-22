@@ -1,11 +1,14 @@
+"use client"
+
+import { Tooltip, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { logoMask } from "@/components/site/agent-logos"
 import type { Agent } from "@/lib/origin"
 
 /**
- * The agent a lesson was made with, in the byline after its author: the muted logo from the home
- * page's set and the agent's name, which is cut short before the author's handle is.
+ * The agent a lesson was made with, in the byline right after its author: the muted logo from the
+ * home page's set, with "Made with" and the agent's name on hover or focus.
  */
 export function MadeWith({
   agent,
@@ -15,16 +18,23 @@ export function MadeWith({
   className?: string
 }) {
   return (
-    <span className={cn("flex min-w-0 items-center gap-1", className)}>
+    <TooltipTrigger delay={300}>
       <span
-        aria-hidden="true"
-        className="block size-3.5 shrink-0 bg-muted-foreground"
-        style={logoMask(agent.logo)}
-      />
-      <span className="min-w-0 truncate">
-        <span className="sr-only">Made with </span>
-        {agent.name}
+        role="img"
+        aria-label={`Made with ${agent.name}`}
+        tabIndex={0}
+        className={cn(
+          "flex shrink-0 rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          className
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className="block size-3.5 bg-muted-foreground"
+          style={logoMask(agent.logo)}
+        />
       </span>
-    </span>
+      <Tooltip>Made with {agent.name}</Tooltip>
+    </TooltipTrigger>
   )
 }

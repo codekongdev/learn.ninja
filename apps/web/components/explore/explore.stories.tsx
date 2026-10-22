@@ -280,7 +280,7 @@ export const RowStates: Story = {
           />
         </AppRouterContext.Provider>
       </Labeled>
-      <Labeled label="Long handle on a phone: the agent's name gives way first">
+      <Labeled label="Long handle on a phone">
         <div className="max-w-[340px]">
           <LessonRow
             lesson={summary({

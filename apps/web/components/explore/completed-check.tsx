@@ -29,7 +29,7 @@ export function CompletedCheck({
       <span
         tabIndex={0}
         className={cn(
-          "flex shrink-0 items-center gap-1 rounded-sm text-green-700 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:text-green-500",
+          "flex shrink-0 items-center gap-1 rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
           className
         )}
       >

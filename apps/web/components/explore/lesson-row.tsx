@@ -35,23 +35,22 @@ const ROW_LINK =
   "rounded-sm outline-none after:absolute after:inset-0 focus-visible:after:ring-3 focus-visible:after:ring-ring/50"
 
 /**
- * A lesson as one row of the Explore feed or a profile. A byline first: who made it (their
- * picture and handle, then the agent they made it with when it has a logo) at the start and how
- * long ago at the end, so the ages line up as a column down the feed. Then the title, up to two
- * lines of summary, and one meta line with the lesson's length and level, and the views and likes
- * at its end. The length gives way to the viewer's own state: Done with a green check once they've
- * finished it, or the minutes left beside an amber pie when this browser holds their progress.
- * Neither the subject nor the tags are shown: the subject is for filters, and tags stay hidden
- * until they're governed well enough to read as labels (plans/subjects-and-tags.md). The whole row
- * opens the lesson; the author, the check, the progress, and the heart are their own targets.
- * Rows sit between hairlines (the list adds them), not in cards. Hovering one turns it into a
- * bordered, filled tile that reaches past the column into the gutter (negative margin, matching
- * padding), so the text stays lined up with the page and the tile has room around it; the list
- * hides the two hairlines it would touch. `rank` puts a number in the margin on the Top tab. The
- * author shows on a profile too, though every row shares it. The viewer's own rows open a menu on
- * right click to publish, unpublish, rename, or delete them (LessonMenu), and a badge after the
- * title marks the ones visitors don't see: Private when only the link opens it, Hidden after a
- * report.
+ * A lesson as one row of the Explore feed or a profile. A byline first: who made it (their picture
+ * and handle, then the logo of the agent they made it with) at the start and how long ago at the
+ * end, so the ages line up as a column down the feed. Then the title, up to two lines of summary,
+ * and one meta line with the lesson's length and level, and the views and likes at its end. The
+ * length gives way to the viewer's own state: Done with a green check once they've finished it, or
+ * the minutes left beside an amber pie when this browser holds their progress. Neither the subject
+ * nor the tags are shown: the subject is for filters, and tags stay hidden until they're governed
+ * well enough to read as labels (plans/subjects-and-tags.md). The whole row opens the lesson; the
+ * author, the agent, the check, the progress, and the heart are their own targets. Rows sit
+ * between hairlines (the list adds them), not in cards. Hovering one turns it into a bordered,
+ * filled tile that reaches past the column into the gutter (negative margin, matching padding), so
+ * the text stays lined up with the page and the tile has room around it; the list hides the two
+ * hairlines it would touch. `rank` puts a number in the margin on the Top tab. The author shows on
+ * a profile too, though every row shares it. The viewer's own rows open a menu on right click to
+ * publish, unpublish, rename, or delete them (LessonMenu), and a badge after the title marks the
+ * ones visitors don't see: Private when only the link opens it, Hidden after a report.
  */
 export function LessonRow({
   lesson,
@@ -134,19 +133,10 @@ export function LessonRow({
       ) : null}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-          <span className="flex min-w-0 items-center gap-1.5">
+          <span className="flex min-w-0 items-center gap-1">
             {byline}
             {agent ? (
-              <>
-                <span
-                  aria-hidden="true"
-                  className="shrink-0 text-muted-foreground/60"
-                >
-                  ·
-                </span>
-                {/* Shrinks long before the handle does, down to its logo. */}
-                <MadeWith agent={agent} className="min-w-3.5 shrink-100" />
-              </>
+              <MadeWith agent={agent} className="relative z-10" />
             ) : null}
           </span>
           <TimeAgo

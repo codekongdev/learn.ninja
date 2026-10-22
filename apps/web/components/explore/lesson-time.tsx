@@ -44,11 +44,15 @@ export function LessonTime({
       <span
         tabIndex={0}
         className={cn(
-          "flex shrink-0 items-center gap-1 rounded-sm text-amber-700 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:text-amber-500",
+          "flex shrink-0 items-center gap-1 rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
           className
         )}
       >
-        <svg viewBox="0 0 24 24" className="size-3.5" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          className="size-3.5 text-amber-600 dark:text-amber-500"
+          aria-hidden="true"
+        >
           <circle
             cx="12"
             cy="12"
