@@ -411,6 +411,11 @@ export const lesson = pgTable(
     /** The column keeps its first name, plays: renaming it would break the deployment still serving while the next one migrates. */
     views: integer("plays").notNull().default(0),
     likes: integer("likes").notNull().default(0),
+    /**
+     * The app or agent that published it, as it named itself (an MCP client's name, or the agent
+     * the CLI ran in, like `claude-code`); null when it didn't say. Cards match it to a logo.
+     */
+    origin: text("origin"),
     createdAt: time("created_at").notNull().defaultNow(),
     updatedAt: time("updated_at").notNull().defaultNow(),
     /** Null means it never expires (owned lessons). */

@@ -17,6 +17,7 @@ export async function POST(req: Request) {
         skillVersion: req.headers.get("x-learn-skill-version"),
         ownerId: actor?.userId ?? null,
         ownerHandle: actor?.handle ?? null,
+        origin: req.headers.get("x-learn-agent"),
       },
       await depsFor(req)
     )

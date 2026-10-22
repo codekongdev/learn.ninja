@@ -11,7 +11,14 @@ import { join } from "node:path"
 
 import { beforeEach, describe, expect, it } from "vitest"
 
-import { CREDENTIALS_FILE, run, SKILL_VERSION, SYNC_DIR, type Io } from "./cli"
+import {
+  agentOf,
+  CREDENTIALS_FILE,
+  run,
+  SKILL_VERSION,
+  SYNC_DIR,
+  type Io,
+} from "./cli"
 
 const lesson = readFileSync(
   new URL("../../../examples/button-hierarchy.json", import.meta.url),
@@ -24,6 +31,7 @@ type Call = {
   auth?: string
   skill?: string
   apiKey?: string
+  agent?: string
   cookie?: string
   body?: string
 }
@@ -79,6 +87,7 @@ function setup(routes: Routes = {}) {
         auth: headers.authorization,
         skill: headers["x-learn-skill-version"],
         apiKey: headers["x-api-key"],
+        agent: headers["x-learn-agent"],
         cookie: headers.cookie,
         body: typeof init?.body === "string" ? init.body : undefined,
       }
@@ -486,6 +495,15 @@ describe("learn publish", () => {
       auth: "Bearer tok-abcd1234",
     })
     expect(t.out.join("\n")).toMatch(/Updated: /)
+  })
+
+  it("names the agent it runs in when publishing", async () => {
+    t.io.env = { AI_AGENT: "claude-code_2-1-304_agent" }
+    await run(["publish", "lesson.json", "--api", "https://learn.test"], t.io)
+    expect(t.calls.at(-1)).toMatchObject({
+      method: "POST",
+      agent: "claude-code_2-1-304_agent",
+    })
   })
 
   it("publishes a new link when the saved one has expired", async () => {
@@ -1120,5 +1138,16 @@ describe("learn whoami and logout", () => {
     t.io.env.LEARN_API_KEY = KEY
     expect(await run(["logout"], t.io)).toBe(0)
     expect(t.out.at(-1)).toMatch(/LEARN_API_KEY is set.*Unset it to log out\./)
+  })
+})
+
+describe("agentOf", () => {
+  it("reads AI_AGENT first, then each agent's own marker", () => {
+    expect(agentOf({ AI_AGENT: "amp", CLAUDECODE: "1" })).toBe("amp")
+    expect(agentOf({ CLAUDECODE: "1" })).toBe("claude-code")
+    expect(agentOf({ CURSOR_AGENT: "1" })).toBe("cursor")
+    expect(agentOf({ GEMINI_CLI: "1" })).toBe("gemini-cli")
+    expect(agentOf({ CODEX_SANDBOX: "seatbelt" })).toBe("codex")
+    expect(agentOf({})).toBeNull()
   })
 })

@@ -296,6 +296,50 @@ describe("validate_lesson", () => {
 })
 
 describe("publish_lesson and update_lesson", () => {
+  it("records the app that published, from its client info or else its User-Agent", async () => {
+    const send = async (headers: Record<string, string>, meta?: object) => {
+      const req = rpcRequest(
+        "https://learn.test/mcp",
+        "tools/call",
+        {
+          name: "publish_lesson",
+          arguments: { lesson: buttons },
+          ...(meta ? { _meta: meta } : {}),
+        },
+        "1.2.3.4"
+      )
+      for (const [k, v] of Object.entries(headers)) req.headers.set(k, v)
+      const res = await mcp(req)
+      // A 2026-era request is answered with plain JSON rather than an event stream.
+      const result = (
+        res.headers.get("content-type")?.startsWith("application/json")
+          ? (await res.json()).result
+          : await resultOf(res)
+      ) as ToolResult
+      return (await deps.store.get(result.structuredContent.id as string))
+        ?.origin
+    }
+    expect(await send({ "user-agent": "Cursor/1.7" })).toBe("Cursor/1.7")
+    expect(
+      await send(
+        {
+          "mcp-protocol-version": "2026-07-28",
+          "mcp-method": "tools/call",
+          "mcp-name": "publish_lesson",
+          "user-agent": "node",
+        },
+        {
+          "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+          "io.modelcontextprotocol/clientInfo": {
+            name: "cursor-vscode",
+            version: "1.0.0",
+          },
+          "io.modelcontextprotocol/clientCapabilities": {},
+        }
+      )
+    ).toBe("cursor-vscode")
+  })
+
   it("publishes, then updates with the edit token", async () => {
     const published = await call("publish_lesson", { lesson: buttons })
     expect(published.isError).toBeFalsy()

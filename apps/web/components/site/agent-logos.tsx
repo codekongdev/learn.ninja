@@ -1,5 +1,13 @@
 import { AGENTS } from "@/lib/site"
 
+/** Draws an agent's logo as a mask over the element's background color, so it takes the text color. */
+export const logoMask = (logo: string): React.CSSProperties => ({
+  maskImage: `url(/agents/${logo}.svg)`,
+  maskSize: "contain",
+  maskRepeat: "no-repeat",
+  maskPosition: "center",
+})
+
 /** A slowly scrolling row of agent logos, drawn as masks so they take the text color. */
 export function AgentLogos() {
   return (
@@ -27,12 +35,7 @@ export function AgentLogos() {
                   key={a.name}
                   title={a.name}
                   className="block size-7 bg-foreground/70"
-                  style={{
-                    maskImage: `url(/agents/${a.logo}.svg)`,
-                    maskSize: "contain",
-                    maskRepeat: "no-repeat",
-                    maskPosition: "center",
-                  }}
+                  style={logoMask(a.logo)}
                 />
               ))}
             </div>

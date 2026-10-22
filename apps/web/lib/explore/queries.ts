@@ -59,6 +59,8 @@ export interface LessonSummary {
   } | null
   views: number
   likes: number
+  /** The app or agent that published it, as it named itself; the card shows its logo when there's one. */
+  origin: string | null
   visibility: Visibility
   hidden: boolean
   createdAt: number
@@ -98,6 +100,7 @@ const columns = {
   targetLanguage: field("targetLanguage"),
   views: lesson.views,
   likes: lesson.likes,
+  origin: lesson.origin,
   visibility: lesson.visibility,
   hidden: lesson.hidden,
   createdAt: lesson.createdAt,
@@ -123,6 +126,7 @@ interface Row {
   targetLanguage: string | null
   views: number
   likes: number
+  origin: string | null
   visibility: Visibility
   hidden: boolean
   createdAt: Date
@@ -181,6 +185,7 @@ function toSummary(row: Row): LessonSummary {
         : null,
     views: row.views,
     likes: row.likes,
+    origin: row.origin,
     visibility: row.visibility,
     hidden: row.hidden,
     createdAt: row.createdAt.getTime(),

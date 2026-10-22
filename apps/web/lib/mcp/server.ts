@@ -1,5 +1,8 @@
 import { createMcpHandler } from "mcp-handler"
-import type { McpServer } from "@modelcontextprotocol/server"
+import {
+  CLIENT_INFO_META_KEY,
+  type McpServer,
+} from "@modelcontextprotocol/server"
 import { z } from "zod"
 
 import { LIMITS } from "@workspace/spec"
@@ -259,6 +262,7 @@ function registerTools(server: McpServer, deps: McpDeps) {
               ownerHandle: actor?.handle ?? null,
               // A personal URL publishes everything, drafts included: keep them out of Explore.
               visibility: actor ? "unlisted" : undefined,
+              origin: originOf(ctx),
             },
             deps
           )
@@ -511,6 +515,22 @@ function clientOf(
 ): string {
   if (actor) return actor.limitKey
   return ctx.http?.req ? clientKey(ctx.http.req) : "local"
+}
+
+/**
+ * The chat app or agent calling, as it names itself: the client info a 2026-era request carries
+ * in its `_meta`, or else the HTTP request's User-Agent (a stateless 2025-era client said its
+ * name in an `initialize` this server never saw). Cards show a logo when the name matches one.
+ */
+function originOf(ctx: {
+  mcpReq?: { envelope?: object }
+  http?: { req?: Request }
+}): string | null {
+  const info = (ctx.mcpReq?.envelope as Record<string, unknown> | undefined)?.[
+    CLIENT_INFO_META_KEY
+  ] as { name?: unknown } | undefined
+  if (typeof info?.name === "string") return info.name
+  return ctx.http?.req?.headers.get("user-agent") ?? null
 }
 
 /**

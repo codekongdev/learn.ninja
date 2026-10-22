@@ -18,6 +18,7 @@ import {
   tokenMatches,
 } from "./ids"
 import type { RateLimiter } from "./rate-limit"
+import { cleanOrigin } from "../origin"
 import { SKILL_UPDATE_COMMAND, skillInfo } from "../skill-version"
 import {
   LESSON_TTL_SECONDS,
@@ -79,6 +80,8 @@ interface PublishRequest {
    * publishes unlisted, so half-finished drafts don't land in Explore. Ignored for anonymous lessons.
    */
   visibility?: "public" | "unlisted"
+  /** The app or agent publishing (an MCP client's name, or the CLI's x-learn-agent header), shown on cards. */
+  origin?: string | null
 }
 
 /** Checks size, JSON, spec version, the spec's rules, and that diagrams draw. Returns the lesson or an error reply. */
@@ -215,6 +218,7 @@ export async function publishLesson(
     hidden: false,
     views: 0,
     likes: 0,
+    origin: cleanOrigin(req.origin),
     createdAt: now,
     expiresAt: owner ? null : now + LESSON_TTL_SECONDS * 1000,
   }

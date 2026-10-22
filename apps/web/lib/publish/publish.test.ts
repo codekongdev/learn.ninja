@@ -124,6 +124,35 @@ describe("publishing", () => {
     expect(stored?.ownerId).toBeNull()
   })
 
+  it("keeps the app that published it, tidied, and keeps it through an update", async () => {
+    const reply = await publishLesson(
+      {
+        text: buttons,
+        client: "1.2.3.4",
+        origin: "  claude-code_2-1-304_agent\n",
+      },
+      deps
+    )
+    const id = reply.body.id as string
+    expect((await deps.store.get(id))?.origin).toBe("claude-code_2-1-304_agent")
+    await updateLesson(
+      {
+        id,
+        text: buttons,
+        client: "1.2.3.4",
+        editToken: reply.body.editToken as string,
+      },
+      deps
+    )
+    expect((await deps.store.get(id))?.origin).toBe("claude-code_2-1-304_agent")
+
+    const unnamed = await publishLesson(
+      { text: buttons, client: "1.2.3.4" },
+      deps
+    )
+    expect((await deps.store.get(unnamed.body.id as string))?.origin).toBeNull()
+  })
+
   it("publishes an owned lesson listed, with no expiry and no claim token, naming the owner", async () => {
     const reply = await publishLesson(
       { text: buttons, client: "x", ownerId: "user_1" },

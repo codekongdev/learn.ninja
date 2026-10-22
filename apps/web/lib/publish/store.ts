@@ -50,6 +50,8 @@ export interface StoredLesson {
   hidden: boolean
   views: number
   likes: number
+  /** The app or agent that published it, as it named itself; null (or absent) when it didn't say. */
+  origin?: string | null
   createdAt: number
   /** Null when it never expires (owned lessons). */
   expiresAt: number | null
@@ -96,6 +98,7 @@ export class PostgresLessonStore implements LessonStore {
       hidden: record.hidden,
       views: record.views,
       likes: record.likes,
+      origin: record.origin ?? null,
       createdAt: new Date(record.createdAt),
       updatedAt: new Date(record.updatedAt ?? record.createdAt),
       expiresAt: record.expiresAt === null ? null : new Date(record.expiresAt),
@@ -200,6 +203,7 @@ function toStored(row: typeof lesson.$inferSelect): StoredLesson {
     hidden: row.hidden,
     views: row.views,
     likes: row.likes,
+    origin: row.origin,
     createdAt: row.createdAt.getTime(),
     updatedAt: row.updatedAt.getTime(),
     expiresAt: row.expiresAt?.getTime() ?? null,

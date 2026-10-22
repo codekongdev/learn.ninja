@@ -18,7 +18,7 @@ import {
 // the current guides into .learn/skill/ (text only, never code), and `validate` checks the lesson on the
 // server. The copies that came with the install are the fallback when the server can't be reached.
 
-export const SKILL_VERSION = "0.14.1"
+export const SKILL_VERSION = "0.15.0"
 export const DEFAULT_API_URL = "https://learn.ninja"
 /** Where `sync` puts the guides, relative to the current folder. */
 export const SYNC_DIR = ".learn/skill"
@@ -469,6 +469,20 @@ function validateOffline(
 
 // --- publish ---
 
+/**
+ * The agent whose shell runs this, from what it sets in the environment: the shared `AI_AGENT`
+ * (`claude-code_2-1-304_agent`), or else a marker of its own. The server matches the name to a logo.
+ */
+export function agentOf(env: Io["env"]): string | null {
+  if (env.AI_AGENT) return env.AI_AGENT
+  if (env.CLAUDECODE) return "claude-code"
+  if (env.CURSOR_AGENT) return "cursor"
+  if (env.GEMINI_CLI) return "gemini-cli"
+  if (env.CODEX_SANDBOX) return "codex"
+  if (env.OPENCODE || env.OPENCODE_CLIENT) return "opencode"
+  return null
+}
+
 async function publish(
   io: Io,
   o: {
@@ -485,10 +499,13 @@ async function publish(
   const saved = o.forceNew ? undefined : state.lessons[o.path]
   const live = saved && isLive(saved) ? saved : undefined
   const credential = await readCredential(io, o.api)
+  const agent = agentOf(io.env)
   const headers: Record<string, string> = {
     "content-type": "application/json",
     "x-learn-skill-version": SKILL_VERSION,
     ...(credential ? { "x-api-key": credential.apiKey } : {}),
+    // Which agent published it, so Explore can show its logo on the lesson.
+    ...(agent ? { "x-learn-agent": agent } : {}),
   }
 
   let response: Response

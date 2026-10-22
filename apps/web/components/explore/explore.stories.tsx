@@ -78,6 +78,7 @@ const summary = (over: Partial<LessonSummary> = {}): LessonSummary => ({
   author: { id: "ada", handle: "ada", name: "Ada Lovelace", image: PORTRAIT },
   views: 1284,
   likes: 37,
+  origin: "claude-code_2-1-304_agent",
   visibility: "public",
   hidden: false,
   createdAt: Date.now() - 2 * DAY,
@@ -103,6 +104,7 @@ const LESSONS: LessonSummary[] = [
     },
     views: 412,
     likes: 9,
+    origin: "cursor",
   }),
   summary({
     id: "a1b2c3d4",
@@ -117,6 +119,7 @@ const LESSONS: LessonSummary[] = [
     author: { id: "maria", handle: "maria", name: "María", image: null },
     views: 88,
     likes: 2,
+    origin: "claude-ai",
   }),
   summary({
     id: "z9y8x7w6",
@@ -131,6 +134,7 @@ const LESSONS: LessonSummary[] = [
     author: { id: "noor", handle: "noor", name: "Noor", image: null },
     views: 40,
     likes: 5,
+    origin: "codex",
   }),
   summary({
     id: "n0h4ndl3",
