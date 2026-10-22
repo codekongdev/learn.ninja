@@ -35,8 +35,8 @@ const word = (words: string) =>
  */
 const PATTERNS: [RegExp, Agent["logo"]][] = [
   [word("claude[ _-]?code"), "claudecode"],
-  // Claude.ai and Claude Desktop (`claude-ai`), after Claude Code.
-  [word("claude"), "claude"],
+  // Claude.ai and Claude Desktop (`claude-ai`, or the User-Agent `Anthropic/ClaudeAI`), after Claude Code.
+  [word("claude(?:[ _-]?ai)?|anthropic"), "claude"],
   [word("codex"), "codex"],
   // ChatGPT (`openai-mcp`), after Codex.
   [word("chatgpt|openai"), "openai"],

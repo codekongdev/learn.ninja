@@ -16,6 +16,7 @@ describe("agentOf", () => {
     expect(logo("Cline")).toBe("cline")
     expect(logo("amp")).toBe("amp")
     expect(logo("claude-ai")).toBe("claude")
+    expect(logo("Anthropic/ClaudeAI")).toBe("claude")
     expect(logo("openai-mcp")).toBe("openai")
     expect(logo("ChatGPT")).toBe("openai")
   })
