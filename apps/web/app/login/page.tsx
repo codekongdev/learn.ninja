@@ -36,7 +36,6 @@ export default async function LoginPage({
       <LoginForm
         github={githubFromEnv() !== null}
         callback={callback}
-        pickHandle={resume === null}
         {...(resume && {
           title: "Log in to connect your app",
           description:

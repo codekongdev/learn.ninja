@@ -34,7 +34,7 @@ const fakeApi = (over: Partial<AccountApi> = {}): AccountApi => ({
   async verifyCode(_email, code) {
     await wait()
     return code === "123456"
-      ? { account: { handle: null, image: null } }
+      ? { account: { handle: "quiet-kitsune", image: null } }
       : { error: "That code isn't right. 2 tries left." }
   },
   async loginWithGitHub() {
@@ -208,12 +208,11 @@ export const LoginEmailOnly: Story = {
 export const LoginFromChatApp: Story = {
   name: "Log in, from a chat app",
   render: () => (
-    // A chat app's OAuth log-in: no handle step here, /consent offers it instead.
+    // A chat app's OAuth log-in: it goes on to /consent.
     <AuthPanel footer={<LegalConsent />}>
       <LoginForm
         github
         callback="/consent?client_id=…"
-        pickHandle={false}
         title="Log in to connect your app"
         description="An agent wants to publish lessons to your account. Log in, then you’ll be asked to allow it."
         api={fakeApi()}
@@ -395,13 +394,13 @@ export const Consent: Story = {
   ),
 }
 
-export const ConsentNoHandle: Story = {
-  name: "Consent, no handle yet",
+export const ConsentNewAccount: Story = {
+  name: "Consent, new account",
   render: () => (
     <AuthPanel>
       <ConsentForm
         app="A chat app"
-        handle={null}
+        handle="quiet-kitsune"
         email="ada@example.com"
         returnTo={null}
         switchHref="/login"

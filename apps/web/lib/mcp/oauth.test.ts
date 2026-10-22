@@ -385,7 +385,7 @@ describe("the gate in front of /mcp", () => {
     expect(body).toMatchObject({
       ok: true,
       expiresAt: null,
-      owner: { handle: null },
+      owner: { handle: expect.stringMatching(/^[a-z]+-[a-z]+$/) },
       visibility: "public",
     })
     expect(body).not.toHaveProperty("editToken")

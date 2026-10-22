@@ -1,8 +1,10 @@
 import { readFileSync } from "node:fs"
 
+import { eq } from "drizzle-orm"
+
 import { beforeAll, describe, expect, it } from "vitest"
 
-import { connectPglite, type Db } from "@workspace/db"
+import { connectPglite, user, type Db } from "@workspace/db"
 
 import { publishLesson, claimLesson, type Deps } from "@/lib/publish/handlers"
 import { MemoryRateLimiter } from "@/lib/publish/rate-limit"
@@ -25,7 +27,16 @@ import {
   MCP_KEY_PREFIX,
   type Auth,
 } from "./auth"
-import { freeHandle, handleProblem, normalizeHandle } from "./handles"
+import {
+  backfillHandles,
+  freeHandle,
+  handleProblem,
+  HANDLE_ANIMALS,
+  HANDLE_TRAITS,
+  normalizeHandle,
+  randomHandle,
+  randomHandleName,
+} from "./handles"
 import { safeCallback } from "./session"
 
 // Better Auth over an in-memory Postgres: the email code flow the CLI and the log-in page use,
@@ -79,12 +90,12 @@ async function signIn(email: string): Promise<string> {
 }
 
 describe("email codes", () => {
-  it("signs a new user in with a six-digit code and creates the account", async () => {
+  it("signs a new user in with a six-digit code and creates the account, with a random handle", async () => {
     const cookie = await signIn("ada@example.com")
     const actor = await getActor(auth, new Headers({ cookie }))
     expect(actor).toMatchObject({
       email: "ada@example.com",
-      handle: null,
+      handle: expect.stringMatching(/^[a-z]+-[a-z]+$/),
       viaApiKey: false,
     })
   })
@@ -365,6 +376,39 @@ describe("handles", () => {
     // "ninja" itself is reserved, so the fallback is numbered.
     expect(await freeHandle(db, "___")).toBe("ninja-1")
     expect(await freeHandle(db, "ab")).toBe("ab0")
+  })
+
+  it("makes random handles that follow the rules, and finds a free one", async () => {
+    for (const trait of HANDLE_TRAITS)
+      for (const animal of HANDLE_ANIMALS)
+        expect(handleProblem(`${trait}-${animal}`)).toBeNull()
+    expect(randomHandleName(() => 0)).toBe("quiet-kitsune")
+    expect(randomHandleName(() => 0.999)).toBe("dawn-kani")
+    // Always the same pair, so once it's taken the fallback is numbered. (Sign-ups elsewhere in
+    // this file get random handles, so "quiet-kitsune" may be taken already.)
+    const first = await randomHandle(db, () => 0)
+    expect(first).toMatch(/^quiet-kitsune(-\d+)?$/)
+    await db
+      .insert(user)
+      .values({ id: "rh1", name: "R", email: "rh1@example.com", handle: first })
+    const next = await randomHandle(db, () => 0)
+    expect(next).toMatch(/^quiet-kitsune-\d+$/)
+    expect(next).not.toBe(first)
+  })
+
+  it("gives accounts without a handle a random one, only with write", async () => {
+    await db
+      .insert(user)
+      .values(["bf1", "bf2"].map((id) => ({ id, name: id, email: `${id}@example.com` })))
+    const handleOf = async (id: string) =>
+      (await db.select().from(user).where(eq(user.id, id)))[0]!.handle
+    const dry = await backfillHandles(db)
+    expect(dry.map((g) => g.id)).toEqual(expect.arrayContaining(["bf1", "bf2"]))
+    expect(new Set(dry.map((g) => g.handle)).size).toBe(dry.length)
+    expect(await handleOf("bf1")).toBeNull()
+    const written = await backfillHandles(db, { write: true })
+    expect(await handleOf("bf1")).toBe(written.find((g) => g.id === "bf1")!.handle)
+    expect(await backfillHandles(db)).toEqual([])
   })
 
   it("only sends the browser to site paths after logging in", () => {

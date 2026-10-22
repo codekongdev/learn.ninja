@@ -464,7 +464,7 @@ describe("keep_lesson", () => {
       url: published.structuredContent.url,
       title: JSON.parse(buttons).title,
       expiresAt: null,
-      owner: { handle: null },
+      owner: { handle: expect.stringMatching(/^[a-z]+-[a-z]+$/) },
       visibility: "public",
     })
     expect(listed).toBe(1)
@@ -502,7 +502,8 @@ describe("/mcp/{key}, the personal URL", () => {
     const publish = tools.find(
       (t: { name: string }) => t.name === "publish_lesson"
     )
-    expect(publish.description).toContain("saved to the user's account")
+    // A new email account gets a random handle, like "quiet-kitsune".
+    expect(publish.description).toMatch(/saved to @[a-z]+-[a-z]+ /)
     expect(publish.description).not.toContain("7 days")
 
     const published = await personal(key).call("publish_lesson", {
@@ -513,7 +514,7 @@ describe("/mcp/{key}, the personal URL", () => {
     expect(body).toMatchObject({
       ok: true,
       expiresAt: null,
-      owner: { handle: null },
+      owner: { handle: expect.stringMatching(/^[a-z]+-[a-z]+$/) },
       visibility: "public",
     })
     expect(body).not.toHaveProperty("claimUrl")

@@ -22,21 +22,18 @@ import {
 } from "@/lib/auth/browser"
 
 import { AuthHeading } from "./auth-panel"
-import { HandleForm } from "./handle-form"
 import { FormError } from "./form-error"
 
 const CODE_LENGTH = 6
 
 /**
  * Log in with GitHub or a six-digit email code, drawn for the centered auth panel (AuthPanel).
- * Email users without a handle pick one before leaving, unless `pickHandle` is off: a chat app's
- * OAuth log-in goes straight on to /consent, which offers the handle there. Ends by sending the
- * browser to `callback`.
+ * A new account already has a handle (its GitHub login, or a random one), changed in settings.
+ * Ends by sending the browser to `callback`.
  */
 export function LoginForm({
   github,
   callback,
-  pickHandle = true,
   title = "Log in",
   description = "Only to keep lessons beyond 7 days. Making and playing them needs no account.",
   api = accountApi,
@@ -46,24 +43,23 @@ export function LoginForm({
   github: boolean
   /** Where to go once logged in, a site path. */
   callback: string
-  /** Whether a new email user picks a handle here before going on. */
-  pickHandle?: boolean
-  /** The first step's heading and line; the code and handle steps have their own. */
+  /** The first step's heading and line; the code step has its own. */
   title?: React.ReactNode
   description?: React.ReactNode
   api?: AccountApi
   navigate?: (to: string) => void
 }) {
-  const [step, setStep] = React.useState<"email" | "code" | "handle">("email")
+  const [step, setStep] = React.useState<"email" | "code">("email")
   const [email, setEmail] = React.useState("")
   const [code, setCode] = React.useState("")
   const [busy, setBusy] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
-  const [account, setAccount] = React.useState<AccountInfo | null>(null)
-
-  const finish = (handle: string | null, image = account?.image ?? null) => {
-    rememberAccount({ handle, image })
+  const finish = (account: AccountInfo | null) => {
+    rememberAccount({
+      handle: account?.handle ?? null,
+      image: account?.image ?? null,
+    })
     navigate(callback)
   }
 
@@ -88,10 +84,7 @@ export function LoginForm({
       setCode("")
       return setError(result.error)
     }
-    setAccount(result.account ?? null)
-    if (result.account?.handle || !pickHandle)
-      finish(result.account?.handle ?? null, result.account?.image ?? null)
-    else setStep("handle")
+    finish(result.account ?? null)
   }
 
   async function githubLogin() {
@@ -102,33 +95,6 @@ export function LoginForm({
       setBusy(false)
       setError(error)
     }
-  }
-
-  if (step === "handle") {
-    return (
-      <>
-        <AuthHeading title="Pick a handle">
-          It names your lessons and your page. You can change it later in
-          settings.
-        </AuthHeading>
-        <div className="flex w-full flex-col gap-2 text-start">
-          <HandleForm
-            initial={null}
-            api={api}
-            submitLabel="Continue"
-            stretch
-            onSaved={(handle) => finish(handle)}
-          />
-          <Button
-            variant="ghost"
-            className="w-full"
-            onPress={() => finish(null)}
-          >
-            Skip for now
-          </Button>
-        </div>
-      </>
-    )
   }
 
   if (step === "code") {

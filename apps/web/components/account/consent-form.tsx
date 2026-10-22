@@ -16,7 +16,6 @@ import { accountApi, forgetAccount, type AccountApi } from "@/lib/auth/browser"
 
 import { AuthHeading } from "./auth-panel"
 import { FormError } from "./form-error"
-import { HandleForm } from "./handle-form"
 
 /** What a connected app can do: the MCP's tools that act on the account (lib/mcp/server.ts). */
 const CAN = [
@@ -30,13 +29,11 @@ const CAN = [
  * learn.ninja side by side, what it could do, who is logged in, then Allow or Cancel. Either
  * answer goes to Better Auth with the signed request from the page's query, which replies with
  * where to send the browser: back to the app with a code, or with a refusal. Switch logs out and
- * goes to log in, which comes back here. A user without a handle (a new account: the log-in
- * page skips the handle step on this path) can pick one here, so the app's lessons have a name to
- * be listed under; it's optional, and settings has it too.
+ * goes to log in, which comes back here.
  */
 export function ConsentForm({
   app,
-  handle: initialHandle,
+  handle,
   email,
   returnTo,
   switchHref,
@@ -45,7 +42,7 @@ export function ConsentForm({
 }: {
   /** Who is asking, as shown to the user: the app's host (claude.ai) or its name. */
   app: string
-  /** The logged-in user's handle, or null when they haven't picked one. */
+  /** The logged-in user's handle; null only for an account made before handles were assigned. */
   handle: string | null
   /** The logged-in user's email, shown when there's no handle yet. */
   email: string
@@ -56,7 +53,6 @@ export function ConsentForm({
   api?: AccountApi
   navigate?: (to: string) => void
 }) {
-  const [handle, setHandle] = React.useState(initialHandle)
   const [busy, setBusy] = React.useState<"allow" | "cancel" | "switch" | null>(
     null
   )
@@ -131,23 +127,6 @@ export function ConsentForm({
               Switch
             </Button>
           </div>
-          {handle === null ? (
-            <div className="flex flex-col gap-3 rounded-xl border p-4 text-start">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-base font-semibold">Pick a handle</h2>
-                <p className="text-sm text-muted-foreground">
-                  Lessons it publishes are listed under it. You can skip this
-                  and pick one later in settings.
-                </p>
-              </div>
-              <HandleForm
-                initial={null}
-                api={api}
-                submitVariant="outline"
-                onSaved={setHandle}
-              />
-            </div>
-          ) : null}
         </div>
         {error ? <FormError>{error}</FormError> : null}
         <div className="flex flex-col gap-2">

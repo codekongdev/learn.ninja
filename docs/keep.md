@@ -40,7 +40,7 @@ Publishing also returns a keep link, `https://learn.ninja/keep/…`. Opening it 
 
 ## Show it in Explore
 
-A kept lesson is listed straight away: it shows in Explore and on your profile at `learn.ninja/u/{handle}`. Pick a handle in [learn.ninja/settings](https://learn.ninja/settings) if you haven't; Explore credits lessons by handle.
+A kept lesson is listed straight away: it shows in Explore and on your profile at `learn.ninja/u/{handle}`. New accounts get a random handle, like `quiet-kitsune` (GitHub accounts get their GitHub username); change it any time in [learn.ninja/settings](https://learn.ninja/settings).
 
 To keep a lesson link-only, switch it to **Unlisted** under **Your lessons** on your profile (you see that list only on your own). Switch it back to **Listed** at any time: the link keeps working either way.
 

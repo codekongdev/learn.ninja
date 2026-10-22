@@ -15,6 +15,7 @@
     "share": "tsx --tsconfig scripts/tsconfig.json scripts/build-share-images.tsx",
     "tags": "tsx --tsconfig scripts/tsconfig.json scripts/tag-report.ts",
     "tags:backfill": "tsx --tsconfig scripts/tsconfig.json scripts/backfill-tags.ts",
+    "handles:backfill": "tsx --tsconfig scripts/tsconfig.json scripts/backfill-handles.ts",
     "predev": "npm run visuals:css",
     "prebuild": "npm run visuals:css && npm run migrate -w @workspace/db",
     "test": "vitest run",

@@ -20,7 +20,13 @@ import { getRateLimiter, type RateLimiter } from "@/lib/publish/rate-limit"
 import { getDb } from "@/lib/publish/store"
 
 import { codeSenderFromEnv, type CodeSender } from "./email"
-import { findByHandle, freeHandle, handleProblem, normalizeHandle } from "./handles"
+import {
+  findByHandle,
+  freeHandle,
+  handleProblem,
+  normalizeHandle,
+  randomHandle,
+} from "./handles"
 import { authStorageFromEnv } from "./storage"
 
 // Better Auth, as plans/accounts-v2.md describes: GitHub (website only) and a six-digit email code
@@ -278,6 +284,13 @@ export function createAuth(deps: AuthDeps) {
     },
     databaseHooks: {
       user: {
+        create: {
+          // GitHub users arrive with their login as the handle; everyone else gets a random one.
+          before: async (data) =>
+            data.handle
+              ? undefined
+              : { data: { ...data, handle: await randomHandle(deps.db) } },
+        },
         update: {
           // Every handle change, from the settings page or anywhere else, follows the rules.
           before: async (data, ctx) => {
