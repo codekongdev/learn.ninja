@@ -115,6 +115,38 @@ export const de: Strings = {
   likeLogIn: "Melde dich an, um diese Lektion in deinen Likes zu speichern.",
   logIn: "Anmelden",
   likeFailed: "Dein Like wurde nicht gespeichert. Versuch es noch einmal.",
+  creatorPrivate: "Privat",
+  creatorPublished: "In Explore veröffentlicht",
+  creatorHidden: "Nach einer Meldung ausgeblendet",
+  publishTitle: "Zufrieden damit?",
+  publishBody:
+    "Veröffentliche sie in Explore und auf deinem Profil, damit alle sie finden.",
+  publishedBody: "Alle finden sie in Explore und auf deinem Profil.",
+  hiddenBody:
+    "Solange sie ausgeblendet ist, kann sie nicht veröffentlicht werden.",
+  publish: "Veröffentlichen",
+  publishFailed: "Veröffentlichen hat nicht geklappt. Versuch es noch einmal.",
+  makeChanges: "Änderungen vornehmen",
+  changesBody:
+    "Wähl aus, was sich ändern soll, ergänze den Rest und füg alles in den Chat ein, in dem du die Lektion erstellt hast. Der Link bleibt derselbe.",
+  changes: {
+    visual: "Mach sie anschaulicher",
+    harder: "Mach sie schwieriger",
+    easier: "Mach sie einfacher",
+    shorter: "Mach sie kürzer",
+    examples: "Nimm andere Beispiele",
+  },
+  changesOther: "Sonst noch etwas",
+  changesPlaceholder: "Die zweite Frage ist verwirrend.",
+  copyChanges: "Änderungen kopieren",
+  changesCopied: "Kopiert. Füg es in deinen Chat ein.",
+  changesEmpty: "Wähl zuerst eine Änderung aus oder beschreib eine.",
+  copyFailed:
+    "Kopieren nicht möglich. Dein Browser blockiert die Zwischenablage.",
+  changesPrompt: (url) =>
+    `Aktualisiere meine learn.ninja-Lektion unter demselben Link:\n${url}\n\nÄnderungen:`,
+  cancel: "Abbrechen",
+  changesDone: "Fertig",
   restart: "Lektion neu starten",
   progress: "Fortschritt der Lektion",
   progressLabel: "Fortschritt",

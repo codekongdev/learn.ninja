@@ -68,8 +68,13 @@ export function LessonView({
   const [reportOpen, setReportOpen] = React.useState(false)
   // Kept here, not in the wrap-up, so a replay's wrap-up shows the like the last one made.
   const [like, setLike] = React.useState(likes)
+  // Likewise a publish from the wrap-up, which the lesson menu then shows too.
+  const [visibility, setVisibility] = React.useState(owner?.visibility)
+  // The lesson's link without ?ui= and the like, for the prompt the owner's Make changes copies.
+  const [url, setUrl] = React.useState("")
   React.useEffect(() => {
     setMounted(true)
+    setUrl(window.location.origin + window.location.pathname)
     const params = new URLSearchParams(window.location.search)
     setUrlLanguage(params.get("ui") ?? undefined)
     // Back from logging in to like it (the wrap-up's Log in link adds ?like=1): the player
@@ -101,7 +106,7 @@ export function LessonView({
                 <EyeOffIcon className="size-3.5" aria-hidden="true" />
                 Hidden after a report
               </>
-            ) : owner.visibility === "public" ? (
+            ) : visibility === "public" ? (
               <>
                 <GlobeIcon className="size-3.5" aria-hidden="true" />
                 Published in Explore
@@ -142,6 +147,26 @@ export function LessonView({
         onThemeChange={setTheme}
         menuItems={menuItems}
         nextPrompt={nextPrompt}
+        creator={
+          lessonId && owner
+            ? {
+                status: owner.hidden
+                  ? "hidden"
+                  : visibility === "public"
+                    ? "published"
+                    : "private",
+                onPublish: async () => {
+                  const result = await exploreApi.setVisibility(
+                    lessonId,
+                    "public"
+                  )
+                  if (!result.error) setVisibility("public")
+                  return result
+                },
+                url,
+              }
+            : undefined
+        }
         like={
           lessonId && like
             ? {

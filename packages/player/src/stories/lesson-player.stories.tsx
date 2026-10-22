@@ -6,6 +6,7 @@ import type { Lesson } from "@workspace/spec"
 import { buildSequence, scoredQuestions, type Outcome } from "../flow"
 import { LessonPlayer, type State } from "../lesson-player"
 import { fingerprint } from "../progress"
+import { stringsFor } from "../strings"
 import { lessons, prepared } from "./fixtures"
 
 // The whole player, playable end to end. Switch language and theme in the toolbar or the footer.
@@ -235,4 +236,77 @@ export const WrapUpLikeFails: Story = {
     },
   },
   loaders: atWrap(lessons.buttons, "story-wrap-like-fails"),
+}
+
+/** A fake publish that answers after a moment, as the server would. */
+const publishAfter = () =>
+  new Promise<{ error?: string }>((resolve) =>
+    setTimeout(() => resolve({}), 300)
+  )
+const LESSON_URL =
+  "https://learn.ninja/l/pick-the-right-button-for-every-action-puepf71u"
+
+/** The lesson's maker, logged in, with it still private: their card replaces the heart. */
+export const WrapUpCreator: Story = {
+  name: "Wrap-up: creator, private",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-creator",
+    like: likeAfter(0, false),
+    creator: { status: "private", onPublish: publishAfter, url: LESSON_URL },
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-creator"),
+}
+/** The maker's lesson once it's in Explore: only Make changes is left. */
+export const WrapUpCreatorPublished: Story = {
+  name: "Wrap-up: creator, published",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-creator-published",
+    creator: { status: "published", url: LESSON_URL },
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-creator-published"),
+}
+/** Hidden after a report: it can't be published, but it can still be changed. */
+export const WrapUpCreatorHidden: Story = {
+  name: "Wrap-up: creator, hidden",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-creator-hidden",
+    creator: { status: "hidden", url: LESSON_URL },
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-creator-hidden"),
+}
+/** A publish the server refuses: the card stays private and says so. */
+export const WrapUpCreatorPublishFails: Story = {
+  name: "Wrap-up: creator, publish fails",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-creator-fails",
+    creator: {
+      status: "private",
+      onPublish: async () => ({ error: "Something went wrong." }),
+      url: LESSON_URL,
+    },
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-creator-fails"),
+}
+/** Make changes open: tick changes, add your own, and copy them as one prompt. */
+export const WrapUpCreatorChanges: Story = {
+  name: "Wrap-up: creator, make changes",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-creator-changes",
+    creator: { status: "private", onPublish: publishAfter, url: LESSON_URL },
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-creator-changes"),
+  // Opens the dialog once the wrap-up is in, in whichever language the toolbar picked.
+  play: async ({ canvas, userEvent, globals }) => {
+    const button = await canvas.findByRole(
+      "button",
+      { name: stringsFor(globals.ui ?? "en").makeChanges },
+      { timeout: 10_000 }
+    )
+    await userEvent.click(button)
+  },
 }

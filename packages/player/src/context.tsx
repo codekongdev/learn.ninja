@@ -19,6 +19,8 @@ interface PlayerContextValue {
   nextPrompt?: (topic: string, after: string) => string
   /** The wrap-up's like. Without it there's no heart. */
   like?: LessonLike
+  /** The lesson's maker is the one playing: the wrap-up shows their card instead of the heart. */
+  creator?: LessonCreator
 }
 
 /** A published lesson's likes, and the learner's, for the heart on the wrap-up. */
@@ -32,6 +34,16 @@ export interface LessonLike {
   onChange?: (liked: boolean) => Promise<{ likes?: number; error?: string }>
   /** Where a logged-out learner logs in, coming back to this lesson. */
   loginHref?: string
+}
+
+/** What the wrap-up shows the lesson's maker: where it stands, a way to publish it, and its link. */
+export interface LessonCreator {
+  /** Private (link only), published in Explore, or hidden after a report (it can't be published). */
+  status: "private" | "published" | "hidden"
+  /** Publishes the lesson to Explore, resolving to an error when it didn't go through. */
+  onPublish?: () => Promise<{ error?: string }>
+  /** The lesson's link, which the prompt Make changes copies names, so the agent updates it. */
+  url: string
 }
 
 const PlayerContext = React.createContext<PlayerContextValue>({

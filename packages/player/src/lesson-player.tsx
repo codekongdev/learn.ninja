@@ -37,7 +37,13 @@ import {
   type Mark,
 } from "./check"
 import { Briefing } from "./briefing"
-import { PlayerProvider, usePlayer, type LessonLike } from "./context"
+import {
+  PlayerProvider,
+  usePlayer,
+  type LessonCreator,
+  type LessonLike,
+} from "./context"
+import { CreatorCard } from "./creator"
 import {
   hasOptionCards,
   BlankBrick,
@@ -159,6 +165,8 @@ export interface LessonPlayerProps {
   nextPrompt?: (topic: string, after: string) => string
   /** The heart on the wrap-up, for a published lesson. Omit it to show no heart. */
   like?: LessonLike
+  /** When the lesson's maker is playing: their card on the wrap-up (publish it, ask for changes) instead of the heart. */
+  creator?: LessonCreator
 }
 
 export function LessonPlayer({
@@ -183,6 +191,7 @@ export function LessonPlayer({
   onComplete,
   nextPrompt,
   like,
+  creator,
 }: LessonPlayerProps) {
   const root = React.useRef<HTMLDivElement>(null)
   // The title as shown, which a rename in the header changes.
@@ -211,6 +220,7 @@ export function LessonPlayer({
           keyScope: scopeKeys ? root : undefined,
           nextPrompt,
           like,
+          creator,
         }}
       >
         <div
@@ -1567,7 +1577,7 @@ function WrapUp({
   /** How long the lesson took, in ms. */
   time?: number
 }) {
-  const { t, lang = "en" } = usePlayer()
+  const { t, lang = "en", creator } = usePlayer()
   const s = summarize(lesson, results)
   const run = runFor(s)
   // The celebration leads; the score is one quiet line: first tries, then the time it took.
@@ -1595,8 +1605,10 @@ function WrapUp({
           <h1 className="text-2xl font-semibold">{t.done}</h1>
           <p className="text-sm font-medium text-muted-foreground">{score}</p>
         </div>
-        <LikeLesson />
+        {creator ? null : <LikeLesson />}
       </div>
+      {/* The maker's next step leads: publish it, or ask their agent for changes. */}
+      {creator ? <CreatorCard /> : null}
       <div className="flex flex-col gap-2">
         <ScreenLabel text={t.takeaways} />
         {/* A check list, not cards, so the next lesson is the screen's one box. */}
@@ -1613,7 +1625,8 @@ function WrapUp({
           ))}
         </ul>
       </div>
-      {lesson.wrapup.next ? (
+      {/* Not for the maker: one copied prompt on the screen, the changes. */}
+      {lesson.wrapup.next && !creator ? (
         <NextLesson topic={lesson.wrapup.next} after={lesson.title} />
       ) : null}
     </div>

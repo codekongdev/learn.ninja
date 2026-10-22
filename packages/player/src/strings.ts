@@ -92,6 +92,31 @@ export type Strings = {
   likeLogIn: string
   logIn: string
   likeFailed: string
+  /** The wrap-up's card for the lesson's maker: where it stands, a way to publish it, and a way to ask for changes. */
+  creatorPrivate: string
+  creatorPublished: string
+  creatorHidden: string
+  publishTitle: string
+  publishBody: string
+  publishedBody: string
+  hiddenBody: string
+  publish: string
+  publishFailed: string
+  makeChanges: string
+  /** The Make changes dialog: what to do with what it copies. */
+  changesBody: string
+  /** The changes the dialog offers as checkboxes, each also a line of the copied prompt. */
+  changes: Record<LessonChange, string>
+  changesOther: string
+  changesPlaceholder: string
+  copyChanges: string
+  changesCopied: string
+  changesEmpty: string
+  copyFailed: string
+  /** The copied prompt's opening, with the lesson's link; the changes follow as a list. */
+  changesPrompt: (url: string) => string
+  cancel: string
+  changesDone: string
   restart: string
   progress: string
   /** Short label before the counter in the progress bar tooltip. */
@@ -144,6 +169,15 @@ export type Strings = {
   terms: string
 }
 
+/** The ready-made changes the Make changes dialog offers. */
+export const LESSON_CHANGES = [
+  "visual",
+  "harder",
+  "easier",
+  "shorter",
+  "examples",
+] as const
+export type LessonChange = (typeof LESSON_CHANGES)[number]
 export type TextSize = "sm" | "md" | "lg"
 export type Theme = "system" | "light" | "dark"
 /** The ninja's character: hidden, plain and short, a calm mentor, or a nervous wreck. */
