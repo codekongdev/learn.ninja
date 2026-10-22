@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto"
-
 import { apiKey } from "@better-auth/api-key"
 import { cimd } from "@better-auth/cimd"
 import { fetchClientMetadataResource } from "@better-auth/cimd/node"
@@ -129,14 +127,16 @@ export function githubFromEnv(env = process.env) {
 }
 
 /**
- * The signing secret. Production needs BETTER_AUTH_SECRET. A preview deployment without one derives
- * a secret from its own database URL, which is unique per Neon branch and never leaves Vercel, so
- * previews work before anyone sets the variable. Development uses Better Auth's default.
+ * The signing secret: BETTER_AUTH_SECRET on every Vercel environment, Better Auth's default in
+ * development. It also encrypts the private key that signs OAuth tokens, which lives in the jwks
+ * table of the one database previews and production share, so every deployment must use the same
+ * value: a key minted under one secret can't sign under another (previews once derived a secret
+ * from DATABASE_URL, and the key one of them minted left production unable to issue tokens). A
+ * deployment without the variable throws at start-up rather than minting an incompatible key.
  */
 function secretFromEnv(env: NodeJS.ProcessEnv): string | undefined {
   if (env.BETTER_AUTH_SECRET) return env.BETTER_AUTH_SECRET
-  if (env.VERCEL_ENV && env.VERCEL_ENV !== "production" && env.DATABASE_URL)
-    return createHash("sha256").update(env.DATABASE_URL).digest("base64url")
+  if (env.VERCEL_ENV) throw new Error("BETTER_AUTH_SECRET is not set for this Vercel environment.")
   return undefined
 }
 
