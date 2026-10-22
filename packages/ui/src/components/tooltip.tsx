@@ -10,6 +10,9 @@ import {
 
 function TooltipTrigger({
   delay = 0,
+  // React Aria keeps a tooltip up for 500ms after the pointer leaves, which feels sticky; close
+  // it as soon as the pointer leaves, like shadcn's Radix tooltip.
+  closeDelay = 0,
   children,
   ...props
 }: React.ComponentProps<typeof TooltipTriggerPrimitive>) {
@@ -19,6 +22,7 @@ function TooltipTrigger({
     <TooltipTriggerPrimitive
       data-slot="tooltip-trigger"
       delay={delay}
+      closeDelay={closeDelay}
       {...props}
     >
       <Focusable>
