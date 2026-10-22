@@ -72,10 +72,6 @@ export const id: Voices = {
       plain: ["Yang terakhir, dan benar."],
       flavor: ["Itulah pelajarannya.", "Diakhiri dengan kuat."],
     },
-    perfect: {
-      plain: ["Semua benar."],
-      flavor: ["Tanpa satu pun salah.", "Tidak ada yang perlu diperbaiki."],
-    },
   },
   sensei: {
     praise: {
@@ -146,13 +142,6 @@ export const id: Voices = {
       flavor: [
         "Kamu menyelesaikan yang kamu mulai.",
         "Langkah terakhir juga dihitung.",
-      ],
-    },
-    perfect: {
-      plain: ["Tak ada yang meleset. Simpan itu."],
-      flavor: [
-        "Tak ada yang perlu diperbaiki.",
-        "Pikiran tenang, mata jernih.",
       ],
     },
   },
@@ -234,13 +223,6 @@ export const id: Voices = {
     last: {
       plain: ["Selesai. Kita berhasil."],
       flavor: ["Aku harus rebahan.", "Yang terakhir. Lututku lemas."],
-    },
-    perfect: {
-      plain: ["Sempurna. SEMPURNA. Aku harus duduk."],
-      flavor: [
-        "Tidak ada yang meledak. Sekali pun tidak.",
-        "Semuanya? Aku mau pingsan.",
-      ],
     },
   },
 }

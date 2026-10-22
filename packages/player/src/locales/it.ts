@@ -99,12 +99,17 @@ export const it: Strings = {
       other: "# domande tornano. Riprovale prima del riepilogo.",
     }),
   fixStart: "Inizia",
-  done: "Lezione completata!",
-  firstTry: "al primo tentativo",
-  secondTry: "al secondo tentativo",
-  missed: "sbagliate",
+  done: "Lezione completata",
+  firstTryCount: (first, total) => `${first} su ${total} al primo tentativo`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "Entrambe al primo tentativo"
+      : `Tutte e ${total} al primo tentativo`,
   takeaways: "Punti chiave",
   next: "Prossima lezione consigliata",
+  nextHint: "Incolla il prompt nel tuo agente IA per creare questa lezione.",
+  copyPrompt: "Copia il prompt",
+  promptCopied: "Prompt copiato",
   restart: "Ricomincia la lezione",
   progress: "Avanzamento della lezione",
   progressLabel: "Avanzamento",

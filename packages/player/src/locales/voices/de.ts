@@ -72,10 +72,6 @@ export const de: Voices = {
       plain: ["Die letzte, und sie stimmt."],
       flavor: ["Das war die Lektion.", "Stark zu Ende gebracht."],
     },
-    perfect: {
-      plain: ["Alles richtig."],
-      flavor: ["Ohne einen einzigen Fehler.", "Nichts zu korrigieren."],
-    },
   },
   sensei: {
     praise: {
@@ -147,10 +143,6 @@ export const de: Voices = {
         "Du hast beendet, was du begonnen hast.",
         "Der letzte Schritt zählt auch.",
       ],
-    },
-    perfect: {
-      plain: ["Kein einziger Fehltritt. Behalte das."],
-      flavor: ["Nichts zu korrigieren.", "Ruhiger Geist, klarer Blick."],
     },
   },
   unhinged: {
@@ -231,13 +223,6 @@ export const de: Voices = {
     last: {
       plain: ["Vorbei. Wir haben es geschafft."],
       flavor: ["Ich muss mich hinlegen.", "Die letzte. Meine Knie sind weich."],
-    },
-    perfect: {
-      plain: ["Perfekt. PERFEKT. Ich muss mich setzen."],
-      flavor: [
-        "Nichts ist explodiert. Kein einziges Mal.",
-        "Alle? Ich fall gleich um.",
-      ],
     },
   },
 }

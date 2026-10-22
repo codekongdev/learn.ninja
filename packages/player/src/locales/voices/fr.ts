@@ -72,10 +72,6 @@ export const fr: Voices = {
       plain: ["La dernière, et elle est juste."],
       flavor: ["C'était ça, la leçon.", "Tu finis fort."],
     },
-    perfect: {
-      plain: ["Tout juste."],
-      flavor: ["Sans la moindre faute.", "Rien à corriger."],
-    },
   },
   sensei: {
     praise: {
@@ -143,10 +139,6 @@ export const fr: Voices = {
         "Tu as fini ce que tu as commencé.",
         "Le dernier pas compte aussi.",
       ],
-    },
-    perfect: {
-      plain: ["Pas un faux pas. Garde ça."],
-      flavor: ["Rien à corriger.", "Esprit calme, regard clair."],
     },
   },
   unhinged: {
@@ -229,13 +221,6 @@ export const fr: Voices = {
       flavor: [
         "Il faut que je m'allonge.",
         "La dernière. Mes genoux ont lâché.",
-      ],
-    },
-    perfect: {
-      plain: ["Parfait. PARFAIT. Il faut que je m'assoie."],
-      flavor: [
-        "Rien n'a explosé. Pas une fois.",
-        "Toutes ? Je vais tomber dans les pommes.",
       ],
     },
   },

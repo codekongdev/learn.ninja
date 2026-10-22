@@ -77,12 +77,18 @@ export const ko: Strings = {
   fixTitle: "틀린 문제를 다시 풀어 봐요",
   fixBody: (n) => `${n}문제가 다시 나와요. 마무리 전에 한 번 더 풀어 보세요.`,
   fixStart: "시작",
-  done: "레슨 완료!",
-  firstTry: "첫 번째 시도에 정답",
-  secondTry: "두 번째 시도에 정답",
-  missed: "틀림",
+  done: "레슨 완료",
+  firstTryCount: (first, total) =>
+    `${total}문제 중 ${first}문제 첫 시도에 정답`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "두 문제 모두 첫 시도에 정답"
+      : `${total}문제 모두 첫 시도에 정답`,
   takeaways: "핵심 정리",
   next: "추천 다음 레슨",
+  nextHint: "프롬프트를 AI 에이전트에 붙여 넣으면 이 레슨을 만들어 줘요.",
+  copyPrompt: "프롬프트 복사",
+  promptCopied: "프롬프트를 복사했어요",
   restart: "레슨 다시 시작",
   progress: "레슨 진행률",
   progressLabel: "진행률",

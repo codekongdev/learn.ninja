@@ -52,6 +52,14 @@ export function summarize(
   return summary
 }
 
+/** How the run went, for the wrap-up: every question right first time, a good run, or more than one missed. */
+export type Run = "perfect" | "good" | "rough"
+
+export function runFor(s: Summary): Run {
+  if (s.total > 0 && s.first === s.total) return "perfect"
+  return s.missed > 1 ? "rough" : "good"
+}
+
 /** The outcome to record for a question answered correctly. Opening the theory first costs nothing. */
 export function outcomeFor(attempts: number): Outcome {
   return attempts > 0 ? "second" : "first"

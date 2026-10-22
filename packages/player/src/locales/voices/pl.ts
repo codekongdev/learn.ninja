@@ -72,10 +72,6 @@ export const pl: Voices = {
       plain: ["Ostatnie, i dobrze."],
       flavor: ["To była cała lekcja.", "Mocne zakończenie."],
     },
-    perfect: {
-      plain: ["Wszystko dobrze."],
-      flavor: ["Bez jednego błędu.", "Nie ma czego poprawiać."],
-    },
   },
   sensei: {
     praise: {
@@ -140,10 +136,6 @@ export const pl: Voices = {
     last: {
       plain: ["To cała lekcja. Dobra robota."],
       flavor: ["Dokończone, co zaczęte.", "Ostatni krok też się liczy."],
-    },
-    perfect: {
-      plain: ["Ani jednego potknięcia. Zachowaj to."],
-      flavor: ["Nie ma czego poprawiać.", "Spokojny umysł, jasne oczy."],
     },
   },
   unhinged: {
@@ -221,10 +213,6 @@ export const pl: Voices = {
     last: {
       plain: ["Koniec. Udało się."],
       flavor: ["Muszę się położyć.", "Ostatnie. Kolana mi zmiękły."],
-    },
-    perfect: {
-      plain: ["Idealnie. IDEALNIE. Muszę usiąść."],
-      flavor: ["Nic nie wybuchło. Ani razu.", "Wszystkie? Zaraz zemdleję."],
     },
   },
 }

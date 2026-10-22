@@ -91,12 +91,18 @@ export const hi: Strings = {
       other: "# सवाल वापस आ रहे हैं। समापन से पहले एक बार फिर कोशिश करें।",
     }),
   fixStart: "शुरू करें",
-  done: "पाठ पूरा हुआ!",
-  firstTry: "पहली कोशिश में सही",
-  secondTry: "दूसरी कोशिश में",
-  missed: "छूटे",
+  done: "पाठ पूरा हुआ",
+  firstTryCount: (first, total) =>
+    `${total} में से ${first} पहली कोशिश में सही`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "दोनों पहली कोशिश में सही"
+      : `सभी ${total} पहली कोशिश में सही`,
   takeaways: "मुख्य बातें",
   next: "सुझाया गया अगला पाठ",
+  nextHint: "यह पाठ बनाने के लिए प्रॉम्प्ट को अपने AI एजेंट में पेस्ट करें।",
+  copyPrompt: "प्रॉम्प्ट कॉपी करें",
+  promptCopied: "प्रॉम्प्ट कॉपी हो गया",
   restart: "पाठ फिर से शुरू करें",
   progress: "पाठ की प्रगति",
   progressLabel: "प्रगति",

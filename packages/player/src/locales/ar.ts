@@ -97,12 +97,17 @@ export const ar: Strings = {
   fixTitle: "لنصحّح أخطاءك",
   fixBody: (n) => `سيعود ${n} من الأسئلة. جرّبها مرة أخرى قبل الختام.`,
   fixStart: "ابدأ",
-  done: "أكملت الدرس!",
-  firstTry: "صحيحة من المحاولة الأولى",
-  secondTry: "في المحاولة الثانية",
-  missed: "فاتتك",
+  done: "أكملت الدرس",
+  firstTryCount: (first, total) => `${first} من ${total} في المحاولة الأولى`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "كلاهما في المحاولة الأولى"
+      : `كل الأسئلة الـ${total} في المحاولة الأولى`,
   takeaways: "أهم النقاط",
   next: "الدرس التالي المقترح",
+  nextHint: "الصق الموجّه في وكيل الذكاء الاصطناعي لديك لإنشاء هذا الدرس.",
+  copyPrompt: "نسخ الموجّه",
+  promptCopied: "تم نسخ الموجّه",
   restart: "أعد الدرس",
   progress: "تقدم الدرس",
   progressLabel: "التقدم",

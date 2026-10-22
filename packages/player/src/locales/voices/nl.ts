@@ -72,10 +72,6 @@ export const nl: Voices = {
       plain: ["De laatste, en hij klopt."],
       flavor: ["Dat was de les.", "Sterk afgesloten."],
     },
-    perfect: {
-      plain: ["Alles goed."],
-      flavor: ["Zonder één fout.", "Niets te verbeteren."],
-    },
   },
   sensei: {
     praise: {
@@ -137,10 +133,6 @@ export const nl: Voices = {
     last: {
       plain: ["Dat is de les. Goed gedaan."],
       flavor: ["Je maakte af wat je begon.", "De laatste stap telt ook."],
-    },
-    perfect: {
-      plain: ["Geen misstap. Hou dat vast."],
-      flavor: ["Niets te verbeteren.", "Stil hoofd, heldere blik."],
     },
   },
   unhinged: {
@@ -218,10 +210,6 @@ export const nl: Voices = {
     last: {
       plain: ["Het is voorbij. We hebben het gehaald."],
       flavor: ["Ik moet even liggen.", "De laatste. Mijn knieën begaven het."],
-    },
-    perfect: {
-      plain: ["Perfect. PERFECT. Ik moet even zitten."],
-      flavor: ["Niets ontploft. Niet één keer.", "Allemaal? Ik val flauw."],
     },
   },
 }

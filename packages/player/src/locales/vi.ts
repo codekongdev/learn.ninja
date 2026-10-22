@@ -81,12 +81,18 @@ export const vi: Strings = {
   fixTitle: "Cùng sửa lỗi của bạn",
   fixBody: (n) => `${n} câu hỏi sẽ quay lại. Hãy thử lại trước phần tổng kết.`,
   fixStart: "Bắt đầu",
-  done: "Hoàn thành bài học!",
-  firstTry: "đúng ngay lần đầu",
-  secondTry: "đúng ở lần hai",
-  missed: "sai",
+  done: "Hoàn thành bài học",
+  firstTryCount: (first, total) =>
+    `${first} trên ${total} câu đúng ngay lần đầu`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "Cả hai câu đều đúng ngay lần đầu"
+      : `Cả ${total} câu đều đúng ngay lần đầu`,
   takeaways: "Điểm chính",
   next: "Bài học tiếp theo gợi ý",
+  nextHint: "Dán prompt vào AI agent của bạn để tạo bài học này.",
+  copyPrompt: "Sao chép prompt",
+  promptCopied: "Đã sao chép prompt",
   restart: "Học lại từ đầu",
   progress: "Tiến độ bài học",
   progressLabel: "Tiến độ",

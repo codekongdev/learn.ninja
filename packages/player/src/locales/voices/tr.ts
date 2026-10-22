@@ -72,10 +72,6 @@ export const tr: Voices = {
       plain: ["Sonuncusu da doğru."],
       flavor: ["Ders buydu.", "Güçlü bitirdin."],
     },
-    perfect: {
-      plain: ["Hepsi doğru."],
-      flavor: ["Tek hata yok.", "Düzeltilecek bir şey yok."],
-    },
   },
   sensei: {
     praise: {
@@ -143,10 +139,6 @@ export const tr: Voices = {
     last: {
       plain: ["Ders bu. Aferin."],
       flavor: ["Başladığını bitirdin.", "Son adım da sayılır."],
-    },
-    perfect: {
-      plain: ["Tek bir hata yok. Bunu sakla."],
-      flavor: ["Düzeltecek bir şey yok.", "Sakin zihin, açık göz."],
     },
   },
   unhinged: {
@@ -224,10 +216,6 @@ export const tr: Voices = {
     last: {
       plain: ["Bitti. Başardık."],
       flavor: ["Uzanmam lazım.", "Sonuncu. Dizlerim çözüldü."],
-    },
-    perfect: {
-      plain: ["Mükemmel. MÜKEMMEL. Oturmam lazım."],
-      flavor: ["Hiçbir şey patlamadı. Bir kez bile.", "Hepsi mi? Bayılacağım."],
     },
   },
 }

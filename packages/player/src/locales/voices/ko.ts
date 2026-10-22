@@ -69,10 +69,6 @@ export const ko: Voices = {
       plain: ["마지막 문제, 정답."],
       flavor: ["이게 오늘의 수업이었어요.", "강하게 마무리했네요."],
     },
-    perfect: {
-      plain: ["전부 정답."],
-      flavor: ["하나도 안 틀렸어요.", "고칠 게 없어요."],
-    },
   },
   sensei: {
     praise: {
@@ -137,10 +133,6 @@ export const ko: Voices = {
     last: {
       plain: ["이것이 수업이다. 잘했다."],
       flavor: ["시작한 것을 끝냈다.", "마지막 걸음도 걸음이다."],
-    },
-    perfect: {
-      plain: ["한 번도 헛디디지 않았다. 간직해라."],
-      flavor: ["고칠 것이 없다.", "고요한 마음, 맑은 눈."],
     },
   },
   unhinged: {
@@ -218,10 +210,6 @@ export const ko: Voices = {
     last: {
       plain: ["끝났어요. 우리가 해냈어요."],
       flavor: ["누워야겠어요.", "마지막 문제. 무릎이 풀렸어요."],
-    },
-    perfect: {
-      plain: ["완벽. 완벽해요! 앉아야겠어요."],
-      flavor: ["아무것도 안 터졌어요. 한 번도.", "전부요? 기절할 것 같아요."],
     },
   },
 }

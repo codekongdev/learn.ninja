@@ -84,12 +84,18 @@ export const id: Strings = {
       ? "Satu pertanyaan akan kembali. Coba lagi sebelum rangkuman."
       : `${n} pertanyaan akan kembali. Coba lagi sebelum rangkuman.`,
   fixStart: "Mulai",
-  done: "Pelajaran selesai!",
-  firstTry: "benar di percobaan pertama",
-  secondTry: "di percobaan kedua",
-  missed: "terlewat",
+  done: "Pelajaran selesai",
+  firstTryCount: (first, total) =>
+    `${first} dari ${total} benar di percobaan pertama`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "Keduanya benar di percobaan pertama"
+      : `Semua ${total} benar di percobaan pertama`,
   takeaways: "Poin penting",
   next: "Saran pelajaran berikutnya",
+  nextHint: "Tempel prompt ke agen AI kamu untuk membuat pelajaran ini.",
+  copyPrompt: "Salin prompt",
+  promptCopied: "Prompt disalin",
   restart: "Ulangi pelajaran",
   progress: "Kemajuan pelajaran",
   progressLabel: "Kemajuan",

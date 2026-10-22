@@ -104,12 +104,17 @@ export const pl: Strings = {
       other: "Wraca # pytania. Spróbuj jeszcze raz przed podsumowaniem.",
     }),
   fixStart: "Zacznij",
-  done: "Lekcja ukończona!",
-  firstTry: "za pierwszym razem",
-  secondTry: "za drugim razem",
-  missed: "nieudanych",
+  done: "Lekcja ukończona",
+  firstTryCount: (first, total) => `${first} z ${total} za pierwszym razem`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "Oba za pierwszym razem"
+      : `Wszystkie ${total} za pierwszym razem`,
   takeaways: "Najważniejsze wnioski",
   next: "Proponowana następna lekcja",
+  nextHint: "Wklej prompt do swojego agenta AI, aby utworzyć tę lekcję.",
+  copyPrompt: "Kopiuj prompt",
+  promptCopied: "Prompt skopiowany",
   restart: "Zacznij lekcję od nowa",
   progress: "Postęp lekcji",
   progressLabel: "Postęp",

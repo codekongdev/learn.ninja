@@ -98,12 +98,18 @@ export const de: Strings = {
         "# Fragen kommen noch einmal. Versuch sie vor der Zusammenfassung erneut.",
     }),
   fixStart: "Los",
-  done: "Lektion abgeschlossen!",
-  firstTry: "beim ersten Versuch richtig",
-  secondTry: "beim zweiten Versuch",
-  missed: "falsch",
+  done: "Lektion abgeschlossen",
+  firstTryCount: (first, total) => `${first} von ${total} beim ersten Versuch`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "Beide beim ersten Versuch"
+      : `Alle ${total} beim ersten Versuch`,
   takeaways: "Das Wichtigste",
   next: "Vorgeschlagene nächste Lektion",
+  nextHint:
+    "Füge den Prompt in deinen KI-Agenten ein, um diese Lektion zu erstellen.",
+  copyPrompt: "Prompt kopieren",
+  promptCopied: "Prompt kopiert",
   restart: "Lektion neu starten",
   progress: "Fortschritt der Lektion",
   progressLabel: "Fortschritt",

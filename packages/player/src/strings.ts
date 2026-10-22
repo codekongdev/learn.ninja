@@ -75,11 +75,16 @@ export type Strings = {
   fixBody: (n: number) => string
   fixStart: string
   done: string
-  firstTry: string
-  secondTry: string
-  missed: string
+  /** The wrap-up's score line: "8 of 9 on the first try". */
+  firstTryCount: (first: number, total: number) => string
+  /** The score line on a perfect run: "All 9 on the first try". */
+  allFirstTry: (total: number) => string
   takeaways: string
   next: string
+  /** Under the suggested next lesson's title, saying what Copy prompt is for. */
+  nextHint: string
+  copyPrompt: string
+  promptCopied: string
   restart: string
   progress: string
   /** Short label before the counter in the progress bar tooltip. */

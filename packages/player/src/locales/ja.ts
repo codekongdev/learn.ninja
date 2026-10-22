@@ -78,12 +78,16 @@ export const ja: Strings = {
   fixBody: (n) =>
     `${n}問がもう一度出題されます。まとめの前にもう一度挑戦しましょう。`,
   fixStart: "開始",
-  done: "レッスン完了！",
-  firstTry: "1回目で正解",
-  secondTry: "2回目で正解",
-  missed: "不正解",
+  done: "レッスン完了",
+  firstTryCount: (first, total) => `${total}問中${first}問を1回目で正解`,
+  allFirstTry: (total) =>
+    total === 2 ? "2問とも1回目で正解" : `${total}問すべて1回目で正解`,
   takeaways: "ポイント",
   next: "おすすめの次のレッスン",
+  nextHint:
+    "プロンプトをAIエージェントに貼り付けると、このレッスンを作れます。",
+  copyPrompt: "プロンプトをコピー",
+  promptCopied: "プロンプトをコピーしました",
   restart: "レッスンをやり直す",
   progress: "レッスンの進捗",
   progressLabel: "進捗",

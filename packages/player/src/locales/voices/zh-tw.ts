@@ -58,10 +58,6 @@ export const zhTw: Voices = {
       plain: ["最後一題，答對了。"],
       flavor: ["這就是這堂課。", "收尾有力。"],
     },
-    perfect: {
-      plain: ["全部正確。"],
-      flavor: ["一題沒錯。", "沒什麼要改的。"],
-    },
   },
   sensei: {
     praise: {
@@ -119,10 +115,6 @@ export const zhTw: Voices = {
     last: {
       plain: ["這就是這一課。做得好。"],
       flavor: ["有始有終。", "最後一步也算一步。"],
-    },
-    perfect: {
-      plain: ["一次都沒錯。記住這個。"],
-      flavor: ["沒什麼要改的。", "心靜，眼明。"],
     },
   },
   unhinged: {
@@ -200,10 +192,6 @@ export const zhTw: Voices = {
     last: {
       plain: ["結束了。我們撐過來了。"],
       flavor: ["我得躺一下。", "最後一題。我腿都軟了。"],
-    },
-    perfect: {
-      plain: ["完美。完美！我得坐下。"],
-      flavor: ["什麼都沒爆炸。一次都沒有。", "全對？我要暈了。"],
     },
   },
 }

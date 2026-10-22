@@ -22,6 +22,12 @@ import {
 
 import { ReportDialog } from "@/components/explore/report-dialog"
 import type { Visibility } from "@/lib/explore/queries"
+import { AGENT_PROMPT } from "@/lib/site"
+
+/** What the wrap-up's Copy prompt copies: the site's agent prompt for the suggested next lesson. */
+function nextPrompt(topic: string, after: string): string {
+  return `${AGENT_PROMPT}${topic}, as a follow-up to my lesson "${after}".`
+}
 
 export interface LessonViewProps extends LessonPlayerProps {
   /** The published lesson's id, for the report and the owner's menu. */
@@ -109,6 +115,7 @@ export function LessonView({
         theme={mounted ? ((theme as Theme | undefined) ?? "system") : "system"}
         onThemeChange={setTheme}
         menuItems={menuItems}
+        nextPrompt={nextPrompt}
         onComplete={
           lessonId && recordCompletion
             ? () => {

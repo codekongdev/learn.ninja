@@ -87,12 +87,18 @@ export const tr: Strings = {
       other: "# soru geri geliyor. Özetten önce bir daha dene.",
     }),
   fixStart: "Başla",
-  done: "Ders tamamlandı!",
-  firstTry: "ilk denemede doğru",
-  secondTry: "ikinci denemede",
-  missed: "yanlış",
+  done: "Ders tamamlandı",
+  firstTryCount: (first, total) =>
+    `${total} sorudan ${first} tanesi ilk denemede doğru`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "İkisi de ilk denemede doğru"
+      : `${total} sorunun hepsi ilk denemede doğru`,
   takeaways: "Önemli noktalar",
   next: "Önerilen sonraki ders",
+  nextHint: "Bu dersi oluşturmak için istemi yapay zeka ajanına yapıştır.",
+  copyPrompt: "İstemi kopyala",
+  promptCopied: "İstem kopyalandı",
   restart: "Dersi yeniden başlat",
   progress: "Ders ilerlemesi",
   progressLabel: "İlerleme",

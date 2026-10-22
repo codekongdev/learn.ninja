@@ -2,7 +2,14 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { LightbulbIcon, PanelRightIcon, RotateCcwIcon } from "lucide-react"
+import {
+  CheckIcon,
+  CircleCheckIcon,
+  CopyIcon,
+  LightbulbIcon,
+  PanelRightIcon,
+  RotateCcwIcon,
+} from "lucide-react"
 
 import type {
   ConceptBrick as ConceptBrickData,
@@ -47,10 +54,12 @@ import {
   outcomeFor,
   progressAt,
   questionAt,
+  runFor,
   summarize,
   type Item,
   type Outcome,
   type Role,
+  type Run,
 } from "./flow"
 import {
   Aura,
@@ -81,6 +90,7 @@ import {
   TRAY_BUTTON,
   TRAY_GHOST,
   usePreferences,
+  useShare,
   type Preferences,
 } from "./shell"
 import {
@@ -140,6 +150,12 @@ export interface LessonPlayerProps {
   progressKey?: string
   /** Called when the learner reaches the wrap-up (not in demos), once per run through the lesson. */
   onComplete?: () => void
+  /**
+   * The prompt the wrap-up's Copy prompt button copies, for the learner's agent to make the
+   * suggested next lesson (`topic`) as a follow-up to this one (`after`, its title). Omit it to show
+   * the suggestion without the button.
+   */
+  nextPrompt?: (topic: string, after: string) => string
 }
 
 export function LessonPlayer({
@@ -162,6 +178,7 @@ export function LessonPlayer({
   chrome = true,
   progressKey,
   onComplete,
+  nextPrompt,
 }: LessonPlayerProps) {
   const root = React.useRef<HTMLDivElement>(null)
   // The title as shown, which a rename in the header changes.
@@ -188,6 +205,7 @@ export function LessonPlayer({
           dir,
           visualsCss,
           keyScope: scopeKeys ? root : undefined,
+          nextPrompt,
         }}
       >
         <div
@@ -847,24 +865,16 @@ function Player({
             key: `${state.index}-${q.attempts}-${q.phase}`,
           }
         : null
-  // The wrap-up's send-off, with more for a perfect run: a line of his, shown under his slot once
-  // he's leapt up there (or at once when he's off and there's no leap to wait for).
-  const celebrate = React.useMemo(() => {
-    if (item.kind !== "wrap") return undefined
-    const s = summarize(lesson, state.results)
-    return s.total > 0 && s.first === s.total ? "perfect" : "done"
-  }, [item.kind, lesson, state.results])
-  const wrapLine =
-    celebrate === "perfect"
-      ? pickLine(
-          `${state.index}-0--perfect-${ninja}`,
-          "perfect",
-          voiceLines(lang, ninja, "perfect"),
-          CADENCE[characterFor(ninja)]
-        )
-      : null
-  const [landed, setLanded] = React.useState(false)
-  React.useEffect(() => setLanded(false), [state.index])
+  // The wrap-up's send-off: he leaps up to his slot there, with more for a perfect run.
+  const run = React.useMemo(
+    () =>
+      item.kind === "wrap"
+        ? runFor(summarize(lesson, state.results))
+        : undefined,
+    [item.kind, lesson, state.results]
+  )
+  const celebrate = run && (run === "perfect" ? "perfect" : "done")
+  const { share, copied } = useShare(lesson.title, shareUrl)
 
   return (
     <>
@@ -945,9 +955,8 @@ function Player({
                           "motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in-0 motion-safe:slide-in-from-end-24"
                         : "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
                     columnWidth(item),
-                    // Room under the content for the feedback toast (the wrap gets one on a perfect lesson).
-                    (item.kind === "question" || item.kind === "wrap") &&
-                      "pb-40"
+                    // Room under the content for the feedback toast.
+                    item.kind === "question" && "pb-40"
                   )}
                 >
                   <div
@@ -962,7 +971,11 @@ function Player({
                       label={screenLabel(state, t)}
                       inBubble
                       ninja={ninja !== "off"}
-                      wrapLine={ninja === "off" || landed ? wrapLine : null}
+                      wrapTime={
+                        clock.start && clock.end
+                          ? clock.end - clock.start
+                          : undefined
+                      }
                       brief={
                         briefKey
                           ? {
@@ -1000,6 +1013,7 @@ function Player({
                     }
                     onRewind={rewind}
                     rewinding={rewinding}
+                    share={{ onPress: share, copied }}
                     why={
                       canWhy
                         ? {
@@ -1020,7 +1034,6 @@ function Player({
                   screen={briefKey ?? state.index}
                   cue={cue}
                   celebrate={celebrate}
-                  onLanded={() => setLanded(true)}
                   level={ninja}
                   vanishing={vanishing}
                 />
@@ -1156,23 +1169,6 @@ function columnWidth(item: Item): string {
   return wide ? "max-w-2xl" : "max-w-lg"
 }
 
-const Eyebrow = ({
-  children,
-  muted,
-}: {
-  children: React.ReactNode
-  muted?: boolean
-}) => (
-  <div
-    className={cn(
-      "text-xs font-semibold tracking-[0.08em] uppercase",
-      muted ? "text-muted-foreground" : "text-primary"
-    )}
-  >
-    {children}
-  </div>
-)
-
 /** Instructions under the prompt, only where the interaction isn't obvious (a single pick needs none). */
 function helperFor(brick: QuestionBrick, t: Strings): string {
   switch (brick.type) {
@@ -1195,7 +1191,7 @@ export function Screen({
   state,
   dispatch,
   ninja = true,
-  wrapLine,
+  wrapTime,
   label,
   inBubble = false,
   brief = null,
@@ -1215,8 +1211,8 @@ export function Screen({
   inBubble?: boolean
   /** Whether the ninja is on. Off, his slot folds away so the screen stays centered. */
   ninja?: boolean
-  /** The wrap-up's line for a perfect run, once he's there to say it. */
-  wrapLine?: string | null
+  /** How long the lesson took, in ms, for the wrap-up's score line. */
+  wrapTime?: number
 }) {
   const { t } = usePlayer()
   switch (item.kind) {
@@ -1266,7 +1262,7 @@ export function Screen({
           lesson={lesson}
           results={state.results}
           ninja={ninja}
-          line={wrapLine}
+          time={wrapTime}
         />
       )
     case "question":
@@ -1558,90 +1554,112 @@ function WrapUp({
   lesson,
   results,
   ninja = true,
-  line,
+  time,
 }: {
   lesson: Lesson
   results: Record<string, Outcome>
   ninja?: boolean
-  /** His line for a perfect run, shown as a bubble under his slot. */
-  line?: string | null
+  /** How long the lesson took, in ms. */
+  time?: number
 }) {
-  const { t } = usePlayer()
+  const { t, lang = "en" } = usePlayer()
   const s = summarize(lesson, results)
-  const pct = Math.round((s.first / s.total) * 100)
-  const rows: [string, number, string][] = [
-    ["bg-green-600", s.first, t.firstTry],
-    ["bg-primary", s.second, t.secondTry],
-    ["bg-red-600", s.missed, t.missed],
+  const run = runFor(s)
+  // The celebration leads; the score is one quiet line: first tries, then the time it took.
+  const score = [
+    run === "perfect"
+      ? t.allFirstTry(s.total)
+      : t.firstTryCount(s.first, s.total),
+    time === undefined
+      ? null
+      : new Intl.NumberFormat(lang, {
+          style: "unit",
+          unit: "minute",
+          unitDisplay: "short",
+        }).format(Math.max(1, Math.round(time / 60_000))),
   ]
+    .filter(Boolean)
+    .join(" · ")
   return (
-    <div className="flex flex-col gap-6">
-      {/* The ninja leaps up from the corner to his send-off here (NinjaStage). */}
-      <NinjaSlot show={ninja} gap="-mb-6" />
-      {/* Said once he's landed: a speech bubble under him, squared off at the corner nearest him.
-          Always in the tree (hidden until then) so the line is announced when it appears. */}
-      <p
-        aria-live="polite"
-        className={
-          line
-            ? cn(
-                TOAST,
-                toneClass.good,
-                "w-fit max-w-80 text-sm font-semibold motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-top-1",
-                ninja && "rounded-ss-sm"
-              )
-            : "sr-only"
-        }
-      >
-        {line ? <RichText text={line} /> : null}
-      </p>
-      <Eyebrow>{lesson.title}</Eyebrow>
-      <h1 className="-mt-4 text-2xl font-semibold">{t.done}</h1>
-      <div className="flex flex-wrap items-center gap-6">
-        <div
-          className="grid size-32 place-items-center rounded-full"
-          style={{
-            background: `conic-gradient(var(--color-green-600) ${pct}%, var(--muted) 0)`,
-          }}
-        >
-          <div className="grid size-24 place-items-center rounded-full bg-card text-center">
-            <div className="text-3xl font-extrabold tabular-nums">
-              {s.first}/{s.total}
-            </div>
-          </div>
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col items-center gap-4 text-center">
+        {/* The ninja leaps up from the corner to his send-off here (NinjaStage). */}
+        <NinjaSlot show={ninja} gap="-mb-4" />
+        {/* The heading and its line as on the fix screen; text in cards at the options' size. */}
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-semibold">{t.done}</h1>
+          <p className="text-sm font-medium text-muted-foreground">{score}</p>
         </div>
-        <ul className="grid gap-1.5 text-base">
-          {rows.map(([color, n, label]) => (
-            <li key={label} className="flex items-center gap-2">
-              <span
-                className={cn("size-2.5 rounded-full", color)}
-                aria-hidden="true"
-              />
-              <span className="tabular-nums">{n}</span> {label}
-            </li>
-          ))}
-        </ul>
       </div>
-      <div className="flex flex-col gap-3">
-        <Eyebrow muted>{t.takeaways}</Eyebrow>
+      <div className="flex flex-col gap-2">
+        <ScreenLabel text={t.takeaways} />
+        {/* A check list, not cards, so the next lesson is the screen's one box. */}
         <ul className="grid gap-2.5">
           {lesson.wrapup.takeaways.map((k) => (
-            <li key={k}>
-              <Card size="sm">
-                <CardContent className="text-base">
-                  <RichText text={k} />
-                </CardContent>
-              </Card>
+            <li key={k} className="flex gap-2.5 text-sm font-medium">
+              {/* The solid check Explore shows on a finished lesson. */}
+              <CircleCheckIcon
+                aria-hidden="true"
+                className="mt-0.5 size-4 shrink-0 fill-green-600 text-background"
+              />
+              <RichText text={k} />
             </li>
           ))}
         </ul>
-        {lesson.wrapup.next ? (
-          <p className="text-base text-muted-foreground">
-            {t.next}:{" "}
-            <strong className="text-foreground">{lesson.wrapup.next}</strong>
-          </p>
-        ) : null}
       </div>
+      {lesson.wrapup.next ? (
+        <NextLesson topic={lesson.wrapup.next} after={lesson.title} />
+      ) : null}
+    </div>
+  )
+}
+
+/** The suggested next lesson, with a button that copies a prompt for the learner's agent to make it. */
+function NextLesson({ topic, after }: { topic: string; after: string }) {
+  const { t, nextPrompt } = usePlayer()
+  const [copied, setCopied] = React.useState(false)
+  React.useEffect(() => {
+    if (!copied) return
+    const id = setTimeout(() => setCopied(false), 2000)
+    return () => clearTimeout(id)
+  }, [copied])
+
+  async function copy() {
+    if (!nextPrompt) return
+    try {
+      await navigator.clipboard.writeText(nextPrompt(topic, after))
+      setCopied(true)
+    } catch {
+      // Clipboard blocked; nothing else to do.
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <ScreenLabel text={t.next} />
+      <Card size="sm">
+        <CardContent className="flex flex-wrap items-center gap-x-4 gap-y-3">
+          <div className="flex min-w-0 flex-1 basis-56 flex-col gap-0.5">
+            <p className="text-sm font-semibold">{topic}</p>
+            {nextPrompt ? (
+              <p className="text-sm text-muted-foreground">{t.nextHint}</p>
+            ) : null}
+          </div>
+          {nextPrompt ? (
+            <Button variant="outline" size="sm" onPress={copy}>
+              {copied ? (
+                <CheckIcon data-icon="inline-start" />
+              ) : (
+                <CopyIcon data-icon="inline-start" />
+              )}
+              {copied ? t.promptCopied : t.copyPrompt}
+            </Button>
+          ) : null}
+        </CardContent>
+      </Card>
+      <span aria-live="polite" className="sr-only">
+        {copied ? t.promptCopied : ""}
+      </span>
     </div>
   )
 }
@@ -1650,7 +1668,7 @@ function WrapUp({
 
 type Tone = "neutral" | "good" | "warn"
 
-/** The feedback toast's recipe for each tone (the wrap-up's bubble shares it). */
+/** The feedback toast's recipe for each tone. */
 const TOAST = "rounded-xl border px-4 py-3 shadow-xs"
 const toneClass: Record<Tone, string> = {
   neutral: "border-border bg-popover text-popover-foreground",
@@ -1678,6 +1696,7 @@ export function ActionArea({
   brief = null,
   onRewind,
   rewinding = false,
+  share,
 }: {
   lesson: Lesson
   item: Item
@@ -1711,6 +1730,8 @@ export function ActionArea({
   onRewind?: () => void
   /** The rewind is playing: the bubble fades and the buttons wait. */
   rewinding?: boolean
+  /** Shares the lesson from the wrap-up; `copied` while the link was just copied. */
+  share?: { onPress: () => void; copied: boolean }
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const ownPicker = React.useMemo(
@@ -1768,11 +1789,18 @@ export function ActionArea({
       onPress: () => dispatch({ type: "startFix" }),
     }
   else if (item.kind === "wrap") {
-    // A perfect lesson earns one last line, said from his slot once he's landed (WrapUp), not from
-    // the corner he's just left.
-    primary = {
+    // After a good run Share leads; after a rough one, going again does.
+    const restart = {
       label: t.restart,
       onPress: () => dispatch({ type: "restart", lesson }),
+    }
+    const shareLabel = share?.copied ? t.linkCopied : t.share
+    if (share && runFor(summarize(lesson, state.results)) !== "rough") {
+      primary = { label: shareLabel, onPress: share.onPress }
+      secondary = helpButton(restart.label, restart.onPress)
+    } else {
+      primary = restart
+      if (share) secondary = helpButton(shareLabel, share.onPress)
     }
   } else if (item.kind === "question" && state.question && brief) {
     // The ninja's brief: Skip shows the rest at once; once it's told, Continue goes to the question.

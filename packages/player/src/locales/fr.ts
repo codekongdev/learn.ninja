@@ -99,12 +99,17 @@ export const fr: Strings = {
       other: "# questions reviennent. Réessaie avant le récapitulatif.",
     }),
   fixStart: "Commencer",
-  done: "Leçon terminée !",
-  firstTry: "du premier coup",
-  secondTry: "au deuxième essai",
-  missed: "manquées",
+  done: "Leçon terminée",
+  firstTryCount: (first, total) => `${first} sur ${total} du premier coup`,
+  allFirstTry: (total) =>
+    total === 2
+      ? "Les deux du premier coup"
+      : `Toutes les ${total} du premier coup`,
   takeaways: "À retenir",
   next: "Leçon suivante suggérée",
+  nextHint: "Colle le prompt dans ton agent IA pour créer cette leçon.",
+  copyPrompt: "Copier le prompt",
+  promptCopied: "Prompt copié",
   restart: "Recommencer la leçon",
   progress: "Progression de la leçon",
   progressLabel: "Progression",

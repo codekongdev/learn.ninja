@@ -15,6 +15,8 @@ interface PlayerContextValue {
   visualsCss: string
   /** Only take keyboard shortcuts (Enter, number keys) from inside this element, for several demos on one page. */
   keyScope?: React.RefObject<HTMLElement | null>
+  /** The prompt the wrap-up copies to make its suggested next lesson. Without it there's no copy button. */
+  nextPrompt?: (topic: string, after: string) => string
 }
 
 const PlayerContext = React.createContext<PlayerContextValue>({

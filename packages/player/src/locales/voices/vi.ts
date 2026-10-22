@@ -72,10 +72,6 @@ export const vi: Voices = {
       plain: ["Câu cuối, và đúng."],
       flavor: ["Đó chính là bài học.", "Kết thúc mạnh mẽ."],
     },
-    perfect: {
-      plain: ["Đúng hết."],
-      flavor: ["Không sai câu nào.", "Không có gì phải sửa."],
-    },
   },
   sensei: {
     praise: {
@@ -140,10 +136,6 @@ export const vi: Voices = {
     last: {
       plain: ["Đó là bài học. Tốt lắm."],
       flavor: ["Em đã làm xong điều em bắt đầu.", "Bước cuối cũng tính."],
-    },
-    perfect: {
-      plain: ["Không một sai sót. Giữ lấy."],
-      flavor: ["Không có gì để sửa.", "Tâm tĩnh, mắt sáng."],
     },
   },
   unhinged: {
@@ -224,10 +216,6 @@ export const vi: Voices = {
     last: {
       plain: ["Xong rồi. Ta làm được."],
       flavor: ["Tôi phải nằm xuống.", "Câu cuối. Đầu gối tôi mềm nhũn."],
-    },
-    perfect: {
-      plain: ["Hoàn hảo. HOÀN HẢO. Tôi phải ngồi xuống."],
-      flavor: ["Không gì nổ cả. Không một lần.", "Tất cả? Tôi sắp xỉu."],
     },
   },
 }

@@ -45,11 +45,10 @@ export type Moment =
   | "nudge"
   | "close"
   | "answer"
-  // Earned: a correct answer at a moment worth more than praise, and a perfect lesson at the wrap.
+  // Earned: a correct answer at a moment worth more than praise.
   | "streak"
   | "comeback"
   | "last"
-  | "perfect"
 
 /** A moment's lines: the plain ones, said most of the time, and the flavor ones, rationed. */
 export type Lines = { plain: string[]; flavor: string[] }

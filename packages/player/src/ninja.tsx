@@ -641,7 +641,6 @@ export function NinjaStage({
   screen,
   cue,
   celebrate,
-  onLanded,
   level = "sensei",
   vanishing = false,
 }: {
@@ -653,8 +652,6 @@ export function NinjaStage({
   cue: NinjaCue | null
   /** Set on the wrap-up: his send-off once he's landed, with more for a perfect run. */
   celebrate?: "done" | "perfect"
-  /** Called on the wrap-up once he's landed on his slot, before the send-off. */
-  onLanded?: () => void
   /** Which character he is. The player leaves him out entirely when the setting is off. */
   level?: NinjaEnergy
   /** Set while the intro vanishes: he goes up in smoke too, and turns up on the next screen instead of leaping. */
@@ -816,15 +813,12 @@ export function NinjaStage({
   }, [cue?.key, cue?.kind, level, life])
 
   // The wrap-up: his send-off once he's landed on his slot.
-  const landed = React.useRef(onLanded)
-  landed.current = onLanded
   React.useEffect(() => {
     if (!celebrate) return
     let cancelled = false
     ;(async () => {
       await leaping.current
       if (cancelled) return
-      landed.current?.()
       await life.play(WRAP[level][celebrate])
     })()
     return () => {

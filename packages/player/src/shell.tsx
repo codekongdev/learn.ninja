@@ -465,15 +465,11 @@ export function formatElapsed(seconds: number): string {
   return h > 0 ? `${h}:${two(m)}:${two(s)}` : `${two(m)}:${two(s)}`
 }
 
-function ShareButton({
-  title,
-  url,
-  t,
-}: {
-  title: string
-  url?: string
-  t: Strings
-}) {
+/**
+ * Shares the lesson: the system share sheet on phones, the link copied everywhere else. `copied`
+ * stays true for two seconds after a copy, for the button to say so.
+ */
+export function useShare(title: string, url?: string) {
   const [copied, setCopied] = React.useState(false)
   React.useEffect(() => {
     if (!copied) return
@@ -483,7 +479,6 @@ function ShareButton({
 
   async function share() {
     const link = url ?? window.location.href
-    // Phones get the system share sheet; everywhere else copies the link.
     if (navigator.share && matchMedia("(pointer: coarse)").matches) {
       try {
         await navigator.share({ title, url: link })
@@ -500,6 +495,19 @@ function ShareButton({
     }
   }
 
+  return { share, copied }
+}
+
+function ShareButton({
+  title,
+  url,
+  t,
+}: {
+  title: string
+  url?: string
+  t: Strings
+}) {
+  const { share, copied } = useShare(title, url)
   const label = copied ? t.linkCopied : t.share
   return (
     <>

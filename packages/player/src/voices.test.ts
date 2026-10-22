@@ -20,7 +20,6 @@ const MOMENTS: Moment[] = [
   "streak",
   "comeback",
   "last",
-  "perfect",
 ]
 const CHARACTERS = ["sensei", "casual", "unhinged"] as const
 

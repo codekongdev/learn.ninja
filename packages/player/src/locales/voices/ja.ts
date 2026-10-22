@@ -66,10 +66,6 @@ export const ja: Voices = {
       plain: ["最後の1問、正解。"],
       flavor: ["これがこのレッスンだった。", "強い締めくくり。"],
     },
-    perfect: {
-      plain: ["全問正解。"],
-      flavor: ["ミスなしの完走。", "直すところなし。"],
-    },
   },
   sensei: {
     praise: {
@@ -131,10 +127,6 @@ export const ja: Voices = {
     last: {
       plain: ["これで一通りだ。よくやった。"],
       flavor: ["始めたことをやり遂げた。", "最後の一歩も一歩だ。"],
-    },
-    perfect: {
-      plain: ["一つもつまずかなかった。それを持っていけ。"],
-      flavor: ["直すところがない。", "静かな心、澄んだ目。"],
     },
   },
   unhinged: {
@@ -212,10 +204,6 @@ export const ja: Voices = {
     last: {
       plain: ["終わった。やりきった。"],
       flavor: ["横にならせて。", "最後の1問。膝が笑ってる。"],
-    },
-    perfect: {
-      plain: ["完璧。完璧！座らせて。"],
-      flavor: ["何も爆発しなかった。一度も。", "全問？気を失いそう。"],
     },
   },
 }

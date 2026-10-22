@@ -70,10 +70,6 @@ export const en: Voices = {
       plain: ["Last one, and it's right."],
       flavor: ["That's the lesson.", "Finished strong."],
     },
-    perfect: {
-      plain: ["Every answer right."],
-      flavor: ["Clean run.", "Nothing to fix."],
-    },
   },
   sensei: {
     praise: {
@@ -138,10 +134,6 @@ export const en: Voices = {
     last: {
       plain: ["That's the lesson. Well done."],
       flavor: ["You finished what you began.", "The last step counts too."],
-    },
-    perfect: {
-      plain: ["Not one slip. Keep it."],
-      flavor: ["Nothing to correct.", "Quiet mind, clear eyes."],
     },
   },
   unhinged: {
@@ -222,10 +214,6 @@ export const en: Voices = {
     last: {
       plain: ["It's over. We made it."],
       flavor: ["I need to lie down.", "Last one. My knees gave out."],
-    },
-    perfect: {
-      plain: ["Perfect. PERFECT. I need to sit down."],
-      flavor: ["Nothing exploded. Not once.", "Every one? I'm going to faint."],
     },
   },
 }
