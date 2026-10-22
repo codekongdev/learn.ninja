@@ -3,7 +3,7 @@ import { cache } from "react"
 import { upgradeLesson, type Lesson } from "@workspace/spec"
 
 import { currentActor } from "./auth/session"
-import { authorOf } from "./explore/queries"
+import { authorOf, likedIds } from "./explore/queries"
 import { idFromParam } from "./publish/ids"
 import { getDb, getLessonStore, type StoredLesson } from "./publish/store"
 
@@ -34,6 +34,8 @@ export interface PublishedView {
   listed: boolean
   /** The owner's public name and picture, for the title screen; null for anonymous lessons. */
   author: { handle: string | null; name: string; image: string | null } | null
+  /** Whether the logged-in visitor has liked the lesson. */
+  liked: boolean
 }
 
 /**
@@ -55,6 +57,7 @@ export const viewPublished = cache(
         isOwner: false,
         listed: false,
         author: null,
+        liked: false,
       }
     const isOwner = actor !== null && record.ownerId === actor.userId
     if (record.hidden && !isOwner)
@@ -65,10 +68,13 @@ export const viewPublished = cache(
         isOwner,
         listed: false,
         author: null,
+        liked: false,
       }
-    const author = record.ownerId
-      ? await authorOf(await getDb(), record.ownerId)
-      : null
+    const db = await getDb()
+    const [author, liked] = await Promise.all([
+      record.ownerId ? authorOf(db, record.ownerId) : null,
+      actor ? likedIds(db, actor.userId, [record.id]) : new Set<string>(),
+    ])
     return {
       record,
       reason: null,
@@ -79,6 +85,7 @@ export const viewPublished = cache(
         record.visibility === "public" &&
         !record.hidden,
       author,
+      liked: liked.has(record.id),
     }
   }
 )

@@ -1,10 +1,11 @@
 // Client-safe exports. The server-only preparer is imported from "@workspace/player/prepare".
 export { LessonPlayer, type LessonPlayerProps } from "./lesson-player"
+export type { LessonLike } from "./context"
 export { BrickDemo, type BrickDemoProps } from "./brick-demo"
 export type { Answer } from "./check"
 export type { Prepared } from "./prepared"
 export { stringsFor, UI_LANGUAGES, type Strings, type Theme } from "./strings"
 export { timeAgo, shortTimeAgo, exactTime, TimeAgo } from "./time"
 export { plainText } from "./plain-text"
-export { BRAND, LearnLogo } from "./shell"
+export { BRAND, LearnLogo, timeLeft } from "./shell"
 export { savedProgress } from "./progress"

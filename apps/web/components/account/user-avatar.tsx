@@ -1,6 +1,7 @@
 import { UserRoundIcon } from "lucide-react"
 import { getImageProps } from "next/image"
 
+import { LearnLogo } from "@workspace/player"
 import {
   Avatar,
   AvatarFallback,
@@ -64,6 +65,23 @@ export function UserAvatar({
         ) : (
           <UserRoundIcon className="size-[55%]" aria-hidden="true" />
         )}
+      </AvatarFallback>
+    </Avatar>
+  )
+}
+
+/** The ninja in a person's place, for a lesson nobody has kept yet. Decorative, like UserAvatar. */
+export function AnonymousAvatar({
+  size,
+  className,
+}: {
+  size: keyof typeof SIZES
+  className?: string
+}) {
+  return (
+    <Avatar className={cn(SIZES[size].avatar, className)}>
+      <AvatarFallback>
+        <LearnLogo className="size-[70%]" />
       </AvatarFallback>
     </Avatar>
   )

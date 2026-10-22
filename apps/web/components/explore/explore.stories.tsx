@@ -82,6 +82,7 @@ const summary = (over: Partial<LessonSummary> = {}): LessonSummary => ({
   visibility: "public",
   hidden: false,
   createdAt: Date.now() - 2 * DAY,
+  expiresAt: null,
   ...over,
 })
 
@@ -216,6 +217,24 @@ function seedProgress(lesson: LessonSummary, done: number, total: number) {
   )
 }
 
+/** A lesson nobody has kept yet, which only its liker's own Likes tab lists. */
+const ANONYMOUS = summary({
+  id: "z8y7x6w5",
+  slug: "why-the-sky-is-blue",
+  title: "Why the sky is blue",
+  summary: "Sunlight scatters off air, and blue scatters the most.",
+  subject: "science",
+  tags: ["Light", "Atmosphere"],
+  minutes: 5,
+  author: null,
+  views: 23,
+  likes: 3,
+  origin: "claude",
+  visibility: "unlisted",
+  createdAt: Date.now() - 4 * DAY,
+  expiresAt: Date.now() + 3 * DAY,
+})
+
 export const RowStates: Story = {
   name: "Row states",
   beforeEach: () => {
@@ -249,6 +268,9 @@ export const RowStates: Story = {
       </Labeled>
       <Labeled label="Owner has no handle yet">
         <LessonRow lesson={LESSONS[4]!} viewer={signedIn} />
+      </Labeled>
+      <Labeled label="Anonymous (liked before anyone kept it)">
+        <LessonRow lesson={ANONYMOUS} viewer={signedIn} />
       </Labeled>
       <Labeled label="Right-to-left lesson">
         <LessonRow lesson={LESSONS[3]!} viewer={signedIn} />
@@ -419,8 +441,13 @@ export const OwnProfileTabs: Story = {
               panel: <LessonFeed lessons={lessons} viewer={own} />,
             }}
             likes={{
-              count: 1,
-              panel: <LessonFeed lessons={LESSONS.slice(2, 3)} viewer={own} />,
+              count: 2,
+              panel: (
+                <LessonFeed
+                  lessons={[ANONYMOUS, ...LESSONS.slice(2, 3)]}
+                  viewer={own}
+                />
+              ),
             }}
           />
         </div>

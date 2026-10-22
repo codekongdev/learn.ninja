@@ -21,6 +21,7 @@ import {
 } from "@workspace/ui/components/dropdown-menu"
 
 import { ReportDialog } from "@/components/explore/report-dialog"
+import { exploreApi } from "@/lib/explore/browser"
 import type { Visibility } from "@/lib/explore/queries"
 import { AGENT_PROMPT } from "@/lib/site"
 
@@ -38,20 +39,26 @@ export interface LessonViewProps extends LessonPlayerProps {
   owner?: { visibility: Visibility; hidden: boolean; handle: string | null }
   /** Record finishing the lesson to the viewer's account (logged in only), for the check on Explore. */
   recordCompletion?: boolean
+  /** The lesson's likes and the viewer's, for the heart on the wrap-up; logged out, it offers `loginHref`. */
+  likes?: { likes: number; liked: boolean; signedIn: boolean }
+  /** Where a logged-out viewer logs in to like the lesson; send them back with ?like=1 to make the like. */
+  loginHref?: string
 }
 
 /**
  * The lesson player with the footer's theme setting connected to next-themes. A page that doesn't
  * pass `uiLanguage` (the prerendered /lessons pages) still honors ?ui=, read after mounting, the
  * same moment the player loads saved preferences, so the page can stay static. Published lessons
- * add the site's own items to the lesson menu: a report, or the owner's listing status, and tell
- * the server when a logged-in viewer reaches the wrap-up.
+ * add the site's own items to the lesson menu: a report, or the owner's listing status, tell the
+ * server when a logged-in viewer reaches the wrap-up, and give the wrap-up its heart.
  */
 export function LessonView({
   lessonId,
   canReport = false,
   owner,
   recordCompletion = false,
+  likes,
+  loginHref,
   ...props
 }: LessonViewProps) {
   const { theme, setTheme } = useTheme()
@@ -59,11 +66,30 @@ export function LessonView({
   const [mounted, setMounted] = React.useState(false)
   const [urlLanguage, setUrlLanguage] = React.useState<string>()
   const [reportOpen, setReportOpen] = React.useState(false)
+  // Kept here, not in the wrap-up, so a replay's wrap-up shows the like the last one made.
+  const [like, setLike] = React.useState(likes)
   React.useEffect(() => {
     setMounted(true)
-    setUrlLanguage(
-      new URLSearchParams(window.location.search).get("ui") ?? undefined
-    )
+    const params = new URLSearchParams(window.location.search)
+    setUrlLanguage(params.get("ui") ?? undefined)
+    // Back from logging in to like it (the wrap-up's Log in link adds ?like=1): the player
+    // starts the lesson afresh, so the like they asked for is made here.
+    if (params.get("like") === "1") {
+      params.delete("like")
+      const query = params.toString()
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + (query ? `?${query}` : "")
+      )
+      if (lessonId && likes?.signedIn && !likes.liked)
+        void exploreApi.like(lessonId).then((result) => {
+          if (typeof result.likes === "number")
+            setLike({ signedIn: true, liked: true, likes: result.likes })
+        })
+    }
+    // Only on arriving at the page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const menuItems = lessonId ? (
     <>
@@ -116,6 +142,25 @@ export function LessonView({
         onThemeChange={setTheme}
         menuItems={menuItems}
         nextPrompt={nextPrompt}
+        like={
+          lessonId && like
+            ? {
+                likes: like.likes,
+                liked: like.liked,
+                onChange: like.signedIn
+                  ? async (liked) => {
+                      const result = liked
+                        ? await exploreApi.like(lessonId)
+                        : await exploreApi.unlike(lessonId)
+                      if (typeof result.likes === "number")
+                        setLike({ signedIn: true, liked, likes: result.likes })
+                      return result
+                    }
+                  : undefined,
+                loginHref,
+              }
+            : undefined
+        }
         onComplete={
           lessonId && recordCompletion
             ? () => {

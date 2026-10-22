@@ -6,6 +6,7 @@ import {
   CheckIcon,
   CircleCheckIcon,
   CopyIcon,
+  HeartIcon,
   LightbulbIcon,
   PanelRightIcon,
   RotateCcwIcon,
@@ -18,7 +19,7 @@ import type {
 } from "@workspace/spec"
 import { Alert, AlertDescription } from "@workspace/ui/components/alert"
 import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
+import { Button, LinkButton } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { DirectionProvider } from "@workspace/ui/components/direction"
 import { cn } from "@workspace/ui/lib/utils"
@@ -36,7 +37,7 @@ import {
   type Mark,
 } from "./check"
 import { Briefing } from "./briefing"
-import { PlayerProvider, usePlayer } from "./context"
+import { PlayerProvider, usePlayer, type LessonLike } from "./context"
 import {
   hasOptionCards,
   BlankBrick,
@@ -156,6 +157,8 @@ export interface LessonPlayerProps {
    * the suggestion without the button.
    */
   nextPrompt?: (topic: string, after: string) => string
+  /** The heart on the wrap-up, for a published lesson. Omit it to show no heart. */
+  like?: LessonLike
 }
 
 export function LessonPlayer({
@@ -179,6 +182,7 @@ export function LessonPlayer({
   progressKey,
   onComplete,
   nextPrompt,
+  like,
 }: LessonPlayerProps) {
   const root = React.useRef<HTMLDivElement>(null)
   // The title as shown, which a rename in the header changes.
@@ -206,6 +210,7 @@ export function LessonPlayer({
           visualsCss,
           keyScope: scopeKeys ? root : undefined,
           nextPrompt,
+          like,
         }}
       >
         <div
@@ -1590,6 +1595,7 @@ function WrapUp({
           <h1 className="text-2xl font-semibold">{t.done}</h1>
           <p className="text-sm font-medium text-muted-foreground">{score}</p>
         </div>
+        <LikeLesson />
       </div>
       <div className="flex flex-col gap-2">
         <ScreenLabel text={t.takeaways} />
@@ -1611,6 +1617,92 @@ function WrapUp({
         <NextLesson topic={lesson.wrapup.next} after={lesson.title} />
       ) : null}
     </div>
+  )
+}
+
+/**
+ * The heart under the score, while finishing is fresh. Logged in, it likes the lesson at once and
+ * settles on the server's count; the lesson then waits in the learner's likes. Logged out, pressing
+ * it swaps it for a line saying so, with a Log in link: asked for, never pushed.
+ */
+function LikeLesson() {
+  const { t, lang = "en", like } = usePlayer()
+  const [state, setState] = React.useState(() => ({
+    liked: like?.liked ?? false,
+    likes: like?.likes ?? 0,
+  }))
+  const [asked, setAsked] = React.useState(false)
+  const [busy, setBusy] = React.useState(false)
+  const [failed, setFailed] = React.useState(false)
+  if (!like) return null
+
+  if (!like.onChange && asked)
+    return (
+      <div className="flex flex-col items-center gap-3">
+        <p className="text-sm text-muted-foreground">{t.likeLogIn}</p>
+        {like.loginHref ? (
+          <LinkButton
+            href={like.loginHref}
+            variant="outline"
+            size="sm"
+            autoFocus
+          >
+            {t.logIn}
+          </LinkButton>
+        ) : null}
+      </div>
+    )
+
+  async function toggle() {
+    if (!like?.onChange) return setAsked(true)
+    if (busy) return
+    const was = state
+    const next = {
+      liked: !was.liked,
+      likes: Math.max(0, was.likes + (was.liked ? -1 : 1)),
+    }
+    setState(next)
+    setBusy(true)
+    setFailed(false)
+    const result = await like.onChange(next.liked).catch(() => ({
+      error: "network",
+      likes: undefined,
+    }))
+    setBusy(false)
+    if (result.error) {
+      setState(was)
+      setFailed(true)
+      return
+    }
+    if (typeof result.likes === "number")
+      setState({ liked: next.liked, likes: result.likes })
+  }
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        aria-pressed={state.liked}
+        onPress={() => void toggle()}
+      >
+        <HeartIcon
+          data-icon="inline-start"
+          className={cn(state.liked && "fill-current text-destructive")}
+        />
+        {state.liked ? t.liked : t.like}
+        {state.likes > 0 ? (
+          <span className="text-muted-foreground tabular-nums">
+            {new Intl.NumberFormat(lang, { notation: "compact" }).format(
+              state.likes
+            )}
+          </span>
+        ) : null}
+      </Button>
+      <span role="status" className="sr-only">
+        {failed ? t.likeFailed : ""}
+      </span>
+    </>
   )
 }
 

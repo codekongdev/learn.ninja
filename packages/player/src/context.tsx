@@ -17,6 +17,21 @@ interface PlayerContextValue {
   keyScope?: React.RefObject<HTMLElement | null>
   /** The prompt the wrap-up copies to make its suggested next lesson. Without it there's no copy button. */
   nextPrompt?: (topic: string, after: string) => string
+  /** The wrap-up's like. Without it there's no heart. */
+  like?: LessonLike
+}
+
+/** A published lesson's likes, and the learner's, for the heart on the wrap-up. */
+export interface LessonLike {
+  likes: number
+  liked: boolean
+  /**
+   * Likes the lesson (true) or takes the like back, resolving to the lesson's new count or an
+   * error. Omit it when the learner is logged out: pressing the heart then offers `loginHref`.
+   */
+  onChange?: (liked: boolean) => Promise<{ likes?: number; error?: string }>
+  /** Where a logged-out learner logs in, coming back to this lesson. */
+  loginHref?: string
 }
 
 const PlayerContext = React.createContext<PlayerContextValue>({

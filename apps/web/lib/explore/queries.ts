@@ -64,6 +64,8 @@ export interface LessonSummary {
   visibility: Visibility
   hidden: boolean
   createdAt: number
+  /** When an anonymous lesson's link stops working (ms since epoch); null once it's owned. */
+  expiresAt: number | null
 }
 
 /** Trending: views plus three times likes, halved every 48 hours. */
@@ -104,6 +106,7 @@ const columns = {
   visibility: lesson.visibility,
   hidden: lesson.hidden,
   createdAt: lesson.createdAt,
+  expiresAt: lesson.expiresAt,
   authorId: lesson.ownerId,
   authorHandle: user.handle,
   authorName: user.name,
@@ -130,6 +133,7 @@ interface Row {
   visibility: Visibility
   hidden: boolean
   createdAt: Date
+  expiresAt: Date | null
   authorId: string | null
   authorHandle: string | null
   authorName: string | null
@@ -189,6 +193,7 @@ function toSummary(row: Row): LessonSummary {
     visibility: row.visibility,
     hidden: row.hidden,
     createdAt: row.createdAt.getTime(),
+    expiresAt: row.expiresAt?.getTime() ?? null,
   }
 }
 

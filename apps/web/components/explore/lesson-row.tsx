@@ -1,11 +1,11 @@
 import Link from "next/link"
 import { EyeIcon } from "lucide-react"
 
-import { stringsFor, TimeAgo } from "@workspace/player"
+import { stringsFor, TimeAgo, timeLeft } from "@workspace/player"
 import { Badge } from "@workspace/ui/components/badge"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { UserAvatar } from "@/components/account/user-avatar"
+import { AnonymousAvatar, UserAvatar } from "@/components/account/user-avatar"
 import { compact } from "@/lib/explore/browser"
 import type { LessonSummary } from "@/lib/explore/queries"
 import { agentOf } from "@/lib/origin"
@@ -91,7 +91,15 @@ export function LessonRow({
         <span className="min-w-0 truncate">{author.name}</span>
       </span>
     )
-  ) : null
+  ) : (
+    // A lesson nobody has kept (only its liker's own Likes tab lists one): the ninja stands in,
+    // with how long its link has left, so it doesn't vanish from the list unannounced.
+    <span className="flex min-w-0 items-center gap-1.5">
+      <AnonymousAvatar size="row" />
+      <span className="min-w-0 truncate">anonymous ninja</span>
+      {lesson.expiresAt !== null ? <ExpiryBadge at={lesson.expiresAt} /> : null}
+    </span>
+  )
   const facts: React.ReactNode[] = [
     ...lesson.tags.slice(0, 2).map((tag, i) => (
       <bdi key={`tag-${i}`} lang={lesson.language} className="min-w-0 truncate">
@@ -248,5 +256,15 @@ function HeartGlyph() {
     >
       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
     </svg>
+  )
+}
+
+/** How long an anonymous lesson's link has left, as the lesson page's header says it. */
+function ExpiryBadge({ at, now = Date.now() }: { at: number; now?: number }) {
+  const left = timeLeft(at - now)
+  return (
+    <Badge variant="outline" className="shrink-0 text-muted-foreground">
+      {t.expires[left.unit](left.count)}
+    </Badge>
   )
 }

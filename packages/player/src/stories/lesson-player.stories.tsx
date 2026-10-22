@@ -178,3 +178,61 @@ export const WrapUpRough: Story = {
     "second",
   ]),
 }
+
+/** A fake like that answers after a moment, as the server would. */
+const likeAfter = (likes: number, liked: boolean) => ({
+  likes,
+  liked,
+  onChange: (next: boolean) =>
+    new Promise<{ likes: number }>((resolve) =>
+      setTimeout(
+        () => resolve({ likes: likes + (next ? 1 : 0) - (liked ? 1 : 0) }),
+        300
+      )
+    ),
+})
+
+/** Logged in, with the heart under the score: pressing it likes the lesson. */
+export const WrapUpLike: Story = {
+  name: "Wrap-up: like",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-like",
+    like: likeAfter(12, false),
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-like"),
+}
+/** Logged in and already liked. */
+export const WrapUpLiked: Story = {
+  name: "Wrap-up: liked",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-liked",
+    like: likeAfter(13, true),
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-liked"),
+}
+/** Logged out: pressing the heart asks them to log in to save the lesson to their likes. */
+export const WrapUpLikeLoggedOut: Story = {
+  name: "Wrap-up: like, logged out",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-like-out",
+    like: { likes: 12, liked: false, loginHref: "#login" },
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-like-out"),
+}
+/** A like the server refuses: the heart goes back and the failure is announced. */
+export const WrapUpLikeFails: Story = {
+  name: "Wrap-up: like fails",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-like-fails",
+    like: {
+      likes: 12,
+      liked: false,
+      onChange: async () => ({ error: "Something went wrong." }),
+    },
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-like-fails"),
+}

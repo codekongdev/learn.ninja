@@ -85,6 +85,13 @@ export type Strings = {
   nextHint: string
   copyPrompt: string
   promptCopied: string
+  /** The wrap-up's heart, before and after the learner likes the lesson. */
+  like: string
+  liked: string
+  /** Shown in the heart's place when a logged-out learner presses it, beside the Log in link. */
+  likeLogIn: string
+  logIn: string
+  likeFailed: string
   restart: string
   progress: string
   /** Short label before the counter in the progress bar tooltip. */
