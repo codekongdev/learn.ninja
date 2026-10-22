@@ -1,10 +1,19 @@
 import { AGENTS } from "./site"
 
 // Where a lesson was made: the app or agent that published it, stored as it named itself (an MCP
-// client's `clientInfo.name`, or the agent the CLI ran in) and matched to one of the home page's
-// logos when a card shows it. Stored raw so a logo added later lights up older lessons too.
+// client's `clientInfo.name`, or the agent the CLI ran in) and matched to one of the logos in
+// public/agents/ (the home page's agents, plus Claude and ChatGPT) when a card shows it. Stored
+// raw so a logo added later lights up older lessons too.
 
-export type Agent = (typeof AGENTS)[number]
+/** Chat apps that publish over MCP: their logos show on lessons, not in the home page's agent list. */
+const CHAT_APPS = [
+  { name: "Claude", logo: "claude" },
+  // The icon set has no ChatGPT mark of its own; ChatGPT shows OpenAI's.
+  { name: "ChatGPT", logo: "openai" },
+] as const
+
+export type Agent = (typeof AGENTS)[number] | (typeof CHAT_APPS)[number]
+const LOGOS: readonly Agent[] = [...AGENTS, ...CHAT_APPS]
 
 /** The longest origin stored; longer names are cut. */
 const MAX_ORIGIN = 64
@@ -26,7 +35,11 @@ const word = (words: string) =>
  */
 const PATTERNS: [RegExp, Agent["logo"]][] = [
   [word("claude[ _-]?code"), "claudecode"],
+  // Claude.ai and Claude Desktop (`claude-ai`), after Claude Code.
+  [word("claude"), "claude"],
   [word("codex"), "codex"],
+  // ChatGPT (`openai-mcp`), after Codex.
+  [word("chatgpt|openai"), "openai"],
   [word("cursor"), "cursor"],
   [word("gemini"), "geminicli"],
   [word("copilot|visual studio code|vscode"), "copilot"],
@@ -42,10 +55,10 @@ const PATTERNS: [RegExp, Agent["logo"]][] = [
   [word("junie"), "junie"],
 ]
 
-/** The home page agent an origin matches, or null (no origin, or one without a logo yet). */
+/** The agent or chat app an origin matches, or null (no origin, or one without a logo yet). */
 export function agentOf(origin: string | null | undefined): Agent | null {
   if (!origin) return null
   const text = origin.toLowerCase()
   const logo = PATTERNS.find(([pattern]) => pattern.test(text))?.[1]
-  return AGENTS.find((a) => a.logo === logo) ?? null
+  return LOGOS.find((a) => a.logo === logo) ?? null
 }

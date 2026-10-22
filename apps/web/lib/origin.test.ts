@@ -15,11 +15,12 @@ describe("agentOf", () => {
     expect(logo("Roo Cline")).toBe("roocode")
     expect(logo("Cline")).toBe("cline")
     expect(logo("amp")).toBe("amp")
+    expect(logo("claude-ai")).toBe("claude")
+    expect(logo("openai-mcp")).toBe("openai")
+    expect(logo("ChatGPT")).toBe("openai")
   })
 
   it("shows nothing for apps without a logo, unknown names, or none", () => {
-    expect(logo("claude-ai")).toBeNull()
-    expect(logo("openai-mcp")).toBeNull()
     expect(logo("example-app")).toBeNull()
     expect(logo("node")).toBeNull()
     expect(logo(null)).toBeNull()

@@ -155,6 +155,7 @@ const LESSONS: LessonSummary[] = [
     },
     views: 0,
     likes: 0,
+    origin: "openai-mcp",
   }),
   summary({
     id: "bignums1",
@@ -168,6 +169,8 @@ const LESSONS: LessonSummary[] = [
     author: { id: "dev", handle: "dev", name: "Dev", image: null },
     views: 3100,
     likes: 120,
+    // An app that didn't say, or has no logo: no icon.
+    origin: null,
   }),
 ]
 
