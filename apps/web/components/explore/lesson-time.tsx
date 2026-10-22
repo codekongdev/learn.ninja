@@ -2,20 +2,25 @@
 
 import * as React from "react"
 
-import { savedProgress } from "@workspace/player"
+import { savedProgress, stringsFor } from "@workspace/player"
 import { Tooltip, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
+const t = stringsFor("en")
+
 /**
- * An amber pie for a lesson the viewer left midway, filled to the share of bricks behind them,
- * with the count on hover or focus. It's the same size as CompletedCheck, which takes its place
- * once the lesson is finished. Progress lives only in this browser (the player saves it under the
- * lesson's path), so the pie is read after hydration and the server renders nothing.
+ * A lesson's length on its row, or, for a lesson the viewer left midway, the minutes left beside
+ * an amber pie filled to the share of bricks behind them, with the count on hover or focus.
+ * CompletedCheck takes its place once the lesson is finished. Progress lives only in this browser
+ * (the player saves it under the lesson's path), so it's read after hydration and the server
+ * renders the length.
  */
-export function ProgressPie({
+export function LessonTime({
+  minutes,
   progressKey,
   className,
 }: {
+  minutes: number
   /** The player's progress key: the lesson's path without the leading slash. */
   progressKey: string
   className?: string
@@ -28,39 +33,37 @@ export function ProgressPie({
     try {
       setProgress(savedProgress(localStorage, progressKey))
     } catch {
-      // Storage is blocked: no pie.
+      // Storage is blocked: the length stays.
     }
   }, [progressKey])
-  if (!progress) return null
-  const label = `${progress.done} of ${progress.total} bricks done`
+  if (!progress) return <span className="shrink-0">{t.minutes(minutes)}</span>
+  const share = progress.done / progress.total
+  const left = Math.max(1, Math.round(minutes * (1 - share)))
   return (
     <TooltipTrigger delay={300}>
       <span
-        role="img"
-        aria-label={`In progress, ${label}`}
         tabIndex={0}
         className={cn(
-          "flex shrink-0 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          "flex shrink-0 items-center gap-1 rounded-sm text-amber-700 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:text-amber-500",
           className
         )}
       >
-        <svg
-          viewBox="0 0 24 24"
-          className="size-4 text-amber-600 dark:text-amber-500"
-          aria-hidden="true"
-        >
+        <svg viewBox="0 0 24 24" className="size-3.5" aria-hidden="true">
           <circle
             cx="12"
             cy="12"
             r="8.75"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.5"
           />
-          <path d={wedge(progress.done / progress.total)} fill="currentColor" />
+          <path d={wedge(share)} fill="currentColor" />
         </svg>
+        {left} min left
       </span>
-      <Tooltip>{label}</Tooltip>
+      <Tooltip>
+        {progress.done} of {progress.total} bricks done
+      </Tooltip>
     </TooltipTrigger>
   )
 }

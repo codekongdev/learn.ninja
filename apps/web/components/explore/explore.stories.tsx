@@ -271,6 +271,32 @@ export const RowStates: Story = {
       <Labeled label="Anonymous (liked before anyone kept it)">
         <LessonRow lesson={ANONYMOUS} viewer={signedIn} />
       </Labeled>
+      <Labeled label="Yours, private, 3 of 8 bricks done">
+        {/* Your own rows' menu needs Next's router, which Storybook doesn't mount. */}
+        <AppRouterContext.Provider value={stubRouter}>
+          <LessonRow
+            lesson={{ ...LESSONS[1]!, visibility: "unlisted" }}
+            viewer={{ ...signedIn, userId: "bob-builds" }}
+          />
+        </AppRouterContext.Provider>
+      </Labeled>
+      <Labeled label="Long handle on a phone: the agent's name gives way first">
+        <div className="max-w-[340px]">
+          <LessonRow
+            lesson={summary({
+              id: "longname",
+              author: {
+                id: "long",
+                handle: "a-rather-long-handle-indeed",
+                name: "Long",
+                image: null,
+              },
+              origin: "claude-code",
+            })}
+            viewer={signedOut}
+          />
+        </div>
+      </Labeled>
       <Labeled label="Right-to-left lesson">
         <LessonRow lesson={LESSONS[3]!} viewer={signedIn} />
       </Labeled>

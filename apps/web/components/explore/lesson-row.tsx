@@ -13,9 +13,9 @@ import { lessonPath } from "@/lib/publish/paths"
 
 import { CompletedCheck } from "./completed-check"
 import { LessonMenu } from "./lesson-menu"
+import { LessonTime } from "./lesson-time"
 import { LikeButton } from "./like-button"
-import { OriginLogo } from "./origin-logo"
-import { ProgressPie } from "./progress-pie"
+import { MadeWith } from "./made-with"
 
 /** What the viewer can do on a row: like it (logged in) or be told to log in. Omit for a read-only row. */
 export interface Viewer {
@@ -36,21 +36,22 @@ const ROW_LINK =
 
 /**
  * A lesson as one row of the Explore feed or a profile. A byline first: who made it (their
- * picture and handle) at the start and how long ago at the end, so the ages line up as a column
- * down the feed. Then the title, up to two lines of summary, and one meta line with the lesson's
- * length, level, and the muted logo of the agent it was made with when the home page has one
- * (then a green check when the viewer has finished it, or an amber pie of how far they got when
- * this browser holds their progress), and the views and likes at its end. Neither the subject nor
- * the tags are shown: the subject is for filters, and tags stay hidden until they're governed well
- * enough to read as labels (plans/subjects-and-tags.md). The whole row opens the lesson; the author,
- * the logo, the check, and the heart are their own targets. Rows sit between hairlines (the list adds them), not in
- * cards. Hovering one turns it into a bordered, filled tile that reaches past the column into the
- * gutter (negative margin, matching padding), so the text stays lined up with the page and the
- * tile has room around it; the list hides the two hairlines it would touch. `rank` puts a number
- * in the margin on the Top tab. The author shows on a profile too, though every row shares it. The
- * viewer's own rows open a menu on right click to publish, unpublish, rename, or delete them
- * (LessonMenu), and a badge after the title marks the ones visitors don't see: Private when only
- * the link opens it, Hidden after a report.
+ * picture and handle, then the agent they made it with when it has a logo) at the start and how
+ * long ago at the end, so the ages line up as a column down the feed. Then the title, up to two
+ * lines of summary, and one meta line with the lesson's length and level, and the views and likes
+ * at its end. The length gives way to the viewer's own state: Done with a green check once they've
+ * finished it, or the minutes left beside an amber pie when this browser holds their progress.
+ * Neither the subject nor the tags are shown: the subject is for filters, and tags stay hidden
+ * until they're governed well enough to read as labels (plans/subjects-and-tags.md). The whole row
+ * opens the lesson; the author, the check, the progress, and the heart are their own targets.
+ * Rows sit between hairlines (the list adds them), not in cards. Hovering one turns it into a
+ * bordered, filled tile that reaches past the column into the gutter (negative margin, matching
+ * padding), so the text stays lined up with the page and the tile has room around it; the list
+ * hides the two hairlines it would touch. `rank` puts a number in the margin on the Top tab. The
+ * author shows on a profile too, though every row shares it. The viewer's own rows open a menu on
+ * right click to publish, unpublish, rename, or delete them (LessonMenu), and a badge after the
+ * title marks the ones visitors don't see: Private when only the link opens it, Hidden after a
+ * report.
  */
 export function LessonRow({
   lesson,
@@ -100,19 +101,22 @@ export function LessonRow({
       {lesson.expiresAt !== null ? <ExpiryBadge at={lesson.expiresAt} /> : null}
     </span>
   )
+  const agent = agentOf(lesson.origin)
   const facts: React.ReactNode[] = [
-    <span key="minutes" className="shrink-0">
-      {t.minutes(lesson.minutes)}
-    </span>,
+    completedAt !== undefined ? (
+      <CompletedCheck key="time" at={completedAt} className="relative z-10" />
+    ) : (
+      <LessonTime
+        key="time"
+        minutes={lesson.minutes}
+        progressKey={href.slice(1)}
+        className="relative z-10"
+      />
+    ),
     <span key="level" className="shrink-0">
       {t.levels[lesson.level]}
     </span>,
   ]
-  const agent = agentOf(lesson.origin)
-  if (agent)
-    facts.push(
-      <OriginLogo key="origin" agent={agent} className="relative z-10" />
-    )
   return (
     <div
       className={cn(
@@ -130,7 +134,21 @@ export function LessonRow({
       ) : null}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-          {byline}
+          <span className="flex min-w-0 items-center gap-1.5">
+            {byline}
+            {agent ? (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="shrink-0 text-muted-foreground/60"
+                >
+                  ·
+                </span>
+                {/* Shrinks long before the handle does, down to its logo. */}
+                <MadeWith agent={agent} className="min-w-3.5 shrink-100" />
+              </>
+            ) : null}
+          </span>
           <TimeAgo
             at={lesson.createdAt}
             lang="en"
@@ -195,14 +213,6 @@ export function LessonRow({
                 {fact}
               </span>
             ))}
-            {completedAt !== undefined ? (
-              <CompletedCheck at={completedAt} className="relative z-10" />
-            ) : (
-              <ProgressPie
-                progressKey={href.slice(1)}
-                className="relative z-10"
-              />
-            )}
           </p>
           <span className="ms-auto flex shrink-0 items-center gap-3">
             <span

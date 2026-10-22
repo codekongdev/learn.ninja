@@ -11,9 +11,10 @@ const when = new Intl.DateTimeFormat("en", {
 })
 
 /**
- * A solid green check for a lesson the viewer has finished, with when they first finished it on
- * hover or focus. The time is formatted only when the tooltip opens, in the browser, so it's in the
- * viewer's own time zone and the server's render never disagrees with it.
+ * Done beside a solid green check, in place of the length on the row of a lesson the viewer has
+ * finished, with when they first finished it on hover or focus. The time is formatted only when
+ * the tooltip opens, in the browser, so it's in the viewer's own time zone and the server's render
+ * never disagrees with it.
  */
 export function CompletedCheck({
   at,
@@ -26,18 +27,17 @@ export function CompletedCheck({
   return (
     <TooltipTrigger delay={300}>
       <span
-        role="img"
-        aria-label="Completed"
         tabIndex={0}
         className={cn(
-          "flex shrink-0 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          "flex shrink-0 items-center gap-1 rounded-sm text-green-700 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:text-green-500",
           className
         )}
       >
         <CircleCheckIcon
-          className="size-4 fill-green-600 text-background"
+          className="size-3.5 fill-green-600 text-background"
           aria-hidden="true"
         />
+        Done
       </span>
       <Tooltip>Completed {when.format(at)}</Tooltip>
     </TooltipTrigger>
