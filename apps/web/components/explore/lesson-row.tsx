@@ -145,7 +145,7 @@ export function LessonRow({
             className="ms-auto shrink-0"
           />
         </div>
-        <h3 className="mt-2 text-base leading-snug font-medium">
+        <h3 className="mt-3 text-base leading-snug font-medium">
           {mine ? (
             <LessonMenu
               lesson={{
