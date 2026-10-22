@@ -624,12 +624,8 @@ export function lessonImage(lesson: Lesson) {
   const t = stringsFor(lesson.language)
   const dir = /^(ar|he|fa|ur)\b/i.test(lesson.language) ? "rtl" : "ltr"
   const shown = peek(lesson)
-  // The first two tags (the lesson's label, then its product or field), then length and level.
-  const facts = [
-    ...lesson.tags.slice(0, 2),
-    t.minutes(lesson.estimatedMinutes),
-    t.levels[lesson.level],
-  ]
+  // Length and level, as the row and the title screen show them; tags stay hidden for now.
+  const facts = [t.minutes(lesson.estimatedMinutes), t.levels[lesson.level]]
   return respond(
     <Page dir={dir}>
       <Header />

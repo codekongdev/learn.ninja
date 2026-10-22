@@ -17,7 +17,6 @@ import { LessonRow } from "./lesson-row"
 import { LikeButton } from "./like-button"
 import { ProfileTabs } from "./profile-tabs"
 import { ReportDialog } from "./report-dialog"
-import { TagFilter } from "./tag-filter"
 
 // Explore's rows and controls with a fake server: likes go through, a report with "fail" in it
 // fails, listing a lesson whose title has "fail" in it is refused, and so is renaming one to a
@@ -144,7 +143,6 @@ const LESSONS: LessonSummary[] = [
     title: "Why the Bronze Age collapsed",
     summary:
       "Drought, earthquakes, and the Sea Peoples: weighing the usual suspects.",
-    // One tag: the row shows just it before the length and level.
     subject: "history",
     tags: ["Bronze Age"],
     level: "advanced",
@@ -362,27 +360,6 @@ export const FeedTop: Story = {
       />
     </div>
   ),
-}
-
-/** Explore narrowed to one tag (a row's tag was clicked): the count and a pill that clears it at the greeting's end. */
-export const FeedTagFilter: Story = {
-  name: "Feed, filtered by tag",
-  render: () => {
-    const label = LESSONS[0]!.tags[0]!
-    const lessons = LESSONS.filter((l) => l.tags.includes(label))
-    return (
-      <div className="mx-auto flex max-w-2xl flex-col gap-8">
-        <ExploreGreeting greeting={greetingFor(9)}>
-          <TagFilter
-            label={label}
-            count={lessons.length}
-            className="ms-auto"
-          />
-        </ExploreGreeting>
-        <LessonFeed lessons={lessons} viewer={signedIn} />
-      </div>
-    )
-  },
 }
 
 export const FeedLoading: Story = {

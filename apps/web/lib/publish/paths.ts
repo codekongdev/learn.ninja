@@ -1,8 +1,6 @@
 // Lesson links, with nothing from Node in them, so client components can build them too. The
 // server-side helpers (ids, tokens) are in ids.ts, which re-exports these.
 
-import { normalizeTag } from "@workspace/spec"
-
 /** "How compound interest works!" → "how-compound-interest-works" */
 export function slugify(title: string): string {
   const slug = title
@@ -18,10 +16,6 @@ export function slugify(title: string): string {
 
 /** The path a lesson is shared at: /l/{slug}-{id}. */
 export const lessonPath = (slug: string, id: string) => `/l/${slug}-${id}`
-
-/** Explore narrowed to one tag, by its key, so "JS" and "JavaScript" open the same list: /explore?tag=javascript. */
-export const tagPath = (label: string) =>
-  `/explore?tag=${encodeURIComponent(normalizeTag(label))}`
 
 /** The path a personal MCP URL lives at: /mcp/{key}, with the key from the settings page. */
 export const mcpPath = (key: string) => `/mcp/${key}`

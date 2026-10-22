@@ -9,7 +9,7 @@ import { AnonymousAvatar, UserAvatar } from "@/components/account/user-avatar"
 import { compact } from "@/lib/explore/browser"
 import type { LessonSummary } from "@/lib/explore/queries"
 import { agentOf } from "@/lib/origin"
-import { lessonPath, tagPath } from "@/lib/publish/paths"
+import { lessonPath } from "@/lib/publish/paths"
 
 import { CompletedCheck } from "./completed-check"
 import { LessonMenu } from "./lesson-menu"
@@ -38,11 +38,11 @@ const ROW_LINK =
  * A lesson as one row of the Explore feed or a profile. A byline first: who made it (their
  * picture and handle) at the start and how long ago at the end, so the ages line up as a column
  * down the feed. Then the title, up to two lines of summary, and one meta line with the lesson's
- * first two tags (its label, then the product or field, as the agent wrote them), length, level,
- * and the muted logo of the agent it was made with when the home page has one (then a green check
- * when the viewer has finished it, or an amber pie of how far they got when this browser holds
- * their progress), and the views and likes at its end. The subject is never shown: it's for
- * filters. The whole row opens the lesson; the author, the tags (each opens Explore narrowed to it),
+ * length, level, and the muted logo of the agent it was made with when the home page has one
+ * (then a green check when the viewer has finished it, or an amber pie of how far they got when
+ * this browser holds their progress), and the views and likes at its end. Neither the subject nor
+ * the tags are shown: the subject is for filters, and tags stay hidden until they're governed well
+ * enough to read as labels (plans/subjects-and-tags.md). The whole row opens the lesson; the author,
  * the logo, the check, and the heart are their own targets. Rows sit between hairlines (the list adds them), not in
  * cards. Hovering one turns it into a bordered, filled tile that reaches past the column into the
  * gutter (negative margin, matching padding), so the text stays lined up with the page and the
@@ -101,16 +101,6 @@ export function LessonRow({
     </span>
   )
   const facts: React.ReactNode[] = [
-    ...lesson.tags.slice(0, 2).map((tag, i) => (
-      <Link
-        key={`tag-${i}`}
-        href={tagPath(tag)}
-        lang={lesson.language}
-        className="relative z-10 min-w-0 truncate rounded-sm underline-offset-4 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
-        <bdi>{tag}</bdi>
-      </Link>
-    )),
     <span key="minutes" className="shrink-0">
       {t.minutes(lesson.minutes)}
     </span>,

@@ -16,7 +16,7 @@ const DOTS =
  * The sensei's hello above the feed, on one line: "Konbanwa, still time." The Japanese word has a
  * faint dotted underline, the usual hint for a word with a definition, and its English on hover or
  * focus. The negative margin pulls the feed up: the page's 32px gap plus the first row's padding
- * read as too much air under one line. `children` sit at the line's end (the active tag filter),
+ * read as too much air under one line. `children` sit at the line's end (an active filter, say),
  * and wrap under it on a phone.
  */
 export function ExploreGreeting({
