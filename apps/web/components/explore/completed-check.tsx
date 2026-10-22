@@ -1,7 +1,5 @@
 "use client"
 
-import { CircleCheckIcon } from "lucide-react"
-
 import { Tooltip, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -33,10 +31,21 @@ export function CompletedCheck({
           className
         )}
       >
-        <CircleCheckIcon
-          className="size-3.5 fill-green-600 text-background"
+        <svg
+          viewBox="0 0 24 24"
+          className="size-3.5 text-green-600"
           aria-hidden="true"
-        />
+        >
+          <circle cx="12" cy="12" r="10" fill="currentColor" />
+          <path
+            d="m8.5 12 2.5 2.5 4.5-4.5"
+            fill="none"
+            stroke="var(--background)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
         Done
       </span>
       <Tooltip>Completed {when.format(at)}</Tooltip>
