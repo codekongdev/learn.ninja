@@ -27,6 +27,7 @@ import {
   slugify,
   tokenMatches,
 } from "./ids"
+import { tagPath } from "./paths"
 import { MemoryRateLimiter } from "./rate-limit"
 import { LESSON_TTL_SECONDS, PostgresLessonStore } from "./store"
 
@@ -75,6 +76,13 @@ describe("links and tokens", () => {
     expect(lessonPath("writing-a-prd", id)).toBe(`/l/writing-a-prd-${id}`)
     expect(idFromParam(`writing-a-prd-${id}`)).toBe(id)
     expect(idFromParam("../../etc")).toBeNull()
+  })
+
+  it("links a tag to Explore by its key, so variants open one list", () => {
+    expect(tagPath("Claude Code")).toBe("/explore?tag=claude-code")
+    expect(tagPath("JS")).toBe("/explore?tag=javascript")
+    expect(tagPath("C++")).toBe("/explore?tag=cpp")
+    expect(tagPath("Historia")).toBe("/explore?tag=historia")
   })
 
   it("stores only a hash of the edit token", () => {

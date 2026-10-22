@@ -16,23 +16,33 @@ const DOTS =
  * The sensei's hello above the feed, on one line: "Konbanwa, still time." The Japanese word has a
  * faint dotted underline, the usual hint for a word with a definition, and its English on hover or
  * focus. The negative margin pulls the feed up: the page's 32px gap plus the first row's padding
- * read as too much air under one line.
+ * read as too much air under one line. `children` sit at the line's end (the active tag filter),
+ * and wrap under it on a phone.
  */
-export function ExploreGreeting({ greeting }: { greeting: Greeting }) {
+export function ExploreGreeting({
+  greeting,
+  children,
+}: {
+  greeting: Greeting
+  children?: React.ReactNode
+}) {
   return (
-    <p className="-mb-3 text-2xl font-semibold">
-      <TooltipTrigger delay={300}>
-        <i
-          lang="ja-Latn"
-          tabIndex={0}
-          className={`cursor-help rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${DOTS}`}
-        >
-          {greeting.word}
-        </i>
-        <Tooltip>{greeting.meaning}</Tooltip>
-      </TooltipTrigger>
-      , {greeting.line}.
-    </p>
+    <div className="-mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+      <p className="text-2xl font-semibold">
+        <TooltipTrigger delay={300}>
+          <i
+            lang="ja-Latn"
+            tabIndex={0}
+            className={`cursor-help rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${DOTS}`}
+          >
+            {greeting.word}
+          </i>
+          <Tooltip>{greeting.meaning}</Tooltip>
+        </TooltipTrigger>
+        , {greeting.line}.
+      </p>
+      {children}
+    </div>
   )
 }
 
