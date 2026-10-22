@@ -173,6 +173,55 @@ describe("tools", () => {
     }
   })
 
+  it("completes a listen for tool-list changes at once, instead of holding the stream open", async () => {
+    // A 2026-07-28 client (Claude.ai) opens `subscriptions/listen` and keeps it open for as long
+    // as the server honors a requested change notification. The tool list never changes here, so
+    // none is honored and the stream ends with the result; on Vercel an open stream is a function
+    // invocation running until its time limit, reopened by the client as soon as it ends.
+    const req = new Request("https://learn.test/mcp", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json, text/event-stream",
+        "mcp-protocol-version": "2026-07-28",
+        "mcp-method": "subscriptions/listen",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 99,
+        method: "subscriptions/listen",
+        params: {
+          notifications: { toolsListChanged: true },
+          _meta: {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": { name: "test", version: "0" },
+            "io.modelcontextprotocol/clientCapabilities": {},
+          },
+        },
+      }),
+    })
+    const res = await mcp(req)
+    expect(res.status).toBe(200)
+    const text = await Promise.race([
+      res.text(),
+      new Promise<string>((_, reject) =>
+        setTimeout(() => reject(new Error("the listen stream stayed open")), 5_000)
+      ),
+    ])
+    const messages = text
+      .split("\n")
+      .filter((l) => l.startsWith("data: "))
+      .map((l) => JSON.parse(l.slice(6)))
+    expect(messages[0].params.notifications).toEqual({})
+    expect(messages.at(-1).result.resultType).toBe("complete")
+    const { capabilities } = await rpc("initialize", {
+      protocolVersion: "2025-06-18",
+      capabilities: {},
+      clientInfo: { name: "test", version: "0" },
+    })
+    expect(capabilities.tools.listChanged).toBe(false)
+  })
+
   it("says which tools work logged out, the way ChatGPT reads it", async () => {
     const { tools } = await rpc("tools/list", {})
     const schemes = Object.fromEntries(

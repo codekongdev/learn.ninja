@@ -134,6 +134,13 @@ export function createLearnMcp(
   return createMcpHandler((server) => registerTools(server, deps), {
     serverInfo: { name: "learn.ninja", version: "2.0.0" },
     instructions: INSTRUCTIONS,
+    // The tool list never changes (a new server per request, the same five tools), so don't
+    // advertise `listChanged`, which registering a tool otherwise turns on. A 2026-07-28 client
+    // like Claude.ai opens `subscriptions/listen` for tool-list changes and holds the stream open
+    // for as long as the server honors them: on Vercel that was one function invocation per listen
+    // running to the 300-second limit, then reopened at once. With nothing to honor, the listen is
+    // acknowledged and completes immediately.
+    capabilities: { tools: { listChanged: false } },
   })
 }
 

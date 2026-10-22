@@ -29,3 +29,8 @@ async function handler(req: Request) {
 }
 
 export { handler as GET, handler as POST }
+
+// A tool call takes seconds (publishing prepares formulas and code), not minutes. The shorter
+// limit caps what any request held open by a client can cost, after one that ran to Vercel's
+// 300-second default on every listen stream.
+export const maxDuration = 60
