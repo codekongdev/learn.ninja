@@ -105,11 +105,11 @@ export const zh: Strings = {
     "选择要修改的地方，补充其他内容，然后粘贴到你创建这节课的聊天里。链接保持不变。",
   changes: {
     visual: "更直观一些",
-    harder: "更难一些",
-    easier: "更简单一些",
     shorter: "更短一些",
     examples: "换些例子",
   },
+  changesLevel: "难度",
+  changeLevel: (level) => `改成${level}难度`,
   changesOther: "其他",
   changesPlaceholder: "第二个问题让人困惑。",
   copyChanges: "复制修改",

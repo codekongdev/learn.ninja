@@ -136,11 +136,11 @@ export const he: Strings = {
     "בחרו מה לשנות, הוסיפו כל דבר אחר והדביקו בצ'אט שבו יצרתם את השיעור. הקישור נשאר אותו קישור.",
   changes: {
     visual: "הפכו אותו לחזותי יותר",
-    harder: "הפכו אותו לקשה יותר",
-    easier: "הפכו אותו לקל יותר",
     shorter: "קצרו אותו",
     examples: "השתמשו בדוגמאות אחרות",
   },
+  changesLevel: "רמת קושי",
+  changeLevel: (level) => `שנו את הרמה: ${level}`,
   changesOther: "משהו נוסף",
   changesPlaceholder: "השאלה השנייה מבלבלת.",
   copyChanges: "העתקת השינויים",

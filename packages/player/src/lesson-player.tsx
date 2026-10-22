@@ -1591,7 +1591,7 @@ function WrapUp({
         {creator ? null : <LikeLesson />}
       </div>
       {/* The maker's next step leads: publish it, or ask their agent for changes. */}
-      {creator ? <CreatorCard /> : null}
+      {creator ? <CreatorCard level={lesson.level} /> : null}
       <div className="flex flex-col gap-2">
         <ScreenLabel text={t.takeaways} />
         {/* A check list, not cards, so the next lesson is the screen's one box. */}

@@ -107,11 +107,11 @@ export const ja: Strings = {
     "変えたい点を選び、ほかにもあれば書き足して、レッスンを作ったチャットに貼り付けてください。リンクは同じままです。",
   changes: {
     visual: "もっと視覚的に",
-    harder: "もっと難しく",
-    easier: "もっとやさしく",
     shorter: "もっと短く",
     examples: "別の例を使う",
   },
+  changesLevel: "難易度",
+  changeLevel: (level) => `レベルを${level}に`,
   changesOther: "その他",
   changesPlaceholder: "2問目がわかりにくい。",
   copyChanges: "変更をコピー",

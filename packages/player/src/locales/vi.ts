@@ -113,11 +113,11 @@ export const vi: Strings = {
     "Chọn những gì cần thay đổi, thêm điều khác nếu có, rồi dán vào cuộc trò chuyện nơi bạn tạo bài học. Liên kết vẫn giữ nguyên.",
   changes: {
     visual: "Trực quan hơn",
-    harder: "Khó hơn",
-    easier: "Dễ hơn",
     shorter: "Ngắn hơn",
     examples: "Dùng ví dụ khác",
   },
+  changesLevel: "Độ khó",
+  changeLevel: (level) => `Đổi sang mức ${level}`,
   changesOther: "Điều khác",
   changesPlaceholder: "Câu hỏi thứ hai khó hiểu.",
   copyChanges: "Sao chép thay đổi",

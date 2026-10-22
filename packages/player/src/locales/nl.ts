@@ -126,11 +126,11 @@ export const nl: Strings = {
     "Kies wat er moet veranderen, vul aan wat je wilt en plak het in de chat waarin je de les maakte. De link blijft hetzelfde.",
   changes: {
     visual: "Maak hem visueler",
-    harder: "Maak hem moeilijker",
-    easier: "Maak hem makkelijker",
     shorter: "Maak hem korter",
     examples: "Gebruik andere voorbeelden",
   },
+  changesLevel: "Moeilijkheid",
+  changeLevel: (level) => `Zet het niveau op ${level}`,
   changesOther: "Nog iets anders",
   changesPlaceholder: "De tweede vraag is verwarrend.",
   copyChanges: "Wijzigingen kopiëren",

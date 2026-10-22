@@ -107,6 +107,9 @@ export type Strings = {
   changesBody: string
   /** The changes the dialog offers as checkboxes, each also a line of the copied prompt. */
   changes: Record<LessonChange, string>
+  /** The Make changes dialog's level picker, and its line of the copied prompt with the level's name. */
+  changesLevel: string
+  changeLevel: (level: string) => string
   changesOther: string
   changesPlaceholder: string
   copyChanges: string
@@ -172,8 +175,6 @@ export type Strings = {
 /** The ready-made changes the Make changes dialog offers. */
 export const LESSON_CHANGES = [
   "visual",
-  "harder",
-  "easier",
   "shorter",
   "examples",
 ] as const

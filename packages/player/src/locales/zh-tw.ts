@@ -105,11 +105,11 @@ export const zhTw: Strings = {
     "選擇要修改的地方，補充其他內容，然後貼到你建立這堂課的聊天中。連結保持不變。",
   changes: {
     visual: "更直觀一點",
-    harder: "更難一點",
-    easier: "更簡單一點",
     shorter: "更短一點",
     examples: "換些例子",
   },
+  changesLevel: "難度",
+  changeLevel: (level) => `改成${level}難度`,
   changesOther: "其他",
   changesPlaceholder: "第二題讓人困惑。",
   copyChanges: "複製修改",

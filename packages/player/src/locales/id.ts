@@ -116,11 +116,11 @@ export const id: Strings = {
     "Pilih apa yang perlu diubah, tambahkan hal lain, lalu tempel di chat tempat kamu membuat pelajaran ini. Tautannya tetap sama.",
   changes: {
     visual: "Buat lebih visual",
-    harder: "Buat lebih sulit",
-    easier: "Buat lebih mudah",
     shorter: "Buat lebih singkat",
     examples: "Pakai contoh lain",
   },
+  changesLevel: "Tingkat kesulitan",
+  changeLevel: (level) => `Ubah levelnya ke ${level}`,
   changesOther: "Hal lain",
   changesPlaceholder: "Pertanyaan kedua membingungkan.",
   copyChanges: "Salin perubahan",

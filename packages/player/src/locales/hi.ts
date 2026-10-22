@@ -123,11 +123,11 @@ export const hi: Strings = {
     "चुनें कि क्या बदलना है, बाकी जोड़ें, फिर इसे उस चैट में पेस्ट करें जहाँ आपने पाठ बनाया था। लिंक वही रहेगा।",
   changes: {
     visual: "इसे ज़्यादा विज़ुअल बनाएँ",
-    harder: "इसे कठिन बनाएँ",
-    easier: "इसे आसान बनाएँ",
     shorter: "इसे छोटा करें",
     examples: "दूसरे उदाहरण इस्तेमाल करें",
   },
+  changesLevel: "कठिनाई",
+  changeLevel: (level) => `स्तर बदलकर ${level} करें`,
   changesOther: "कुछ और",
   changesPlaceholder: "दूसरा सवाल उलझाने वाला है।",
   copyChanges: "बदलाव कॉपी करें",

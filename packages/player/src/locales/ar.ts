@@ -127,11 +127,11 @@ export const ar: Strings = {
     "اختر ما يجب تغييره، وأضف أي شيء آخر، ثم الصقه في المحادثة التي أنشأت فيها الدرس. يبقى الرابط نفسه.",
   changes: {
     visual: "أضف عناصر مرئية أكثر",
-    harder: "اجعله أصعب",
-    easier: "اجعله أسهل",
     shorter: "اجعله أقصر",
     examples: "استخدم أمثلة مختلفة",
   },
+  changesLevel: "الصعوبة",
+  changeLevel: (level) => `غيّر المستوى إلى: ${level}`,
   changesOther: "شيء آخر",
   changesPlaceholder: "السؤال الثاني مربك.",
   copyChanges: "نسخ التعديلات",

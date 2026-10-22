@@ -118,11 +118,11 @@ export const tr: Strings = {
     "Neyin değişeceğini seç, başka ne varsa ekle, sonra dersi oluşturduğun sohbete yapıştır. Bağlantı aynı kalır.",
   changes: {
     visual: "Daha görsel yap",
-    harder: "Daha zor yap",
-    easier: "Daha kolay yap",
     shorter: "Daha kısa yap",
     examples: "Farklı örnekler kullan",
   },
+  changesLevel: "Zorluk",
+  changeLevel: (level) => `Seviyeyi değiştir: ${level}`,
   changesOther: "Başka bir şey",
   changesPlaceholder: "İkinci soru kafa karıştırıyor.",
   copyChanges: "Değişiklikleri kopyala",

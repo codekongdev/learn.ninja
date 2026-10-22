@@ -112,11 +112,11 @@ export const th: Strings = {
     "เลือกสิ่งที่อยากเปลี่ยน เพิ่มอย่างอื่นได้ แล้ววางในแชตที่คุณสร้างบทเรียนนี้ ลิงก์ยังเหมือนเดิม",
   changes: {
     visual: "ให้เห็นภาพมากขึ้น",
-    harder: "ให้ยากขึ้น",
-    easier: "ให้ง่ายขึ้น",
     shorter: "ให้สั้นลง",
     examples: "ใช้ตัวอย่างอื่น",
   },
+  changesLevel: "ระดับความยาก",
+  changeLevel: (level) => `เปลี่ยนเป็นระดับ${level}`,
   changesOther: "อย่างอื่น",
   changesPlaceholder: "คำถามที่สองชวนสับสน",
   copyChanges: "คัดลอกการเปลี่ยนแปลง",

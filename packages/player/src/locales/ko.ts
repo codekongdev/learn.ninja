@@ -108,11 +108,11 @@ export const ko: Strings = {
     "바꿀 점을 고르고 다른 내용도 적은 다음, 레슨을 만든 채팅에 붙여 넣으세요. 링크는 그대로예요.",
   changes: {
     visual: "더 시각적으로",
-    harder: "더 어렵게",
-    easier: "더 쉽게",
     shorter: "더 짧게",
     examples: "다른 예시 사용",
   },
+  changesLevel: "난이도",
+  changeLevel: (level) => `${level} 수준으로`,
   changesOther: "그 밖에",
   changesPlaceholder: "두 번째 질문이 헷갈려요.",
   copyChanges: "변경 사항 복사",

@@ -123,11 +123,11 @@ export const pt: Strings = {
     "Escolha o que deve mudar, acrescente o que quiser e cole no chat onde você criou a lição. O link continua o mesmo.",
   changes: {
     visual: "Deixe mais visual",
-    harder: "Deixe mais difícil",
-    easier: "Deixe mais fácil",
     shorter: "Deixe mais curta",
     examples: "Use outros exemplos",
   },
+  changesLevel: "Dificuldade",
+  changeLevel: (level) => `Mude o nível para ${level}`,
   changesOther: "Mais alguma coisa",
   changesPlaceholder: "A segunda pergunta está confusa.",
   copyChanges: "Copiar alterações",
