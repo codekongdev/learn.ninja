@@ -37,7 +37,7 @@ Synced from the server. All five have a title and annotations:
 
 > learn.ninja turns anything you give Claude into one short, interactive lesson, Duolingo-style: a hook, a few concept screens, questions with instant feedback (multiple choice, compare, hotspot, sort, order, match, fill the blank, scenarios), and a wrap-up. Give it a topic, an article, meeting notes, docs, a transcript, or code, and it writes, checks, and publishes the lesson, then hands back a link anyone can open in a browser. Lessons work on phones, in 20+ languages including right-to-left ones, with no sign-up to play.
 >
-> Making lessons needs no account. A published lesson lasts 7 days; say "keep it" and Claude asks you to sign in to learn.ninja once, after which that lesson and every later one are saved to your account, can be listed in Explore under your handle, and can be edited from any chat. Lessons are built from a checked, open lesson format, so every one has the same quality bar, and the guide Claude follows is the same one the learn.ninja skill uses in Claude Code.
+> Making lessons needs no account. A published lesson lasts 7 days; say "keep it" and Claude asks you to sign in to learn.ninja once, after which that lesson and every later one are saved to your account, can be published to Explore under your handle, and can be edited from any chat. Lessons are built from a checked, open lesson format, so every one has the same quality bar, and the guide Claude follows is the same one the learn.ninja skill uses in Claude Code.
 >
 > Tools: read the lesson guide, check a lesson, publish a lesson, update a published lesson, and keep a lesson in your account. Lesson visuals are plain HTML with no scripts, and the server only ever calls learn.ninja's own API.
 >
@@ -101,7 +101,7 @@ Synced from the server. All five have a title and annotations:
 1. Add `https://learn.ninja/mcp` as a custom connector with **Sign in when needed** (or connect from the listing once it's live).
 2. In a chat: "Make a short lesson about why the sky is blue." Claude calls `get_guide`, then `publish_lesson`, and replies with a link that opens in any browser. No sign-in.
 3. "Change the title to 'Blue skies'." Claude calls `update_lesson` with the edit token from publishing; the same link now shows the new title.
-4. "Keep it." Claude calls `keep_lesson`; a Connect card appears. Sign in with the email above and the code; allow the app. Claude retries and replies "Saved to @reviewer and listed in Explore."
+4. "Keep it." Claude calls `keep_lesson`; a Connect card appears. Sign in with the email above and the code; allow the app. Claude retries and replies "Saved to @reviewer. It's private: only people with the link can open it."
 5. "Make a lesson about compound interest." Published straight to the account (unlisted), no prompt.
 6. Optional: "Check this lesson without publishing it" with any lesson JSON calls `validate_lesson`.
 

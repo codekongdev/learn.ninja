@@ -151,8 +151,8 @@ export async function completeLesson(
 }
 
 /**
- * PATCH /api/lessons/{id} with { visibility }: the owner lists a lesson in Explore ("public") or
- * takes it back to link-only ("unlisted"). "team" waits for teams.
+ * PATCH /api/lessons/{id} with { visibility }: the owner publishes a lesson to Explore ("public") or
+ * makes it private again ("unlisted", link only). "team" waits for teams.
  */
 export async function setVisibility(
   req: { id: string; userId: string; visibility: unknown },

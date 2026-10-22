@@ -118,7 +118,8 @@ export function ConnectChat({
         The fallback for an app that only takes a URL and has no log-in step.
         Claude, ChatGPT, and Claude Code don&apos;t need it: they log in on
         their own with the public URL. For the others, make your own: every
-        lesson it publishes is saved to your account and listed in Explore.
+        lesson it publishes is saved to your account, private until you publish
+        it.
       </p>
 
       {fresh ? (

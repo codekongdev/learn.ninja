@@ -3,7 +3,7 @@ title: Publish API
 description: The HTTP API behind publishing. The CLI uses it; you can too.
 ---
 
-Base URL: `https://learn.ninja`. Requests and responses are JSON. No account is needed: publishing returns an edit token for that one lesson, and anonymous lessons last 7 days. Logged in, with a session cookie or an API key, lessons are saved to your account, never expire, and are listed in Explore under your handle.
+Base URL: `https://learn.ninja`. Requests and responses are JSON. No account is needed: publishing returns an edit token for that one lesson, and anonymous lessons last 7 days. Logged in, with a session cookie or an API key, lessons are saved to your account, never expire, and start private until you publish them to Explore.
 
 ## Publish a lesson
 
@@ -30,7 +30,7 @@ The body is the lesson file. A valid lesson returns `201`:
 }
 ```
 
-Keep `editToken` private: it's the way to update the lesson, and it's shown once. `claimToken` is shown once too; it moves the lesson into an account later (see [Keep a lesson](#keep-a-lesson)), and so does the edit token. With an `x-api-key` header or a session cookie, the lesson belongs to that account from the start: `owned` is `true`, `expiresAt` is `null`, `owner` is `{ "handle": "…" }` (the handle is `null` until the account picks one), `visibility` says whether Explore lists it, and there's no claim token. The same four fields come back from updating and keeping, so a client can say "saved to @handle and listed in Explore" in one place.
+Keep `editToken` private: it's the way to update the lesson, and it's shown once. `claimToken` is shown once too; it moves the lesson into an account later (see [Keep a lesson](#keep-a-lesson)), and so does the edit token. With an `x-api-key` header or a session cookie, the lesson belongs to that account from the start: `owned` is `true`, `expiresAt` is `null`, `owner` is `{ "handle": "…" }` (the handle is `null` until the account picks one), `visibility` is `unlisted` (private: link only, as every lesson starts) or `public` (published in Explore), and there's no claim token. The same four fields come back from updating and keeping, so a client can say "saved to @handle" and whether it's private in one place.
 
 When the checker tidied something that didn't stop the publish, the reply also has `notes`: an array of `{ "path": "tags[0]", "message": "Kept the tag \" Git\" as \"Git\"." }`, the same shape as `issues`. Today that's a tag label it trimmed, whose whitespace it collapsed, or whose leading `#` it dropped. The field is absent when there's nothing to say. Updating and validating reply with it the same way.
 
@@ -56,7 +56,7 @@ The body is `{ "claimToken": "…" }` or `{ "editToken": "…" }` from publishin
 
 `claimUrl` from publishing (`/keep/{claimToken}`) does the same thing in the browser: it signs the visitor in, then keeps that one lesson. The MCP server's `keep_lesson` tool does the same for a chat app that has signed the user in over OAuth (see [Connect with your account](/docs/reference/mcp#connect-with-your-account)).
 
-## List a lesson in Explore
+## Publish a lesson to Explore
 
 ```http
 PATCH /api/lessons/{id}
@@ -64,7 +64,7 @@ Content-Type: application/json
 x-api-key: <key>
 ```
 
-The body is `{ "visibility": "public" }` to list a lesson in [Explore](/explore) and on your profile, or `{ "visibility": "unlisted" }` to make it link-only again. Owner only (`403 not_owner` otherwise). A lesson is listed once it's saved to an account (published logged in, or kept); anonymous lessons are always link-only. Returns `200` with `id`, `url`, and `visibility`. The same switch is under **Your lessons** on your own profile.
+The body is `{ "visibility": "public" }` to publish a lesson to [Explore](/explore) and your profile, or `{ "visibility": "unlisted" }` to make it private (link only) again. Owner only (`403 not_owner` otherwise). Every lesson starts private, and only a lesson saved to an account can be published; anonymous lessons stay private. Returns `200` with `id`, `url`, and `visibility`. The same switch is under **Your lessons** on your own profile.
 
 ## Like a lesson
 
@@ -119,7 +119,7 @@ POST /api/account/mcp
 DELETE /api/account/mcp
 ```
 
-The account's personal MCP URL (`https://learn.ninja/mcp/{key}`, see [Connect with your account](/docs/reference/mcp#connect-with-your-account)). `POST` makes it, revoking any earlier one, and returns `{ "ok": true, "id": "…", "url": "…", "start": "learn_mcp_ab12", "createdAt": "…" }`: the only time the URL is shown. `DELETE` revokes it. Both need a session cookie. The key in the URL starts with `learn_mcp_` and is not an API key: sent as `x-api-key` it answers `401 invalid_api_key` everywhere, and it's not listed by `GET /api/keys`. The MCP server on that URL publishes to the account, listed in Explore (`visibility: "public"`), and a key that was revoked or never existed answers `401 invalid_api_key` with nothing published.
+The account's personal MCP URL (`https://learn.ninja/mcp/{key}`, see [Connect with your account](/docs/reference/mcp#connect-with-your-account)). `POST` makes it, revoking any earlier one, and returns `{ "ok": true, "id": "…", "url": "…", "start": "learn_mcp_ab12", "createdAt": "…" }`: the only time the URL is shown. `DELETE` revokes it. Both need a session cookie. The key in the URL starts with `learn_mcp_` and is not an API key: sent as `x-api-key` it answers `401 invalid_api_key` everywhere, and it's not listed by `GET /api/keys`. The MCP server on that URL publishes to the account, private (`visibility: "unlisted"`), and a key that was revoked or never existed answers `401 invalid_api_key` with nothing published.
 
 Logging in goes through [Better Auth](https://better-auth.com)'s routes under `/api/auth/`: `POST /api/auth/email-otp/send-verification-otp` with `{ "email": "…", "type": "sign-in" }` emails a six-digit code, and `POST /api/auth/sign-in/email-otp` with `{ "email": "…", "otp": "…" }` logs in and sets the session cookie. The CLI's `login` command does exactly this.
 

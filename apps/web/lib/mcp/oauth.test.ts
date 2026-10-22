@@ -274,9 +274,7 @@ const buttons = readFileSync(
 )
 
 describe("the gate in front of /mcp", () => {
-  let listed = 0
   const mcp = () => {
-    listed = 0
     const deps: Omit<McpDeps, "actor"> = {
       store: new PostgresLessonStore(db),
       limiter: new MemoryRateLimiter(),
@@ -285,9 +283,6 @@ describe("the gate in front of /mcp", () => {
       guide: skillBundle,
       drafts: new PostgresDraftStore(db),
       handleOf: (id) => handleOf(db, id),
-      exploreChanged: () => {
-        listed++
-      },
     }
     return gateMcp({
       db,
@@ -386,15 +381,13 @@ describe("the gate in front of /mcp", () => {
       ok: true,
       expiresAt: null,
       owner: { handle: expect.stringMatching(/^[a-z]+-[a-z]+$/) },
-      visibility: "public",
+      visibility: "unlisted",
     })
     expect(body).not.toHaveProperty("editToken")
     expect(body).not.toHaveProperty("claimUrl")
     const [ada] = await db.select().from(user).where(eq(user.email, "ada@example.com"))
     const store = new PostgresLessonStore(db)
     expect((await store.get(body.id as string))?.ownerId).toBe(ada!.id)
-    // Listed straight away, so Explore's cached lists refresh.
-    expect(listed).toBe(1)
 
     // The logged-in app edits its lessons by account, no token in the chat.
     const updated = await resultOf(
@@ -406,7 +399,7 @@ describe("the gate in front of /mcp", () => {
     )
     expect(updated.isError).toBeFalsy()
 
-    // A lesson published logged out, then kept once the app logged in: listed under the account.
+    // A lesson published logged out, then kept once the app logged in: saved to the account, still private.
     const anonymous = await resultOf(await call("publish_lesson", { lesson: buttons }))
     const kept = await resultOf(
       await call(
@@ -421,7 +414,7 @@ describe("the gate in front of /mcp", () => {
     expect(kept.structuredContent).toMatchObject({
       ok: true,
       id: anonymous.structuredContent.id,
-      visibility: "public",
+      visibility: "unlisted",
     })
     expect((await store.get(anonymous.structuredContent.id as string))?.ownerId).toBe(ada!.id)
   })

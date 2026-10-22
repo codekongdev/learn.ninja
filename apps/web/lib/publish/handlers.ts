@@ -207,9 +207,8 @@ export async function publishLesson(
     editTokenHash: hashToken(editToken),
     claimTokenHash: claimToken ? hashToken(claimToken) : null,
     ownerId: owner,
-    // An owned lesson is listed in Explore straight away (the owner can unlist it on their
-    // profile); an anonymous one stays link-only until it's kept.
-    visibility: owner ? "public" : "unlisted",
+    // Every lesson starts private (link only); its owner publishes it to Explore when it's ready.
+    visibility: "unlisted",
     hidden: false,
     views: 0,
     likes: 0,
@@ -381,7 +380,7 @@ export async function claimLesson(
       },
     }
   }
-  // Reply from the row as the store left it, not from `existing`: claiming may change more than the owner (its visibility, say).
+  // Reply from the row as the store left it, not from `existing`: claiming changes more than the owner (its expiry, say).
   return kept(await deps.store.claim(existing.id, req.ownerId), deps)
 }
 
@@ -481,7 +480,7 @@ export async function reissueClaimToken(
 
 /**
  * The reply fields that say where a lesson stands: `owned`, when it expires, who owns it
- * (`owner.handle`, so a client can say "saved to @handle"), and whether it's listed in Explore
+ * (`owner.handle`, so a client can say "saved to @handle"), and whether it's published in Explore
  * (`visibility`).
  */
 async function ownership(

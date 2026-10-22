@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 
 import { currentActor } from "@/lib/auth/session"
-import { revalidateExplore } from "@/lib/explore/cache"
 import { claimLesson } from "@/lib/publish/handlers"
 import { depsFor } from "@/lib/publish/request"
 
@@ -21,7 +20,5 @@ export async function GET(req: Request, { params }: Params) {
     await depsFor(req)
   )
   if (!reply.body.ok) return back
-  // A kept lesson is listed straight away.
-  revalidateExplore()
   return NextResponse.redirect(reply.body.url as string)
 }

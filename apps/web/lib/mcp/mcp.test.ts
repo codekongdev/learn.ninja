@@ -48,9 +48,7 @@ beforeAll(async () => {
 
 let deps: McpDeps
 let mcp: (req: Request) => Promise<Response>
-let listed = 0
 beforeEach(() => {
-  listed = 0
   deps = {
     store: new PostgresLessonStore(db),
     limiter: new MemoryRateLimiter(),
@@ -59,9 +57,6 @@ beforeEach(() => {
     guide: skillBundle,
     drafts: new PostgresDraftStore(db),
     handleOf: (id) => handleOf(db, id),
-    exploreChanged: () => {
-      listed++
-    },
   }
   mcp = createLearnMcp(deps)
 })
@@ -439,7 +434,6 @@ describe("keep_lesson", () => {
       error: "sign_in_required",
     })
     expect((await deps.store.get(id))?.ownerId).toBeNull()
-    expect(listed).toBe(0)
   })
 
   it("keeps a lesson for the logged-in account, once", async () => {
@@ -465,9 +459,8 @@ describe("keep_lesson", () => {
       title: JSON.parse(buttons).title,
       expiresAt: null,
       owner: { handle: expect.stringMatching(/^[a-z]+-[a-z]+$/) },
-      visibility: "public",
+      visibility: "unlisted",
     })
-    expect(listed).toBe(1)
     const [account] = await db
       .select()
       .from(user)
@@ -496,7 +489,7 @@ describe("keep_lesson", () => {
 })
 
 describe("/mcp/{key}, the personal URL", () => {
-  it("publishes to the account, listed, and the owner updates without a token", async () => {
+  it("publishes to the account, private, and the owner updates without a token", async () => {
     const key = await mcpKeyFor("owner@example.com")
     const { tools } = await personal(key).rpc("tools/list", {})
     const publish = tools.find(
@@ -515,7 +508,7 @@ describe("/mcp/{key}, the personal URL", () => {
       ok: true,
       expiresAt: null,
       owner: { handle: expect.stringMatching(/^[a-z]+-[a-z]+$/) },
-      visibility: "public",
+      visibility: "unlisted",
     })
     expect(body).not.toHaveProperty("claimUrl")
     // Nor the edit token: the account edits, and a shared chat shouldn't carry a secret.
@@ -526,11 +519,9 @@ describe("/mcp/{key}, the personal URL", () => {
       .where(eq(user.email, "owner@example.com"))
     expect(await deps.store.get(body.id as string)).toMatchObject({
       ownerId: account!.id,
-      visibility: "public",
+      visibility: "unlisted",
       expiresAt: null,
     })
-    // Listed straight away, so Explore's cached lists refresh.
-    expect(listed).toBe(1)
 
     const updated = await personal(key).call("update_lesson", {
       id: body.id,
@@ -570,9 +561,8 @@ describe("/mcp/{key}, the personal URL", () => {
     expect(kept.structuredContent).toMatchObject({
       ok: true,
       id,
-      visibility: "public",
+      visibility: "unlisted",
     })
-    expect(listed).toBe(1)
     // Now it's theirs to edit.
     const mine = await personal(key).call("update_lesson", {
       id,

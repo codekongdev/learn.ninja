@@ -28,7 +28,7 @@ import { applyPatches, PatchError, type DraftStore, type Patch } from "./drafts"
 // in front of the route (gate.ts) answers `keep_lesson` from a logged-out app with a 401 that
 // makes the app run OAuth against Better Auth, and from then on every call carries a token and
 // `actor` is the account. At /mcp/{key}, a personal URL from the settings page, the key in the
-// path is the account instead. Either way, lessons are published to it and listed in Explore.
+// path is the account instead. Either way, lessons are saved to it, private until the owner publishes them.
 
 export interface McpDeps extends Deps {
   /** The looser limit checks use, as /api/validate does. */
@@ -39,8 +39,6 @@ export interface McpDeps extends Deps {
   drafts: DraftStore
   /** The logged-in account (an OAuth token, or a personal URL's key); null or absent when anonymous. */
   actor?: McpActor | null
-  /** Called when a lesson becomes listed in Explore (a logged-in publish, or a keep), so cached lists refresh. */
-  exploreChanged?: () => void
 }
 
 /** The keep sentence the model says once after an anonymous publish, on every surface (steps.md step 6). */
@@ -219,7 +217,7 @@ function registerTools(server: McpServer, deps: McpDeps) {
   )
 
   const owned = actor
-    ? `Lessons are saved to ${actor.handle ? `@${actor.handle}` : "the user's account"} (this connection is theirs) and listed in Explore straight away; ${actor.handle ? `they can unlist one on their profile, learn.ninja/u/${actor.handle}` : "they can unlist one on their profile once they pick a handle at learn.ninja/settings"}.`
+    ? `Lessons are saved to ${actor.handle ? `@${actor.handle}` : "the user's account"} (this connection is theirs) and start private: only people with the link can open them. ${actor.handle ? `They publish one to Explore from their profile, learn.ninja/u/${actor.handle}` : "They publish one to Explore from their profile once they pick a handle at learn.ninja/settings"}.`
     : null
 
   server.registerTool(
@@ -264,8 +262,6 @@ function registerTools(server: McpServer, deps: McpDeps) {
             },
             deps
           )
-          // A lesson published to an account is listed straight away.
-          if (actor && reply.status === 201) deps.exploreChanged?.()
           return { reply, keepDraft: reply.body.ok !== true }
         },
         [
@@ -287,8 +283,8 @@ function registerTools(server: McpServer, deps: McpDeps) {
       title: "Keep a lesson in an account",
       _meta: NEEDS_AUTH,
       description: actor
-        ? `Saves a lesson that was published anonymously (in another chat, or before the user logged in) to ${actor.handle ? `@${actor.handle}` : "the user's account"}, given its \`id\` and \`editToken\`, and lists it in Explore. Lessons published here are already saved, so it's rarely needed.`
-        : `Saves a published lesson to the user's learn.ninja account, given the \`id\` and \`editToken\` from \`publish_lesson\`: it stops expiring and is listed in Explore under their handle. For when the user asks to keep a lesson. It needs the user logged in; this app asks them to, once, then retries the call. The reply names the account (\`owner.handle\`, \`visibility\`), and a lesson already in an account answers \`already_claimed\`.`,
+        ? `Saves a lesson that was published anonymously (in another chat, or before the user logged in) to ${actor.handle ? `@${actor.handle}` : "the user's account"}, given its \`id\` and \`editToken\`; it stays private. Lessons published here are already saved, so it's rarely needed.`
+        : `Saves a published lesson to the user's learn.ninja account, given the \`id\` and \`editToken\` from \`publish_lesson\`: it stops expiring and stays private until they publish it to Explore. For when the user asks to keep a lesson. It needs the user logged in; this app asks them to, once, then retries the call. The reply names the account (\`owner.handle\`, \`visibility\`), and a lesson already in an account answers \`already_claimed\`.`,
       inputSchema: z.object({
         id: z.string().describe("The lesson's id, from `publish_lesson`."),
         editToken: z
@@ -318,12 +314,10 @@ function registerTools(server: McpServer, deps: McpDeps) {
       return toolResult(async () => {
         if (!(await deps.validateLimiter.allow(clientOf(ctx, actor))))
           return RATE_LIMITED
-        const reply = await claimLesson(
+        return claimLesson(
           { id, editToken, ownerId: actor.userId },
           { ...deps, handleOf: async () => actor.handle }
         )
-        if (reply.status === 200) deps.exploreChanged?.()
-        return reply
       }, ["ok", "id", "url", "title", "expiresAt", "owner", "visibility"])
     }
   )

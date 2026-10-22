@@ -1,6 +1,5 @@
 import { getDb } from "@/lib/publish/store"
 import { mcpResourceFromEnv, oauthIssuerFromEnv } from "@/lib/auth/auth"
-import { revalidateExplore } from "@/lib/explore/cache"
 import { PostgresDraftStore } from "@/lib/mcp/drafts"
 import { gateMcp } from "@/lib/mcp/gate"
 import { createLearnMcp } from "@/lib/mcp/server"
@@ -20,7 +19,6 @@ async function handler(req: Request) {
     validateLimiter: getRateLimiter("validate"),
     guide: skillBundle,
     drafts: new PostgresDraftStore(db),
-    exploreChanged: revalidateExplore,
   }
   return gateMcp({
     db,

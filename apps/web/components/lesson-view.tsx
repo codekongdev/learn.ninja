@@ -104,7 +104,7 @@ export function LessonView({
             ) : owner.visibility === "public" ? (
               <>
                 <GlobeIcon className="size-3.5" aria-hidden="true" />
-                Listed in Explore
+                Published in Explore
               </>
             ) : (
               <>

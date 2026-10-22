@@ -130,11 +130,11 @@ const created = (id = "abcd1234") => ({
   },
 })
 
-/** What the server answers a logged-in publish with: owned, no expiry, no claim token, listed under @ada. */
+/** What the server answers a logged-in publish with: owned, no expiry, no claim token, private under @ada. */
 const createdOwned = (
   id = "own12345",
   handle: string | null = "ada",
-  visibility = "public"
+  visibility = "unlisted"
 ) => {
   const reply = created(id)
   const { claimToken: _c, claimUrl: _u, ...body } = reply.body
@@ -151,7 +151,7 @@ const createdOwned = (
 }
 
 /** What the server answers a claim with. */
-const keptReply = (handle: string | null = "ada", visibility = "public") => ({
+const keptReply = (handle: string | null = "ada", visibility = "unlisted") => ({
   status: 200,
   body: {
     ok: true,
@@ -596,7 +596,7 @@ describe("learn publish", () => {
     expect(await run(["publish", "lesson.json"], t.io)).toBe(0)
     expect(t.calls.at(-1)).toMatchObject({ method: "POST", apiKey: KEY })
     expect(t.out.join("\n")).toMatch(
-      /Saved to @ada and listed in Explore\. Unlist it any time at https:\/\/learn\.ninja\/u\/ada\./
+      /Saved to @ada\. It's private: only people with the link can open it\. Publish it to Explore at https:\/\/learn\.ninja\/u\/ada\./
     )
     const saved = JSON.parse(
       readFileSync(join(t.cwd, ".learn/state.json"), "utf8")
@@ -612,22 +612,22 @@ describe("learn publish", () => {
     })
   })
 
-  it("says what's left to do for an owned lesson without a handle, or not listed yet", async () => {
+  it("says what's left to do for an owned lesson without a handle, or that it's published", async () => {
     t = setup({
       "POST /api/lessons": createdOwned("own12345", null, "unlisted"),
     })
     writeCredentials(t, { "https://learn.ninja": { apiKey: KEY, email: "a" } })
     await run(["publish", "lesson.json"], t.io)
     expect(t.out.join("\n")).toMatch(
-      /Saved to your account: it doesn't expire\. Pick a handle at https:\/\/learn\.ninja\/settings and it'll show in Explore\./
+      /Saved to your account\. It's private: only people with the link can open it\. Pick a handle at https:\/\/learn\.ninja\/settings to publish it to Explore\./
     )
     t = setup({
-      "POST /api/lessons": createdOwned("own12345", "ada", "unlisted"),
+      "POST /api/lessons": createdOwned("own12345", "ada", "public"),
     })
     writeCredentials(t, { "https://learn.ninja": { apiKey: KEY, email: "a" } })
     await run(["publish", "lesson.json"], t.io)
     expect(t.out.join("\n")).toMatch(
-      /Saved to @ada: it doesn't expire\. List it in Explore at https:\/\/learn\.ninja\/u\/ada\./
+      /Saved to @ada and published in Explore\. Unpublish it any time at https:\/\/learn\.ninja\/u\/ada\./
     )
   })
 
@@ -659,7 +659,7 @@ describe("learn publish", () => {
       "POST /api/lessons/abcd1234/claim",
     ])
     expect(t.out.join("\n")).toMatch(
-      /Updated: .*\nSaved to @ada and listed in Explore/
+      /Updated: .*\nSaved to @ada\. It's private/
     )
     const saved = JSON.parse(
       readFileSync(join(t.cwd, ".learn/state.json"), "utf8")
@@ -696,7 +696,7 @@ describe("learn publish", () => {
     expect(JSON.parse(t.calls.at(-1)!.body!)).toEqual({
       editToken: "tok-abcd1234",
     })
-    expect(t.out.join("\n")).toMatch(/Saved to @ada and listed in Explore/)
+    expect(t.out.join("\n")).toMatch(/Saved to @ada\. It's private/)
   })
 
   it("takes the key from LEARN_API_KEY too", async () => {
@@ -803,7 +803,7 @@ describe("learn login", () => {
       },
     })
     expect(t.out.join("\n")).toMatch(
-      /Logged in as ada@example\.com \(@ada\)\. Saved the key in .*learn\/credentials\.\nKept 1 lesson published from this folder, saved to @ada and listed in Explore \(unlist it any time at https:\/\/learn\.ninja\/u\/ada\):\n  https:\/\/learn\.test\/l\/button-hierarchy-aaaa1111/
+      /Logged in as ada@example\.com \(@ada\)\. Saved the key in .*learn\/credentials\.\nKept 1 lesson published from this folder, saved to @ada and private \(publish it to Explore at https:\/\/learn\.ninja\/u\/ada\):\n  https:\/\/learn\.test\/l\/button-hierarchy-aaaa1111/
     )
     const state = JSON.parse(
       readFileSync(join(t.cwd, ".learn/state.json"), "utf8")
@@ -857,7 +857,7 @@ describe("learn login", () => {
     expect(await run(["login"], t.io)).toBe(0)
     expect(readCredentials(t)["https://learn.ninja"].apiKey).toBe(KEY)
     expect(t.out.join("\n")).toMatch(
-      /No lessons from this folder to keep\. From now on, every lesson you publish is saved to your account and listed in Explore under @ada\./
+      /No lessons from this folder to keep\. From now on, every lesson you publish is saved to your account as @ada and starts private\./
     )
   })
 
@@ -955,7 +955,7 @@ describe("learn keep", () => {
       "POST /api/lessons/bbbb2222/claim",
     ])
     expect(t.out.join("\n")).toMatch(
-      /Kept 2 lessons published from this folder, saved to @ada and listed in Explore \(unlist them any time at https:\/\/learn\.ninja\/u\/ada\):\n  https:\/\/learn\.test\/l\/button-hierarchy-aaaa1111\n  https:\/\/learn\.test\/l\/button-hierarchy-bbbb2222/
+      /Kept 2 lessons published from this folder, saved to @ada and private \(publish them to Explore at https:\/\/learn\.ninja\/u\/ada\):\n  https:\/\/learn\.test\/l\/button-hierarchy-aaaa1111\n  https:\/\/learn\.test\/l\/button-hierarchy-bbbb2222/
     )
     const after = JSON.parse(readFileSync(statePath, "utf8"))
     for (const saved of Object.values(after.lessons) as {

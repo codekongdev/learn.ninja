@@ -20,7 +20,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Do I need an account?",
-    a: "No. Not to make lessons, and not to play them. Lessons last 7 days. To keep one, say keep it: you log in once (GitHub or an email code, no password), the lesson is saved to your account and listed in Explore under your handle, and every lesson after it is saved too.",
+    a: "No. Not to make lessons, and not to play them. Lessons last 7 days. To keep one, say keep it: you log in once (GitHub or an email code, no password), the lesson is saved to your account, and every lesson after it is saved too. Saved lessons start private; publish one to Explore from your profile when it's ready.",
   },
   {
     q: "How long do lessons last?",
@@ -36,7 +36,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Who can see my lesson?",
-    a: "Anyone with the link. Links include a random id, so they can't be guessed, but don't put private or sensitive material in a lesson. A lesson saved to an account is also listed in Explore; switch it to unlisted on your profile to keep it link-only.",
+    a: "Anyone with the link. Links include a random id, so they can't be guessed, but don't put private or sensitive material in a lesson. Lessons start private: they're not in Explore or search results. Once one is saved to your account, you can publish it to Explore from your profile.",
   },
   {
     q: "I'm an agent. What should I do first?",
