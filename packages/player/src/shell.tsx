@@ -132,7 +132,7 @@ export interface Preferences {
 const PREFERENCES_KEY = "learn:preferences"
 
 export function usePreferences() {
-  const [prefs, setPrefs] = React.useState<Preferences>({ textSize: "sm" })
+  const [prefs, setPrefs] = React.useState<Preferences>({ textSize: "md" })
   React.useEffect(() => {
     try {
       const saved = JSON.parse(
@@ -911,7 +911,7 @@ export function PlayerSettings({
         icon={<TypeIcon />}
         value={prefs.textSize}
         valueLabel={t.sizesShort[prefs.textSize]}
-        defaultValue="sm"
+        defaultValue="md"
         defaultLabel={t.defaultOption}
         options={(["sm", "md", "lg"] as const).map((id) => ({
           id,

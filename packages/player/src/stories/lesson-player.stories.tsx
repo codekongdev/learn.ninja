@@ -87,7 +87,7 @@ const withPrefs = (prefs: object) => [
   () =>
     localStorage.setItem(
       "learn:preferences",
-      JSON.stringify({ textSize: "sm", ...prefs })
+      JSON.stringify({ textSize: "md", ...prefs })
     ),
 ]
 
