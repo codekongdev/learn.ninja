@@ -33,6 +33,7 @@ import {
   checkAnswer,
   initialAnswer,
   isReady,
+  POOL,
   retryAnswer,
   shuffle,
   solution,
@@ -1055,11 +1056,6 @@ function Player({
                       label={screenLabel(state, t)}
                       inBubble
                       ninja={ninja !== "off"}
-                      wrapTime={
-                        clock.start && clock.end
-                          ? clock.end - clock.start
-                          : undefined
-                      }
                       brief={
                         briefKey
                           ? {
@@ -1282,7 +1278,6 @@ export function Screen({
   state,
   dispatch,
   ninja = true,
-  wrapTime,
   label,
   inBubble = false,
   brief = null,
@@ -1302,8 +1297,6 @@ export function Screen({
   inBubble?: boolean
   /** Whether the ninja is on. Off, his slot folds away so the screen stays centered. */
   ninja?: boolean
-  /** How long the lesson took, in ms, for the wrap-up's score line. */
-  wrapTime?: number
 }) {
   const { t } = usePlayer()
   switch (item.kind) {
@@ -1346,14 +1339,7 @@ export function Screen({
         </div>
       )
     case "wrap":
-      return (
-        <WrapUp
-          lesson={lesson}
-          results={state.results}
-          ninja={ninja}
-          time={wrapTime}
-        />
-      )
+      return <WrapUp lesson={lesson} results={state.results} ninja={ninja} />
     case "question":
       return (
         <QuestionScreen
@@ -1633,32 +1619,19 @@ function WrapUp({
   lesson,
   results,
   ninja = true,
-  time,
 }: {
   lesson: Lesson
   results: Record<string, Outcome>
   ninja?: boolean
-  /** How long the lesson took, in ms. */
-  time?: number
 }) {
-  const { t, lang = "en", creator } = usePlayer()
+  const { t, creator } = usePlayer()
   const s = summarize(lesson, results)
   const run = runFor(s)
-  // The celebration leads; the score is one quiet line: first tries, then the time it took.
-  const score = [
+  // The celebration leads; the score is one quiet line of first tries.
+  const score =
     run === "perfect"
       ? t.allFirstTry(s.total)
-      : t.firstTryCount(s.first, s.total),
-    time === undefined
-      ? null
-      : new Intl.NumberFormat(lang, {
-          style: "unit",
-          unit: "minute",
-          unitDisplay: "short",
-        }).format(Math.max(1, Math.round(time / 60_000))),
-  ]
-    .filter(Boolean)
-    .join(" · ")
+      : t.firstTryCount(s.first, s.total)
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-center gap-4 text-center">
@@ -2002,8 +1975,11 @@ export function ActionArea({
     // In the player a scenario is a story: the ninja says what each pick led to, a miss rewinds.
     const story = inBubble && brick.type === "scenario"
     if (s.phase === "answering") {
+      // Until every sort item is in a group, Check says how many are left instead.
+      const unsorted =
+        s.answer.kind === "zones" ? (s.answer.zones[POOL] ?? []).length : 0
       primary = {
-        label: t.check,
+        label: unsorted ? t.sortLeft(unsorted) : t.check,
         onPress: () => dispatch({ type: "check" }),
         isDisabled: !isReady(brick, s.answer),
       }
