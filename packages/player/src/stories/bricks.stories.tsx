@@ -286,6 +286,27 @@ export const HotspotCode: Story = {
     wrong: { kind: "select", ids: ["l1"] },
   },
 }
+export const HotspotChess: Story = {
+  name: "Hotspot, chess board",
+  args: {
+    brick: {
+      id: "fork",
+      type: "hotspot",
+      prompt: "Where can the knight fork the king and the rook?",
+      visual: {
+        kind: "chess",
+        fen: "r3k3/8/8/3N4/8/8/8/4K3 w - - 0 1",
+        alt: "White's knight on d5, with Black's king on e8 and rook on a8.",
+        highlight: ["d5"],
+      },
+      correct: ["c7"],
+      multiple: false,
+      explanation:
+        "From c7 the knight attacks both e8 and a8, so the king must move and the rook falls.",
+    },
+    wrong: { kind: "select", ids: ["f6"] },
+  },
+}
 export const Sort: Story = {
   name: "Sort, three groups",
   args: {

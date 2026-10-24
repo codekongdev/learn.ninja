@@ -110,6 +110,22 @@ const chessLesson: Lesson = {
       explanation:
         "From c7 a knight reaches both e8 and a8, so Nc7+ wins the rook once the king moves.",
     },
+    {
+      id: "p2",
+      type: "hotspot",
+      prompt: "Tap every square the knight on e5 attacks.",
+      visual: {
+        kind: "chess",
+        fen: "rnbqkb1r/pppp1ppp/5n2/4N3/4P3/8/PPPP1PPP/RNBQKB1R b KQkq - 0 3",
+        alt: "Black's view after 3. Nxe5: White's knight stands on e5, in the middle of the board.",
+        highlight: ["e5"],
+        flip: true,
+      },
+      correct: ["c4", "c6", "d3", "d7", "f3", "f7", "g4", "g6"],
+      multiple: true,
+      explanation:
+        "A knight in the middle reaches eight squares, two along and one across in every direction. Here it hits the pawns on d7 and f7.",
+    },
     ...lessons.buttons.bricks.slice(2),
   ],
 } as Lesson
@@ -125,5 +141,13 @@ export const AsOptions: Story = {
   args: { visual: fork },
   render: () => (
     <BrickDemo lesson={chessLesson} brickId="p1" prepared={prepared} />
+  ),
+}
+
+/** Every square is tappable, seen from Black here: the arrow keys move between squares. */
+export const AsAHotspot: Story = {
+  args: { visual: fork },
+  render: () => (
+    <BrickDemo lesson={chessLesson} brickId="p2" prepared={prepared} />
   ),
 }

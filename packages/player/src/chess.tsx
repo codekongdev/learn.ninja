@@ -1,8 +1,11 @@
 import * as React from "react"
 
 import { readFen, type ChessVisual, type FenPiece } from "@workspace/spec"
+import { Selectable } from "@workspace/ui/components/selectable"
+import { cn } from "@workspace/ui/lib/utils"
 
 import { PIECES, type PieceCode } from "./chess-pieces"
+import type { HotspotControl } from "./visuals"
 
 // A chess position drawn as SVG in the browser: the board, its marked squares and arrows, and the
 // chessnut pieces. visuals.tsx loads this module only for a lesson that has a board, since the
@@ -22,10 +25,13 @@ const code = (p: FenPiece) =>
 export default function ChessBoard({
   board,
   plain,
+  hotspots,
 }: {
   board: ChessVisual
   /** On an option or item card: smaller, so the coordinates and their gutter are left off. */
   plain: boolean
+  /** On a hotspot brick: every square is tappable, its id the square's name. */
+  hotspots?: HotspotControl
 }) {
   // React's ids carry characters a fragment link might not survive.
   const id = `chess${React.useId().replace(/[^\w-]/g, "")}`
@@ -47,7 +53,7 @@ export default function ChessBoard({
   const used = [...new Set(pieces.map((p) => p.code))]
   const gutter = plain ? 0 : GUTTER
 
-  return (
+  const drawing = (
     <svg
       viewBox={`${-gutter} 0 ${8 + gutter} ${8 + gutter}`}
       className="block h-auto w-full"
@@ -138,6 +144,99 @@ export default function ChessBoard({
         <Arrow key={i} from={at(a.from)} to={at(a.to)} />
       ))}
     </svg>
+  )
+  if (!hotspots) return drawing
+  return (
+    <div className="relative">
+      {drawing}
+      <Squares
+        flip={flip}
+        gutter={gutter}
+        first={board.highlight?.[0]}
+        control={hotspots}
+      />
+    </div>
+  )
+}
+
+/** The square at a column and row from the top start corner of the drawing. */
+const squareAt = (x: number, y: number, flip: boolean) =>
+  flip ? `${FILES[7 - x]}${y + 1}` : `${FILES[x]}${8 - y}`
+
+const STEPS: Record<string, [number, number]> = {
+  ArrowUp: [0, -1],
+  ArrowDown: [0, 1],
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+}
+
+/**
+ * The board's squares as toggles laid over the drawing, for a hotspot. The board is one tab stop:
+ * the arrow keys move between squares, so the keyboard doesn't walk through 64 buttons.
+ */
+function Squares({
+  flip,
+  gutter,
+  first,
+  control,
+}: {
+  flip: boolean
+  gutter: number
+  /** The square the board's tab stop starts on when nothing is picked: the piece in question. */
+  first?: string
+  control: HotspotControl
+}) {
+  const refs = React.useRef(new Map<string, HTMLButtonElement>())
+  const [active, setActive] = React.useState<string | null>(null)
+  const order = Array.from({ length: 64 }, (_, i) =>
+    squareAt(i % 8, Math.floor(i / 8), flip)
+  )
+  const stop = active ?? control.selected[0] ?? first ?? order[0]!
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    const step = STEPS[e.key]
+    const i = order.indexOf((e.target as HTMLElement).dataset.square ?? "")
+    if (!step || i < 0) return
+    const x = (i % 8) + step[0]
+    const y = Math.floor(i / 8) + step[1]
+    if (x < 0 || x > 7 || y < 0 || y > 7) return
+    e.preventDefault()
+    refs.current.get(squareAt(x, y, flip))?.focus()
+  }
+  return (
+    // The board is always drawn left to right (its block sets dir="ltr"), so these are physical edges.
+    <div
+      onKeyDown={onKeyDown}
+      className="absolute top-0 grid aspect-square grid-cols-8 grid-rows-8"
+      style={{
+        left: `${(gutter / (8 + gutter)) * 100}%`,
+        width: `${(8 / (8 + gutter)) * 100}%`,
+      }}
+    >
+      {order.map((square) => (
+        <Selectable
+          key={square}
+          ref={(el) => {
+            if (el) refs.current.set(square, el)
+            else refs.current.delete(square)
+          }}
+          data-square={square}
+          aria-label={square}
+          isSelected={control.selected.includes(square)}
+          onChange={() => control.onToggle(square)}
+          onFocus={() => setActive(square)}
+          isDisabled={control.disabled}
+          excludeFromTabOrder={square !== stop}
+          data-status={control.marks[square]}
+          className={cn(
+            "cursor-pointer focus-visible:z-10 data-hovered:bg-primary/10",
+            "data-selected:bg-primary/10 data-selected:inset-ring-2 data-selected:inset-ring-primary",
+            // A checked square takes the answer colors: a 10% tint inside a ring of the color.
+            "data-[status=correct]:bg-green-600/10! data-[status=correct]:inset-ring-2 data-[status=correct]:inset-ring-green-600!",
+            "data-[status=wrong]:bg-yellow-500/10! data-[status=wrong]:inset-ring-2 data-[status=wrong]:inset-ring-yellow-500!"
+          )}
+        />
+      ))}
+    </div>
   )
 }
 

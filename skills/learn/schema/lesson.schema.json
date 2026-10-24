@@ -1487,6 +1487,9 @@
             },
             {
               "$ref": "#/$defs/CodeVisual"
+            },
+            {
+              "$ref": "#/$defs/ChessVisual"
             }
           ]
         },

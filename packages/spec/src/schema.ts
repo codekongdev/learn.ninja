@@ -480,8 +480,8 @@ export const hotspotBrick = z
   .strictObject({
     ...questionBase,
     type: z.literal("hotspot"),
-    /** An html visual with data-hotspot elements, or a code visual with hotspots. */
-    visual: z.discriminatedUnion("kind", [htmlVisual, codeVisual]),
+    /** An html visual with data-hotspot elements, a code visual with hotspots, or a chess board (every square is tappable; ids are squares like "e4"). */
+    visual: z.discriminatedUnion("kind", [htmlVisual, codeVisual, chessVisual]),
     correct: z.array(id).min(1),
     multiple: z.boolean(),
   })
