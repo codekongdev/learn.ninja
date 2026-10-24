@@ -17,6 +17,7 @@ import {
   controlPadding,
   controlStyles,
   controlSurface,
+  keyHintStyles,
   markStyles,
   slotStyles,
 } from "./controls"
@@ -64,7 +65,7 @@ function KeyHint({
       </Kbd>
     )
   return (
-    <Kbd aria-hidden="true" className={cn(className, "pointer-coarse:hidden")}>
+    <Kbd aria-hidden="true" className={cn(className, keyHintStyles)}>
       {i + 1}
     </Kbd>
   )
@@ -751,10 +752,7 @@ export function BlankBrick({
               {i < 9 ? (
                 <Kbd
                   aria-hidden="true"
-                  className={cn(
-                    "pointer-coarse:hidden",
-                    (gone || locked) && "invisible"
-                  )}
+                  className={cn(keyHintStyles, (gone || locked) && "invisible")}
                 >
                   {i + 1}
                 </Kbd>

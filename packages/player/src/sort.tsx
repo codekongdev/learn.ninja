@@ -14,6 +14,7 @@ import {
   controlPadding,
   controlStyles,
   controlSurface,
+  keyHintStyles,
   markStyles,
   slotStyles,
 } from "./controls"
@@ -369,7 +370,7 @@ export function SortBrick({
                 {g.label}
               </span>
               {locked ? null : (
-                <Kbd aria-hidden="true" className="pointer-coarse:hidden">
+                <Kbd aria-hidden="true" className={keyHintStyles}>
                   {i + 1}
                 </Kbd>
               )}
