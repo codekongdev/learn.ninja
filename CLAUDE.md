@@ -29,6 +29,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `npm run storybook`: Storybook at http://localhost:6006 (theme and language switches in the toolbar)
 - `npm run skill:build -w @workspace/cli`: rebuild `skills/learn` (bundled CLI, schema, examples) after changing the spec, CLI, or examples; a test fails if it's stale
 - `npm run schema -w @workspace/spec`: re-export `packages/spec/schema/lesson.schema.json` after changing the spec (a test fails if it's stale)
+- `npm run map -w @workspace/player`: rebuild the map visual's country shapes (`packages/player/src/map-data.json`) and the checker's table of countries (`packages/spec/src/countries.ts`) from Natural Earth via world-atlas
 - `npm run favicon -w web`: rebuild `apps/web/app/favicon.ico` from `app/icon.svg` after changing the icon
 - `npm run tags -w web`: the weekly tag report (subjects by lesson count, top tags per subject, tags used once) from `DATABASE_URL` or `apps/web/.env.local`, else the local PGlite; read it to add synonyms to `packages/spec/src/tags.ts`
 - `npm run tags:backfill -w web`: brings every stored lesson up to the current spec and rebuilds its `lesson_tag` rows (dry run; `-- --write` applies); run it after a spec bump that changes subjects or tags

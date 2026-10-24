@@ -244,6 +244,9 @@
         },
         {
           "$ref": "#/$defs/ChessVisual"
+        },
+        {
+          "$ref": "#/$defs/MapVisual"
         }
       ]
     },
@@ -834,6 +837,101 @@
       "required": [
         "kind",
         "fen"
+      ],
+      "additionalProperties": false
+    },
+    "MapVisual": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "map"
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "region": {
+          "type": "string",
+          "enum": [
+            "world",
+            "africa",
+            "europe",
+            "asia",
+            "middle-east",
+            "south-asia",
+            "east-asia",
+            "southeast-asia",
+            "north-america",
+            "central-america",
+            "south-america",
+            "oceania",
+            "mediterranean"
+          ]
+        },
+        "countries": {
+          "minItems": 1,
+          "maxItems": 60,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24
+              },
+              "group": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24
+              }
+            },
+            "required": [
+              "code"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "points": {
+          "minItems": 1,
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24
+              }
+            },
+            "required": [
+              "lat",
+              "lon"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "kind"
       ],
       "additionalProperties": false
     },

@@ -722,6 +722,125 @@ describe("chess visuals", () => {
   })
 })
 
+describe("map visuals", () => {
+  function withMap(over: Record<string, unknown> = {}) {
+    const l = buttons()
+    l.bricks[0].visual = {
+      kind: "map",
+      region: "europe",
+      alt: "The six founders of the European Coal and Steel Community.",
+      countries: ["FR", "DE", "IT", "BE", "NL", "LU"].map((code) => ({
+        code,
+      })),
+      points: [{ lat: 50.85, lon: 4.35, label: "Brussels" }],
+      ...over,
+    }
+    return l
+  }
+
+  it("accepts countries and points on the region, and a world map by default", () => {
+    expect(validateLesson(withMap()).ok).toBe(true)
+    expect(
+      validateLesson(
+        withMap({
+          region: undefined,
+          countries: [{ code: "JP", label: "Japan" }],
+          points: [{ lat: -33.87, lon: 151.21 }],
+        })
+      ).ok
+    ).toBe(true)
+  })
+
+  it("wants alt text, and something on the map", () => {
+    const l = withMap()
+    delete l.bricks[0].visual.alt
+    expectIssue(l, {
+      path: "bricks[0].visual",
+      message: /This map has no "alt"/,
+    })
+    expectIssue(withMap({ countries: undefined, points: undefined }), {
+      path: "bricks[0].visual",
+      message: /shade "countries", mark "points"/,
+    })
+  })
+
+  it("names the code to use for one the map doesn't know", () => {
+    const code = (c: string) => withMap({ countries: [{ code: c }] })
+    const at = { path: "bricks[0].visual.countries[0]" }
+    expectIssue(code("UK"), { ...at, message: /United Kingdom is "GB"/ })
+    expectIssue(code("FRA"), { ...at, message: /"FR" for France/ })
+    expectIssue(code("fr"), { ...at, message: /capital letters: "FR"/ })
+    expectIssue(code("GF"), {
+      ...at,
+      message: /French Guiana \("GF"\) is drawn as part of France/,
+    })
+    expectIssue(code("GI"), { ...at, message: /Gibraltar .* too small/ })
+    expectIssue(code("ZZ"), { ...at, message: /isn't a country code/ })
+  })
+
+  it("keeps countries on the region and lists each once", () => {
+    expectIssue(withMap({ countries: [{ code: "JP" }] }), {
+      path: "bricks[0].visual.countries[0]",
+      message:
+        /Japan \("JP"\) isn't on the "europe" map\. .*"asia", "east-asia"/,
+    })
+    // Russia reaches into Europe, and Fiji sits across the 180th meridian in Oceania.
+    expect(validateLesson(withMap({ countries: [{ code: "RU" }] })).ok).toBe(
+      true
+    )
+    expect(
+      validateLesson(
+        withMap({
+          region: "oceania",
+          countries: [{ code: "FJ" }],
+          points: undefined,
+        })
+      ).ok
+    ).toBe(true)
+    expectIssue(withMap({ countries: [{ code: "FR" }, { code: "FR" }] }), {
+      path: "bricks[0].visual.countries",
+      message: /"FR" is listed twice/,
+    })
+  })
+
+  it("rejects a point outside the region, and says the signs are the usual slip", () => {
+    // New York with its longitude's sign dropped lands in Kazakhstan.
+    expectIssue(
+      withMap({ points: [{ lat: 40.71, lon: 74.01, label: "NYC" }] }),
+      {
+        path: "bricks[0].visual.points[0]",
+        message:
+          /"NYC" \(lat 40\.71, lon 74\.01\) is outside the "europe" map \(34°N to 71°N, 25°W to 45°E\)\. Check its signs/,
+      }
+    )
+    expect(
+      validateLesson(
+        withMap({
+          region: "oceania",
+          countries: undefined,
+          points: [{ lat: -13.83, lon: -171.76 }],
+        })
+      ).ok
+    ).toBe(true)
+  })
+
+  it("wants a group on every country or none, and at most 3", () => {
+    expectIssue(
+      withMap({ countries: [{ code: "FR", group: "Allies" }, { code: "DE" }] }),
+      { path: "bricks[0].visual.countries[1]", message: /"DE" has none/ }
+    )
+    expectIssue(
+      withMap({
+        countries: ["FR", "DE", "IT", "ES"].map((code) => ({
+          code,
+          group: code,
+        })),
+      }),
+      { path: "bricks[0].visual.countries", message: /at most 3 groups/ }
+    )
+  })
+})
+
 describe("structure rules", () => {
   it("starts the bricks with a concept brick", () => {
     const l = buttons()

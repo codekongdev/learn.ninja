@@ -7,6 +7,7 @@ import type {
   ChartVisual,
   ChessVisual,
   DiagramVisual,
+  MapVisual,
   Visual as VisualSpec,
 } from "@workspace/spec"
 import { Button } from "@workspace/ui/components/button"
@@ -64,7 +65,8 @@ export function Visual({
     !hotspots &&
     (visual.kind === "html" ||
       visual.kind === "diagram" ||
-      visual.kind === "chart")
+      visual.kind === "chart" ||
+      visual.kind === "map")
   if (!expandable) return block
   return (
     <div className="relative">
@@ -140,6 +142,8 @@ function VisualBlock({
     return <FigureBlock figure={visual} label={label} plain={plain} />
   if (visual.kind === "chess")
     return <ChessBlock board={visual} label={label} plain={plain} />
+  if (visual.kind === "map")
+    return <MapBlock map={visual} label={label} plain={plain} />
   return <ChartBlock chart={visual} label={label} plain={plain} />
 }
 
@@ -754,6 +758,42 @@ function FigureBlock({
         ) : (
           <Clock clock={figure} />
         )}
+      </div>
+    </div>
+  )
+}
+
+// ---------- Maps: countries shaded and places marked ----------
+
+// The country shapes are most of the map's code, so a lesson without a map never loads them.
+const WorldMap = React.lazy(() => import("./map"))
+
+function MapBlock({
+  map,
+  label,
+  plain,
+}: {
+  map: MapVisual
+  label?: string
+  plain: boolean
+}) {
+  const { t } = usePlayer()
+  return (
+    <div
+      role="img"
+      aria-label={map.alt ?? label ?? t.visual}
+      dir="ltr"
+      className={cn(
+        "flex justify-center",
+        !plain && "rounded-xl border bg-background px-4 py-6"
+      )}
+    >
+      <div className={cn("w-full", plain && "max-w-xs")}>
+        <React.Suspense
+          fallback={<div className="aspect-[2/1] w-full rounded-md bg-muted" />}
+        >
+          <WorldMap map={map} plain={plain} />
+        </React.Suspense>
       </div>
     </div>
   )
