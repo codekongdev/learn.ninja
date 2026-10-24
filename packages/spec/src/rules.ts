@@ -1,6 +1,15 @@
 import katex from "katex"
 
 import { pieceOn, readFen } from "./chess"
+import { COUNTRIES, NOT_ON_MAP } from "./countries"
+import {
+  boxesOverlap,
+  describeBox,
+  inBox,
+  MAP_REGION_NAMES,
+  MAP_REGIONS,
+  type Box,
+} from "./map"
 import {
   LEVELS,
   type Brick,
@@ -24,6 +33,8 @@ export interface Issue {
 export const LIMITS = {
   /** Series a chart visual can show (lines on a line chart, colors on a scatter). */
   chartSeries: 3,
+  /** Colors a map can shade countries in, each named in its legend. */
+  mapGroups: 3,
   /** Numbered ticks on a number line, so the numbers stay readable on a phone. */
   numberLineTicks: 21,
   concepts: { min: 1, max: 4 },
@@ -572,6 +583,60 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
     })
   }
 
+  // Maps: country codes the map has, and everything marked inside the region shown.
+  for (const { visual, path } of everyVisual(lesson)) {
+    if (visual.kind !== "map") continue
+    const region = visual.region ?? "world"
+    const box: Box = [...MAP_REGIONS[region]]
+    const countries = visual.countries ?? []
+    if (!countries.length && !visual.points)
+      add(
+        "structure",
+        path,
+        `A map shows something: shade "countries", mark "points", or both.`
+      )
+    const twice = duplicates(countries.map((c) => c.code))
+    if (twice.length)
+      add(
+        "structure",
+        `${path}.countries`,
+        `Each country is listed once; "${twice[0]}" is listed twice.`
+      )
+    countries.forEach((c, j) => {
+      const country = COUNTRIES[c.code]
+      if (!country)
+        add("structure", `${path}.countries[${j}]`, unknownCountry(c.code))
+      else if (!boxesOverlap(country.box, box))
+        add(
+          "structure",
+          `${path}.countries[${j}]`,
+          `${country.name} ("${c.code}") isn't on the "${region}" map. ${showingIt((b) => boxesOverlap(country.box, b))}`
+        )
+    })
+    const groups = new Set(countries.flatMap((c) => c.group ?? []))
+    const ungrouped = countries.findIndex((c) => !c.group)
+    if (groups.size > LIMITS.mapGroups)
+      add(
+        "structure",
+        `${path}.countries`,
+        `A map has at most ${LIMITS.mapGroups} groups, so each color reads apart; this one has ${groups.size}.`
+      )
+    if (groups.size && ungrouped >= 0)
+      add(
+        "structure",
+        `${path}.countries[${ungrouped}]`,
+        `Give every country a "group", or none: "${countries[ungrouped]!.code}" has none, so it has no color in the legend.`
+      )
+    visual.points?.forEach((p, j) => {
+      if (!inBox(p.lon, p.lat, box))
+        add(
+          "structure",
+          `${path}.points[${j}]`,
+          `The point ${p.label ? `"${p.label}" ` : ""}(lat ${p.lat}, lon ${p.lon}) is outside the "${region}" map (${describeBox(box)}). Check its signs: south and west are negative. ${showingIt((b) => inBox(p.lon, p.lat, b))}`
+        )
+    })
+  }
+
   lesson.bricks.forEach((brick, i) => {
     if (brick.type !== "concept") return
     const words = countWords(brick.body)
@@ -1038,6 +1103,33 @@ function walkVisuals(lesson: Lesson, visit: (v: Visual, path: string) => void) {
     if (obj.kind === "html" || obj.kind === "code" || obj.kind === "math")
       visit(obj as unknown as Visual, path)
   })
+}
+
+/** Why a map's country code isn't one it has, and the code to use instead when there is one. */
+function unknownCountry(code: string): string {
+  const upper = code.toUpperCase()
+  const alias = { UK: "GB", EL: "GR" }[upper]
+  const a3 = Object.entries(COUNTRIES).find(([, c]) => c.a3 === upper)
+  const missing = NOT_ON_MAP[upper]
+  if (alias)
+    return `"${code}" isn't an ISO country code; ${COUNTRIES[alias]!.name} is "${alias}".`
+  if (a3)
+    return `Use the two-letter code: "${a3[0]}" for ${a3[1].name}, not "${code}".`
+  if (code !== upper && (COUNTRIES[upper] || missing))
+    return `Country codes are capital letters: "${upper}", not "${code}".`
+  if (missing?.partOf)
+    return `${missing.name} ("${upper}") is drawn as part of ${COUNTRIES[missing.partOf]!.name} on the map. Shade "${missing.partOf}", or mark it with a point.`
+  if (missing)
+    return `${missing.name} ("${upper}") is too small for the map. Mark it with a point instead.`
+  return `"${code}" isn't a country code the map knows. Use ISO 3166-1 alpha-2 codes, like "FR" for France or "JP" for Japan.`
+}
+
+/** "Pick a region that shows it: …", naming the regions whose box passes the test. */
+function showingIt(shows: (box: Box) => boolean): string {
+  const regions = MAP_REGION_NAMES.filter((r) => shows([...MAP_REGIONS[r]]))
+  return regions.length
+    ? `Pick a region that shows it: ${regions.map((r) => `"${r}"`).join(", ")}.`
+    : "No region shows it."
 }
 
 /** The n of a number line step that is 1/n (2 to 12), or undefined. Shared with the player's ticks. */

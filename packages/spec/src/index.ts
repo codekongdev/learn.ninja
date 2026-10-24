@@ -21,6 +21,15 @@ export {
   type FenPiece,
   type Placement,
 } from "./chess"
+export { COUNTRIES, NOT_ON_MAP, type Country } from "./countries"
+export {
+  boxesOverlap,
+  inBox,
+  MAP_REGION_NAMES,
+  MAP_REGIONS,
+  type Box,
+  type MapRegion,
+} from "./map"
 export { canUpgrade, subjectForTopic, upgradeLesson } from "./upgrade"
 export {
   isSubject,

@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { MAP_REGION_NAMES } from "./map"
 import { SUBJECTS } from "./subjects"
 import { TAG_LABEL_PATTERN, TAG_LIMITS } from "./tags"
 
@@ -281,6 +282,43 @@ export const chessVisual = z
   })
   .meta({ id: "ChessVisual" })
 
+/** A world or regional map with countries shaded and places marked (rules.ts checks the codes and that everything is on the map). */
+export const mapVisual = z
+  .strictObject({
+    kind: z.literal("map"),
+    /** One sentence saying what the map shows, for screen readers. Required (rules.ts). */
+    alt: z.string().min(1).max(200).optional(),
+    /** The part of the world to show. Defaults to "world". */
+    region: z.enum(MAP_REGION_NAMES).optional(),
+    /** Countries to shade, by ISO 3166-1 alpha-2 code ("FR"). */
+    countries: z
+      .array(
+        z.strictObject({
+          code: z.string().min(1).max(8),
+          /** Shown on the country, in the lesson's language. */
+          label: z.string().min(1).max(24).optional(),
+          /** Countries with the same group share a color, named in a legend; up to 3 groups (rules.ts). */
+          group: z.string().min(1).max(24).optional(),
+        })
+      )
+      .min(1)
+      .max(60)
+      .optional(),
+    /** Places to mark: cities, battles, ports. North and east are positive. */
+    points: z
+      .array(
+        z.strictObject({
+          lat: z.number().min(-90).max(90),
+          lon: z.number().min(-180).max(180),
+          label: z.string().min(1).max(24).optional(),
+        })
+      )
+      .min(1)
+      .max(8)
+      .optional(),
+  })
+  .meta({ id: "MapVisual" })
+
 export const visual = z
   .discriminatedUnion("kind", [
     htmlVisual,
@@ -292,6 +330,7 @@ export const visual = z
     fractionVisual,
     clockVisual,
     chessVisual,
+    mapVisual,
   ])
   .meta({ id: "Visual" })
 
@@ -561,3 +600,4 @@ export type NumberLineVisual = z.infer<typeof numberLineVisual>
 export type FractionVisual = z.infer<typeof fractionVisual>
 export type ClockVisual = z.infer<typeof clockVisual>
 export type ChessVisual = z.infer<typeof chessVisual>
+export type MapVisual = z.infer<typeof mapVisual>
