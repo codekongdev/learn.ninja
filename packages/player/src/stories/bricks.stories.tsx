@@ -106,7 +106,7 @@ function Question({
 
   return (
     <>
-      <h2 className="text-2xl font-bold tracking-tight text-balance">
+      <h2 className="text-lg font-semibold">
         <RichText text={brick.prompt} />
       </h2>
       {brick.type === "scenario" ? (

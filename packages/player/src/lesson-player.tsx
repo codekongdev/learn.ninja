@@ -1556,7 +1556,7 @@ function QuestionScreen({
         </Card>
       ) : null}
       <h2
-        className={cn("text-base font-semibold", at(200).className)}
+        className={cn("text-lg font-semibold", at(200).className)}
         style={at(200).style}
       >
         <RichText text={brick.prompt} />

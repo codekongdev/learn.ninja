@@ -92,7 +92,7 @@ const optionPanelStyles =
  */
 export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
   const title = (
-    <h2 className="text-base font-semibold text-balance">{brick.title}</h2>
+    <h2 className="text-lg font-semibold text-balance">{brick.title}</h2>
   )
   const body = (
     <RichBlocks
