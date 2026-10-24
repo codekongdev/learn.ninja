@@ -150,6 +150,7 @@ export const Regions: Story = {
           ["south-america", ["CL", "BR"]],
           ["oceania", ["PG", "NZ"]],
           ["mediterranean", ["GR", "TN"]],
+          ["eastern-mediterranean", ["CY", "EG"]],
         ] as const
       ).map(([region, codes]) => (
         <div key={region}>
