@@ -1256,7 +1256,7 @@ function columnWidth(item: Item): string {
   return wide ? "max-w-2xl" : "max-w-lg"
 }
 
-/** Instructions under the prompt, only where the interaction isn't obvious (a single pick needs none). */
+/** Instructions above the prompt, only where the interaction isn't obvious (a single pick needs none). */
 function helperFor(brick: QuestionBrick, t: Strings): string {
   switch (brick.type) {
     case "choice":
@@ -1502,7 +1502,14 @@ function QuestionScreen({
     marks,
     locked,
   }
+  // How to answer, when the interaction isn't obvious: above the prompt, beside the screen's label.
   const helper = helperFor(brick, t)
+  const eyebrow = [
+    label,
+    helper && !brick.prompt.includes(helper) ? helper : "",
+  ]
+    .filter(Boolean)
+    .join(" · ")
   const best =
     brick.type === "scenario"
       ? brick.options.filter((o) => o.quality === "best").map((o) => o.id)
@@ -1529,7 +1536,7 @@ function QuestionScreen({
 
   return (
     <>
-      {label ? <ScreenLabel text={label} className="-mb-4" /> : null}
+      {eyebrow ? <ScreenLabel text={eyebrow} className="-mb-4" /> : null}
       {brick.type === "scenario" ? (
         // The situation, kept in view while choosing. In story mode it's what the ninja just said.
         <Card size="sm" className={at(0).className} style={at(0).style}>
@@ -1561,11 +1568,6 @@ function QuestionScreen({
       >
         <RichText text={brick.prompt} />
       </h2>
-      {helper && !brick.prompt.includes(helper) ? (
-        <p className="-mt-4.5 font-mono text-sm text-muted-foreground">
-          {helper}
-        </p>
-      ) : null}
       {brick.visual && brick.type !== "hotspot" ? (
         <Visual visual={brick.visual} />
       ) : null}
