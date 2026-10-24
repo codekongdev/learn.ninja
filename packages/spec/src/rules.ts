@@ -696,6 +696,25 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
     })
   }
 
+  // Molecules: the SMILES and the highlight patterns are read on the server (the player's
+  // molecule.ts), which needs the chemistry library; here, only what the text alone shows.
+  for (const { visual, path } of everyVisual(lesson)) {
+    if (visual.kind !== "molecule") continue
+    if (/\s/.test(visual.smiles.trim()))
+      add(
+        "structure",
+        `${path}.smiles`,
+        `A SMILES has no spaces. To draw several molecules or ions together, separate them with "." ("[Na+].[Cl-]").`
+      )
+    const twice = duplicates(visual.highlight ?? [])
+    if (twice.length)
+      add(
+        "structure",
+        `${path}.highlight`,
+        `Each pattern is highlighted once; "${twice[0]}" is listed twice.`
+      )
+  }
+
   lesson.bricks.forEach((brick, i) => {
     if (brick.type !== "concept") return
     const words = countWords(brick.body)
@@ -725,7 +744,8 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   // ---------- formulas ----------
 
   walkStrings(lesson, "", (value, path) => {
-    if (/\.(html|css|code|d2)$/.test(path)) return
+    if (/\.(html|css|code|d2|smiles)$|\.visual\.highlight\[\d+\]$/.test(path))
+      return
     if (path.endsWith(".tex")) return checkFormula(value, path, add)
     const opens = value.split("\\(").length - 1
     const closes = value.split("\\)").length - 1

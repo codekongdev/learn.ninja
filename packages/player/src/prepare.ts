@@ -18,18 +18,20 @@ import { renderChart } from "./chart"
 import { checkFunctionCharts } from "./curve"
 import { checkDiagram, renderDiagram } from "./diagram"
 import { iconExists, parseIconClass, suggestIcons } from "./icons"
+import { checkMolecule, renderMolecule } from "./molecule"
 import {
   chartKey,
   codeKey,
   diagramKey,
   INLINE_MATH,
   mathKey,
+  moleculeKey,
   type Prepared,
 } from "./prepared"
 import { visualClasses, visualsCssFor } from "./visual-css"
 
 // Server-only: renders formulas with KaTeX, highlights code with Shiki, draws charts with Observable
-// Plot and diagrams with D2, and compiles the Tailwind CSS a lesson's visuals use, once per lesson,
+// Plot, diagrams with D2, and molecules with OpenChemLib, and compiles the Tailwind CSS a lesson's visuals use, once per lesson,
 // so the learner's browser loads none of those libraries.
 
 const THEMES = { light: "github-light", dark: "github-dark" } as const
@@ -62,6 +64,7 @@ export async function prepareLesson(lesson: Lesson): Promise<Prepared> {
     visualsCss: await visualsCssFor(visualClasses(lesson)),
     charts: {},
     diagrams: {},
+    molecules: {},
   }
   const codeBlocks: { language: string; code: string }[] = []
 
@@ -76,6 +79,15 @@ export async function prepareLesson(lesson: Lesson): Promise<Prepared> {
     }
   }
 
+  for (const { visual } of everyVisual(lesson)) {
+    if (visual.kind !== "molecule") continue
+    try {
+      prepared.molecules![moleculeKey(visual)] = renderMolecule(visual)
+    } catch {
+      // checkMolecules() rejects SMILES that can't be read; anything else shows its alt text instead.
+    }
+  }
+
   walk(lesson, (value, key, parent) => {
     if (typeof value === "string") {
       if (key === "tex") {
@@ -83,7 +95,9 @@ export async function prepareLesson(lesson: Lesson): Promise<Prepared> {
           displayMode: true,
           throwOnError: false,
         })
-      } else if (!["html", "css", "code", "d2"].includes(key)) {
+      } else if (
+        !["html", "css", "code", "d2", "smiles", "highlight"].includes(key)
+      ) {
         for (const m of value.matchAll(INLINE_MATH)) {
           const tex = m[1]!.trim()
           prepared.math[mathKey(tex, false)] = katex.renderToString(tex, {
@@ -197,11 +211,28 @@ export async function checkIcons(lesson: Lesson): Promise<Issue[]> {
   return issues
 }
 
-/** Every publish-time check that needs the server: function charts, diagrams, and icons. */
+/**
+ * The publish-time checks for molecule visuals, which need OpenChemLib and so can't live in the
+ * spec's rules: a SMILES that can't be read or is too big, and highlights that match nothing.
+ */
+export function checkMolecules(lesson: Lesson): Issue[] {
+  return everyVisual(lesson).flatMap(({ visual, path }) =>
+    visual.kind === "molecule"
+      ? checkMolecule(visual).map(({ field, message }) => ({
+          kind: "structure" as const,
+          path: `${path}.${field}`,
+          message,
+        }))
+      : []
+  )
+}
+
+/** Every publish-time check that needs the server: function charts, diagrams, molecules, and icons. */
 export async function checkVisuals(lesson: Lesson): Promise<Issue[]> {
   return [
     ...checkFunctionCharts(lesson),
     ...(await checkDiagrams(lesson)),
+    ...checkMolecules(lesson),
     ...(await checkIcons(lesson)),
   ]
 }

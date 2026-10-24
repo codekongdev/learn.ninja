@@ -79,7 +79,6 @@ export const th: Strings = {
   wordBank: "คลังคำ",
   emptyGap: "ช่องว่าง",
   visual: "ภาพประกอบ",
-  expandVisual: "ขยาย",
   showActions: "แสดงปุ่ม",
   hideActions: "ซ่อนปุ่ม",
   fixTitle: "มาแก้ข้อผิดพลาดกัน",

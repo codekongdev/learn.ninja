@@ -2,7 +2,7 @@
 // (no scripts, frame sized to its content). The teaching guide's "built-in UI kit" table documents the
 // same markup for the skill; keep the two in step when adding a component.
 
-import type { ChartVisual } from "@workspace/spec"
+import type { ChartVisual, MoleculeVisual } from "@workspace/spec"
 
 export interface KitSample {
   name: string
@@ -225,6 +225,125 @@ export const chartSamples: { name: string; chart: ChartVisual }[] = [
         { x: -3, y: 1, label: "B" },
         { x: 1, y: -2, label: "C" },
       ],
+    },
+  },
+]
+
+/** Molecules for the Player/Molecule stories, drawn by stories:prepare as the server draws them. */
+export const moleculeSamples: { name: string; molecule: MoleculeVisual }[] = [
+  {
+    name: "Caffeine",
+    molecule: {
+      kind: "molecule",
+      smiles: "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      alt: "Caffeine: a six-membered ring fused to a five-membered ring, with four nitrogens and two C=O groups.",
+    },
+  },
+  {
+    name: "Ethanol",
+    molecule: {
+      kind: "molecule",
+      smiles: "CCO",
+      style: "full",
+      alt: "Ethanol: two carbons, each with its hydrogens, and an OH group.",
+      highlight: ["[OX2H]"],
+    },
+  },
+  {
+    name: "Aspirin",
+    molecule: {
+      kind: "molecule",
+      smiles: "CC(=O)Oc1ccccc1C(=O)O",
+      alt: "Aspirin: a benzene ring with an ester group and a carboxylic acid group side by side.",
+      highlight: ["C(=O)O[#6]"],
+    },
+  },
+  {
+    name: "Glycine",
+    molecule: {
+      kind: "molecule",
+      smiles: "NCC(=O)O",
+      style: "full",
+      alt: "Glycine, the simplest amino acid: an amine group and a carboxyl group on one carbon.",
+      highlight: ["[NX3;H2]", "C(=O)[OH]"],
+    },
+  },
+  {
+    name: "Water",
+    molecule: { kind: "molecule", smiles: "O", alt: "Water: H₂O." },
+  },
+  {
+    name: "Carbon dioxide",
+    molecule: {
+      kind: "molecule",
+      smiles: "O=C=O",
+      alt: "Carbon dioxide: a carbon with a double bond to each of two oxygens.",
+    },
+  },
+  {
+    name: "Salt",
+    molecule: {
+      kind: "molecule",
+      smiles: "[Na+].[Cl-]",
+      alt: "Sodium chloride: a sodium ion and a chloride ion.",
+    },
+  },
+  {
+    name: "Glucose",
+    molecule: {
+      kind: "molecule",
+      smiles: "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O",
+      alt: "Glucose as a ring: five carbons and an oxygen, with OH groups around it.",
+    },
+  },
+  {
+    name: "Cholesterol",
+    molecule: {
+      kind: "molecule",
+      smiles:
+        "C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C",
+      alt: "Cholesterol: four fused rings with a hydrocarbon tail and one OH group.",
+    },
+  },
+  {
+    name: "Cis and trans",
+    molecule: {
+      kind: "molecule",
+      smiles: "C/C=C\\C.C/C=C/C",
+      alt: "Two forms of but-2-ene: cis, with both methyl groups on one side, and trans, with one on each side.",
+    },
+  },
+  // The options of the AsOptions story: which one is an alcohol?
+  {
+    name: "Propan-1-ol",
+    molecule: {
+      kind: "molecule",
+      smiles: "CCCO",
+      alt: "A three-carbon chain ending in OH.",
+    },
+  },
+  {
+    name: "Propanone",
+    molecule: {
+      kind: "molecule",
+      smiles: "CC(C)=O",
+      alt: "Three carbons, the middle one double-bonded to an oxygen.",
+    },
+  },
+  {
+    name: "Propanoic acid",
+    molecule: {
+      kind: "molecule",
+      smiles: "CCC(=O)O",
+      alt: "A three-carbon chain ending in a C=O with an OH.",
+    },
+  },
+  {
+    name: "Methoxyethane",
+    molecule: {
+      kind: "molecule",
+      smiles: "CCOC",
+      alt: "An oxygen between a two-carbon group and a one-carbon group.",
     },
   },
 ]

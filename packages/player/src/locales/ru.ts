@@ -102,7 +102,6 @@ export const ru: Strings = {
   wordBank: "Банк слов",
   emptyGap: "Пустой пропуск",
   visual: "Иллюстрация",
-  expandVisual: "Увеличить",
   showActions: "Показать кнопки",
   hideActions: "Скрыть кнопки",
   fixTitle: "Разберём ваши ошибки",

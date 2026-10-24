@@ -793,6 +793,37 @@ describe("checking", () => {
     expect(Object.values(stored!.prepared.diagrams!)[0]).toContain(">draft<")
   }, 20_000)
 
+  it("rejects a SMILES that can't be read, and draws one that can", async () => {
+    const lesson = JSON.parse(buttons)
+    const molecule = {
+      kind: "molecule",
+      smiles: "CCO",
+      alt: "Ethanol, with its hydroxyl group marked.",
+      highlight: ["[OX2H]"],
+    }
+    lesson.bricks[0].visual = { ...molecule, smiles: "CC(O)1" }
+    const checked = await checkLesson(
+      { text: JSON.stringify(lesson), client: "x" },
+      deps
+    )
+    expect(checked.status).toBe(422)
+    expect(checked.body.issues).toEqual([
+      expect.objectContaining({
+        path: "bricks[0].visual.smiles",
+        message: expect.stringMatching(/^The SMILES can't be read/),
+      }),
+    ])
+
+    lesson.bricks[0].visual = molecule
+    const reply = await publishLesson(
+      { text: JSON.stringify(lesson), client: "x" },
+      deps
+    )
+    expect(reply.status).toBe(201)
+    const stored = await deps.store.get(reply.body.id as string)
+    expect(Object.values(stored!.prepared.molecules!)[0]).toContain(">O</text>")
+  })
+
   it("rejects an icon the kit doesn't have, and embeds one it does", async () => {
     const lesson = JSON.parse(buttons)
     const visual = lesson.bricks[0].visual

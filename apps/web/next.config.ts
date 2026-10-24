@@ -85,8 +85,13 @@ const nextConfig: NextConfig = {
     "@workspace/db",
   ],
   // PGlite (lesson storage in development) loads its WebAssembly and data files from its own folder;
-  // D2.js finds its WASM build and worker next to its own file. Bundling would move both.
-  serverExternalPackages: ["@electric-sql/pglite", "@terrastruct/d2"],
+  // D2.js finds its WASM build and worker next to its own file. Bundling would move both. OpenChemLib
+  // is a megabyte of compiled Java, already minified: bundling it again only slows the build.
+  serverExternalPackages: [
+    "@electric-sql/pglite",
+    "@terrastruct/d2",
+    "openchemlib",
+  ],
   // GitHub profile pictures are served from our own origin (see UserAvatar): after a client-side
   // visit to a lesson page, the document keeps LESSON_CSP, which blocks off-site images.
   images: {
