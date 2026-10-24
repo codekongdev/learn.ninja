@@ -771,6 +771,21 @@ describe("chess visuals", () => {
         message: /An arrow ends on e5/,
       })
     })
+
+    it("doesn't let the alt name an empty answer square", () => {
+      const told = chessHotspot()
+      told.bricks[2].correct = ["d4"]
+      told.bricks[2].visual.alt = "After 2. Nf3, White can strike with d4."
+      expectIssue(told, {
+        path: "bricks[2].visual.alt",
+        message: /The alt names d4, an answer/,
+      })
+      // e5 holds Black's pawn, so the alt has to name it to describe the position.
+      const described = chessHotspot()
+      described.bricks[2].visual.alt =
+        "After 1. e4 e5 2. Nf3: Black's pawn on e5 and White's knight on f3."
+      expect(validateLesson(described).ok).toBe(true)
+    })
   })
 })
 
@@ -890,6 +905,149 @@ describe("map visuals", () => {
       }),
       { path: "bricks[0].visual.countries", message: /at most 3 groups/ }
     )
+  })
+  describe("as a hotspot", () => {
+    // Where did the Hittites live? Five countries of the eastern Mediterranean shaded, none named.
+    function mapHotspot(over: Record<string, unknown> = {}) {
+      const l = buttons()
+      l.bricks[2].visual = {
+        kind: "map",
+        region: "eastern-mediterranean",
+        alt: "The eastern Mediterranean, with Greece, Turkey, Cyprus, Syria, and Egypt shaded.",
+        countries: ["GR", "TR", "CY", "SY", "EG"].map((code) => ({ code })),
+      }
+      l.bricks[2].correct = ["TR"]
+      Object.assign(l.bricks[2], over)
+      return l
+    }
+
+    it("takes countries on the region as answers", () => {
+      expect(validateLesson(mapHotspot()).ok).toBe(true)
+      expect(
+        validateLesson(mapHotspot({ correct: ["TR", "SY"], multiple: true })).ok
+      ).toBe(true)
+      // Any country the region draws can be tapped, shaded or not.
+      expect(validateLesson(mapHotspot({ correct: ["IQ"] })).ok).toBe(true)
+    })
+
+    it("rejects an answer that isn't a two-letter code, with the format", () => {
+      expectIssue(mapHotspot({ correct: ["Turkey"] }), {
+        path: "bricks[2].correct",
+        message:
+          /"Turkey" isn't a country code\. .*two capital letters, like "FR"/,
+      })
+      expectIssue(mapHotspot({ correct: ["TUR"] }), {
+        path: "bricks[2].correct",
+        message: /"TR" for Türkiye/,
+      })
+      expectIssue(mapHotspot({ correct: ["tr"] }), {
+        path: "bricks[2].correct",
+        message: /capital letters: "TR"/,
+      })
+    })
+
+    it("rejects an answer off the region, naming one that shows it", () => {
+      expectIssue(mapHotspot({ correct: ["FR"] }), {
+        path: "bricks[2].correct",
+        message:
+          /France \("FR"\) isn't on the "eastern-mediterranean" map, so it can't be tapped\. Pick a region that shows it: .*"europe"/,
+      })
+    })
+
+    it("wants alt text, since the countries are only names", () => {
+      const l = mapHotspot()
+      delete l.bricks[2].visual.alt
+      expectIssue(l, {
+        path: "bricks[2].visual",
+        message: /This map has no "alt"/,
+      })
+    })
+
+    it("doesn't let a label or a lone shading give the answer away", () => {
+      const labeled = mapHotspot()
+      labeled.bricks[2].visual.countries[1].label = "Anatolia"
+      expectIssue(labeled, {
+        path: "bricks[2].visual.countries[1].label",
+        message: /Türkiye \("TR"\) is an answer and it's labeled/,
+      })
+      expectIssue(
+        mapHotspot({
+          visual: {
+            kind: "map",
+            region: "eastern-mediterranean",
+            alt: "The eastern Mediterranean, with Turkey shaded.",
+            countries: [{ code: "TR" }],
+          },
+        }),
+        {
+          path: "bricks[2].visual.countries[0]",
+          message: /the only country shaded, which gives it away/,
+        }
+      )
+      // A label on another country is fine: it names a landmark, not the answer.
+      const other = mapHotspot()
+      other.bricks[2].visual.countries[4].label = "Egypt"
+      expect(validateLesson(other).ok).toBe(true)
+    })
+
+    it("doesn't let the alt name only the answers", () => {
+      const alt = (text: string, over: Record<string, unknown> = {}) => {
+        const l = mapHotspot(over)
+        l.bricks[2].visual.alt = text
+        return l
+      }
+      expectIssue(
+        alt("The eastern Mediterranean, with central Turkey marked."),
+        {
+          path: "bricks[2].visual.alt",
+          message: /The alt names Türkiye, an answer, and no other country/,
+        }
+      )
+      expectIssue(
+        alt("Tunisia and Spain, at either end of the sea.", {
+          visual: {
+            kind: "map",
+            region: "mediterranean",
+            alt: "",
+            points: [{ lat: 33.27, lon: 35.2, label: "Tyre" }],
+          },
+          correct: ["TN", "ES"],
+          multiple: true,
+        }),
+        { message: /names Tunisia and Spain, answers/ }
+      )
+      // In the lesson's language too.
+      const arabic = alt("شرق البحر المتوسط وفي وسطه تركيا.")
+      arabic.language = "ar"
+      expectIssue(arabic, { message: /The alt names Türkiye/ })
+      // Among other candidates, or not at all, is fine.
+      expect(validateLesson(mapHotspot()).ok).toBe(true)
+      expect(
+        validateLesson(alt("The eastern Mediterranean, from Greece to Iraq."))
+          .ok
+      ).toBe(true)
+    })
+
+    it("rejects an answer too small to tap, suggesting a tighter region", () => {
+      expectIssue(
+        mapHotspot({
+          visual: {
+            kind: "map",
+            region: "world",
+            alt: "A map of the world.",
+            points: [{ lat: 37, lon: 35 }],
+          },
+          correct: ["CY"],
+        }),
+        {
+          path: "bricks[2].visual.region",
+          message:
+            /Cyprus \("CY"\) is too small to find and tap on the "world" map\. Pick a tighter region: .*"eastern-mediterranean"/,
+        }
+      )
+      // Lebanon is small but fine on the eastern Mediterranean, the region drawn closest.
+      expect(validateLesson(mapHotspot({ correct: ["LB"] })).ok).toBe(true)
+    })
   })
 })
 

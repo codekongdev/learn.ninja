@@ -1,25 +1,24 @@
 import * as React from "react"
-import {
-  geoAzimuthalEqualArea,
-  geoNaturalEarth1,
-  geoPath,
-  type GeoPath,
-  type GeoPermissibleObjects,
-} from "d3-geo"
+import type { GeoPath } from "d3-geo"
 import type { Feature, MultiPolygon, Polygon } from "geojson"
 import { feature, mesh } from "topojson-client"
 import type { GeometryCollection, Topology } from "topojson-specification"
 
 import {
   COUNTRIES,
-  MAP_REGIONS,
+  DRAWN_SIZES,
+  MAP_WIDTH as WIDTH,
   type MapRegion,
   type MapVisual,
 } from "@workspace/spec"
+import { Selectable } from "@workspace/ui/components/selectable"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { usePlayer } from "./context"
+import { countryName } from "./country-names"
 import data from "./map-data.json"
+import { frameFor } from "./map-frame"
+import type { HotspotControl } from "./visuals"
 
 // A world or regional map drawn as SVG in the browser from Natural Earth's countries (public
 // domain, simplified by scripts/build-map.ts): land, borders, shaded countries, and marked places.
@@ -32,15 +31,20 @@ const countries = feature(topology, topology.objects.countries)
   .features as Feature<Polygon | MultiPolygon>[]
 const borders = mesh(topology, topology.objects.countries, (a, b) => a !== b)
 const land = { type: "FeatureCollection" as const, features: countries }
+/** Land no country code owns (Natural Earth leaves a few places unnamed): drawn, never tapped. */
+const unowned = {
+  type: "FeatureCollection" as const,
+  features: countries.filter((f) => !f.id),
+}
 
-/** The drawing's width; its height follows the region. Text is sized against the shown width. */
-const WIDTH = 480
 /** Text, dots, and rings in px as shown, whatever the map's width. */
 const TEXT = 12
 const DOT = 4
 const RING = 7
 /** A shaded country smaller than this (in px across) gets a ring, so it can be found. */
 const TINY = 10
+/** On a hotspot, a country smaller than this (in px across) is also tapped in a circle this wide. */
+const TAP = 44
 
 /**
  * Shaded countries take the accent; with groups, each group a color of its own, in order: the
@@ -64,60 +68,18 @@ const GROUPS = [
   },
 ]
 
-/** A region's projection, fitted to its box, and the drawing's height. Made once per region. */
-const frames = new Map<MapRegion, { path: GeoPath; height: number }>()
-function frameFor(region: MapRegion) {
-  const known = frames.get(region)
-  if (known) return known
-  const [w, s, e, n] = MAP_REGIONS[region]
-  const east = e < w ? e + 360 : e
-  // The box's edges as points every degree or so, so the fit follows the parallels, not chords.
-  const outline: GeoPermissibleObjects = {
-    type: "MultiPoint",
-    coordinates: [
-      ...steps(w, east).flatMap((lon) => [
-        [lon, s],
-        [lon, n],
-      ]),
-      ...steps(s, n).flatMap((lat) => [
-        [w, lat],
-        [east, lat],
-      ]),
-    ],
-  }
-  // The world in the Natural Earth projection; a region in an equal-area view from above its middle,
-  // which keeps far-north and far-south countries their true size, with only the near side drawn.
-  const projection =
-    region === "world"
-      ? geoNaturalEarth1()
-      : geoAzimuthalEqualArea()
-          .rotate([-(w + east) / 2, -(s + n) / 2])
-          .clipAngle(90)
-  projection.fitWidth(WIDTH, outline)
-  const height = Math.round(geoPath(projection).bounds(outline)[1][1])
-  projection.clipExtent([
-    [0, 0],
-    [WIDTH, height],
-  ])
-  const frame = { path: geoPath(projection), height }
-  frames.set(region, frame)
-  return frame
-}
-
-const steps = (from: number, to: number) => {
-  const n = Math.max(2, Math.ceil(to - from))
-  return Array.from({ length: n + 1 }, (_, i) => from + ((to - from) * i) / n)
-}
-
 export default function WorldMap({
   map,
   plain,
+  hotspots,
 }: {
   map: MapVisual
   /** On an option or item card: shorter, to fit the card. */
   plain: boolean
+  /** On a hotspot brick: every country drawn is tappable, its id the country's code. */
+  hotspots?: HotspotControl
 }) {
-  const { dir } = usePlayer()
+  const { dir, lang } = usePlayer()
   const ref = React.useRef<SVGSVGElement>(null)
   const region = map.region ?? "world"
   const { path, height } = frameFor(region)
@@ -211,72 +173,128 @@ export default function WorldMap({
     style: { fontFamily: "inherit" },
   } as const
 
+  const spots = hotspots ? spotsFor(region) : []
+  // The country the map's tab stop is on, and the one with keyboard focus, to outline it.
+  const [active, setActive] = React.useState<string | null>(null)
+  const [focused, setFocused] = React.useState<string | null>(null)
+  const tap = (code: string) => {
+    setActive(code)
+    hotspots?.onToggle(code)
+  }
+  const drawing = (
+    <svg
+      ref={ref}
+      viewBox={`0 0 ${WIDTH} ${height}`}
+      className={cn("block h-auto w-full", plain ? "max-h-44" : "max-h-112")}
+      aria-hidden
+    >
+      {hotspots ? (
+        <CountryShapes
+          spots={spots}
+          unowned={path(unowned) ?? ""}
+          fills={Object.fromEntries(shaded.map((c) => [c.code, c.color.fill]))}
+          control={hotspots}
+          onTap={tap}
+        />
+      ) : (
+        <>
+          <path
+            d={path(land) ?? ""}
+            className="fill-foreground/8 dark:fill-foreground/12"
+          />
+          {shaded.map((c) => (
+            <path
+              key={c.code}
+              d={path({ type: "FeatureCollection", features: c.shapes }) ?? ""}
+              className={c.color.fill}
+            />
+          ))}
+        </>
+      )}
+      <path
+        d={path(borders) ?? ""}
+        fill="none"
+        strokeWidth={1}
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+        className="stroke-background"
+      />
+      {hotspots && (
+        <CountryMarks
+          spots={spots}
+          control={hotspots}
+          k={k}
+          focused={focused}
+          onTap={tap}
+        />
+      )}
+      {shaded.map(
+        (c) =>
+          c.tiny &&
+          c.anchor && (
+            <circle
+              key={c.code}
+              cx={c.anchor[0]}
+              cy={c.anchor[1]}
+              r={RING * k}
+              fill="none"
+              strokeWidth={1.5}
+              vectorEffect="non-scaling-stroke"
+              pointerEvents="none"
+              className={c.color.stroke}
+            />
+          )
+      )}
+      {dots.map((d, i) => (
+        <circle
+          key={i}
+          cx={d.x}
+          cy={d.y}
+          r={DOT * k}
+          strokeWidth={1.5 * k}
+          pointerEvents="none"
+          className="fill-foreground stroke-background"
+        />
+      ))}
+      {labels.map((l, i) => (
+        <text
+          key={i}
+          {...text}
+          x={l.x}
+          y={l.y}
+          textAnchor={l.anchor}
+          dominantBaseline="central"
+          pointerEvents="none"
+        >
+          {l.text}
+        </text>
+      ))}
+    </svg>
+  )
+
   return (
     <>
-      <svg
-        ref={ref}
-        viewBox={`0 0 ${WIDTH} ${height}`}
-        className={cn("block h-auto w-full", plain ? "max-h-44" : "max-h-112")}
-        aria-hidden
-      >
-        <path
-          d={path(land) ?? ""}
-          className="fill-foreground/8 dark:fill-foreground/12"
-        />
-        {shaded.map((c) => (
-          <path
-            key={c.code}
-            d={path({ type: "FeatureCollection", features: c.shapes }) ?? ""}
-            className={c.color.fill}
+      {hotspots ? (
+        // The toggles sit over the drawing, which the svg centers when its height is the limit.
+        <div className="relative overflow-hidden">
+          {drawing}
+          <Toggles
+            spots={spots}
+            control={hotspots}
+            lang={lang}
+            k={k}
+            height={height}
+            active={active}
+            onFocus={(code) => {
+              setActive(code)
+              setFocused(code)
+            }}
+            onBlur={() => setFocused(null)}
           />
-        ))}
-        <path
-          d={path(borders) ?? ""}
-          fill="none"
-          strokeWidth={1}
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-          className="stroke-background"
-        />
-        {shaded.map(
-          (c) =>
-            c.tiny &&
-            c.anchor && (
-              <circle
-                key={c.code}
-                cx={c.anchor[0]}
-                cy={c.anchor[1]}
-                r={RING * k}
-                fill="none"
-                strokeWidth={1.5}
-                vectorEffect="non-scaling-stroke"
-                className={c.color.stroke}
-              />
-            )
-        )}
-        {dots.map((d, i) => (
-          <circle
-            key={i}
-            cx={d.x}
-            cy={d.y}
-            r={DOT * k}
-            strokeWidth={1.5 * k}
-            className="fill-foreground stroke-background"
-          />
-        ))}
-        {labels.map((l, i) => (
-          <text
-            key={i}
-            {...text}
-            x={l.x}
-            y={l.y}
-            textAnchor={l.anchor}
-            dominantBaseline="central"
-          >
-            {l.text}
-          </text>
-        ))}
-      </svg>
+        </div>
+      ) : (
+        drawing
+      )}
       {groups.length > 0 && (
         <ul
           dir={dir}
@@ -291,6 +309,320 @@ export default function WorldMap({
         </ul>
       )}
     </>
+  )
+}
+
+/** A country on a hotspot map: its shape, where its name would go, its box, and its drawn size. */
+interface Spot {
+  code: string
+  d: string
+  x: number
+  y: number
+  box: [number, number, number, number]
+  /** Px across at WIDTH, from the checker's table, so the checker and the map agree. */
+  size: number
+}
+
+/**
+ * Every country a region's map draws, as the checker lists them, west to east and then north to
+ * south by where its name would go: the order the arrow keys step through. Made once per region.
+ */
+const spotsByRegion = new Map<MapRegion, Spot[]>()
+export function spotsFor(region: MapRegion): Spot[] {
+  const known = spotsByRegion.get(region)
+  if (known) return known
+  const { path, height } = frameFor(region)
+  const projection = path.projection() as (
+    p: [number, number]
+  ) => [number, number] | null
+  const spots = Object.entries(DRAWN_SIZES[region])
+    .map(([code, size]) => {
+      const shapes = countries.filter((f) => f.id === code)
+      const all = { type: "FeatureCollection" as const, features: shapes }
+      const [[x0, y0], [x1, y1]] = path.bounds(all)
+      const anchor = projection(COUNTRIES[code]?.at ?? [0, 0])
+      const at = labelAt(shapes, anchor, path, height)
+      return {
+        code,
+        d: path(all) ?? "",
+        x: at?.x ?? (x0 + x1) / 2,
+        y: at?.y ?? (y0 + y1) / 2,
+        box: [x0, y0, x1, y1] as Spot["box"],
+        size,
+      }
+    })
+    .sort((a, b) => a.x - b.x || a.y - b.y)
+  spotsByRegion.set(region, spots)
+  return spots
+}
+
+/** A picked or checked country's mark, drawn over it: a 10% tint inside an outline of the color. */
+const markStyles = (selected: boolean, mark: string | undefined) =>
+  cn(
+    "fill-transparent",
+    selected && "fill-primary/10 stroke-primary",
+    mark === "correct" && "fill-green-600/10! stroke-green-600!",
+    mark === "wrong" && "fill-yellow-500/10! stroke-yellow-500!"
+  )
+
+/**
+ * Of the small countries (under TAP px across), the one whose middle is nearest a point, within
+ * TAP/2 px: who a tap in the circles over small countries is for.
+ */
+export function nearestSmall(
+  x: number,
+  y: number,
+  spots: Spot[],
+  k: number
+): string | undefined {
+  let best: { code: string; d: number } | undefined
+  for (const s of spots) {
+    if (s.size >= TAP * k) continue
+    const d = Math.hypot(s.x - x, s.y - y)
+    if (d <= (TAP / 2) * k && (!best || d < best.d)) best = { code: s.code, d }
+  }
+  return best?.code
+}
+
+/**
+ * On a hotspot, the countries themselves, under the borders: each one a single shape, drawn in
+ * the land's wash (or its shaded color) and tapped. Land no country owns is drawn apart, untappable.
+ */
+function CountryShapes({
+  spots,
+  unowned,
+  fills,
+  control,
+  onTap,
+}: {
+  spots: Spot[]
+  /** The path of the land no country owns. */
+  unowned: string
+  /** Shaded countries' fill classes, by code; the rest take the land's. */
+  fills: Record<string, string>
+  control: HotspotControl
+  onTap: (code: string) => void
+}) {
+  return (
+    <g className={cn(!control.disabled && "cursor-pointer")}>
+      <path d={unowned} className="fill-foreground/8 dark:fill-foreground/12" />
+      {spots.map((s) => (
+        <path
+          key={s.code}
+          d={s.d}
+          data-shape={s.code}
+          className={cn(
+            fills[s.code] ?? "fill-foreground/8 dark:fill-foreground/12",
+            !control.disabled &&
+              (fills[s.code] ? "hover:opacity-80" : "hover:fill-primary/15")
+          )}
+          onClick={control.disabled ? undefined : () => onTap(s.code)}
+        />
+      ))}
+    </g>
+  )
+}
+
+/**
+ * Over the borders: picks and marks, the keyboard's focus, and a circle TAP px wide over each small
+ * country. The circles sit above the neighbors, so a tap near a small country's middle is for it
+ * (Switzerland among France, Germany, Italy, and Austria). Where circles overlap, a tap goes to the
+ * small country under it, else the nearest middle (nearestSmall): one handler for every circle,
+ * simpler than clipping each circle against the others.
+ */
+function CountryMarks({
+  spots,
+  control,
+  k,
+  focused,
+  onTap,
+}: {
+  spots: Spot[]
+  control: HotspotControl
+  k: number
+  focused: string | null
+  onTap: (code: string) => void
+}) {
+  const marked = spots.filter(
+    (s) => control.selected.includes(s.code) || Boolean(control.marks[s.code])
+  )
+  const small = spots.filter((s) => s.size < TAP * k)
+  const focus = spots.find((s) => s.code === focused)
+  const tapSmall = (e: React.MouseEvent<SVGCircleElement>) => {
+    const m = e.currentTarget.ownerSVGElement?.getScreenCTM()
+    if (!m) return
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse())
+    const under = document
+      .elementsFromPoint(e.clientX, e.clientY)
+      .map((el) => (el as SVGElement).dataset?.shape)
+      .find((c) => c && small.some((s) => s.code === c))
+    const code = under ?? nearestSmall(p.x, p.y, spots, k)
+    if (code) onTap(code)
+  }
+  return (
+    <>
+      {marked.map((s) =>
+        // A small country's outline is too small to see, so it's ringed in the same colors.
+        s.size < TINY * k ? (
+          <circle
+            key={s.code}
+            cx={s.x}
+            cy={s.y}
+            r={RING * k}
+            strokeWidth={2}
+            vectorEffect="non-scaling-stroke"
+            pointerEvents="none"
+            className={cn(
+              markStyles(
+                control.selected.includes(s.code),
+                control.marks[s.code]
+              ),
+              "fill-none!"
+            )}
+          />
+        ) : (
+          <path
+            key={s.code}
+            d={s.d}
+            strokeWidth={2}
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+            pointerEvents="none"
+            className={markStyles(
+              control.selected.includes(s.code),
+              control.marks[s.code]
+            )}
+          />
+        )
+      )}
+      {/* The keyboard's place, as the focus ring the player's other controls show. */}
+      {focus &&
+        (focus.size < TINY * k ? (
+          <circle
+            cx={focus.x}
+            cy={focus.y}
+            r={RING * k + 2 * k}
+            strokeWidth={3}
+            vectorEffect="non-scaling-stroke"
+            pointerEvents="none"
+            className="fill-none stroke-ring/50"
+          />
+        ) : (
+          <path
+            d={focus.d}
+            strokeWidth={3}
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+            pointerEvents="none"
+            className="fill-none stroke-ring/50"
+          />
+        ))}
+      {!control.disabled &&
+        small.map((s) => (
+          <circle
+            key={s.code}
+            cx={s.x}
+            cy={s.y}
+            r={(TAP / 2) * k}
+            data-tap={s.code}
+            className="cursor-pointer fill-transparent"
+            onClick={tapSmall}
+          />
+        ))}
+    </>
+  )
+}
+
+const STEPS: Record<string, (i: number, n: number) => number> = {
+  ArrowRight: (i) => i + 1,
+  ArrowDown: (i) => i + 1,
+  ArrowLeft: (i) => i - 1,
+  ArrowUp: (i) => i - 1,
+  Home: () => 0,
+  End: (_, n) => n - 1,
+}
+
+/**
+ * The countries as toggles, laid over the drawing for the keyboard and screen readers; taps go
+ * through them to the shapes below. The map is one tab stop: the arrow keys step through the
+ * countries, so the keyboard doesn't walk through every one.
+ */
+function Toggles({
+  spots,
+  control,
+  lang,
+  k,
+  height,
+  active,
+  onFocus,
+  onBlur,
+}: {
+  spots: Spot[]
+  control: HotspotControl
+  lang?: string
+  k: number
+  /** The drawing's height at WIDTH. */
+  height: number
+  active: string | null
+  onFocus: (code: string) => void
+  onBlur: () => void
+}) {
+  const refs = React.useRef(new Map<string, HTMLButtonElement>())
+  const stop = active ?? control.selected[0] ?? spots[0]?.code
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    const i = spots.findIndex(
+      (s) => s.code === (e.target as HTMLElement).dataset.country
+    )
+    const to = STEPS[e.key]?.(i, spots.length)
+    if (i < 0 || to === undefined || to < 0 || to >= spots.length) return
+    e.preventDefault()
+    refs.current.get(spots[to]!.code)?.focus()
+  }
+  const pct = (v: number, of: number) => `${(v / of) * 100}%`
+  return (
+    // The map is always drawn left to right (its block sets dir="ltr"), so these are physical edges.
+    <div
+      onKeyDown={onKeyDown}
+      className="pointer-events-none absolute inset-0 m-auto"
+      style={{ width: WIDTH / k, height: height / k }}
+    >
+      {spots.map((s) => {
+        // Each toggle covers its country, or a circle's square around a small one.
+        const [x0, y0, x1, y1] =
+          s.size < TAP * k
+            ? [
+                s.x - (TAP / 2) * k,
+                s.y - (TAP / 2) * k,
+                s.x + (TAP / 2) * k,
+                s.y + (TAP / 2) * k,
+              ]
+            : s.box
+        return (
+          <Selectable
+            key={s.code}
+            ref={(el) => {
+              if (el) refs.current.set(s.code, el)
+              else refs.current.delete(s.code)
+            }}
+            data-country={s.code}
+            aria-label={countryName(s.code, lang)}
+            isSelected={control.selected.includes(s.code)}
+            onChange={() => control.onToggle(s.code)}
+            onFocus={() => onFocus(s.code)}
+            onBlur={onBlur}
+            isDisabled={control.disabled}
+            excludeFromTabOrder={s.code !== stop}
+            className="pointer-events-none absolute focus-visible:ring-0"
+            style={{
+              insetInlineStart: pct(Math.max(0, x0), WIDTH),
+              top: pct(Math.max(0, y0), height),
+              width: pct(Math.min(WIDTH, x1) - Math.max(0, x0), WIDTH),
+              height: pct(Math.min(height, y1) - Math.max(0, y0), height),
+            }}
+          />
+        )
+      })}
+    </div>
   )
 }
 
