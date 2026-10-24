@@ -5,7 +5,7 @@
   "objective": "Judge which evidence supports which proposed cause of the Late Bronze Age collapse, spot inferences the evidence can't carry, and explain the systems-collapse view.",
   "language": "en",
   "level": "advanced",
-  "estimatedMinutes": 9,
+  "estimatedMinutes": 10,
   "subject": "history",
   "tags": ["Bronze Age", "Ancient history", "Archaeology", "Systems collapse"],
   "source": {
@@ -44,47 +44,113 @@
     {
       "id": "c1",
       "type": "concept",
-      "title": "Five suspects and their evidence",
-      "body": "Every suspect has real evidence, and every one leaves a gap: read the last column. Seaborne raiders don't explain an inland capital emptied before it burned; drought doesn't topple walls; one earthquake can't spread over decades. The gaps decide the case, because an explanation has to fit every site, not just its best one. And look at how they line up: what one cause can't explain, another can.",
+      "title": "Five suspects, many crime scenes",
+      "body": "Within about fifty years around 1200 BCE, every palace on this map burned or was abandoned. Only Egypt came through. Historians have five suspects: **Sea Peoples** raiding the coasts, **drought**, **earthquakes**, **revolt** against the palaces, and a **trade** network that broke. Before you pick one, look at where the sites are: whatever did this reached an inland capital as well as the ports, and it took decades, not a day.",
       "visual": {
-        "kind": "html",
-        "alt": "Table of five proposed causes, the main evidence for each, and what each fails to explain.",
-        "html": "<table class='table text-sm'><thead><tr><th>Cause</th><th>Key evidence</th><th>Can't explain</th></tr></thead><tbody><tr><td>Sea Peoples</td><td>Medinet Habu reliefs; Ugarit's last letters</td><td>Inland Hattusa</td></tr><tr><td>Drought</td><td>Pollen cores; letters asking for grain</td><td>Earthquake damage</td></tr><tr><td>Earthquakes</td><td>Crushed skeletons; toppled walls</td><td>Destructions spread over decades</td></tr><tr><td>Revolt</td><td>Burned palaces; nothing foreign left</td><td>Why everywhere at once</td></tr><tr><td>Trade fragility</td><td>Tin and copper supply chain</td><td>The first shock</td></tr></tbody></table>"
+        "kind": "map",
+        "alt": "Eastern Mediterranean with six destroyed sites marked: Pylos and Mycenae in Greece, Enkomi on Cyprus, Ugarit on the Syrian coast, Emar on the Euphrates, and Hattusa far inland.",
+        "region": "eastern-mediterranean",
+        "points": [
+          {
+            "lat": 37.03,
+            "lon": 21.7,
+            "label": "Pylos"
+          },
+          {
+            "lat": 37.73,
+            "lon": 22.76,
+            "label": "Mycenae"
+          },
+          {
+            "lat": 35.16,
+            "lon": 33.87,
+            "label": "Enkomi"
+          },
+          {
+            "lat": 35.6,
+            "lon": 35.78,
+            "label": "Ugarit"
+          },
+          {
+            "lat": 36,
+            "lon": 38.12,
+            "label": "Emar"
+          },
+          {
+            "lat": 40.02,
+            "lon": 34.62,
+            "label": "Hattusa"
+          }
+        ]
       }
     },
     {
       "id": "p1",
-      "type": "match",
-      "prompt": "Match each piece of evidence to the cause it supports most directly.",
-      "pairs": [
+      "type": "choice",
+      "prompt": "Hattusa, the Hittite capital, was emptied of its archives and valuables, then burned. Which suspect does it fit worst?",
+      "options": [
         {
-          "left": "Reliefs of a sea battle at Medinet Habu, year 8 of Ramesses III",
-          "right": "Sea Peoples"
+          "id": "a",
+          "text": "The Sea Peoples"
         },
         {
-          "left": "Pollen cores from coastal Syria and Cyprus showing a dry phase from about 1200 BCE",
-          "right": "Drought"
+          "id": "b",
+          "text": "Revolt",
+          "feedback": "Revolt fits: a court that left in order, and locals who burned what remained, would leave exactly this."
         },
         {
-          "left": "Skeletons under collapsed walls at Mycenae and Tiryns",
-          "right": "Earthquakes"
+          "id": "c",
+          "text": "Drought",
+          "feedback": "Drought fits: years of failed harvests are a reason to move a court out slowly and in order."
         },
         {
-          "left": "The Uluburun wreck: Cypriot copper, tin from the east, goods of many cultures",
-          "right": "Trade-network dependence"
+          "id": "d",
+          "text": "Trade breaking down",
+          "feedback": "Trade fits: a capital cut off from grain and metal could be given up in order, without an enemy at the gate."
         }
       ],
-      "explanation": "Each find is strong for one cause and silent on the others. The Uluburun wreck shows how far the bronze supply chain stretched, which made a cascade possible."
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "Hattusa sits far from any coast, and its court left before the fire. Raiders from the sea fit it worst; the other suspects could empty a capital slowly."
     },
     {
       "id": "p2",
+      "type": "choice",
+      "prompt": "Burned palaces with nothing foreign left behind look like revolt. What is hardest for revolt to explain?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Kingdoms from Greece to Syria fell within fifty years"
+        },
+        {
+          "id": "b",
+          "text": "No foreign weapons or pottery turn up in the destruction layers",
+          "feedback": "That's evidence for revolt: people burning their own palace leave only local things behind."
+        },
+        {
+          "id": "c",
+          "text": "Letters from the period beg for grain",
+          "feedback": "This fits revolt: hunger is one of the oldest reasons to rise against a palace."
+        },
+        {
+          "id": "d",
+          "text": "The palace storerooms burned along with the buildings",
+          "feedback": "This fits revolt: burning the stores of rulers who taxed you is what rebels do."
+        }
+      ],
+      "correct": ["a"],
+      "multiple": false,
+      "explanation": "A revolt is local and explains one palace. Separate kingdoms rising within fifty years needs something pushing them all, which is where drought and trade come in."
+    },
+    {
+      "id": "p3",
       "type": "choice",
       "prompt": "Three of these objections to \"the Sea Peoples did it\" hold up. Which one doesn't?",
       "options": [
         {
           "id": "a",
-          "text": "Hattusa lies far inland and seems to have been emptied before it burned; seaborne raiders fit it badly",
-          "feedback": "This one holds. A planned evacuation is hard to square with a sack from the sea."
+          "text": "Many raiders seem to have been displaced people looking for land, a symptom of the crisis as much as its cause",
+          "feedback": "This one holds. Egypt's own reliefs show them with ox carts, women, and children: people fleeing something too."
         },
         {
           "id": "b",
@@ -112,7 +178,7 @@
       "body": "A destruction layer shows a place burned, not who or what burned it. Historians read the details: bodies crushed under masonry point to earthquake; arrowheads in walls to fighting; archives and valuables removed first to a planned evacuation, as at Hattusa; local pottery above the ash to survivors returning rather than newcomers. Old stories get re-checked: Ugarit's tablets were long said to be baking in a kiln as the city fell; later study suggests they fell from an upper floor."
     },
     {
-      "id": "p3",
+      "id": "p4",
       "type": "hotspot",
       "prompt": "A site report for a hypothetical Late Bronze Age town. Tap the inference the evidence doesn't support.",
       "visual": {
@@ -124,7 +190,7 @@
       "explanation": "Bodies under fallen masonry are what earthquakes leave, and nothing ties the arrowheads to the collapse. Fighting then a quake, or a quake then raiders, both fit."
     },
     {
-      "id": "p4",
+      "id": "p5",
       "type": "choice",
       "prompt": "Pollen cores from coastal Syria and Cyprus indicate a dry phase beginning about 1200 BCE and lasting roughly three centuries. What does this establish?",
       "options": [
@@ -164,7 +230,7 @@
       }
     },
     {
-      "id": "p5",
+      "id": "p6",
       "type": "order",
       "prompt": "Put one plausible systems-collapse cascade in order.",
       "items": [
@@ -192,7 +258,7 @@
       "explanation": "Each step removes the buffer that would have absorbed the next. The sequence differed by region, but the chain ran through the trade network, so coupled powers fell together."
     },
     {
-      "id": "p6",
+      "id": "p7",
       "type": "compare",
       "prompt": "Two explanations of the collapse. Which argues better from the evidence?",
       "options": [

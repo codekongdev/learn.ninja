@@ -18,6 +18,8 @@ export const MAP_REGIONS = {
   "south-america": [-82, -56, -34, 13],
   oceania: [110, -48, -170, 0],
   mediterranean: [-10, 29, 42, 47],
+  // Greece to Mesopotamia's edge and the Nile delta: the ancient world's middle, which the whole sea would leave a corner of.
+  "eastern-mediterranean": [19, 28, 41, 43],
 } as const satisfies Record<string, Box>
 
 export type MapRegion = keyof typeof MAP_REGIONS
