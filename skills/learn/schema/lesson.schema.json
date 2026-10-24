@@ -870,7 +870,8 @@
             "central-america",
             "south-america",
             "oceania",
-            "mediterranean"
+            "mediterranean",
+            "eastern-mediterranean"
           ]
         },
         "countries": {
@@ -1531,6 +1532,9 @@
             },
             {
               "$ref": "#/$defs/CodeVisual"
+            },
+            {
+              "$ref": "#/$defs/ChessVisual"
             }
           ]
         },

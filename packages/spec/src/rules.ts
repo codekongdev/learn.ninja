@@ -205,8 +205,14 @@ function hotspotIds(v: Visual): string[] {
       (m) => m[1]!
     )
   if (v.kind === "code") return (v.hotspots ?? []).map((h) => h.id)
+  if (v.kind === "chess") return CHESS_SQUARES
   return []
 }
+
+/** Every square on a chess board, a1 to h8: on a chess hotspot, each one is tappable. */
+const CHESS_SQUARES = [..."abcdefgh"].flatMap((f) =>
+  [1, 2, 3, 4, 5, 6, 7, 8].map((r) => `${f}${r}`)
+)
 
 export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   const issues: Issue[] = []
@@ -386,12 +392,14 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
 
   // A brick's HTML visual is a picture to a screen reader, so it needs alt text. (Hotspot visuals
   // are read through their tappable regions, item visuals through their captions, and option
-  // visuals below.)
+  // visuals below. A chess hotspot's squares are only names, so its alt describes the position.)
   const withVisuals = [
     ...lesson.bricks.flatMap((b, i) =>
       b.type === "concept" ? [{ brick: b, path: `bricks[${i}]` }] : []
     ),
-    ...questions.filter((q) => q.brick.type !== "hotspot"),
+    ...questions.filter(
+      (q) => q.brick.type !== "hotspot" || q.brick.visual.kind === "chess"
+    ),
   ]
   for (const { brick, path } of withVisuals) {
     const v = brick.visual
@@ -1066,7 +1074,9 @@ function checkBrickReferences(
           add(
             "structure",
             `${path}.correct`,
-            `"${c}" isn't one of this visual's hotspot ids (${ids.join(", ") || "none"}).`
+            brick.visual.kind === "chess"
+              ? `"${c}" isn't a square. On a chess board, "correct" lists squares: a file a–h then a rank 1–8, like "e4".`
+              : `"${c}" isn't one of this visual's hotspot ids (${ids.join(", ") || "none"}).`
           )
       if (!brick.multiple && brick.correct.length !== 1)
         add(
@@ -1084,6 +1094,24 @@ function checkBrickReferences(
               `Line ${h.line} doesn't exist; the code has ${lines} lines.`
             )
         })
+      }
+      if (brick.visual.kind === "chess") {
+        // Marks on the board point the learner somewhere: on an answer square, they give it away.
+        const { highlight = [], arrows = [] } = brick.visual
+        for (const c of brick.correct) {
+          if (highlight.includes(c))
+            add(
+              "teaching",
+              `${path}.visual.highlight`,
+              `${c} is an answer and it's highlighted, which gives it away. Highlight the piece the question is about, not the square to find.`
+            )
+          else if (arrows.some((a) => a.to === c))
+            add(
+              "teaching",
+              `${path}.visual.arrows`,
+              `An arrow ends on ${c}, an answer, which gives it away. Show moves that lead up to the question, not its answer.`
+            )
+        }
       }
       break
     }

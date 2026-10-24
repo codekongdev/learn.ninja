@@ -720,6 +720,58 @@ describe("chess visuals", () => {
       message: /"e5" is listed twice/,
     })
   })
+
+  describe("as a hotspot", () => {
+    // Black to move: which square does the knight on f3 attack?
+    function chessHotspot(over: Record<string, unknown> = {}) {
+      const l = buttons()
+      l.bricks[2].visual = {
+        kind: "chess",
+        fen: AFTER_NF3,
+        alt: "After 1. e4 e5 2. Nf3, with Black to move.",
+        highlight: ["f3"],
+      }
+      l.bricks[2].correct = ["e5"]
+      Object.assign(l.bricks[2], over)
+      return l
+    }
+
+    it("takes squares as answers", () => {
+      expect(validateLesson(chessHotspot()).ok).toBe(true)
+      expect(
+        validateLesson(chessHotspot({ correct: ["e5", "d4"], multiple: true }))
+          .ok
+      ).toBe(true)
+      expectIssue(chessHotspot({ correct: ["create"] }), {
+        path: "bricks[2].correct",
+        message: /"create" isn't a square/,
+      })
+    })
+
+    it("wants alt text, since the squares are only names", () => {
+      const l = chessHotspot()
+      delete l.bricks[2].visual.alt
+      expectIssue(l, {
+        path: "bricks[2].visual",
+        message: /chess position has no "alt"/,
+      })
+    })
+
+    it("doesn't let a highlight or an arrow give the answer away", () => {
+      const highlighted = chessHotspot()
+      highlighted.bricks[2].visual.highlight = ["f3", "e5"]
+      expectIssue(highlighted, {
+        path: "bricks[2].visual.highlight",
+        message: /e5 is an answer and it's highlighted/,
+      })
+      const arrow = chessHotspot()
+      arrow.bricks[2].visual.arrows = [{ from: "f3", to: "e5" }]
+      expectIssue(arrow, {
+        path: "bricks[2].visual.arrows",
+        message: /An arrow ends on e5/,
+      })
+    })
+  })
 })
 
 describe("map visuals", () => {
