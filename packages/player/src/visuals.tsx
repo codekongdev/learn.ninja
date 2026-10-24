@@ -141,7 +141,14 @@ function VisualBlock({
   )
     return <FigureBlock figure={visual} label={label} plain={plain} />
   if (visual.kind === "chess")
-    return <ChessBlock board={visual} label={label} plain={plain} />
+    return (
+      <ChessBlock
+        board={visual}
+        hotspots={hotspots}
+        label={label}
+        plain={plain}
+      />
+    )
   if (visual.kind === "map")
     return <MapBlock map={visual} label={label} plain={plain} />
   return <ChartBlock chart={visual} label={label} plain={plain} />
@@ -679,22 +686,29 @@ const ChessBoard = React.lazy(() => import("./chess"))
 
 function ChessBlock({
   board,
+  hotspots,
   label,
   plain,
 }: {
   board: ChessVisual
+  hotspots?: HotspotControl
   label?: string
   plain: boolean
 }) {
   const { t } = usePlayer()
-  return (
+  const block = (
+    // On a hotspot the squares are buttons, so the board is a group named by its alt, not an image.
     <div
-      role="img"
+      role={hotspots ? "group" : "img"}
       aria-label={board.alt ?? label ?? t.visual}
       dir="ltr"
       className={cn(
         "flex justify-center",
-        !plain && "rounded-xl border bg-background px-4 py-6"
+        !plain &&
+          (hotspots
+            ? // Like an HTML hotspot's visual: on a filled stage, with no frame.
+              "rounded-2xl bg-muted px-4 py-6 dark:bg-input/30"
+            : "rounded-xl border bg-background px-4 py-6")
       )}
     >
       <div
@@ -703,9 +717,22 @@ function ChessBlock({
         <React.Suspense
           fallback={<div className="size-full rounded-md bg-muted" />}
         >
-          <ChessBoard board={board} plain={plain} />
+          <ChessBoard board={board} plain={plain} hotspots={hotspots} />
         </React.Suspense>
       </div>
+    </div>
+  )
+  if (!hotspots) return block
+  return (
+    <div className="flex flex-col gap-3">
+      {block}
+      {/* The squares picked, by name: confirms the tap, and screen readers hear it. */}
+      <p
+        aria-live="polite"
+        className="min-h-5 truncate text-sm text-muted-foreground"
+      >
+        {hotspots.selected.length ? t.picked(hotspots.selected.join(", ")) : ""}
+      </p>
     </div>
   )
 }
