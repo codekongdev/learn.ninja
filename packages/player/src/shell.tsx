@@ -843,7 +843,7 @@ function ShortcutsDialog({
                   {i > 0 && join !== "pair" ? (
                     <span className="text-xs text-muted-foreground">–</span>
                   ) : null}
-                  <Kbd className="bg-muted text-foreground">{key}</Kbd>
+                  <Kbd>{key}</Kbd>
                 </React.Fragment>
               ))}
             </span>

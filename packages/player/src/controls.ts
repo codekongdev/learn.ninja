@@ -30,9 +30,5 @@ export const markStyles =
   "data-[status=wrong]:border-yellow-500! data-[status=wrong]:bg-yellow-500/10! " +
   "data-[status=partial]:border-amber-500! data-[status=partial]:bg-amber-500/10!"
 
-/**
- * The number key on an option, chip, or sort lane: an outlined keycap with no fill, so it keeps its
- * shape on a hovered or selected control (which takes the muted fill a filled key would have). Hidden
- * on touch screens, where there's no keyboard to press it on.
- */
-export const keyHintStyles = "border bg-transparent pointer-coarse:hidden"
+/** The number key on an option, chip, or sort lane: hidden on touch screens, which have no keys to press. */
+export const keyHintStyles = "pointer-coarse:hidden"

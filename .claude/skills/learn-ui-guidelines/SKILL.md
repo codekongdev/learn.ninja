@@ -88,7 +88,7 @@ Phones get a focused player, not the desktop frame squeezed down. Everything is 
 ## States and interaction
 
 - Every interactive element has hover, `focus-visible` (the 3px ring from the components), pressed, and selected or disabled states as needed. Prefer explaining why something can't happen over a disabled button.
-- Keyboard first: Enter runs the main action (start, check, continue) and number keys pick answer options (shown with a `Kbd` on each option). The footer's shortcuts dialog (`?`) lists them. Avoid pointer-only interactions.
+- Keyboard first: Enter runs the main action (start, check, continue) and number keys pick answer options (shown with a `Kbd` on each option). A `Kbd` is an outlined keycap with no fill everywhere (options, chips, the footer, the shortcuts dialog), so it keeps its shape on a hovered or selected surface; don't give one a background. The footer's shortcuts dialog (`?`) lists them. Avoid pointer-only interactions.
 - Motion goes behind `motion-safe:` and stays short (fades and small slides, about 150 to 300ms).
 
 ## Accessibility
