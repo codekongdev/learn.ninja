@@ -92,7 +92,9 @@ Mechanics of each type:
 
 ## 6. Visuals
 
-Visuals make lessons feel real. There are ten kinds:
+The right visual makes a lesson feel real. A visual earns its place when the learner sees the point in it faster than they could read it: a shape, a position, a trend, a contrast. A table or a card of sentences is text in a box: if getting the point means reading every cell, put it in the body or ask it as a question. No visual is better than one that's really text. Pick the kind that shows the idea: where things happened is a map, how much is a chart, what leads to what is a diagram, what something looks like is HTML. A table belongs in a lesson only when the learner will look things up in it, like a verb's endings.
+
+There are ten kinds:
 
 - **`chart`**: anything with axes, drawn by the player in the lesson's own style. A `scatter`, `bar`, or `line` chart from the points you give, or a `function` chart from one to three formulas in `x` (`"sin(x)"`, `"x^2 - 2"`, `"1000 * 1.05^x"`) over an `x` range: the player samples and plots them, so a graph of a function, a growth curve, a supply and demand pair, or a distribution needs only the expressions, the range, axis labels, and an `alt`. Name each curve with a `label` the prompt and options can refer to ("Line A"), and set a `y` range for a curve that shoots off (`tan(x)`, `1/x`). Mark points on a function chart with `points` (the roots, where two curves cross, a vertex), each with a short `label`; with points and no curves, the chart is a coordinate plane with equal units on both axes and a grid line at every unit, for plotting and reading coordinates. Never draw a chart or a curve by hand in HTML or SVG: a hand-plotted curve is always a little wrong, and the player's isn't.
 - **`numberline`**, **`fraction`**, and **`clock`**: the small figures of school maths, laid out by the player so the ticks are even, the parts are equal, and the hands point where the time says.

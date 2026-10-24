@@ -56,12 +56,19 @@ function KeyHint({
         aria-hidden="true"
         className={cn(
           className,
+          // Square like the number key it replaces (the icon plus the key's padding would be 2px wider),
+          // and filled, so it needs no outline.
+          "w-5 border-0 px-0",
           mark === "correct"
             ? "bg-green-500 text-green-950"
             : "bg-yellow-500 text-yellow-950"
         )}
       >
-        {mark === "correct" ? <CheckIcon /> : <XIcon />}
+        {mark === "correct" ? (
+          <CheckIcon strokeWidth={3} />
+        ) : (
+          <XIcon strokeWidth={3} />
+        )}
       </Kbd>
     )
   return (
