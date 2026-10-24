@@ -1141,6 +1141,64 @@ describe("code outside backticks", () => {
   })
 })
 
+describe("markdown in lesson text", () => {
+  const withBody = (body: string) => {
+    const lesson = buttons()
+    lesson.bricks[0].body = body
+    return lesson
+  }
+
+  it("accepts paragraphs and lists in a concept body", () => {
+    const body =
+      "Famous openings:\n- **Italian Game**: e4 e5, Nf3 Nc6, Bc4\n- **Sicilian Defense**: e4 c5\n\nThen:\n1. Develop\n2. Castle"
+    expect(validateLesson(withBody(body)).issues).toEqual([])
+  })
+
+  it("keeps a lone numbered line as text", () => {
+    expect(validateLesson(withBody("1. e4 e5 2. Nf3 Nc6")).issues).toEqual([])
+  })
+
+  it("rejects a list with one item", () => {
+    expectIssue(withBody("Openings:\n- Italian Game"), {
+      path: "bricks[0].body",
+      message: /two or more items/,
+    })
+  })
+
+  it("rejects a list outside a concept body", () => {
+    const lesson = buttons()
+    lesson.hook.explanation = "Two reasons:\n- One stands out\n- It reads fast"
+    expectIssue(lesson, {
+      path: "hook.explanation",
+      message: /on its own line, without a marker/,
+    })
+  })
+
+  it("rejects headings, links, tables, and code blocks", () => {
+    expectIssue(withBody("## Openings\nPush a centre pawn."), {
+      message: /Headings don't show/,
+    })
+    expectIssue(withBody("See [the rules](https://fide.com)."), {
+      message: /Links and images/,
+    })
+    expectIssue(
+      withBody("| Opening | Moves |\n| --- | --- |\n| Italian | e4 |"),
+      {
+        message: /Tables don't show/,
+      }
+    )
+    expectIssue(withBody("Run this:\n```\ngit push\n```"), {
+      message: /Code blocks/,
+    })
+  })
+
+  it("leaves # and | inside code and formulas alone", () => {
+    expect(
+      validateLesson(withBody("Write `# done` and \\( |x| \\) here.")).issues
+    ).toEqual([])
+  })
+})
+
 describe("explanation length", () => {
   it("rejects an explanation over the word limit", () => {
     const lesson = loadExample("writing-a-prd.json") as {

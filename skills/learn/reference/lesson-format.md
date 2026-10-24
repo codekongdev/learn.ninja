@@ -71,6 +71,8 @@ Brick ids are unique across the whole lesson, including the hook and the challen
 
 `{ "id", "type": "concept", "title" (≤60 chars), "body" (rich text, ≤80 words), "visual"? }`
 
+With a visual, the player shows the title, then the visual, then the body, so the body explains what the learner has just seen. The body is rich text with paragraphs and lists: each line is a paragraph, two or more lines in a row starting with `- ` make a bulleted list, and lines numbered `1. `, `2. `… make a numbered one (in JSON, each line break is `\n`). One marker line on its own stays text, so `1. e4 e5` reads as written. Lists don't nest.
+
 ```json
 {
   "id": "c1",
@@ -78,6 +80,10 @@ Brick ids are unique across the whole lesson, including the hook and the challen
   "title": "Buttons do, links go",
   "body": "Ask whether the action **does** something or **goes** somewhere."
 }
+```
+
+```json
+"body": "Each piece has a letter; no letter means a pawn.\n- **N** is a knight\n- **B** is a bishop\n- **Q** is the queen"
 ```
 
 ## Every question brick
@@ -217,6 +223,7 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
 - Unique ids; every reference points to something real (`correct`, `group`, `alsoAccept`, `[[gap]]` ids, hotspot ids, code hotspot lines).
 - Every `choice` has `multiple`, even when it's `false`; every wrong `choice`/`compare` option has `feedback`; every question brick has an `explanation`; a `choice` has at least one wrong option; a `scenario` has a `best` option.
 - Prompts ≤40 words; concept bodies ≤80 words.
+- Lists only in a concept's body, with two or more items; no headings, links, images, tables, or code blocks in any lesson text (code and formulas may hold `#` and `|`).
 - No `number` bricks; every `blank` has `choices` that include an accepted answer.
 - Formulas in `\( … \)` are balanced and render; language codes are valid BCP 47.
 - Code sits in backticks: a command like `git push`, a flag, a call, a file name, a path, or an HTML tag written as plain text in a prompt, option, pair, item, feedback, or explanation is rejected.

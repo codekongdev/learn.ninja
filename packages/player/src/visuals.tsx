@@ -526,10 +526,9 @@ function CodeBlock({
         !plain && "rounded-xl border bg-muted/40"
       )}
     >
-      {/* Phones scale lesson text up a step; code steps back down, since its lines need the width. And
-          there a long line wraps under its own start instead of scrolling, so every line (and every
-          tappable one in a hotspot) shows whole. */}
-      <pre className="m-0 flex flex-col py-3 font-mono text-sm leading-7 max-sm:text-xs sm:min-w-max">
+      {/* On phones a long line wraps under its own start instead of scrolling, so every line (and
+          every tappable one in a hotspot) shows whole. */}
+      <pre className="m-0 flex flex-col py-3 font-mono text-sm leading-7 sm:min-w-max">
         {lines.map((tokens, i) => {
           const n = i + 1
           const id = hotspots ? spotByLine.get(n) : undefined
