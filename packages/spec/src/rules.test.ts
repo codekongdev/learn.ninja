@@ -841,6 +841,52 @@ describe("map visuals", () => {
   })
 })
 
+describe("molecule visuals", () => {
+  function withMolecule(over: Record<string, unknown> = {}) {
+    const l = buttons()
+    l.bricks[0].visual = {
+      kind: "molecule",
+      smiles: "CC(=O)O",
+      alt: "Acetic acid, with its carboxyl group marked.",
+      highlight: ["C(=O)[OH]"],
+      ...over,
+    }
+    return l
+  }
+
+  it("accepts a molecule, skeletal or full", () => {
+    expect(validateLesson(withMolecule()).ok).toBe(true)
+    expect(validateLesson(withMolecule({ style: "full" })).ok).toBe(true)
+  })
+
+  it("wants alt text", () => {
+    const l = withMolecule()
+    delete l.bricks[0].visual.alt
+    expectIssue(l, {
+      path: "bricks[0].visual",
+      message: /molecule has no "alt"/,
+    })
+  })
+
+  it("rejects a SMILES with spaces, pointing to the dot", () => {
+    expectIssue(withMolecule({ smiles: "[Na+] [Cl-]" }), {
+      path: "bricks[0].visual.smiles",
+      message: /separate them with "\."/,
+    })
+  })
+
+  it("wants each highlight once", () => {
+    expectIssue(withMolecule({ highlight: ["C=O", "C=O"] }), {
+      path: "bricks[0].visual.highlight",
+      message: /"C=O" is listed twice/,
+    })
+  })
+
+  it("doesn't read a SMILES as a formula", () => {
+    expect(validateLesson(withMolecule({ smiles: "F/C=C\\(F)" })).ok).toBe(true)
+  })
+})
+
 describe("structure rules", () => {
   it("starts the bricks with a concept brick", () => {
     const l = buttons()

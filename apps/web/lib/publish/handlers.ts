@@ -121,7 +121,8 @@ async function checkLessonText(text: string, skillVersion?: string | null) {
     }
   }
   const result = validateLesson(canUpgrade(data) ? upgradeLesson(data) : text)
-  // Diagrams and icons are checked on the server: D2 must compile, and icons must exist in the kit.
+  // Diagrams, molecules, and icons are checked on the server: D2 must compile, SMILES must read,
+  // and icons must exist in the kit.
   const issues = result.ok ? await checkVisuals(result.lesson) : result.issues
   if (!result.ok || issues.length) {
     return {

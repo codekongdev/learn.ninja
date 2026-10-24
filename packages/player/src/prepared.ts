@@ -16,6 +16,8 @@ export interface Prepared {
   charts?: Record<string, string>
   /** Diagram visuals drawn from their D2 as SVG, keyed by diagramKey(). Older prepared data has none. */
   diagrams?: Record<string, string>
+  /** Molecule visuals drawn from their SMILES as SVG, keyed by moleculeKey(). Older prepared data has none. */
+  molecules?: Record<string, string>
 }
 
 export const emptyPrepared: Prepared = {
@@ -24,6 +26,7 @@ export const emptyPrepared: Prepared = {
   visualsCss: "",
   charts: {},
   diagrams: {},
+  molecules: {},
 }
 
 export const mathKey = (tex: string, display: boolean) =>
@@ -61,6 +64,13 @@ export const chartKey = (chart: unknown, compact: boolean) =>
   `${compact ? "c" : "f"}:${hash(canonicalJson(chart))}`
 /** A diagram's key: its D2 source hashed. One drawing serves every size. */
 export const diagramKey = (d2: string) => `d:${hash(d2)}`
+/** A molecule's key: what changes its drawing (not its alt), hashed. One drawing serves every size. */
+export const moleculeKey = (molecule: {
+  smiles: string
+  style?: string
+  highlight?: string[]
+}) =>
+  `m:${hash(canonicalJson([molecule.smiles, molecule.style ?? "skeletal", molecule.highlight ?? []]))}`
 
 /** Inline formulas in rich text: \( ... \) */
 export const INLINE_MATH = /\\\(([\s\S]+?)\\\)/g

@@ -319,6 +319,28 @@ export const mapVisual = z
   })
   .meta({ id: "MapVisual" })
 
+/**
+ * A molecule drawn from its SMILES as a structural formula. The server lays it out and draws it at
+ * publish time (packages/player/src/molecule.ts, which also rejects SMILES it can't read).
+ */
+export const moleculeVisual = z
+  .strictObject({
+    kind: z.literal("molecule"),
+    /** The molecule in SMILES: "CCO" for ethanol, "c1ccccc1" for benzene; several, ions too, separated by "." ("[Na+].[Cl-]"). */
+    smiles: z.string().min(1).max(200),
+    /** One sentence saying what the molecule shows, for screen readers. Required (rules.ts). */
+    alt: z.string().min(1).max(200).optional(),
+    /**
+     * "skeletal" (the default) draws carbons as corners and line ends and leaves out the hydrogens on
+     * them, as chemists do. "full" draws every atom and bond, carbons and hydrogens labelled: the
+     * displayed formula of school chemistry.
+     */
+    style: z.enum(["skeletal", "full"]).optional(),
+    /** Parts to mark in the accent color, each a SMARTS pattern: "[OX2H]" for a hydroxyl group, "C(=O)[OH]" for a carboxyl group. */
+    highlight: z.array(z.string().min(1).max(100)).min(1).max(3).optional(),
+  })
+  .meta({ id: "MoleculeVisual" })
+
 export const visual = z
   .discriminatedUnion("kind", [
     htmlVisual,
@@ -331,6 +353,7 @@ export const visual = z
     clockVisual,
     chessVisual,
     mapVisual,
+    moleculeVisual,
   ])
   .meta({ id: "Visual" })
 
@@ -602,3 +625,4 @@ export type FractionVisual = z.infer<typeof fractionVisual>
 export type ClockVisual = z.infer<typeof clockVisual>
 export type ChessVisual = z.infer<typeof chessVisual>
 export type MapVisual = z.infer<typeof mapVisual>
+export type MoleculeVisual = z.infer<typeof moleculeVisual>

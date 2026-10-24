@@ -95,7 +95,6 @@ export const ar: Strings = {
   wordBank: "بنك الكلمات",
   emptyGap: "فراغ",
   visual: "رسم توضيحي",
-  expandVisual: "تكبير",
   showActions: "إظهار الأزرار",
   hideActions: "إخفاء الأزرار",
   fixTitle: "لنصحّح أخطاءك",

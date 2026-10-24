@@ -32,6 +32,7 @@
     "linkedom": "^0.18.13",
     "lucide-react": "^1.52.0",
     "mathjs": "^15.2.0",
+    "openchemlib": "^9.25.1",
     "react": "^19.3.0",
     "react-aria-components": "^1.21.1",
     "react-dom": "^19.3.0",

@@ -1,17 +1,15 @@
 "use client"
 
 import * as React from "react"
-import { Maximize2Icon } from "lucide-react"
 
 import type {
   ChartVisual,
   ChessVisual,
   DiagramVisual,
   MapVisual,
+  MoleculeVisual,
   Visual as VisualSpec,
 } from "@workspace/spec"
-import { Button } from "@workspace/ui/components/button"
-import { Dialog } from "@workspace/ui/components/dialog"
 import { Selectable } from "@workspace/ui/components/selectable"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -24,6 +22,7 @@ import {
   codeKey,
   diagramKey,
   mathKey,
+  moleculeKey,
   type CodeLines,
 } from "./prepared"
 
@@ -46,66 +45,6 @@ export function Visual({
   label?: string
   /** No box of its own: the visual sits on a surface that already frames it, like an option card's panel. */
   plain?: boolean
-}) {
-  const { t } = usePlayer()
-  const [open, setOpen] = React.useState(false)
-  const block = (
-    <VisualBlock
-      visual={visual}
-      hotspots={hotspots}
-      label={label}
-      plain={plain}
-    />
-  )
-  // On phones a picture, diagram, or chart can open full screen, laid out at a desktop column's
-  // width: the learner pans it and pinches to zoom, instead of squinting at it scaled down. Not for
-  // hotspots (tapping them is the answer), code (it wraps), math, or visuals inside a card.
-  const expandable =
-    !plain &&
-    !hotspots &&
-    (visual.kind === "html" ||
-      visual.kind === "diagram" ||
-      visual.kind === "chart" ||
-      visual.kind === "map")
-  if (!expandable) return block
-  return (
-    <div className="relative">
-      {block}
-      <Button
-        variant="outline"
-        size="icon-sm"
-        aria-label={t.expandVisual}
-        onPress={() => setOpen(true)}
-        className="absolute end-2 top-2 bg-background sm:hidden"
-      >
-        <Maximize2Icon />
-      </Button>
-      <Dialog
-        isOpen={open}
-        onOpenChange={setOpen}
-        aria-label={visual.alt ?? label ?? t.visual}
-        className="inset-0 h-full max-w-none translate-x-0 translate-y-0 content-start rounded-none p-0 ring-0 sm:max-w-none rtl:translate-x-0"
-      >
-        <div className="min-h-0 overflow-auto px-4 pt-12 pb-6">
-          <div className="w-160">
-            <VisualBlock visual={visual} label={label} plain={false} />
-          </div>
-        </div>
-      </Dialog>
-    </div>
-  )
-}
-
-function VisualBlock({
-  visual,
-  hotspots,
-  label,
-  plain,
-}: {
-  visual: VisualSpec
-  hotspots?: HotspotControl
-  label?: string
-  plain: boolean
 }) {
   if (visual.kind === "html")
     return (
@@ -144,6 +83,8 @@ function VisualBlock({
     return <ChessBlock board={visual} label={label} plain={plain} />
   if (visual.kind === "map")
     return <MapBlock map={visual} label={label} plain={plain} />
+  if (visual.kind === "molecule")
+    return <MoleculeBlock molecule={visual} label={label} plain={plain} />
   return <ChartBlock chart={visual} label={label} plain={plain} />
 }
 
@@ -795,6 +736,49 @@ function MapBlock({
           <WorldMap map={map} plain={plain} />
         </React.Suspense>
       </div>
+    </div>
+  )
+}
+
+// ---------- Molecules: drawn by OpenChemLib on the server ----------
+
+/**
+ * The server lays out and draws the molecule from its SMILES in theme tokens (molecule.ts), at one
+ * scale for every molecule, so water stays small beside caffeine; a wide one shrinks to fit. Before
+ * it's drawn (a lesson without prepared data), the alt stands in.
+ */
+function MoleculeBlock({
+  molecule,
+  label,
+  plain,
+}: {
+  molecule: MoleculeVisual
+  label?: string
+  plain: boolean
+}) {
+  const { prepared, t } = usePlayer()
+  const alt = molecule.alt ?? label ?? t.visual
+  const svg = prepared.molecules?.[moleculeKey(molecule)]
+  return (
+    <div
+      role="img"
+      aria-label={alt}
+      dir="ltr"
+      className={cn(
+        "flex justify-center [&_svg]:h-auto [&_svg]:max-w-full",
+        !plain && "rounded-xl border bg-background px-4 py-6"
+      )}
+    >
+      {svg ? (
+        <div
+          className={cn("flex w-full justify-center", plain && "max-w-xs")}
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+      ) : (
+        <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+          {alt}
+        </p>
+      )}
     </div>
   )
 }

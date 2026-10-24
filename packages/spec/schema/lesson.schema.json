@@ -247,6 +247,9 @@
         },
         {
           "$ref": "#/$defs/MapVisual"
+        },
+        {
+          "$ref": "#/$defs/MoleculeVisual"
         }
       ]
     },
@@ -932,6 +935,47 @@
       },
       "required": [
         "kind"
+      ],
+      "additionalProperties": false
+    },
+    "MoleculeVisual": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "molecule"
+        },
+        "smiles": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "style": {
+          "type": "string",
+          "enum": [
+            "skeletal",
+            "full"
+          ]
+        },
+        "highlight": {
+          "minItems": 1,
+          "maxItems": 3,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "smiles"
       ],
       "additionalProperties": false
     },

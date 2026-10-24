@@ -91,7 +91,6 @@ export const nl: Strings = {
   wordBank: "Woordenlijst",
   emptyGap: "Leeg gat",
   visual: "Afbeelding",
-  expandVisual: "Vergroten",
   showActions: "Knoppen tonen",
   hideActions: "Knoppen verbergen",
   fixTitle: "Laten we je fouten herstellen",

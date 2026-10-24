@@ -79,7 +79,6 @@ export const id: Strings = {
   wordBank: "Bank kata",
   emptyGap: "Bagian kosong",
   visual: "Ilustrasi",
-  expandVisual: "Perbesar",
   showActions: "Tampilkan tombol",
   hideActions: "Sembunyikan tombol",
   fixTitle: "Ayo perbaiki kesalahanmu",
