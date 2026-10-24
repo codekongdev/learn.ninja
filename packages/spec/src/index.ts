@@ -21,6 +21,7 @@ export {
   type FenPiece,
   type Placement,
 } from "./chess"
+export { listItem, textBlocks, type TextBlock } from "./text"
 export { canUpgrade, subjectForTopic, upgradeLesson } from "./upgrade"
 export {
   isSubject,

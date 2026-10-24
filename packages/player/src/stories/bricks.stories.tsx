@@ -106,7 +106,7 @@ function Question({
 
   return (
     <>
-      <h2 className="text-2xl font-bold tracking-tight text-balance">
+      <h2 className="text-lg font-semibold">
         <RichText text={brick.prompt} />
       </h2>
       {brick.type === "scenario" ? (
@@ -206,6 +206,26 @@ export const ConceptDiagram: Story = {
 export const ConceptFormula: Story = {
   name: "Concept, formula",
   args: { brick: concept(compound, 0) },
+  argTypes: noState,
+}
+/** A body with paragraphs and both kinds of list, under a chess visual. */
+export const ConceptList: Story = {
+  name: "Concept, list",
+  args: {
+    brick: {
+      id: "c1",
+      type: "concept",
+      title: "Openings are named first moves",
+      body: "Famous openings are named sequences, White then Black. No letter means a pawn.\n- **Italian Game**: e4 e5, Nf3 Nc6, Bc4\n- **Ruy Lopez**: e4 e5, Nf3 Nc6, Bb5\n- **Sicilian Defense**: e4 c5\nEach one aims to:\n1. Claim the centre\n2. Bring a piece out",
+      visual: {
+        kind: "chess",
+        fen: "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R",
+        alt: "The Italian Game: White's bishop on c4 aims at f7.",
+        highlight: ["f7"],
+        arrows: [{ from: "c4", to: "f7" }],
+      },
+    },
+  },
   argTypes: noState,
 }
 

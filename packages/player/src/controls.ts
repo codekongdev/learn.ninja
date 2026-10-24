@@ -29,3 +29,6 @@ export const markStyles =
   "data-[status=correct]:border-green-600! data-[status=correct]:bg-green-600/10! " +
   "data-[status=wrong]:border-yellow-500! data-[status=wrong]:bg-yellow-500/10! " +
   "data-[status=partial]:border-amber-500! data-[status=partial]:bg-amber-500/10!"
+
+/** The number key on an option, chip, or sort lane: hidden on touch screens, which have no keys to press. */
+export const keyHintStyles = "pointer-coarse:hidden"
