@@ -21,7 +21,7 @@ import {
   slotStyles,
 } from "./controls"
 import { buzz, fly, shake } from "./motion"
-import { RichText } from "./rich-text"
+import { RichBlocks, RichText } from "./rich-text"
 import { Visual } from "./visuals"
 
 export interface QuestionBrickProps {
@@ -86,17 +86,32 @@ const optionPanelStyles =
 
 // ---------- concept ----------
 
-/** Theory: one idea with an optional visual. Nothing to answer. */
+/**
+ * Theory: one idea with an optional visual. Nothing to answer. The visual sits under the title, as
+ * in a question: the learner sees it first and the body explains it, and a tall one isn't missed below.
+ */
 export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
+  const title = (
+    <h2 className="text-base font-semibold text-balance">{brick.title}</h2>
+  )
+  const body = (
+    <RichBlocks
+      text={brick.body}
+      className="text-sm leading-relaxed text-pretty"
+    />
+  )
+  if (!brick.visual)
+    return (
+      <div className="flex flex-col gap-3">
+        {title}
+        {body}
+      </div>
+    )
   return (
     <>
-      <div className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold text-balance">{brick.title}</h2>
-        <p className="text-sm leading-relaxed text-pretty">
-          <RichText text={brick.body} />
-        </p>
-      </div>
-      {brick.visual ? <Visual visual={brick.visual} /> : null}
+      {title}
+      <Visual visual={brick.visual} />
+      {body}
     </>
   )
 }

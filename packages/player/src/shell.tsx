@@ -52,7 +52,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import type { QuestionCount } from "./flow"
 import { Ninja, type NinjaMood } from "./ninja"
-import { RichText } from "./rich-text"
+import { RichBlocks } from "./rich-text"
 import {
   UI_LANGUAGES,
   uiLanguageFor,
@@ -1173,7 +1173,7 @@ export function TheoryPanel({
             {concepts.map((c) => (
               <li key={c.id} className="flex flex-col gap-2">
                 <h3 className="text-lg font-semibold">{c.title}</h3>
-                <RichText text={c.body} className="block text-sm" />
+                <RichBlocks text={c.body} className="text-sm" />
               </li>
             ))}
           </ol>

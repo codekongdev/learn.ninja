@@ -2,12 +2,15 @@
 
 import * as React from "react"
 
+import { textBlocks } from "@workspace/spec"
+import { cn } from "@workspace/ui/lib/utils"
+
 import { usePlayer } from "./context"
 import { TOKEN } from "./plain-text"
 import { mathKey } from "./prepared"
 
 // Renders the spec's rich-text subset: **bold**, *italic*, `code`, and \( formulas \).
-// A $ is always a plain dollar sign.
+// A $ is always a plain dollar sign. A concept body also has paragraphs and lists (RichBlocks).
 
 export { plainText } from "./plain-text"
 
@@ -78,5 +81,45 @@ export function RichText({
     <span lang={lang} dir="auto" className={className}>
       {nodes}
     </span>
+  )
+}
+
+/** A concept body: its lines as paragraphs, and bulleted or numbered lists (see textBlocks). */
+export function RichBlocks({
+  text,
+  className,
+}: {
+  text: string
+  className?: string
+}) {
+  return (
+    <div className={cn("flex flex-col gap-2", className)}>
+      {textBlocks(text).map((block, i) => {
+        if (block.kind === "paragraph")
+          return (
+            <p key={i} dir="auto">
+              <RichText text={block.text} />
+            </p>
+          )
+        const List = block.ordered ? "ol" : "ul"
+        return (
+          <List
+            key={i}
+            dir="auto"
+            start={block.ordered && block.start !== 1 ? block.start : undefined}
+            className={cn(
+              "flex flex-col gap-1 ps-5 marker:text-muted-foreground",
+              block.ordered ? "list-decimal" : "list-disc"
+            )}
+          >
+            {block.items.map((item, j) => (
+              <li key={j} className="ps-1">
+                <RichText text={item} />
+              </li>
+            ))}
+          </List>
+        )
+      })}
+    </div>
   )
 }

@@ -9,6 +9,7 @@ import {
   type Visual,
 } from "./schema"
 import { normalizeTag } from "./tags"
+import { listItem, textBlocks } from "./text"
 
 // Rules the schema can't express: cross-references, teaching quality, v1 limits, and safety.
 // Every message says what's wrong and how to fix it, so an LLM can correct the lesson on its own.
@@ -150,7 +151,31 @@ const RICH_TEXT_KEYS = new Set([
 ])
 
 const countWords = (s: string) =>
-  s.replace(/[*`]/g, "").trim().split(/\s+/).filter(Boolean).length
+  s
+    .replace(/^\s*(?:[-*]|\d{1,3}[.)])\s+/gm, "")
+    .replace(/[*`]/g, "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length
+
+/**
+ * Markdown the player doesn't show, which would reach the learner as raw symbols, with what to use
+ * instead. Lists are checked apart, since a concept body may have them.
+ */
+function unsupportedMarkdown(text: string): string | null {
+  if (/^\s*(```|~~~)/m.test(text))
+    return 'Code blocks don\'t show in lesson text. Put the code in a "code" visual, or a short piece in backticks.'
+  // Code and formulas may hold # or |, so they're left out of the rest.
+  const prose = text.replace(/\\\([\s\S]*?\\\)|`[^`\n]*`/g, "")
+  if (/^\s*#{1,6}\s/m.test(prose))
+    return "Headings don't show in lesson text: a concept's title is its heading. Start the line without #, or split the idea into another concept brick."
+  if (/!?\[[^\]\n]+\]\([^)\n]*\)/.test(prose))
+    return "Links and images don't show in lesson text, and a lesson never sends the learner elsewhere. Name a source in words, and draw a picture as a visual."
+  if (/^\s*\|.*\|\s*$/m.test(prose) || /\|\s*:?-{3,}/.test(prose))
+    return "Tables don't show in lesson text. Put the table in an HTML visual (3 columns at most, so it fits a phone)."
+  // HTML tags are caught by bareCode, which asks for backticks.
+  return null
+}
 
 function duplicates(values: string[]): string[] {
   const seen = new Set<string>()
@@ -319,6 +344,32 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
         "teaching",
         where,
         `"${found}" looks like code, but it isn't in backticks, so it shows as plain text. Wrap commands, flags, file names, paths, tags, and code in backticks (\`${found}\`) so they render in monospace.`
+      )
+  })
+
+  // Only a concept body has paragraphs and lists; everywhere else, list markers would show as is.
+  walkRichText(lesson, (text, where) => {
+    const markdown = unsupportedMarkdown(text)
+    if (markdown) return add("structure", where, markdown)
+    const isBody = /^bricks\[\d+\]\.body$/.test(where)
+    const blocks = textBlocks(text)
+    if (!isBody && blocks.some((b) => b.kind === "list"))
+      add(
+        "structure",
+        where,
+        where.endsWith(".explanation")
+          ? "Only a concept's body can hold a list. Put each step of an explanation on its own line, without a marker."
+          : "Only a concept's body can hold a list. Write this as a sentence, or move the list into the concept it practises."
+      )
+    // A lone "- " line shows its dash, which is usually a list written with one item or on one line.
+    const lone = blocks.find(
+      (b) => b.kind === "paragraph" && listItem(b.text)?.ordered === false
+    )
+    if (isBody && lone)
+      add(
+        "structure",
+        where,
+        'A list needs two or more items, each on its own line starting with "- " (in JSON, "\\n- "). Make it a list, or write the line as a sentence.'
       )
   })
 

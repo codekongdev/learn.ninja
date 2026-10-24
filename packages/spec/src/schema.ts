@@ -486,6 +486,7 @@ export const conceptBrick = z
     id,
     type: z.literal("concept"),
     title: z.string().min(1).max(60),
+    /** Rich text with paragraphs (one per line) and lists (two or more "- " or "1. " lines); see text.ts. */
     body: richText,
     visual: visual.optional(),
   })
