@@ -59,6 +59,7 @@ import {
   MatchBrick,
   Explanation,
   explanationAnchor,
+  Note,
   OptionsBrick,
 } from "./bricks"
 import { shortcutBlocked } from "./keys"
@@ -866,8 +867,8 @@ function Player({
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [keyScope])
-  // All feedback is in the ninja's speech bubble. After a right answer, Why? (or W) adds the
-  // explanation to it; each new screen starts with it closed.
+  // The ninja's line is in his speech bubble, the rest in a note under the answers. After a right
+  // answer, Why? (or W) adds the explanation note; each new screen starts with it closed.
   const [whyOpen, setWhyOpen] = React.useState(false)
   // Extra scroll room under the lesson when the bubble is taller than the space the screen leaves
   // for it. It sits below the centered column, so the lesson itself never moves.
@@ -940,6 +941,8 @@ function Player({
   // answers below the fold: once it has settled, bring the last of them back into view. Wider, the
   // toast floats in the card's corner, over the answers when they reach that far down (a tall
   // question on a short screen): scroll them up clear of it, into the room the screen leaves below.
+  // The note under the answers always clears it, which also brings it up from below the fold, and
+  // Why? adding the explanation note runs this again.
   React.useEffect(() => {
     if (!q?.result || q.phase === "answering") return
     const id = window.setTimeout(() => {
@@ -960,18 +963,21 @@ function Player({
       if (!toast) return
       let lowest = -Infinity
       for (const el of scroller.querySelectorAll(
-        "[data-slot=selectable], [data-status]"
+        "[data-slot=selectable], [data-status], [data-feedback-note]"
       )) {
         const r = el.getBoundingClientRect()
         // Within a gap of the toast counts: a row it touches looks covered too.
-        if (r.right > toast.left - 12 && r.left < toast.right + 12)
+        if (
+          el.hasAttribute("data-feedback-note") ||
+          (r.right > toast.left - 12 && r.left < toast.right + 12)
+        )
           lowest = Math.max(lowest, r.bottom)
       }
       const overlap = lowest + 12 - toast.top
       if (overlap > 0) scroller.scrollBy({ top: overlap, behavior })
     }, 250)
     return () => window.clearTimeout(id)
-  }, [q?.result, q?.phase])
+  }, [q?.result, q?.phase, whyOpen])
   // A scenario opens with his brief (story mode): he steps up to tell it, then goes back to his
   // corner for the question. Each telling has its own key, so a replay starts fresh. With him off
   // there's no brief: the situation is on the question screen.
@@ -1241,14 +1247,25 @@ function Player({
                 <div className="flex items-center gap-2">
                   {/* Equal sides keep the actions in the middle. On phones the settings are in the header's menu. */}
                   <div className="flex flex-1 items-center gap-1 max-sm:hidden">
-                    <PlayerSettings prefs={prefs} onPrefs={onPrefs} t={t} />
+                    <PlayerSettings
+                      side="start"
+                      prefs={prefs}
+                      onPrefs={onPrefs}
+                      t={t}
+                    />
                   </div>
                   <div
                     ref={setActionsEl}
                     className="flex flex-wrap items-center justify-center gap-2 max-sm:flex-1 max-sm:flex-nowrap"
                   />
                   <div className="flex flex-1 items-center justify-end gap-1 max-sm:hidden">
-                    {/* The end of the tray holds help. Theory stays hidden while it's redesigned. */}
+                    <PlayerSettings
+                      side="end"
+                      prefs={prefs}
+                      onPrefs={onPrefs}
+                      t={t}
+                    />
+                    {/* Then help. Theory stays hidden while it's redesigned. */}
                     {SHOW_THEORY ? (
                       <Button
                         variant="ghost"
@@ -1607,8 +1624,8 @@ function QuestionScreen({
     brick.type === "scenario"
       ? brick.options.filter((o) => o.quality === "best").map((o) => o.id)
       : []
-  // In the player the ninja says a pick's outcome, so rows show outcomes only for Every path and
-  // the revealed answer. A lone demo shows them under the picked row.
+  // In the player a pick's outcome is in the note under the answers, so rows show outcomes only
+  // for Every path. A lone demo shows them under the picked row and, once revealed, the best one.
   const showOutcomes =
     brick.type !== "scenario"
       ? []
@@ -1620,7 +1637,7 @@ function QuestionScreen({
               ...(!inBubble && state.answer.kind === "select"
                 ? state.answer.ids
                 : []),
-              ...(state.phase === "revealed" ? best : []),
+              ...(!inBubble && state.phase === "revealed" ? best : []),
             ]
   // After the brief, the question rises in behind him as he heads back to his corner.
   const arrive = storyMode && brick.type === "scenario"
@@ -1923,8 +1940,11 @@ function useSpokenLine(src: string | null, key: string | undefined) {
   }, [src, key])
 }
 
-/** The feedback toast's recipe for each tone. */
-const TOAST = "rounded-xl border px-4 py-3 shadow-xs"
+/**
+ * The feedback toast: in the player it's the ninja's speech bubble, a chat message with a soft tint
+ * of the tone and no border or shadow, so it stays out of the way.
+ */
+const TOAST = "rounded-[18px] px-3.5 py-2 text-foreground"
 /**
  * On phones the whole tray takes the feedback's tone, the toast's recipe spread across it, with a line
  * of the tone's color along its top edge. It reads from the feedback card inside (`data-tone`).
@@ -1938,10 +1958,10 @@ const PHONE_TRAY_TONE = cn(
 /** On phones the tray's buttons share its width at a thumb-sized height. */
 const PHONE_BAR = "max-sm:h-12 max-sm:flex-1 max-sm:text-base"
 const toneClass: Record<Tone, string> = {
-  neutral: "border-border bg-popover text-popover-foreground",
-  // The marked rows' colors (markStyles in bricks.tsx), mixed into the page the way the browser blends them (sRGB), so the toast matches yet stays opaque.
-  good: "border-green-600 bg-[color-mix(in_srgb,var(--color-green-600)_10%,var(--background))]",
-  warn: "border-yellow-500 bg-[color-mix(in_srgb,var(--color-yellow-500)_10%,var(--background))]",
+  neutral: "bg-muted",
+  // A light tint mixed into the page (in sRGB), so it stays opaque over content scrolling under it.
+  good: "bg-[color-mix(in_srgb,var(--color-green-500)_18%,var(--background))]",
+  warn: "bg-[color-mix(in_srgb,var(--color-yellow-500)_22%,var(--background))]",
 }
 
 /** The screen's main action (Enter runs it; the shortcuts dialog says so), and the feedback after checking. */
@@ -2029,6 +2049,9 @@ export function ActionArea({
   let secondary: React.ReactNode = null
   // "Why?" opens the explanation under the answer, so feedback stays one short line until the learner asks.
   let explanation: string | null = null
+  // In the player the bubble says only the ninja's line; the message is a note under the answers,
+  // amber for a hint, a miss, or where a wrong pick led, green for the explanation or a right pick's outcome.
+  let noteTone: "good" | "warn" = "warn"
   const helpButton = (label: string, onPress: () => void) => (
     <Button
       variant="outline"
@@ -2125,6 +2148,7 @@ export function ActionArea({
       // What the pick led to; with Every path open the rows show every outcome, so he says why.
       if (story) message = why?.open ? brick.explanation : (r.feedback ?? null)
       else if (inBubble && why?.open) message = brick.explanation
+      noteTone = "good"
       primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r && story) {
       // What the pick led to, then back to the decision.
@@ -2161,6 +2185,7 @@ export function ActionArea({
       title = say("answer")
       explanation = brick.explanation
       if (inBubble) message = brick.explanation
+      noteTone = "good"
     }
     if (!inBubble && explanation && !explanationShown(s, role))
       // The button goes once pressed, so focus moves on to Continue.
@@ -2277,14 +2302,17 @@ export function ActionArea({
     </>
   )
 
-  const feedback = (
+  // In the player the note says the message, so the bubble keeps only his line.
+  // The player scrolls it clear of the bubble (data-feedback-note).
+  const note = inBubble ? message : null
+  const feedback = (withMessage: boolean) => (
     <>
       {title ? (
         <p className="text-sm font-semibold">
           <RichText text={title} />
         </p>
       ) : null}
-      {message ? (
+      {withMessage && message ? (
         // Keyed by the text, so a line added later (Why?) fades up into the bubble.
         <div
           key={message}
@@ -2314,6 +2342,25 @@ export function ActionArea({
       ) : (
         <div className="flex flex-wrap items-center gap-2">{buttons}</div>
       )}
+      {note ? (
+        // Under the answers, a step closer than the column's gap. Keyed by the text, so Why? fades it in.
+        // The text size goes on a wrapper: on the same element as text-sm, the scaled size doesn't resolve.
+        <div
+          key={note}
+          data-feedback-note
+          aria-hidden="true"
+          data-text-size={textSize}
+          className={cn(
+            "-mt-2 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
+            rewinding &&
+              "motion-safe:animate-out motion-safe:fade-out-0 motion-safe:fill-mode-forwards",
+            // On phones it's in the tray's card instead.
+            tray?.feedbackEl && "max-sm:hidden"
+          )}
+        >
+          <Note tone={noteTone} text={note} />
+        </div>
+      ) : null}
       <p aria-live="polite" className="sr-only">
         {title || message
           ? [title, message, !inBubble && explanationOpen ? explanation : null]
@@ -2331,21 +2378,21 @@ export function ActionArea({
           data-text-size={textSize}
           className={cn(
             TOAST,
-            "absolute end-4 z-10 rounded-es-[2px] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:w-fit sm:max-w-80",
+            "absolute end-4 z-10 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 sm:end-auto sm:w-fit sm:max-w-80",
             // On phones it's a card in the tray instead (below).
             tray?.feedbackEl && "max-sm:hidden",
             // Rewinding: what he said runs back out.
             rewinding &&
               "motion-safe:animate-out motion-safe:fade-out-0 motion-safe:fill-mode-forwards motion-safe:slide-out-to-bottom-2",
-            // In the player the bubble sits above the ninja, behind him, so he jumps in front of it; the
-            // corner over his head is squared off. Without him it takes his corner.
+            // In the player the bubble sits above the ninja, behind him, so he jumps in front of it.
+            // Without him it takes his corner.
             tray && ninja
               ? "start-4 bottom-17 sm:start-6 sm:bottom-19"
               : "start-4 bottom-4 sm:start-6 sm:bottom-6",
             toneClass[tone]
           )}
         >
-          {feedback}
+          {feedback(!inBubble)}
         </div>
       ) : null}
       {phoneCard && tray?.feedbackEl
@@ -2362,7 +2409,7 @@ export function ActionArea({
                   "motion-safe:animate-out motion-safe:fade-out-0 motion-safe:fill-mode-forwards"
               )}
             >
-              <div className="min-w-0 flex-1">{feedback}</div>
+              <div className="min-w-0 flex-1">{feedback(true)}</div>
               {whyButton(true)}
             </div>,
             tray.feedbackEl
@@ -2399,7 +2446,10 @@ function useMedia(query: string): boolean {
  */
 const useFixedTray = () => useMedia("(pointer: coarse), (width < 40rem)")
 
-/** A short bar floating on the content's bottom edge: click, press, or drag it to close or open the tray. */
+/**
+ * A short bar floating on the content's bottom edge: click, press, or drag it to close or open the tray.
+ * It stays hidden until the pointer is over it, it has keyboard focus, or it's being dragged.
+ */
 function TrayNotch({
   open,
   controls,
@@ -2420,9 +2470,12 @@ function TrayNotch({
   const SLOP = 4
   const start = React.useRef<number | null>(null)
   const dragged = React.useRef(false)
+  // Pointer capture moves the hover off the button mid-drag, so the bar keeps itself shown here.
+  const [grabbed, setGrabbed] = React.useState(false)
   const end = (e: React.PointerEvent) => {
     if (start.current === null) return
     start.current = null
+    setGrabbed(false)
     e.currentTarget.releasePointerCapture(e.pointerId)
     // Pointer capture keeps the pointer's release from reaching the button, so a plain tap toggles here.
     if (dragged.current) onDrop()
@@ -2439,6 +2492,7 @@ function TrayNotch({
       onPointerDownCapture={(e) => {
         start.current = e.clientY
         dragged.current = false
+        setGrabbed(true)
         e.currentTarget.setPointerCapture(e.pointerId)
       }}
       onPointerMoveCapture={(e) => {
@@ -2468,7 +2522,10 @@ function TrayNotch({
         {/* Frosted glass: a faint tint with a hairline, and content scrolling under it shows through, blurred. */}
         <span
           aria-hidden="true"
-          className="h-1.5 w-16 rounded-full bg-foreground/20 shadow-xs ring-1 ring-foreground/10 transition-colors group-hover/button:bg-foreground/35 group-active/button:bg-foreground/50 supports-backdrop-filter:bg-foreground/10 supports-backdrop-filter:backdrop-blur-sm supports-backdrop-filter:group-hover/button:bg-foreground/25 supports-backdrop-filter:group-active/button:bg-foreground/40"
+          className={cn(
+            "h-1.5 w-16 rounded-full bg-foreground/20 opacity-0 shadow-xs ring-1 ring-foreground/10 transition-colors group-hover/button:bg-foreground/35 group-hover/button:opacity-100 group-focus-visible/button:opacity-100 group-active/button:bg-foreground/50 supports-backdrop-filter:bg-foreground/10 supports-backdrop-filter:backdrop-blur-sm supports-backdrop-filter:group-hover/button:bg-foreground/25 supports-backdrop-filter:group-active/button:bg-foreground/40 motion-safe:transition-[opacity,background-color] motion-safe:duration-200",
+            grabbed && "opacity-100"
+          )}
         />
       </Button>
     </div>
