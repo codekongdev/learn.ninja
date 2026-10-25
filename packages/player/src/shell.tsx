@@ -50,6 +50,7 @@ import { Slider } from "@workspace/ui/components/slider"
 import { Tooltip, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { usePlayer } from "./context"
 import type { QuestionCount } from "./flow"
 import { BRAND, LearnLogo } from "./logo"
 import { Ninja, type NinjaMood } from "./ninja"
@@ -63,6 +64,7 @@ import {
   type TextSize,
   type Theme,
 } from "./strings"
+import { hasVoice } from "./voices"
 
 // The frame around every lesson screen: header (home, title menu, progress, Share), the player's
 // settings at the end of the tray, footer (credit and app settings), and the Theory panel. Layout
@@ -98,7 +100,7 @@ export interface Preferences {
   uiLanguage?: string
   /** Whether the tray of action buttons under the lesson is open (it is until closed). */
   tray?: "open" | "closed"
-  /** Sound effects (on until muted). */
+  /** The ninja's voice (on until muted). */
   sound?: "on" | "off"
   /** The ninja's character (Sensei until changed). */
   ninja?: NinjaLevel
@@ -827,9 +829,6 @@ export const TRAY_BUTTON = "rounded-full px-4"
 export const TRAY_GHOST =
   "hover:bg-input aria-expanded:bg-input dark:hover:bg-input/50 dark:aria-expanded:bg-input/50"
 
-/** Sound effects aren't in yet; the setting is ready for when they are. */
-const SHOW_SOUND = false
-
 export const NINJA_LEVELS = [
   "off",
   "sensei",
@@ -847,7 +846,8 @@ const NINJA_PREVIEW: Record<NinjaLevel, NinjaMood> = {
 
 /**
  * Settings that change how the lesson plays, in the tray. The ninja's sits at the start, under the
- * corner he lives in; text size and sound sit at the end.
+ * corner he lives in; text size and sound sit at the end. Sound is his voice, so it shows only in a
+ * language he speaks.
  */
 export function PlayerSettings({
   prefs,
@@ -858,6 +858,7 @@ export function PlayerSettings({
   onPrefs: (patch: Partial<Preferences>) => void
   t: Strings
 }) {
+  const { lang = "en" } = usePlayer()
   const sound = prefs.sound ?? "on"
   const ninja = prefs.ninja ?? "sensei"
   return (
@@ -882,7 +883,7 @@ export function PlayerSettings({
         size="lg"
         className={cn(TRAY_BUTTON, TRAY_GHOST)}
       />
-      {SHOW_SOUND ? (
+      {hasVoice(lang) ? (
         <Button
           variant="ghost"
           size="lg"
@@ -900,7 +901,7 @@ export function PlayerSettings({
   )
 }
 
-/** The tray's settings (the ninja and text size) as submenus, for the phone menu. */
+/** The tray's settings (the ninja and text size as submenus, and sound) for the phone menu. */
 export function PlayerSettingsItems({
   prefs,
   onPrefs,
@@ -910,6 +911,8 @@ export function PlayerSettingsItems({
   onPrefs: (patch: Partial<Preferences>) => void
   t: Strings
 }) {
+  const { lang = "en" } = usePlayer()
+  const sound = prefs.sound ?? "on"
   const ninja = prefs.ninja ?? "sensei"
   return (
     <>
@@ -960,6 +963,16 @@ export function PlayerSettingsItems({
           ))}
         </DropdownMenuSubContent>
       </DropdownMenuSub>
+      {hasVoice(lang) ? (
+        <DropdownMenuItem
+          textValue={sound === "on" ? t.sound : t.muted}
+          aria-label={`${t.sound}: ${sound === "on" ? t.sound : t.muted}`}
+          onAction={() => onPrefs({ sound: sound === "on" ? "off" : "on" })}
+        >
+          {sound === "on" ? <Volume2Icon /> : <VolumeXIcon />}
+          {sound === "on" ? t.sound : t.muted}
+        </DropdownMenuItem>
+      ) : null}
     </>
   )
 }

@@ -123,6 +123,7 @@ import { Visual } from "./visuals"
 import {
   CADENCE,
   characterFor,
+  clipFor,
   createLinePicker,
   voiceLines,
   type LinePicker,
@@ -1081,6 +1082,7 @@ function Player({
                     ninja={ninja !== "off"}
                     level={ninja}
                     pickLine={pickLine}
+                    speak={ninja !== "off" && prefs.sound !== "off"}
                     onConceptDone={leaveConcept}
                     onStart={vanishIntro}
                     onBubbleRoom={setBubbleRoom}
@@ -1815,6 +1817,24 @@ function NextLesson({ topic, after }: { topic: string; after: string }) {
 
 type Tone = "neutral" | "good" | "warn"
 
+/**
+ * Plays the ninja's line: `src` is its clip (null when he stays quiet), `key` names the piece of
+ * feedback, so the same line said again later plays again. A new line, a muted player, or leaving
+ * the screen stops the one playing.
+ */
+function useSpokenLine(src: string | null, key: string | undefined) {
+  const audio = React.useRef<HTMLAudioElement | null>(null)
+  React.useEffect(() => {
+    if (!src) return
+    const el = (audio.current ??= new Audio())
+    el.src = src
+    // The browser may refuse before the learner has pressed anything, or the clip may not load:
+    // then he just doesn't speak.
+    el.play().catch(() => {})
+    return () => el.pause()
+  }, [src, key])
+}
+
 /** The feedback toast's recipe for each tone. */
 const TOAST = "rounded-xl border px-4 py-3 shadow-xs"
 /**
@@ -1847,6 +1867,7 @@ export function ActionArea({
   ninja = true,
   level = "sensei",
   pickLine: picker,
+  speak = false,
   onConceptDone,
   onStart,
   inBubble = false,
@@ -1875,6 +1896,8 @@ export function ActionArea({
   level?: NinjaLevel
   /** The lesson's line picker, shared across screens so lines don't repeat. A demo of one brick can omit it. */
   pickLine?: LinePicker
+  /** The ninja says his line out loud (the player, with sound on and the ninja not Off). */
+  speak?: boolean
   /** "Got it" on a concept: the player animates the card away before moving on. */
   onConceptDone?: () => void
   /** Starts the lesson from the intro (the player makes the intro vanish first). */
@@ -1930,13 +1953,17 @@ export function ActionArea({
   )
 
   // One line per piece of feedback, in the character's voice, rationed and without repeats.
-  const say = (moment: Moment) =>
-    pickLine(
-      `${state.index}-${state.question?.attempts ?? 0}-${state.question?.phase ?? ""}-${moment}-${level}`,
+  const said: { key?: string; line?: string } = {}
+  const say = (moment: Moment) => {
+    said.key = `${state.index}-${state.question?.attempts ?? 0}-${state.question?.phase ?? ""}-${moment}-${level}`
+    said.line = pickLine(
+      said.key,
       moment,
       voiceLines(lang, level, moment),
       CADENCE[characterFor(level)]
     )
+    return said.line
+  }
   if (item.kind === "intro")
     primary = {
       label: t.start,
@@ -2054,6 +2081,12 @@ export function ActionArea({
         primaryRef.current?.focus()
       })
   }
+  // He says the line that heads the feedback, once per piece of feedback.
+  useSpokenLine(
+    speak && said.line && title === said.line ? clipFor(lang, said.line) : null,
+    said.key
+  )
+
   // On phones the feedback is a card in the tray, and Why? sits in it so Continue keeps the width.
   const phoneCard = Boolean(tray?.feedbackEl && (title || message))
   const whyButton = (inCard: boolean) =>
