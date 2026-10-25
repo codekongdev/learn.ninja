@@ -35,6 +35,7 @@ import { zh } from "./locales/voices/zh"
 import { zhTw } from "./locales/voices/zh-tw"
 import { seeded } from "./random"
 import { uiLanguageFor, type NinjaLevel, type UiLanguage } from "./strings"
+import voiceClips from "./voice-clips.json"
 
 /** A point in a lesson where the ninja says something. */
 export type Moment =
@@ -103,6 +104,30 @@ export function voiceLines(
 ): Lines {
   const voices = VOICES[uiLanguageFor(lang)?.code ?? "en"]
   return voices[characterFor(level)][moment]
+}
+
+/**
+ * The ninja's spoken lines: for each language that has them (only English so far), each line's
+ * clip, an mp3 at /voice/{language}/{clip}.mp3. Written by `npm run voice -w @workspace/player`.
+ */
+export type VoiceClips = {
+  voice: string
+  model: string
+  clips: Partial<Record<UiLanguage, Record<string, string>>>
+}
+
+const CLIPS = (voiceClips as VoiceClips).clips
+
+/** Whether the ninja speaks in the player's language. */
+export function hasVoice(lang: string): boolean {
+  return Boolean(CLIPS[uiLanguageFor(lang)?.code ?? "en"])
+}
+
+/** The URL of a line's clip in the player's language, or null for a line he doesn't speak. */
+export function clipFor(lang: string, line: string): string | null {
+  const code = uiLanguageFor(lang)?.code ?? "en"
+  const clip = CLIPS[code]?.[line]
+  return clip ? `/voice/${code}/${clip}.mp3` : null
 }
 
 /**

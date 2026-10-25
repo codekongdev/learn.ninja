@@ -1,9 +1,14 @@
+import { existsSync } from "node:fs"
+import { fileURLToPath } from "node:url"
+
 import { describe, expect, it } from "vitest"
 
 import { UI_LANGUAGES } from "./strings"
 import {
   CADENCE,
+  clipFor,
   createLinePicker,
+  hasVoice,
   voiceLines,
   type Lines,
   type Moment,
@@ -155,5 +160,29 @@ describe("voices", () => {
     const pick = createLinePicker("lesson")
     const first = pick("q1", "praise", lines, CADENCE.casual)
     expect(pick("q1", "praise", lines, CADENCE.casual)).toBe(first)
+  })
+
+  it("speaks every English line, from a clip in the web app", () => {
+    // Stale after changing the English lines: run `npm run voice -w @workspace/player`.
+    const publicDir = fileURLToPath(
+      new URL("../../../apps/web/public", import.meta.url)
+    )
+    for (const level of CHARACTERS)
+      for (const moment of MOMENTS) {
+        const { plain, flavor } = voiceLines("en", level, moment)
+        for (const line of [...plain, ...flavor]) {
+          const url = clipFor("en", line)
+          expect(url, `a clip for "${line}"`).not.toBeNull()
+          expect(existsSync(publicDir + url), `${url} for "${line}"`).toBe(true)
+        }
+      }
+  })
+
+  it("stays quiet in languages without clips", () => {
+    expect(hasVoice("en")).toBe(true)
+    expect(hasVoice("ja")).toBe(false)
+    expect(
+      clipFor("ja", voiceLines("ja", "sensei", "praise").plain[0]!)
+    ).toBeNull()
   })
 })

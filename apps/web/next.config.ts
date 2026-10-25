@@ -173,6 +173,16 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // The ninja's spoken lines: each clip's name is a hash of its voice and text, so it never changes.
+      {
+        source: "/voice/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
     ]
   },
   async redirects() {
