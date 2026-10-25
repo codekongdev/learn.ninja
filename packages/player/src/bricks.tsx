@@ -176,6 +176,67 @@ export function Explanation({
   )
 }
 
+/**
+ * The player's feedback under the answers, beside the ninja's line: a miss's hint or a scenario's
+ * outcome in amber, the explanation in green. The explanation's recipe, led by a filled icon.
+ */
+export function Note({
+  tone,
+  text,
+  className,
+}: {
+  tone: "good" | "warn"
+  text: string
+  className?: string
+}) {
+  return (
+    <div
+      className={cn(
+        "flex items-start gap-2.5 rounded-lg border px-4 py-3 text-sm tabular-nums",
+        tone === "good"
+          ? "border-green-600 bg-green-600/10"
+          : "border-yellow-500 bg-yellow-500/10",
+        className
+      )}
+    >
+      {/* A filled dot: a white check, or a dark "!" (white is too faint on yellow). */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full",
+          tone === "good"
+            ? "bg-green-600 text-white"
+            : "bg-yellow-500 text-yellow-950"
+        )}
+      >
+        {tone === "good" ? (
+          <CheckIcon className="size-3" strokeWidth={3} />
+        ) : (
+          // Lucide's circle-alert mark, without its circle.
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={3}
+            strokeLinecap="round"
+            className="size-3"
+          >
+            <path d="M12 7v6M12 17h.01" />
+          </svg>
+        )}
+      </span>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        {text
+          .split("\n")
+          .filter((line) => line.trim())
+          .map((line, i) => (
+            <RichText key={i} text={line} className="block" />
+          ))}
+      </div>
+    </div>
+  )
+}
+
 export function OptionsBrick({
   brick,
   answer,
