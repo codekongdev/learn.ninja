@@ -850,10 +850,13 @@ const NINJA_PREVIEW: Record<NinjaLevel, NinjaMood> = {
  * language he speaks.
  */
 export function PlayerSettings({
+  side,
   prefs,
   onPrefs,
   t,
 }: {
+  /** Which end of the tray: the ninja's setting, or text size and sound. */
+  side: "start" | "end"
   prefs: Preferences
   onPrefs: (patch: Partial<Preferences>) => void
   t: Strings
@@ -861,13 +864,16 @@ export function PlayerSettings({
   const { lang = "en" } = usePlayer()
   const sound = prefs.sound ?? "on"
   const ninja = prefs.ninja ?? "sensei"
-  return (
-    <>
+  if (side === "start")
+    return (
       <NinjaSetting
         value={ninja}
         onChange={(ninja) => onPrefs({ ninja })}
         t={t}
       />
+    )
+  return (
+    <>
       <SettingMenu
         label={t.textSize}
         icon={<TypeIcon />}

@@ -1181,14 +1181,25 @@ function Player({
                 <div className="flex items-center gap-2">
                   {/* Equal sides keep the actions in the middle. On phones the settings are in the header's menu. */}
                   <div className="flex flex-1 items-center gap-1 max-sm:hidden">
-                    <PlayerSettings prefs={prefs} onPrefs={onPrefs} t={t} />
+                    <PlayerSettings
+                      side="start"
+                      prefs={prefs}
+                      onPrefs={onPrefs}
+                      t={t}
+                    />
                   </div>
                   <div
                     ref={setActionsEl}
                     className="flex flex-wrap items-center justify-center gap-2 max-sm:flex-1 max-sm:flex-nowrap"
                   />
                   <div className="flex flex-1 items-center justify-end gap-1 max-sm:hidden">
-                    {/* The end of the tray holds help. Theory stays hidden while it's redesigned. */}
+                    <PlayerSettings
+                      side="end"
+                      prefs={prefs}
+                      onPrefs={onPrefs}
+                      t={t}
+                    />
+                    {/* Then help. Theory stays hidden while it's redesigned. */}
                     {SHOW_THEORY ? (
                       <Button
                         variant="ghost"
