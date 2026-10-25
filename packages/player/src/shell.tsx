@@ -58,6 +58,7 @@ import { RichBlocks } from "./rich-text"
 import { timeLeft, type TimeLeft } from "./time"
 import {
   UI_LANGUAGES,
+  UI_TRANSLATIONS,
   uiLanguageFor,
   type NinjaLevel,
   type Strings,
@@ -108,8 +109,10 @@ export interface Preferences {
 
 const PREFERENCES_KEY = "learn:preferences"
 
+/** The viewer's preferences, the setter, and whether the saved ones have been read yet. */
 export function usePreferences() {
   const [prefs, setPrefs] = React.useState<Preferences>({ textSize: "md" })
+  const [loaded, setLoaded] = React.useState(false)
   React.useEffect(() => {
     try {
       const saved = JSON.parse(
@@ -123,9 +126,15 @@ export function usePreferences() {
       }
       if (saved.ninja && saved.ninja in renamed)
         saved.ninja = renamed[saved.ninja]
-      setPrefs((p) => ({ ...p, ...(saved as Partial<Preferences>) }))
+      // In a transition: a saved language keeps the current one up until it has loaded, and
+      // `loaded` turns true in the same commit as the preferences it read.
+      React.startTransition(() => {
+        setPrefs((p) => ({ ...p, ...(saved as Partial<Preferences>) }))
+        setLoaded(true)
+      })
     } catch {
       // Storage can be blocked or empty; the defaults are fine.
+      setLoaded(true)
     }
   }, [])
   const update = React.useCallback((patch: Partial<Preferences>) => {
@@ -139,7 +148,7 @@ export function usePreferences() {
       return next
     })
   }, [])
-  return [prefs, update] as const
+  return [prefs, update, loaded] as const
 }
 
 /** Time until the link expires, updated every minute. Null until mounted. */
@@ -743,26 +752,28 @@ export function AppSettingsItems({
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       ) : null}
-      <DropdownMenuSub>
-        <DropdownMenuSubTrigger textValue={t.language}>
-          <GlobeIcon />
-          {t.language}
-          <span className="text-muted-foreground">{language.label}</span>
-        </DropdownMenuSubTrigger>
-        <DropdownMenuSubContent
-          aria-label={t.language}
-          // About nine rows; the rest scrolls.
-          maxHeight={320}
-          selectedKeys={[language.code]}
-          {...single((code) => onPrefs({ uiLanguage: code }))}
-        >
-          {UI_LANGUAGES.map((l) => (
-            <DropdownMenuItem key={l.code} id={l.code} textValue={l.label}>
-              <span lang={l.code}>{l.label}</span>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuSubContent>
-      </DropdownMenuSub>
+      {UI_TRANSLATIONS ? (
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger textValue={t.language}>
+            <GlobeIcon />
+            {t.language}
+            <span className="text-muted-foreground">{language.label}</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent
+            aria-label={t.language}
+            // About nine rows; the rest scrolls.
+            maxHeight={320}
+            selectedKeys={[language.code]}
+            {...single((code) => onPrefs({ uiLanguage: code }))}
+          >
+            {UI_LANGUAGES.map((l) => (
+              <DropdownMenuItem key={l.code} id={l.code} textValue={l.label}>
+                <span lang={l.code}>{l.label}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+      ) : null}
     </>
   )
 }

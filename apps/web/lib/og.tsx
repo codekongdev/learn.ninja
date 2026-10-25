@@ -4,7 +4,12 @@ import { join } from "node:path"
 import { ImageResponse } from "next/og"
 
 import { plainText } from "@workspace/player/plain-text"
-import { stringsFor, type Strings } from "@workspace/player/strings"
+import {
+  loadLanguage,
+  stringsFor,
+  UI_TRANSLATIONS,
+  type Strings,
+} from "@workspace/player/strings"
 import type { Lesson } from "@workspace/spec"
 
 import { AGENTS, INSTALL_COMMAND, SITE } from "./site"
@@ -621,8 +626,10 @@ export function siteImage(size: Size = OG_SIZE) {
 }
 
 /** A lesson's card: title and summary, with its first question in the player's window. */
-export function lessonImage(lesson: Lesson) {
-  const t = stringsFor(lesson.language)
+export async function lessonImage(lesson: Lesson) {
+  // The card's own words (minutes, level) in the player's language: English while translations are off.
+  const t = (await loadLanguage(UI_TRANSLATIONS ? lesson.language : "en"))
+    .strings
   const dir = /^(ar|he|fa|ur)\b/i.test(lesson.language) ? "rtl" : "ltr"
   const shown = peek(lesson)
   // Length and level, as the row and the title screen show them; tags stay hidden for now.

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs"
 
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { beforeAll, beforeEach, describe, expect, it } from "vitest"
 
 import { connectPglite, lesson, lessonTag, user, type Db } from "@workspace/db"
@@ -29,7 +29,7 @@ import {
   tokenMatches,
 } from "./ids"
 import { MemoryRateLimiter } from "./rate-limit"
-import { LESSON_TTL_SECONDS, PostgresLessonStore } from "./store"
+import { atomically, LESSON_TTL_SECONDS, PostgresLessonStore } from "./store"
 
 const example = (file: string) =>
   readFileSync(new URL(`../../../../examples/${file}`, import.meta.url), "utf8")
@@ -91,6 +91,25 @@ describe("links and tokens", () => {
 })
 
 describe("publishing", () => {
+  it("writes a lesson's changes as one: when a later write fails, the earlier ones are undone", async () => {
+    const { body } = await publishLesson({ text: buttons, client: "x" }, deps)
+    const id = body.id as string
+    await expect(
+      atomically(db, (q) => [
+        q.update(lesson).set({ views: 999 }).where(eq(lesson.id, id)),
+        q.delete(lessonTag).where(eq(lessonTag.lessonId, id)),
+        q.execute(sql`select 1 / 0`),
+      ])
+    ).rejects.toThrow()
+    const [row] = await db.select().from(lesson).where(eq(lesson.id, id))
+    expect(row?.views).toBe(0)
+    const tags = await db
+      .select()
+      .from(lessonTag)
+      .where(eq(lessonTag.lessonId, id))
+    expect(tags.length).toBeGreaterThan(0)
+  })
+
   it("publishes a valid lesson with a link, an edit token, and a 7-day expiry", async () => {
     const reply = await publishLesson(
       { text: buttons, client: "1.2.3.4", skillVersion: LATEST_SKILL_VERSION },
@@ -443,6 +462,23 @@ describe("publishing", () => {
 describe("claiming", () => {
   const anonymous = () => publishLesson({ text: buttons, client: "x" }, deps)
 
+  it("gives a lesson kept twice at once to one account, and tells the other", async () => {
+    const { body } = await anonymous()
+    const claim = (ownerId: string) =>
+      claimLesson(
+        {
+          id: body.id as string,
+          claimToken: body.claimToken as string,
+          ownerId,
+        },
+        deps
+      )
+    const replies = await Promise.all([claim("user_1"), claim("user_2")])
+    expect(replies.map((r) => r.status).sort()).toEqual([200, 409])
+    const winner = replies[0]!.status === 200 ? "user_1" : "user_2"
+    expect((await deps.store.get(body.id as string))?.ownerId).toBe(winner)
+  })
+
   it("keeps a lesson with its id and claim token: owned, still private, never expiring, token spent", async () => {
     const { body } = await anonymous()
     const reply = await claimLesson(
@@ -725,6 +761,31 @@ describe("claiming", () => {
       status: 200,
       body: { owned: true, expiresAt: null, owner: { handle: "one" } },
     })
+  })
+
+  it("stops taking the anonymous edit token once a kept lesson is in Explore, but not its owner", async () => {
+    const { body } = await anonymous()
+    const id = body.id as string
+    await claimLesson(
+      { claimToken: body.claimToken as string, ownerId: "user_1" },
+      deps
+    )
+    await db
+      .update(lesson)
+      .set({ visibility: "public" })
+      .where(eq(lesson.id, id))
+    const edit = (who: { editToken: string | null; actorId?: string }) =>
+      updateLesson({ id, text: buttons, client: "x", ...who }, deps)
+    expect(await edit({ editToken: body.editToken as string })).toMatchObject({
+      status: 401,
+      body: {
+        error: "unauthorized",
+        message: expect.stringContaining("owner"),
+      },
+    })
+    expect((await edit({ editToken: null, actorId: "user_1" })).status).toBe(
+      200
+    )
   })
 })
 

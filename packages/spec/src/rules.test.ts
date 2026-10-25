@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { loadExample } from "./test-helpers"
+import { matchesBlank } from "./basics"
 import { bareCode, positionalReference } from "./rules"
 import { SUBJECTS } from "./subjects"
 import { validateLesson } from "./validate"
@@ -1437,6 +1438,59 @@ describe("teaching rules", () => {
   })
 })
 
+describe("blank bricks", () => {
+  const spanish = () => loadExample("spanish-greetings.json")
+
+  it("compare chips the way the player does", () => {
+    expect(matchesBlank("cómo", "Cómo")).toBe(true)
+    expect(matchesBlank("cómo", "Cómo", { caseSensitive: true })).toBe(false)
+    expect(matchesBlank("cómo", "como")).toBe(false)
+    expect(matchesBlank("0.5", "0.50", { numeric: true })).toBe(true)
+    expect(matchesBlank("1.05", "1.06", { numeric: true })).toBe(false)
+    expect(
+      matchesBlank("1.05", "1.06", { numeric: true, tolerance: 0.01 })
+    ).toBe(true)
+    expect(matchesBlank("0.5", "0.50")).toBe(false)
+  })
+
+  it("accept an answer whose chip differs only in case, as the player does", () => {
+    const l = spanish()
+    l.bricks[4].blanks[0].accept = ["cómo"]
+    expect(validateLesson(l).ok).toBe(true)
+  })
+
+  it("reject a decoy that counts as the answer", () => {
+    const l = spanish()
+    l.bricks[4].blanks[0].choices.push("CÓMO")
+    expectIssue(l, {
+      path: "bricks[4].blanks[0].choices",
+      message: /"CÓMO" counts as a right answer/,
+    })
+  })
+
+  it("reject feedback for a mistake that isn't a chip", () => {
+    const l = spanish()
+    l.bricks[4].blanks[0].mistakes[0].answer = "Cuándo"
+    expectIssue(l, {
+      path: "bricks[4].blanks[0].mistakes[0]",
+      message: /isn't one of blank "c"'s chips/,
+    })
+  })
+
+  it("want a decoy among the chips", () => {
+    const l = spanish()
+    const [c, g] = l.bricks[4].blanks
+    c.choices = ["Cómo", "gracias"]
+    g.choices = ["gracias", "Cómo"]
+    delete c.mistakes
+    delete g.mistakes
+    expectIssue(l, {
+      kind: "teaching",
+      message: /Every chip is a right answer/,
+    })
+  })
+})
+
 describe("safety rules", () => {
   it.each([
     ["<script>alert(1)</script>", /can't contain <script>/],
@@ -1476,6 +1530,27 @@ describe("safety rules", () => {
     expect(validateLesson(l).issues.filter((i) => i.kind === "safety")).toEqual(
       []
     )
+  })
+
+  it.each([
+    "<div class='h-screen'>Tall</div>",
+    '<div class="flex min-h-dvh">Tall</div>',
+    "<div class='h-[60vh]'>Tall</div>",
+    "<div style='height: 100vh'>Tall</div>",
+    "<style>.box { min-height: 50svh }</style><div class='box'>Tall</div>",
+  ])("rejects a visual sized to the screen's height: %s", (html) => {
+    const l = buttons()
+    l.bricks[0].visual.html = html
+    expectIssue(l, { message: /screen's height/ })
+  })
+
+  it("lets a visual mention vh in its text", () => {
+    const l = buttons()
+    l.bricks[0].visual.html =
+      "<p>Use <code>100vh</code> or <code>h-screen</code> for a full-height hero.</p>"
+    expect(
+      validateLesson(l).issues.filter((i) => /screen's height/.test(i.message))
+    ).toEqual([])
   })
 
   it("checks a long visual in linear time", () => {

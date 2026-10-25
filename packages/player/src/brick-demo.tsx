@@ -19,7 +19,12 @@ import {
 } from "./lesson-player"
 import { emptyPrepared, type Prepared } from "./prepared"
 import { seeded } from "./random"
-import { ariaLocaleFor, stringsFor, type TextSize } from "./strings"
+import {
+  ariaLocaleFor,
+  UI_TRANSLATIONS,
+  useStrings,
+  type TextSize,
+} from "./strings"
 
 export interface BrickDemoProps {
   lesson: Lesson
@@ -38,7 +43,16 @@ export interface BrickDemoProps {
 }
 
 /** One brick, playable on its own: check, feedback, retry. Continue starts it over; concepts have no action. */
-export function BrickDemo({
+export function BrickDemo(props: BrickDemoProps) {
+  // Suspends until the lesson's language has loaded; hydration keeps the server's HTML meanwhile.
+  return (
+    <React.Suspense>
+      <Demo {...props} />
+    </React.Suspense>
+  )
+}
+
+function Demo({
   lesson,
   brickId,
   prepared = emptyPrepared,
@@ -49,7 +63,8 @@ export function BrickDemo({
   className,
 }: BrickDemoProps) {
   const brick = findBrick(lesson, brickId)
-  const ui = lesson.language
+  const ui = UI_TRANSLATIONS ? lesson.language : "en"
+  const t = useStrings(ui)
   const dir = /^(ar|he|fa|ur)\b/i.test(ui) ? "rtl" : "ltr"
   const [state, dispatch] = React.useReducer(
     (s: State, a: Action) =>
@@ -65,7 +80,7 @@ export function BrickDemo({
       <PlayerProvider
         value={{
           prepared,
-          t: stringsFor(ui),
+          t,
           lang: ui,
           dir,
           visualsCss,

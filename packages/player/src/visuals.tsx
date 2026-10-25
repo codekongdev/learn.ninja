@@ -107,6 +107,9 @@ export function Visual({
  */
 export const VISUAL_SANDBOX = "allow-same-origin"
 
+/** The tallest an HTML visual's frame grows, in pixels. */
+const MAX_VISUAL_HEIGHT = 2400
+
 /**
  * The frame's own Content-Security-Policy, first in its head. The lesson page's header policy only
  * covers a page loaded from a lesson URL, not one reached by an in-app link, so the frame carries
@@ -114,6 +117,13 @@ export const VISUAL_SANDBOX = "allow-same-origin"
  */
 export const VISUAL_CSP =
   "default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
+
+/**
+ * The heights HTML visuals measured at, by frame width and document. A frame seen before, or drawn
+ * ahead out of sight (VisualsAhead in lesson-player.tsx), starts at its height instead of at 120px
+ * and jumping once it has loaded and been measured.
+ */
+const knownHeights = new Map<string, number>()
 
 /** Keeps CSS inside its <style>: "</" would otherwise end the tag and inject markup. A CSS "\/" still means "/". */
 const inStyle = (css: string) => css.replace(/<\//g, "<\\/")
@@ -143,25 +153,46 @@ function HtmlFrame({
   const hotspotsRef = React.useRef(hotspots)
   hotspotsRef.current = hotspots
 
-  // The document is fixed per lesson visual; theme and direction are applied after load without reloading.
+  // The document is fixed per lesson visual; the theme is applied after load without reloading. Its
+  // direction is its own (dir="auto"), like lesson text: the interface's language doesn't mirror it.
   const srcDoc = React.useMemo(
     () =>
       // Without an explicit height the body keeps its natural size, so the player can measure it.
-      `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${VISUAL_CSP}"><link rel="stylesheet" href="${visualsCss}"><style>${inStyle(prepared.visualsCss)}</style><style>html,body{background:transparent}body{margin:0;padding:16px;display:flex;justify-content:center;align-items:center;box-sizing:border-box${height ? ";min-height:100vh" : ""}}${inStyle(css ?? "")}</style></head><body>${html}</body></html>`,
+      `<!doctype html><html dir="auto"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${VISUAL_CSP}"><link rel="stylesheet" href="${visualsCss}"><style>${inStyle(prepared.visualsCss)}</style><style>html,body{background:transparent}body{margin:0;padding:16px;display:flex;justify-content:center;align-items:center;box-sizing:border-box${height ? ";min-height:100vh" : ""}}${inStyle(css ?? "")}</style></head><body>${html}</body></html>`,
     [html, css, visualsCss, height, prepared.visualsCss]
   )
 
+  // A height known from before, set ahead of the first paint: the frame has its width by now.
+  React.useLayoutEffect(() => {
+    const width = ref.current?.clientWidth
+    if (height || !width) return
+    const known = knownHeights.get(`${width}:${srcDoc}`)
+    if (known) setMeasured(known)
+  }, [srcDoc, height])
+
   // Size the frame to its content. allow-same-origin (without allow-scripts) lets the player measure it.
+  // Not before the visual has loaded: the blank document a frame starts with would set a wrong
+  // height, over a known one.
   React.useEffect(() => {
     const doc = ref.current?.contentDocument
-    if (!doc?.body || height) return
-    const measure = () =>
-      setMeasured(Math.ceil(doc.body.getBoundingClientRect().height))
+    if (!loaded || !doc?.body || height) return
+    // Capped, so content tied to the frame's own height (which the checker refuses) can't grow it forever.
+    const measure = () => {
+      const measured = Math.min(
+        MAX_VISUAL_HEIGHT,
+        Math.ceil(doc.body.getBoundingClientRect().height)
+      )
+      setMeasured(measured)
+      // Remembered for the next frame that shows this visual at this width.
+      const width = ref.current?.clientWidth
+      if (width && measured > 0)
+        knownHeights.set(`${width}:${srcDoc}`, measured)
+    }
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(doc.body)
     return () => observer.disconnect()
-  }, [loaded, height])
+  }, [loaded, height, srcDoc])
 
   // Drawings sit in the middle of their own canvas: a viewBox with empty space on one side would
   // push the drawing off-center however the frame lays it out. Runs before the hotspots are measured.
@@ -182,8 +213,7 @@ function HtmlFrame({
     // Before the srcDoc loads, the frame's document can be empty; this runs again on load.
     if (!doc?.documentElement) return
     doc.documentElement.classList.toggle("dark", dark)
-    doc.documentElement.dir = dir
-  }, [loaded, dark, dir])
+  }, [loaded, dark])
 
   // Hotspots: Safari won't run event listeners inside a sandbox without allow-scripts, so the taps
   // land on buttons the player lays over each [data-hotspot] element instead. That also keeps focus

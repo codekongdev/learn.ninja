@@ -2,6 +2,7 @@ import type { Lesson, QuestionBrick } from "@workspace/spec"
 
 import { buildSequence, type Item, type Outcome } from "./flow"
 import { freshQuestion, type QuestionState, type State } from "./lesson-player"
+import { UI_TRANSLATIONS } from "./strings"
 
 // Where a learner is in a lesson, kept in the browser so reopening the page (or reloading it)
 // carries on from the same screen instead of the intro. One entry per lesson, keyed by the page.
@@ -131,21 +132,29 @@ export function saveProgress(
 
 /**
  * An inline script for the server-rendered page, placed first inside the player's root: before
- * anything paints, it marks the root `data-resuming` when the browser holds progress for this
- * lesson, so the intro the server rendered stays hidden (`data-resuming:invisible`) until
- * `loadProgress` has put the saved screen in its place and the player clears the mark. A fresh
- * visit, blocked storage, or a changed lesson leaves the root alone.
+ * anything paints, it marks the root `data-resuming` when what the server drew is about to change,
+ * so it stays hidden (`data-resuming:invisible`) until the player has made the change and clears
+ * the mark. That's when the browser holds progress for this lesson (with `key`), or the learner's
+ * saved preferences differ from the server's defaults: another language (or ?ui= asks for one),
+ * another text size, or the tray closed. A fresh visit with no preferences, or blocked storage,
+ * leaves the root alone.
  */
-export function resumeScript(key: string, lesson: Lesson): string {
-  const name = JSON.stringify(PREFIX + key).replace(/</g, "\\u003c")
-  const print = JSON.stringify(fingerprint(lesson))
-  return (
-    "(function(){try{" +
-    `var s=JSON.parse(localStorage.getItem(${name}));` +
-    `if(s&&(s.v===1||s.v===${VERSION})&&s.fingerprint===${print})` +
-    'document.currentScript.parentNode.setAttribute("data-resuming","")' +
-    "}catch(e){}})()"
-  )
+export function resumeScript(key: string | null, lesson: Lesson): string {
+  const progress = key
+    ? `var s=JSON.parse(localStorage.getItem(${JSON.stringify(PREFIX + key)}));` +
+      `if(s&&(s.v===1||s.v===${VERSION})&&s.fingerprint===${JSON.stringify(fingerprint(lesson))})h=1;`
+    : ""
+  const script =
+    "(function(){var r=document.currentScript.parentNode,h=0;" +
+    `try{${progress}}catch(e){}` +
+    // The preferences shell.tsx keeps (PREFERENCES_KEY); the server draws English-or-the-lesson's
+    // language, medium text, and the tray open.
+    'try{var p=JSON.parse(localStorage.getItem("learn:preferences")||"{}"),' +
+    `u=new URLSearchParams(location.search).get("ui")${UI_TRANSLATIONS ? "||p.uiLanguage" : ""};` +
+    'if((u&&String(u).toLowerCase()!==(r.getAttribute("lang")||"").toLowerCase())||' +
+    '(p.textSize&&p.textSize!=="md")||p.tray==="closed")h=1}catch(e){}' +
+    'if(h)r.setAttribute("data-resuming","")})()'
+  return script.replace(/</g, "\\u003c")
 }
 
 function prune(storage: Storage) {

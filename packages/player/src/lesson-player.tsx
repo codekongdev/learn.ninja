@@ -12,10 +12,11 @@ import {
   RotateCcwIcon,
 } from "lucide-react"
 
-import type {
-  ConceptBrick as ConceptBrickData,
-  Lesson,
-  QuestionBrick,
+import {
+  matchesBlank,
+  type ConceptBrick as ConceptBrickData,
+  type Lesson,
+  type QuestionBrick,
 } from "@workspace/spec"
 import { Alert, AlertDescription } from "@workspace/ui/components/alert"
 import { Badge } from "@workspace/ui/components/badge"
@@ -114,7 +115,8 @@ import {
 } from "./shell"
 import {
   ariaLocaleFor,
-  stringsFor,
+  UI_TRANSLATIONS,
+  useStrings,
   type NinjaLevel,
   type Strings,
   type TextSize,
@@ -182,7 +184,19 @@ export interface LessonPlayerProps {
   creator?: LessonCreator
 }
 
-export function LessonPlayer({
+/**
+ * A whole lesson. It suspends until its language has loaded (useStrings): while the page hydrates,
+ * React keeps the server's HTML in place meanwhile, so nothing flashes.
+ */
+export function LessonPlayer(props: LessonPlayerProps) {
+  return (
+    <React.Suspense>
+      <LessonInLanguage {...props} />
+    </React.Suspense>
+  )
+}
+
+function LessonInLanguage({
   lesson,
   prepared = emptyPrepared,
   uiLanguage,
@@ -211,14 +225,31 @@ export function LessonPlayer({
   const [title, setTitle] = React.useState(lesson.title)
   React.useEffect(() => setTitle(lesson.title), [lesson.title])
   const shown = React.useMemo(() => ({ ...lesson, title }), [lesson, title])
-  const [prefs, setPrefs] = usePreferences()
+  const [prefs, setPrefs, prefsLoaded] = usePreferences()
   const fixedTray = useFixedTray()
   // The keyboard shortcuts dialog lives in the footer; "?" (handled in the player) opens it too.
   const [shortcutsOpen, setShortcutsOpen] = React.useState(false)
   // A choice made in the footer wins over the page's default for this session.
   const [chosen, setChosen] = React.useState<string>()
-  const ui = chosen ?? uiLanguage ?? prefs.uiLanguage ?? lesson.language
-  const t = stringsFor(ui)
+  // With translations off (UI_TRANSLATIONS), only ?ui= (uiLanguage) picks another than English.
+  const ui =
+    chosen ??
+    uiLanguage ??
+    (UI_TRANSLATIONS ? (prefs.uiLanguage ?? lesson.language) : "en")
+  // Suspends until the language's chunk is in; a change of language waits in a transition.
+  const t = useStrings(ui)
+  // Reveal the player once what the before-paint script hid it for is in: the saved preferences,
+  // in their language (they commit together, after it loads), and ?ui='s language, which a
+  // prerendered page applies after mounting (progress is resumed earlier, before the first paint).
+  // A few seconds at most, whatever happens.
+  React.useEffect(() => {
+    const reveal = () => root.current?.removeAttribute("data-resuming")
+    const timer = window.setTimeout(reveal, 3000)
+    const wanted = new URLSearchParams(window.location.search).get("ui")
+    if (prefsLoaded && (!wanted || wanted.toLowerCase() === ui.toLowerCase()))
+      reveal()
+    return () => window.clearTimeout(timer)
+  }, [prefsLoaded, ui])
   const locale = ariaLocaleFor(ui)
   const dir = /^(ar|he|fa|ur)\b/i.test(ui) ? "rtl" : "ltr"
   const appSettings = {
@@ -226,8 +257,11 @@ export function LessonPlayer({
     onThemeChange,
     uiLanguage: ui,
     onPrefs: (patch: Partial<Preferences>) => {
-      if (patch.uiLanguage) setChosen(patch.uiLanguage)
-      setPrefs(patch)
+      // In a transition: the current language stays up until the new one has loaded.
+      React.startTransition(() => {
+        if (patch.uiLanguage) setChosen(patch.uiLanguage)
+        setPrefs(patch)
+      })
     },
     t,
   }
@@ -404,7 +438,11 @@ export function freshQuestion(
 export function wordBank(brick: Extract<QuestionBrick, { type: "blank" }>) {
   const words = [...new Set(brick.blanks.flatMap((b) => b.choices ?? []))]
   return words.flatMap((word) => {
-    const needed = brick.blanks.filter((b) => b.accept.includes(word)).length
+    const needed = brick.blanks.filter((b) =>
+      b.accept.some((a) =>
+        matchesBlank(a, word, { ...b, caseSensitive: brick.caseSensitive })
+      )
+    ).length
     return Array<string>(Math.max(1, needed)).fill(word)
   })
 }
@@ -712,21 +750,18 @@ function Player({
   // Saved progress comes back before the first paint after hydration, so a reload lands on the same
   // screen. The server's HTML still shows the intro until then; the inline script below (parsed
   // before the rest of the player) marks its parent, the player's root, to hide it when there's
-  // progress to resume, and the effect clears the mark once the saved screen is in. The mark is
-  // reached through the script's ref: the root's own ref isn't attached yet when this effect runs.
-  // A demo (startAt) never saves. The fingerprint, not the lesson, keys the effects: a rename
+  // progress to resume or preferences to apply, and LessonInLanguage clears the mark once they're
+  // in. A demo (startAt) never saves. The fingerprint, not the lesson, keys the effects: a rename
   // changes the lesson object but not what was saved.
   const print = React.useMemo(() => fingerprint(lesson), [lesson])
   const remember = progressKey && !startAt ? progressKey : null
   const loaded = React.useRef(false)
-  const mark = React.useRef<HTMLScriptElement>(null)
   React.useLayoutEffect(() => {
     if (!remember) return
     const storage = browserStorage()
     const saved = storage && loadProgress(storage, remember, lesson, print)
     if (saved) dispatch({ type: "resume", state: saved })
     loaded.current = true
-    mark.current?.parentElement?.removeAttribute("data-resuming")
     // The lesson is covered by its fingerprint.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remember, print])
@@ -786,8 +821,8 @@ function Player({
     null
   )
   const trayId = React.useId()
-  // The tray's natural height, and its height while the notch is being dragged.
-  const [trayHeight, setTrayHeight] = React.useState(0)
+  // The tray's natural height (null until measured), and its height while the notch is being dragged.
+  const [trayHeight, setTrayHeight] = React.useState<number | null>(null)
   const [dragHeight, setDragHeight] = React.useState<number | null>(null)
   // The same value in a ref: a quick flick can end before the state from its last move has rendered.
   const dragRef = React.useRef<number | null>(null)
@@ -799,7 +834,9 @@ function Player({
     observer.observe(trayEl)
     return () => observer.disconnect()
   }, [trayEl])
-  const shownHeight = dragHeight ?? (trayOpen ? trayHeight : 0)
+  // Until it's measured the open tray takes its natural height, so it doesn't slide open as the page
+  // loads; it only animates for a change after that.
+  const shownHeight = dragHeight ?? (trayOpen ? (trayHeight ?? "auto") : 0)
   // "?" shows the keyboard shortcuts, as it does on most of the web. D opens and closes the tray and
   // W the theory card (Why?), matched by key position so they work on any keyboard layout; touch
   // screens have no notch to toggle.
@@ -830,8 +867,8 @@ function Player({
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [keyScope])
-  // All feedback is in the ninja's speech bubble. After a right answer, Why? (or W) adds the
-  // explanation to it; each new screen starts with it closed.
+  // The ninja's line is in his speech bubble, the rest in a note under the answers. After a right
+  // answer, Why? (or W) adds the explanation note; each new screen starts with it closed.
   const [whyOpen, setWhyOpen] = React.useState(false)
   // Extra scroll room under the lesson when the bubble is taller than the space the screen leaves
   // for it. It sits below the centered column, so the lesson itself never moves.
@@ -900,20 +937,47 @@ function Player({
   // The ninja lives on the card and reacts to each check: pleased when it's right, sorry when it's not.
   const cardRef = React.useRef<HTMLDivElement>(null)
   const q = state.question
-  // On phones the tray grows to show feedback, which can push the marked answers below the fold:
-  // once it has settled, bring the last of them back into view.
+  // Feedback can land on the answers. On phones the tray grows to show it, which can push the marked
+  // answers below the fold: once it has settled, bring the last of them back into view. Wider, the
+  // toast floats in the card's corner, over the answers when they reach that far down (a tall
+  // question on a short screen): scroll them up clear of it, into the room the screen leaves below.
+  // The note under the answers always clears it, which also brings it up from below the fold, and
+  // Why? adding the explanation note runs this again.
   React.useEffect(() => {
     if (!q?.result || q.phase === "answering") return
-    if (!matchMedia("(width < 40rem)").matches) return
     const id = window.setTimeout(() => {
-      const marked = scrollRef.current?.querySelectorAll("[data-status]")
-      marked?.[marked.length - 1]?.scrollIntoView({
-        block: "nearest",
-        behavior: reducedMotion() ? "auto" : "smooth",
-      })
+      const scroller = scrollRef.current
+      if (!scroller) return
+      const behavior = reducedMotion() ? "auto" : "smooth"
+      if (matchMedia("(width < 40rem)").matches) {
+        const marked = scroller.querySelectorAll("[data-status]")
+        marked[marked.length - 1]?.scrollIntoView({
+          block: "nearest",
+          behavior,
+        })
+        return
+      }
+      const toast = cardRef.current
+        ?.querySelector("[data-feedback-toast]")
+        ?.getBoundingClientRect()
+      if (!toast) return
+      let lowest = -Infinity
+      for (const el of scroller.querySelectorAll(
+        "[data-slot=selectable], [data-status], [data-feedback-note]"
+      )) {
+        const r = el.getBoundingClientRect()
+        // Within a gap of the toast counts: a row it touches looks covered too.
+        if (
+          el.hasAttribute("data-feedback-note") ||
+          (r.right > toast.left - 12 && r.left < toast.right + 12)
+        )
+          lowest = Math.max(lowest, r.bottom)
+      }
+      const overlap = lowest + 12 - toast.top
+      if (overlap > 0) scroller.scrollBy({ top: overlap, behavior })
     }, 250)
     return () => window.clearTimeout(id)
-  }, [q?.result, q?.phase])
+  }, [q?.result, q?.phase, whyOpen])
   // A scenario opens with his brief (story mode): he steps up to tell it, then goes back to his
   // corner for the question. Each telling has its own key, so a replay starts fresh. With him off
   // there's no brief: the situation is on the question screen.
@@ -962,12 +1026,11 @@ function Player({
 
   return (
     <>
-      {remember ? (
+      {startAt ? null : (
         <script
-          ref={mark}
           dangerouslySetInnerHTML={{ __html: resumeScript(remember, lesson) }}
         />
-      ) : null}
+      )}
       {chrome ? (
         <LessonHeader
           title={lesson.title}
@@ -1114,6 +1177,7 @@ function Player({
                   <div aria-hidden="true" style={{ height: bubbleRoom }} />
                 ) : null}
               </main>
+              <VisualsAhead item={state.items[state.index + 1]} />
               {ninja !== "off" ? (
                 <NinjaStage
                   area={cardRef}
@@ -1141,15 +1205,16 @@ function Player({
                   controls={trayId}
                   onToggle={onTrayToggle}
                   onDrag={(dy) => {
-                    const from = trayOpen ? trayHeight : 0
+                    const full = trayHeight ?? 0
+                    const from = trayOpen ? full : 0
                     dragRef.current =
                       dy === null
                         ? null
-                        : Math.min(trayHeight, Math.max(0, from - dy))
+                        : Math.min(full, Math.max(0, from - dy))
                     setDragHeight(dragRef.current)
                   }}
                   onDrop={() => {
-                    const open = (dragRef.current ?? 0) > trayHeight / 2
+                    const open = (dragRef.current ?? 0) > (trayHeight ?? 0) / 2
                     if (open !== trayOpen) onTrayToggle()
                     dragRef.current = null
                     setDragHeight(null)
@@ -1163,6 +1228,7 @@ function Player({
               className={cn(
                 "shrink-0 overflow-hidden",
                 dragHeight === null &&
+                  trayHeight !== null &&
                   "transition-[height] duration-200 ease-out motion-reduce:transition-none"
               )}
               style={{ height: shownHeight }}
@@ -1258,6 +1324,33 @@ function NinjaSlot({ show, gap }: { show: boolean; gap: string }) {
 }
 
 /** Questions and short screens read best narrow; visuals and side-by-side bricks need room. */
+/**
+ * The next screen's HTML visual, drawn out of sight in a column as wide as that screen's, so its
+ * frame has loaded and measured its height (knownHeights in visuals.tsx) before the screen arrives,
+ * and starts at that height instead of growing into it. A hotspot's stage is laid out differently
+ * and takes keys, so it isn't drawn ahead.
+ */
+function VisualsAhead({ item }: { item: Item | undefined }) {
+  const visual =
+    (item?.kind === "concept" ||
+      (item?.kind === "question" && item.brick.type !== "hotspot")) &&
+    item.brick.visual?.kind === "html"
+      ? item.brick.visual
+      : null
+  if (!visual) return null
+  return (
+    <div
+      aria-hidden="true"
+      inert
+      className="pointer-events-none invisible absolute inset-x-0 top-0 h-0 overflow-hidden"
+    >
+      <div className={cn("mx-auto w-full px-4", columnWidth(item!))}>
+        <Visual visual={visual} />
+      </div>
+    </div>
+  )
+}
+
 function columnWidth(item: Item): string {
   if (item.kind === "intro") return "max-w-md"
   if (item.kind === "concept")
@@ -2210,17 +2303,8 @@ export function ActionArea({
   )
 
   // In the player the note says the message, so the bubble keeps only his line.
+  // The player scrolls it clear of the bubble (data-feedback-note).
   const note = inBubble ? message : null
-  const noteRef = React.useRef<HTMLDivElement>(null)
-  // A new note scrolls into view if a tall brick pushed it under the fold. (Hidden on phones, where
-  // it's in the tray, it doesn't scroll.)
-  React.useEffect(() => {
-    if (!note) return
-    noteRef.current?.scrollIntoView({
-      block: "nearest",
-      behavior: reducedMotion() ? "auto" : "smooth",
-    })
-  }, [note])
   const feedback = (withMessage: boolean) => (
     <>
       {title ? (
@@ -2262,12 +2346,12 @@ export function ActionArea({
         // Under the answers, a step closer than the column's gap. Keyed by the text, so Why? fades it in.
         // The text size goes on a wrapper: on the same element as text-sm, the scaled size doesn't resolve.
         <div
-          ref={noteRef}
           key={note}
+          data-feedback-note
           aria-hidden="true"
           data-text-size={textSize}
           className={cn(
-            "-mt-2 scroll-mb-40 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
+            "-mt-2 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-1",
             rewinding &&
               "motion-safe:animate-out motion-safe:fade-out-0 motion-safe:fill-mode-forwards",
             // On phones it's in the tray's card instead.
@@ -2290,6 +2374,7 @@ export function ActionArea({
           ref={setBubbleEl}
           key={`${state.index}-${state.question?.attempts ?? 0}-${tone}`}
           aria-hidden="true"
+          data-feedback-toast
           data-text-size={textSize}
           className={cn(
             TOAST,
@@ -2399,8 +2484,10 @@ function TrayNotch({
   return (
     // Capture-phase handlers: the button's own press handling stops pointer events from bubbling.
     // It floats over the content's bottom edge (centred by the auto margins) instead of taking a row.
+    // Hidden by CSS where useFixedTray will drop it (touch screens, phones), so the server's HTML
+    // doesn't show it there until hydration.
     <div
-      className="absolute inset-x-0 bottom-0 z-10 mx-auto w-fit"
+      className="absolute inset-x-0 bottom-0 z-10 mx-auto w-fit max-sm:hidden pointer-coarse:hidden"
       style={{ touchAction: "none" }}
       onPointerDownCapture={(e) => {
         start.current = e.clientY

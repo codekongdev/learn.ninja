@@ -3,7 +3,7 @@
 
 import type { Level, Subject } from "@workspace/spec"
 
-import { STRINGS } from "./locales"
+import { packFor } from "./language"
 
 export type Strings = {
   start: string
@@ -70,6 +70,14 @@ export type Strings = {
   sortLeft: (n: number) => string
   /** Announced when an order item lands in a numbered slot. */
   placedAt: (item: string, n: number) => string
+  /** Announced in a match brick when a pair is made right. */
+  matched: (left: string, right: string) => string
+  /** Announced in a match brick when two items don't go together. */
+  notAPair: string
+  /** A checked answer's result as words, for screen readers. */
+  markCorrect: string
+  markWrong: string
+  markPartial: string
   wordBank: string
   emptyGap: string
   /** Name of an HTML visual with no alt text. */
@@ -229,16 +237,29 @@ function normalize(lang: string): UiLanguage | undefined {
   return UI_LANGUAGES.find((l) => l.code === base)?.code
 }
 
+/**
+ * Whether the player's interface follows the learner: their saved choice, the language menu, and
+ * the lesson's language. Off for now, so it's in English until people can test the translations;
+ * they're kept up to date meanwhile, and ?ui= still shows one, for testing. Lessons themselves are
+ * written in any language either way.
+ */
+export const UI_TRANSLATIONS = false
+
 /** The menu entry for a language code, or undefined when the player has no translation for it. */
 export function uiLanguageFor(lang: string) {
   const code = normalize(lang)
   return UI_LANGUAGES.find((l) => l.code === code)
 }
 
-/** The player's text for a language code, falling back to English. */
+/**
+ * The player's text for a language code, falling back to English: for a language other than
+ * English, once it's loaded (loadLanguage, or useStrings in a component).
+ */
 export function stringsFor(lang: string): Strings {
-  return STRINGS[normalize(lang) ?? "en"]
+  return packFor(lang).strings
 }
+
+export { loadLanguage, useStrings } from "./language"
 
 /** React Aria's locale for a UI language (its strings are keyed by full locale, Arabic as ar-AE). */
 export function ariaLocaleFor(lang: string): string {
