@@ -1116,11 +1116,14 @@ function Player({
                 <div
                   key={state.index}
                   className={cn(
-                    "mx-auto flex min-h-full w-full flex-col justify-center-safe gap-8 px-4 py-16",
-                    // On phones a lesson screen starts at the top, so nothing moves when the tray
-                    // grows to show feedback; the intro and wrap-up stay centered.
-                    (item.kind === "concept" || item.kind === "question") &&
-                      "max-sm:justify-start max-sm:py-6",
+                    "mx-auto flex min-h-full w-full flex-col gap-8 px-4 py-16",
+                    // A lesson screen starts at the top, so nothing moves when feedback or the
+                    // tray appears and each brick's prompt lands in the same place; the intro and
+                    // wrap-up stay centered. On larger windows the offset follows the height, so
+                    // short content still sits near the optical center.
+                    item.kind === "concept" || item.kind === "question"
+                      ? "justify-start max-sm:py-6 sm:pt-[clamp(4rem,12vh,8rem)]"
+                      : "justify-center-safe",
                     vanishing && "vanish",
                     leaving
                       ? "motion-safe:animate-out motion-safe:duration-200 motion-safe:fade-out-0 motion-safe:fill-mode-forwards motion-safe:slide-out-to-end-24"
