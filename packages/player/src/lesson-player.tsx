@@ -1023,10 +1023,13 @@ function Player({
   )
   const celebrate = run && (run === "perfect" ? "perfect" : "done")
   const { share, copied } = useShare(lesson.title, shareUrl)
+  const hydrated = useHydrated()
 
   return (
     <>
-      {startAt ? null : (
+      {/* Only the server's HTML runs it: React never runs a script it adds in the browser (a
+          client-side visit, a remount), and warns that it won't. */}
+      {startAt || hydrated ? null : (
         <script
           dangerouslySetInnerHTML={{ __html: resumeScript(remember, lesson) }}
         />
@@ -1300,6 +1303,17 @@ function Player({
         ) : null}
       </div>
     </>
+  )
+}
+
+const noSubscribe = () => () => {}
+
+/** False while rendering on the server and hydrating its HTML; true for every render after, and for a component first drawn in the browser. */
+function useHydrated() {
+  return React.useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false
   )
 }
 
