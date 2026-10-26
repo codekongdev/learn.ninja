@@ -201,7 +201,7 @@ const likeAfter = (likes: number, liked: boolean) => ({
     ),
 })
 
-/** Logged in, with the heart under the score: pressing it likes the lesson. */
+/** Logged in, with the heart beside the other actions: pressing it likes the lesson. */
 export const WrapUpLike: Story = {
   name: "Wrap-up: like",
   args: {
@@ -221,7 +221,7 @@ export const WrapUpLiked: Story = {
   },
   loaders: atWrap(lessons.buttons, "story-wrap-liked"),
 }
-/** Logged out: pressing the heart asks them to log in to save the lesson to their likes. */
+/** Logged out: pressing the heart shows a toast asking them to log in, with a Log in button. */
 export const WrapUpLikeLoggedOut: Story = {
   name: "Wrap-up: like, logged out",
   args: {

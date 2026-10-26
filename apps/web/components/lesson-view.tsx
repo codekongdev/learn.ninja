@@ -28,8 +28,6 @@ function nextPrompt(kind: NextKind, topic: string, after: string): string {
       return `${AGENT_PROMPT}${topic}, going deeper than my lesson "${after}": build on what it taught instead of repeating it.`
     case "harder":
       return `${AGENT_PROMPT}${topic}, at a harder level than my lesson "${after}".`
-    case "other":
-      return `${AGENT_PROMPT}${topic}.`
   }
 }
 

@@ -13,8 +13,6 @@ import {
 
 import type { Lesson } from "@workspace/spec"
 import { Button } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
 import { toast } from "@workspace/ui/components/sonner"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -140,11 +138,14 @@ export function WrapActions({
   summary,
   run,
   onRestart,
+  extra,
 }: {
   lesson: Lesson
   summary: Summary
   run: Run
   onRestart: () => void
+  /** One more outlined button at the row's end (the heart, for learners). */
+  extra?: React.ReactNode
 }) {
   const { t, shareUrl, challenge, challenger } = usePlayer()
   const dare = run !== "rough"
@@ -204,6 +205,7 @@ export function WrapActions({
     <div className="flex justify-center gap-2 max-sm:flex-col">
       {dare ? share : restart}
       {dare ? restart : share}
+      {extra}
     </div>
   )
 }
@@ -245,14 +247,11 @@ export function Takeaways({ items }: { items: string[] }) {
 
 /**
  * Keep learning: a row for each lesson the learner could ask their agent for next (the lesson's
- * suggested next topic, this topic deeper, this topic harder), each copying its prompt when pressed,
- * and a last row with a field for a topic of their own.
+ * suggested next topic, this topic deeper, this topic harder), each copying its prompt when pressed.
  */
 export function KeepLearning({ lesson }: { lesson: Lesson }) {
   const { t, nextPrompt } = usePlayer()
   const [copied, setCopied] = useCopied<NextKind>()
-  const [own, setOwn] = React.useState("")
-  const id = React.useId()
   if (!nextPrompt) return null
 
   const topics: Partial<Record<NextKind, string>> = {
@@ -260,7 +259,7 @@ export function KeepLearning({ lesson }: { lesson: Lesson }) {
     deeper: lesson.title,
     harder: lesson.title,
   }
-  const rows = NEXT_KINDS.filter((k) => k !== "other" && topics[k])
+  const rows = NEXT_KINDS.filter((k) => topics[k])
 
   async function copy(kind: NextKind, topic: string) {
     if (!nextPrompt || !topic.trim()) return
@@ -311,38 +310,6 @@ export function KeepLearning({ lesson }: { lesson: Lesson }) {
           </Button>
         </div>
       ))}
-      <form
-        className="flex min-h-14 items-center gap-4 ps-4 pe-2"
-        onSubmit={(e) => {
-          e.preventDefault()
-          void copy("other", own)
-        }}
-      >
-        <Label htmlFor={`${id}-own`} className="sr-only">
-          {t.keepKinds.other}
-        </Label>
-        <Input
-          id={`${id}-own`}
-          value={own}
-          dir="auto"
-          placeholder={t.keepPlaceholder}
-          className="h-9 border-0 bg-transparent px-0 text-sm font-medium shadow-none focus-visible:ring-0 md:text-sm dark:bg-transparent"
-          onChange={(e) => {
-            setOwn(e.target.value)
-            setCopied(null)
-          }}
-        />
-        {/* Waits for a topic, so there's nothing to get wrong. */}
-        <Button
-          type="submit"
-          variant="ghost"
-          size="icon"
-          aria-label={t.copyPrompt}
-          isDisabled={!own.trim()}
-        >
-          {mark("other")}
-        </Button>
-      </form>
     </WrapSection>
   )
 }

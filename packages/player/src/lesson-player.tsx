@@ -20,10 +20,10 @@ import {
 } from "@workspace/spec"
 import { Alert, AlertDescription } from "@workspace/ui/components/alert"
 import { Badge } from "@workspace/ui/components/badge"
-import { Button, LinkButton } from "@workspace/ui/components/button"
+import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { DirectionProvider } from "@workspace/ui/components/direction"
-import { Toaster } from "@workspace/ui/components/sonner"
+import { toast, Toaster } from "@workspace/ui/components/sonner"
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -1836,37 +1836,42 @@ function WrapUp({
       ? t.allFirstTry(s.total)
       : t.firstTryCount(s.first, s.total)
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col items-center gap-4 text-center">
-        {/* The ninja leaps up from the corner to his send-off here (NinjaStage). */}
-        <NinjaSlot show={ninja} gap="-mb-4" />
-        {/* The heading and its line as on the fix screen, then the run as one bar. */}
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-semibold">{t.done}</h1>
-          <p className="text-sm font-medium text-muted-foreground">{score}</p>
+    // Two groups, further apart than anything inside them: how it went with what to do about it,
+    // then what the lesson said and what to learn next.
+    <div className="flex flex-col gap-14">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col items-center gap-4 text-center">
+          {/* The ninja leaps up from the corner to his send-off here (NinjaStage). */}
+          <NinjaSlot show={ninja} gap="-mb-4" />
+          {/* The heading and its line as on the fix screen, then the run as one bar. */}
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl font-semibold">{t.done}</h1>
+            <p className="text-sm font-medium text-muted-foreground">{score}</p>
+          </div>
+          <RunBar lesson={lesson} results={results} />
+          <ChallengeVerdict summary={s} />
         </div>
-        <RunBar lesson={lesson} results={results} />
-        <ChallengeVerdict summary={s} />
-        {/* The maker's own lesson has no heart; its status is in the header. */}
-        {creator ? null : <LikeLesson />}
+        <WrapActions
+          lesson={lesson}
+          summary={s}
+          run={run}
+          onRestart={onRestart}
+          // The maker's own lesson has no heart; its status is on Share.
+          extra={creator ? null : <LikeLesson />}
+        />
       </div>
-      {/* One main action, Restart under it at the same width. */}
-      <WrapActions
-        lesson={lesson}
-        summary={s}
-        run={run}
-        onRestart={onRestart}
-      />
-      <Takeaways items={lesson.wrapup.takeaways} />
-      <KeepLearning lesson={lesson} />
+      <div className="flex flex-col gap-8">
+        <Takeaways items={lesson.wrapup.takeaways} />
+        <KeepLearning lesson={lesson} />
+      </div>
     </div>
   )
 }
 
 /**
- * The heart under the score, while finishing is fresh. Logged in, it likes the lesson at once and
- * settles on the server's count; the lesson then waits in the learner's likes. Logged out, pressing
- * it swaps it for a line saying so, with a Log in link: asked for, never pushed.
+ * The heart, beside the wrap-up's other actions while finishing is fresh. Logged in, it likes the
+ * lesson at once and settles on the server's count; the lesson then waits in the learner's likes.
+ * Logged out, pressing it says so in a toast with a Log in button: asked for, never pushed.
  */
 function LikeLesson() {
   const { t, lang = "en", like } = usePlayer()
@@ -1874,30 +1879,20 @@ function LikeLesson() {
     liked: like?.liked ?? false,
     likes: like?.likes ?? 0,
   }))
-  const [asked, setAsked] = React.useState(false)
   const [busy, setBusy] = React.useState(false)
-  const [failed, setFailed] = React.useState(false)
   if (!like) return null
 
-  if (!like.onChange && asked)
-    return (
-      <div className="flex flex-col items-center gap-3">
-        <p className="text-sm text-muted-foreground">{t.likeLogIn}</p>
-        {like.loginHref ? (
-          <LinkButton
-            href={like.loginHref}
-            variant="outline"
-            size="sm"
-            autoFocus
-          >
-            {t.logIn}
-          </LinkButton>
-        ) : null}
-      </div>
-    )
-
   async function toggle() {
-    if (!like?.onChange) return setAsked(true)
+    if (!like) return
+    if (!like.onChange) {
+      const href = like.loginHref
+      toast(t.likeLogIn, {
+        action: href
+          ? { label: t.logIn, onClick: () => window.location.assign(href) }
+          : undefined,
+      })
+      return
+    }
     if (busy) return
     const was = state
     const next = {
@@ -1906,7 +1901,6 @@ function LikeLesson() {
     }
     setState(next)
     setBusy(true)
-    setFailed(false)
     const result = await like.onChange(next.liked).catch(() => ({
       error: "network",
       likes: undefined,
@@ -1914,7 +1908,7 @@ function LikeLesson() {
     setBusy(false)
     if (result.error) {
       setState(was)
-      setFailed(true)
+      toast.error(t.likeFailed)
       return
     }
     if (typeof result.likes === "number")
@@ -1922,30 +1916,25 @@ function LikeLesson() {
   }
 
   return (
-    <>
-      <Button
-        variant="outline"
-        size="sm"
-        aria-pressed={state.liked}
-        onPress={() => void toggle()}
-      >
-        <HeartIcon
-          data-icon="inline-start"
-          className={cn(state.liked && "fill-current text-destructive")}
-        />
-        {state.liked ? t.liked : t.like}
-        {state.likes > 0 ? (
-          <span className="text-muted-foreground tabular-nums">
-            {new Intl.NumberFormat(lang, { notation: "compact" }).format(
-              state.likes
-            )}
-          </span>
-        ) : null}
-      </Button>
-      <span role="status" className="sr-only">
-        {failed ? t.likeFailed : ""}
-      </span>
-    </>
+    <Button
+      variant="outline"
+      size="lg"
+      aria-pressed={state.liked}
+      onPress={() => void toggle()}
+    >
+      <HeartIcon
+        data-icon="inline-start"
+        className={cn(state.liked && "fill-current text-destructive")}
+      />
+      {state.liked ? t.liked : t.like}
+      {state.likes > 0 ? (
+        <span className="text-muted-foreground tabular-nums">
+          {new Intl.NumberFormat(lang, { notation: "compact" }).format(
+            state.likes
+          )}
+        </span>
+      ) : null}
+    </Button>
   )
 }
 

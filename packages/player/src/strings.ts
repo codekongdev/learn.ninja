@@ -96,10 +96,8 @@ export type Strings = {
   takeaways: string
   /** The wrap-up's Keep learning list: what to ask the learner's agent for next. */
   keepLearning: string
-  /** Its choices: the lesson's suggested next topic, this topic deeper, this topic harder, or the learner's own. */
+  /** Its rows: the lesson's suggested next topic, this topic deeper, or this topic harder. */
   keepKinds: Record<NextKind, string>
-  /** The placeholder of the field for the learner's own topic. */
-  keepPlaceholder: string
   /** Keep learning's rows say to screen readers what their copied prompts are for. */
   nextHint: string
   copyPrompt: string
@@ -225,7 +223,7 @@ export type Strings = {
 export const LESSON_CHANGES = ["visual", "shorter", "examples"] as const
 export type LessonChange = (typeof LESSON_CHANGES)[number]
 /** What Keep learning asks the agent for, in the order its choices show. */
-export const NEXT_KINDS = ["next", "deeper", "harder", "other"] as const
+export const NEXT_KINDS = ["next", "deeper", "harder"] as const
 export type NextKind = (typeof NEXT_KINDS)[number]
 export type TextSize = "sm" | "md" | "lg"
 export type Theme = "system" | "light" | "dark"
