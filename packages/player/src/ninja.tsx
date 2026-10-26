@@ -51,17 +51,38 @@ export type NinjaMood =
 /** The ninja settings he can be seen at (the player leaves him out when it's off). */
 export type NinjaEnergy = Exclude<NinjaLevel, "off">
 
+/** How far (in viewBox units) a bleeding mark's box reaches past the 64-unit drawing on each side. */
+const BLEED = 16
+
 export const Ninja = React.forwardRef<
   SVGSVGElement,
-  { mood?: NinjaMood; className?: string }
->(function Ninja({ mood = "idle", className }, ref) {
+  {
+    mood?: NinjaMood
+    className?: string
+    /**
+     * Draw him inside a box a quarter bigger on every side (size it at 150%, offset by -25%). His
+     * rolls and bounces leave the 64-unit box, and Safari crops whatever an SVG draws past its own
+     * box, overflow: visible or not; the bleed gives them room inside it.
+     */
+    bleed?: boolean
+  }
+>(function Ninja({ mood = "idle", className, bleed = false }, ref) {
   return (
     <svg
       ref={ref}
-      viewBox="0 0 64 64"
+      viewBox={
+        bleed
+          ? `${-BLEED} ${-BLEED} ${64 + 2 * BLEED} ${64 + 2 * BLEED}`
+          : "0 0 64 64"
+      }
       fill="none"
       aria-hidden="true"
-      className={cn("ninja", mood !== "idle" && `e-${mood}`, className)}
+      className={cn(
+        "ninja",
+        bleed && "ninja-bleed",
+        mood !== "idle" && `e-${mood}`,
+        className
+      )}
     >
       <g className="ninja-head">
         <g stroke="currentColor" strokeWidth="5" strokeLinejoin="round">
@@ -557,9 +578,11 @@ export function useNinjaLife(
       const r = el.getBoundingClientRect()
       const cx = r.left + r.width / 2
       const cy = r.top + r.height / 2
+      // The drawing's own size, without a bleed around it.
+      const size = (r.width * 64) / (el.viewBox.baseVal?.width || 64)
       look(
-        clamp(((at.x - cx) / (r.width * 1.3)) * 5, -5, 5),
-        clamp(((at.y - cy) / (r.height * 1.3)) * 2.4, -2, 2.4)
+        clamp(((at.x - cx) / (size * 1.3)) * 5, -5, 5),
+        clamp(((at.y - cy) / (size * 1.3)) * 2.4, -2, 2.4)
       )
     }
     const move = (e: PointerEvent) => {
@@ -858,7 +881,11 @@ export function NinjaStage({
         } as React.CSSProperties
       }
     >
-      <Ninja ref={svg} className="size-full" />
+      <Ninja
+        ref={svg}
+        bleed
+        className="absolute -start-1/4 -top-1/4 size-[150%] max-w-none"
+      />
     </div>
   )
 }
