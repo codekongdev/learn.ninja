@@ -6,6 +6,8 @@
 // busiest day of the displayed year (after trimming the top 1% of active days, the stand-in for
 // GitHub's undisclosed outlier rule). A new record day re-shades the older ones.
 
+import type { DayState, DayStreak } from "@workspace/player"
+
 /** A calendar day as YYYY-MM-DD. */
 export type Day = string
 
@@ -77,7 +79,10 @@ export function activityLevels(counts: number[]): {
   levelOf: (count: number) => Level
 } {
   const active = counts.filter((c) => c > 0).sort((a, b) => a - b)
-  const trimmed = active.slice(0, active.length - Math.floor(active.length / 100))
+  const trimmed = active.slice(
+    0,
+    active.length - Math.floor(active.length / 100)
+  )
   const cap = trimmed.at(-1) ?? 0
   return {
     cap,
@@ -88,26 +93,89 @@ export function activityLevels(counts: number[]): {
   }
 }
 
+/** Learning days that earn one rest day. */
+export const LEARN_PER_REST = 3
+/** The most rest days a learner can have saved. */
+export const MAX_REST = 2
+
 /**
- * Streaks over `activeDays` (any order, duplicates fine). The current streak is the run that ends
- * today or yesterday, so it survives until the day actually ends. The longest is over every day
- * given, not just the displayed year.
+ * The streak rules, walked day by day from the first day with a lesson to today. Each day with a
+ * finished lesson adds one to the run, and every LEARN_PER_REST of them saves a rest day (MAX_REST
+ * at most). A day without one spends a saved rest day, which keeps the run without adding to it;
+ * with none saved, the run ends, and so do the saved days. Today stays open until it's over.
+ */
+function walk(activeDays: Day[], today: Day) {
+  const active = new Set(activeDays.filter((d) => d <= today))
+  const states = new Map<Day, DayState>()
+  let run = 0
+  let longest = 0
+  let rest = 0
+  let toward = 0
+  const first = [...active].sort()[0]
+  for (let day = first; day && day <= today; day = addDays(day, 1)) {
+    if (active.has(day)) {
+      run++
+      longest = Math.max(longest, run)
+      if (++toward === LEARN_PER_REST) {
+        toward = 0
+        rest = Math.min(MAX_REST, rest + 1)
+      }
+      states.set(day, "lit")
+    } else if (day === today) {
+      states.set(day, "open")
+    } else if (run > 0 && rest > 0) {
+      rest--
+      states.set(day, "rest")
+    } else {
+      run = 0
+      rest = 0
+      toward = 0
+      states.set(day, "missed")
+    }
+  }
+  return { current: run, longest, rest, states }
+}
+
+/**
+ * Streaks over `activeDays` (any order, duplicates fine), by the rules in walk: the current run,
+ * alive through today while today is open, and the longest run over every day given, not just the
+ * displayed year.
  */
 export function streaks(
   activeDays: Day[],
   today: Day
 ): { current: number; longest: number } {
-  const days = [...new Set(activeDays)].sort()
-  let longest = 0
-  let run = 0
-  let current = 0
-  for (let i = 0; i < days.length; i++) {
-    run = i > 0 && dayDiff(days[i - 1]!, days[i]!) === 1 ? run + 1 : 1
-    longest = Math.max(longest, run)
-    const gap = dayDiff(days[i]!, today)
-    if (gap === 0 || gap === 1) current = run
-  }
+  const { current, longest } = walk(activeDays, today)
   return { current, longest }
+}
+
+/** The streak the header and the streak screen show: the counts, rest days saved, and the last seven days. */
+export function dayStreak(activeDays: Day[], today: Day): DayStreak {
+  const { current, longest, rest, states } = walk(activeDays, today)
+  return {
+    current,
+    longest,
+    rest,
+    days: Array.from({ length: 7 }, (_, i) => {
+      const day = addDays(today, i - 6)
+      return {
+        day,
+        state: states.get(day) ?? (day === today ? "open" : "missed"),
+      }
+    }),
+  }
+}
+
+/**
+ * The streak a lesson finished today would show on the streak screen, or null when finishing it
+ * won't light today's lantern because today already has a lesson.
+ */
+export function streakAfterFinish(
+  activeDays: Day[],
+  today: Day
+): DayStreak | null {
+  if (activeDays.includes(today)) return null
+  return dayStreak([...activeDays, today], today)
 }
 
 export interface ActivityCell {

@@ -1,6 +1,6 @@
-import type { Strings } from "../strings"
+import type { Translation } from "../strings"
 
-export const ko: Strings = {
+export const ko: Translation = {
   start: "레슨 시작",
   check: "정답 확인",
   continue: "계속",

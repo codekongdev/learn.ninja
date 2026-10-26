@@ -6,6 +6,7 @@ import type { Lesson } from "@workspace/spec"
 import { buildSequence, scoredQuestions, type Outcome } from "../flow"
 import { LessonPlayer, type State } from "../lesson-player"
 import { fingerprint } from "../progress"
+import type { DayStreak } from "../streak"
 import { stringsFor } from "../strings"
 import { lessons, prepared } from "./fixtures"
 
@@ -247,6 +248,61 @@ export const WrapUpLikeFails: Story = {
 }
 
 /** A fake publish that answers after a moment, as the server would. */
+/**
+ * A streak as of a fixed Monday: the last seven days oldest first, one letter each (l lit, r a rest
+ * day, m missed, o today still open).
+ */
+const streakOf = (
+  current: number,
+  longest: number,
+  rest: number,
+  week: string
+): DayStreak => ({
+  current,
+  longest,
+  rest,
+  days: [...week].map((c, i) => ({
+    day: `2026-10-${String(20 + i).padStart(2, "0")}`,
+    state: ({ l: "lit", r: "rest", m: "missed", o: "open" } as const)[
+      c as "l" | "r" | "m" | "o"
+    ],
+  })),
+})
+
+/**
+ * The day's first lesson, logged in: the streak screen comes before the wrap-up. Today's lantern
+ * lights and swings, the count ticks to 12, and Continue goes on to the wrap-up.
+ */
+export const StreakScreen: Story = {
+  name: "Streak screen",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-streak",
+    streak: streakOf(12, 21, 1, "lllrlll"),
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-streak", ["first", "second"]),
+}
+/** The first lantern ever: the streak starts today. */
+export const StreakScreenStarts: Story = {
+  name: "Streak screen: first day",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-streak-starts",
+    streak: streakOf(1, 1, 0, "mmmmmml"),
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-streak-starts"),
+}
+/** Day 1 after a streak broke: no guilt, and a proverb. */
+export const StreakScreenAgain: Story = {
+  name: "Streak screen: again",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-streak-again",
+    streak: streakOf(1, 21, 0, "lllmmml"),
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-streak-again"),
+}
+
 const publishAfter = () =>
   new Promise<{ error?: string }>((resolve) =>
     setTimeout(() => resolve({}), 300)

@@ -3,7 +3,12 @@ import { use } from "react"
 import { LOADERS } from "./locales"
 import { en } from "./locales/en"
 import { en as enVoices } from "./locales/voices/en"
-import { uiLanguageFor, type Strings, type UiLanguage } from "./strings"
+import {
+  uiLanguageFor,
+  type Strings,
+  type Translation,
+  type UiLanguage,
+} from "./strings"
 import type { Voices } from "./voices"
 
 // The player's languages. English is built in; every other one is a chunk of its own, loaded when a
@@ -13,6 +18,12 @@ import type { Voices } from "./voices"
 /** One language: the player's text and the ninja's lines. */
 export interface Pack {
   strings: Strings
+  voices: Voices
+}
+
+/** A language as its chunk has it: strings still waiting for translation are left out. */
+export interface PackChunk {
+  strings: Translation
   voices: Voices
 }
 
@@ -38,7 +49,9 @@ export function loadLanguage(lang: string): Promise<Pack> {
   let promise = loading.get(code)
   if (!promise) {
     promise = LOADERS[code as Exclude<UiLanguage, "en">]().then(
-      (pack) => {
+      (chunk) => {
+        // English stands in for the strings added while translations are on hold.
+        const pack = { ...chunk, strings: { ...en, ...chunk.strings } }
         packs.set(code, pack)
         return pack
       },

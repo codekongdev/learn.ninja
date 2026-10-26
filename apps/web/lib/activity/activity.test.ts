@@ -5,6 +5,8 @@ import {
   addDays,
   buildGrid,
   dayDiff,
+  dayStreak,
+  streakAfterFinish,
   describeDay,
   GRID_WEEKS,
   isTimeZone,
@@ -72,18 +74,95 @@ describe("levels", () => {
   })
 })
 
+/** `n` days in a row from `from`. */
+const run = (from: string, n: number) =>
+  Array.from({ length: n }, (_, i) => addDays(from, i))
+
 describe("streaks", () => {
-  it("counts the run ending today, or yesterday", () => {
-    const days = ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22"]
+  it("counts the run while today is open, and a saved rest day covers a missed day", () => {
+    // Four learning days save one rest day (at the third).
+    const days = run("2026-10-19", 4)
     expect(streaks(days, "2026-10-22")).toEqual({ current: 4, longest: 4 })
     expect(streaks(days, "2026-10-23")).toEqual({ current: 4, longest: 4 })
-    expect(streaks(days, "2026-10-24")).toEqual({ current: 0, longest: 4 })
+    expect(streaks(days, "2026-10-24")).toEqual({ current: 4, longest: 4 })
+    // The second missed day has nothing left to spend.
+    expect(streaks(days, "2026-10-25")).toEqual({ current: 0, longest: 4 })
+  })
+
+  it("ends at the first missed day before three learning days", () => {
+    const days = run("2026-10-19", 2)
+    expect(streaks(days, "2026-10-21")).toEqual({ current: 2, longest: 2 })
+    expect(streaks(days, "2026-10-22")).toEqual({ current: 0, longest: 2 })
+  })
+
+  it("keeps the run through a rest day without adding to it", () => {
+    const days = [...run("2026-10-19", 3), "2026-10-23"]
+    expect(streaks(days, "2026-10-23")).toEqual({ current: 4, longest: 4 })
+  })
+
+  it("saves two rest days at most", () => {
+    // Nine learning days earn three, but only two are kept: two missed days pass, a third ends it.
+    const days = run("2026-10-01", 9)
+    expect(streaks([...days, "2026-10-12"], "2026-10-12").current).toBe(10)
+    expect(streaks([...days, "2026-10-13"], "2026-10-13").current).toBe(1)
+  })
+
+  it("starts a broken run from nothing, with no rest days saved", () => {
+    // Three days save one, two missed days spend it and break the run; the next missed day breaks the new one.
+    const days = [...run("2026-10-01", 3), "2026-10-06", "2026-10-07"]
+    expect(streaks(days, "2026-10-07").current).toBe(2)
+    expect(streaks(days, "2026-10-09").current).toBe(0)
   })
 
   it("keeps the longest run separately, in any order with duplicates", () => {
-    const days = ["2026-10-23", "2026-05-03", "2026-05-01", "2026-05-02", "2026-05-02"]
+    const days = [
+      "2026-10-23",
+      "2026-05-03",
+      "2026-05-01",
+      "2026-05-02",
+      "2026-05-02",
+    ]
     expect(streaks(days, "2026-10-23")).toEqual({ current: 1, longest: 3 })
     expect(streaks([], "2026-10-23")).toEqual({ current: 0, longest: 0 })
+  })
+
+  it("gives the header the last seven days and the rest days saved", () => {
+    const days = [...run("2026-10-19", 3), "2026-10-23", "2026-10-24"]
+    expect(dayStreak(days, "2026-10-25")).toEqual({
+      current: 5,
+      longest: 5,
+      rest: 0,
+      days: [
+        { day: "2026-10-19", state: "lit" },
+        { day: "2026-10-20", state: "lit" },
+        { day: "2026-10-21", state: "lit" },
+        { day: "2026-10-22", state: "rest" },
+        { day: "2026-10-23", state: "lit" },
+        { day: "2026-10-24", state: "lit" },
+        { day: "2026-10-25", state: "open" },
+      ],
+    })
+    // Before the first lesson, days are missed; with none at all, today is open.
+    expect(dayStreak([], "2026-10-25").days.at(-1)).toEqual({
+      day: "2026-10-25",
+      state: "open",
+    })
+    expect(dayStreak([], "2026-10-25").days[0]!.state).toBe("missed")
+  })
+})
+
+describe("streak after finishing", () => {
+  it("lights today when it has no lesson yet, and is null once it has one", () => {
+    const days = run("2026-10-19", 3)
+    const after = streakAfterFinish(days, "2026-10-22")!
+    expect(after.current).toBe(4)
+    expect(after.days.at(-1)).toEqual({ day: "2026-10-22", state: "lit" })
+    expect(streakAfterFinish([...days, "2026-10-22"], "2026-10-22")).toBeNull()
+  })
+
+  it("starts again at 1 after a break, keeping the longest", () => {
+    const after = streakAfterFinish(run("2026-10-01", 5), "2026-10-20")!
+    expect(after).toMatchObject({ current: 1, longest: 5, rest: 0 })
   })
 })
 
@@ -119,11 +198,22 @@ describe("grid", () => {
   it("counts and shades only the displayed year, but streaks see every day", () => {
     expect(grid.total).toBe(8)
     expect(grid.cap).toBe(4)
-    expect(grid.columns.at(-1)![3]).toEqual({ day: "2026-10-21", lessons: 4, level: 4 })
+    expect(grid.columns.at(-1)![3]).toEqual({
+      day: "2026-10-21",
+      lessons: 4,
+      level: 4,
+    })
     expect(grid.columns.at(-1)![4]!.level).toBe(1)
     expect(grid.streak).toEqual({ current: 3, longest: 3 })
-    expect(buildGrid([{ day: "2025-10-18", lessons: 9 }, { day: "2025-10-17", lessons: 9 }], today).streak)
-      .toEqual({ current: 0, longest: 2 })
+    expect(
+      buildGrid(
+        [
+          { day: "2025-10-18", lessons: 9 },
+          { day: "2025-10-17", lessons: 9 },
+        ],
+        today
+      ).streak
+    ).toEqual({ current: 0, longest: 2 })
   })
 
   it("labels the first column of each month, dropping a first label that has no room", () => {
@@ -138,9 +228,17 @@ describe("grid", () => {
   })
 
   it("describes a day for the tooltip", () => {
-    expect(describeDay({ day: "2026-10-21", lessons: 2, level: 1 })).toBe("2 lessons on October 21st")
-    expect(describeDay({ day: "2026-10-01", lessons: 1, level: 1 })).toBe("1 lesson on October 1st")
-    expect(describeDay({ day: "2026-11-12", lessons: 0, level: 0 })).toBe("No lessons on November 12th")
-    expect(describeDay({ day: "2026-11-23", lessons: 3, level: 1 })).toBe("3 lessons on November 23rd")
+    expect(describeDay({ day: "2026-10-21", lessons: 2, level: 1 })).toBe(
+      "2 lessons on October 21st"
+    )
+    expect(describeDay({ day: "2026-10-01", lessons: 1, level: 1 })).toBe(
+      "1 lesson on October 1st"
+    )
+    expect(describeDay({ day: "2026-11-12", lessons: 0, level: 0 })).toBe(
+      "No lessons on November 12th"
+    )
+    expect(describeDay({ day: "2026-11-23", lessons: 3, level: 1 })).toBe(
+      "3 lessons on November 23rd"
+    )
   })
 })

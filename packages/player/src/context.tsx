@@ -4,6 +4,7 @@ import * as React from "react"
 
 import { emptyPrepared, type Prepared } from "./prepared"
 import type { Challenge } from "./challenge"
+import type { DayStreak } from "./streak"
 import { stringsFor, type NextKind, type Strings } from "./strings"
 
 interface PlayerContextValue {
@@ -28,6 +29,8 @@ interface PlayerContextValue {
   like?: LessonLike
   /** The lesson's maker is the one playing: the wrap-up shows their card instead of the heart. */
   creator?: LessonCreator
+  /** The streak this finish lit, for the wrap-up's card. Without it there's no card. */
+  streak?: DayStreak
 }
 
 /**

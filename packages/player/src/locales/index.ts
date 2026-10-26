@@ -1,10 +1,13 @@
-import type { Pack } from "../language"
+import type { PackChunk } from "../language"
 import type { UiLanguage } from "../strings"
 
 // Every language but English, each loaded on demand as one chunk: its strings and its ninja's lines.
 // A lesson needs one language, so the other twenty never reach the learner's browser.
 
-export const LOADERS: Record<Exclude<UiLanguage, "en">, () => Promise<Pack>> = {
+export const LOADERS: Record<
+  Exclude<UiLanguage, "en">,
+  () => Promise<PackChunk>
+> = {
   es: () =>
     Promise.all([
       import(/* webpackChunkName: "lang-es" */ "./es"),

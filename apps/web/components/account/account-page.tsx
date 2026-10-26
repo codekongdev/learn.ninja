@@ -1,3 +1,5 @@
+import type { DayStreak } from "@workspace/player"
+
 import { SiteFooter } from "@/components/site/site-footer"
 import { SiteHeader } from "@/components/site/site-header"
 import type { AccountInfo } from "@/lib/auth/account-info"
@@ -6,17 +8,20 @@ import type { AccountInfo } from "@/lib/auth/account-info"
  * match the footer. */
 export function AccountPage({
   account,
+  streak,
   wide = false,
   children,
 }: {
   /** The logged-in user, or null when nobody is logged in. */
   account: AccountInfo | null
+  /** The logged-in learner's streak, for the header's lantern. */
+  streak?: DayStreak | null
   wide?: boolean
   children: React.ReactNode
 }) {
   return (
     <div className="flex min-h-svh flex-col">
-      <SiteHeader account={account} />
+      <SiteHeader account={account} streak={streak} />
       <main
         className={
           wide

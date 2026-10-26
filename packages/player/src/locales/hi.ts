@@ -1,10 +1,10 @@
-import type { Strings } from "../strings"
+import type { Translation } from "../strings"
 
 import { plural } from "./plural"
 
 const p = plural("hi")
 
-export const hi: Strings = {
+export const hi: Translation = {
   start: "पाठ शुरू करें",
   check: "उत्तर जाँचें",
   continue: "आगे बढ़ें",

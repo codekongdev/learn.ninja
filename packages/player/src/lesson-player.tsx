@@ -118,6 +118,7 @@ import {
   useShare,
   type Preferences,
 } from "./shell"
+import { StreakScreen, type DayStreak } from "./streak"
 import {
   ariaLocaleFor,
   UI_TRANSLATIONS,
@@ -198,6 +199,12 @@ export interface LessonPlayerProps {
   like?: LessonLike
   /** When the lesson's maker is playing: their card on the wrap-up (publish it, ask for changes) instead of the heart. */
   creator?: LessonCreator
+  /**
+   * The streak finishing this lesson lights, for the screen before the wrap-up: pass it only when
+   * finishing will light today's lantern (logged in, nothing finished yet today, and this lesson not
+   * finished before, which doesn't count again). Leave it out otherwise.
+   */
+  streak?: DayStreak
 }
 
 /**
@@ -237,6 +244,7 @@ function LessonInLanguage({
   challenger,
   like,
   creator,
+  streak,
 }: LessonPlayerProps) {
   const root = React.useRef<HTMLDivElement>(null)
   // The title as shown, which a rename in the header changes.
@@ -306,6 +314,7 @@ function LessonInLanguage({
           challenger,
           like,
           creator,
+          streak,
         }}
       >
         <CreatorProvider level={lesson.level}>
@@ -787,7 +796,7 @@ function Player({
   progressKey?: string
   onComplete?: () => void
 }) {
-  const { t, keyScope, lang = "en" } = usePlayer()
+  const { t, keyScope, lang = "en", streak } = usePlayer()
   const { textSize } = prefs
   const ninja: NinjaLevel = prefs.ninja ?? "sensei"
   const [state, dispatch] = React.useReducer(reducer, lesson, (l) =>
@@ -866,6 +875,15 @@ function Player({
   React.useEffect(() => {
     if (item.kind === "wrap" && !startAt) completeRef.current?.()
   }, [item.kind, state.run, startAt])
+  // The streak screen comes first on the wrap-up, once per run, when finishing lit today's lantern.
+  const [streakSeenRun, setStreakSeenRun] = React.useState<number | null>(null)
+  const onStreak =
+    item.kind === "wrap" && !!streak && streakSeenRun !== state.run
+  const leaveStreak = () => {
+    setStreakSeenRun(state.run)
+    scrollRef.current?.scrollTo({ top: 0 })
+    scrollRef.current?.focus({ preventScroll: true })
+  }
   const fixedTray = useFixedTray()
   // The tray holds the screen's buttons in the middle and the player's settings at the end. The notch
   // opens and closes it (Enter keeps working either way); the buttons render into `actionsEl`.
@@ -1076,7 +1094,9 @@ function Player({
         : undefined,
     [item.kind, lesson, state.results]
   )
-  const celebrate = run && (run === "perfect" ? "perfect" : "done")
+  // He waits in his corner through the streak screen, then leaps up for the wrap-up.
+  const celebrate =
+    run && !onStreak ? (run === "perfect" ? "perfect" : "done") : undefined
   const hydrated = useHydrated()
 
   return (
@@ -1151,7 +1171,7 @@ function Player({
                 className="min-h-0 flex-1 overflow-y-auto outline-none"
               >
                 <div
-                  key={state.index}
+                  key={onStreak ? "streak" : state.index}
                   className={cn(
                     "mx-auto flex min-h-full w-full flex-col gap-8 px-4 py-16",
                     // A lesson screen starts at the top, so nothing moves when feedback or the
@@ -1177,25 +1197,29 @@ function Player({
                     data-text-size={textSize}
                     className="flex flex-col gap-6"
                   >
-                    <Screen
-                      lesson={lesson}
-                      item={item}
-                      state={state}
-                      dispatch={dispatch}
-                      label={screenLabel(state, t)}
-                      inBubble
-                      ninja={ninja !== "off"}
-                      brief={
-                        briefKey
-                          ? {
-                              key: briefKey,
-                              skip: skipBrief,
-                              onTold: () => setToldKey(briefKey),
-                            }
-                          : null
-                      }
-                      paths={canWhy && whyOpen}
-                    />
+                    {onStreak ? (
+                      <StreakScreen streak={streak!} />
+                    ) : (
+                      <Screen
+                        lesson={lesson}
+                        item={item}
+                        state={state}
+                        dispatch={dispatch}
+                        label={screenLabel(state, t)}
+                        inBubble
+                        ninja={ninja !== "off"}
+                        brief={
+                          briefKey
+                            ? {
+                                key: briefKey,
+                                skip: skipBrief,
+                                onTold: () => setToldKey(briefKey),
+                              }
+                            : null
+                        }
+                        paths={canWhy && whyOpen}
+                      />
+                    )}
                   </div>
                   <ActionArea
                     lesson={lesson}
@@ -1214,6 +1238,7 @@ function Player({
                     }
                     onConceptDone={leaveConcept}
                     onStart={vanishIntro}
+                    onStreakDone={onStreak ? leaveStreak : undefined}
                     onBubbleRoom={setBubbleRoom}
                     inBubble
                     brief={
@@ -1245,7 +1270,8 @@ function Player({
               {ninja !== "off" ? (
                 <NinjaStage
                   area={cardRef}
-                  screen={briefKey ?? state.index}
+                  // The streak screen is a screen of its own, so he leaps up when the wrap-up follows it.
+                  screen={onStreak ? "streak" : (briefKey ?? state.index)}
                   cue={cue}
                   celebrate={celebrate}
                   level={ninja}
@@ -1292,7 +1318,7 @@ function Player({
               className={cn(
                 "shrink-0 overflow-hidden",
                 // On phones the tray holds only the screen's actions, and the wrap-up has none there.
-                item.kind === "wrap" && "max-sm:hidden",
+                item.kind === "wrap" && !onStreak && "max-sm:hidden",
                 dragHeight === null &&
                   trayHeight !== null &&
                   "transition-[height] duration-200 ease-out motion-reduce:transition-none"
@@ -1998,6 +2024,7 @@ export function ActionArea({
   speak = false,
   onConceptDone,
   onStart,
+  onStreakDone,
   inBubble = false,
   why,
   onBubbleRoom,
@@ -2029,6 +2056,8 @@ export function ActionArea({
   onConceptDone?: () => void
   /** Starts the lesson from the intro (the player makes the intro vanish first). */
   onStart?: () => void
+  /** The streak screen is up on the wrap-up: Continue goes on to the wrap-up itself. */
+  onStreakDone?: () => void
   /**
    * The player's mode: every piece of feedback (the verdict, a miss's hint, the explanation) is said in
    * the ninja's speech bubble. A lone demo keeps the explanation and hint in place.
@@ -2109,6 +2138,8 @@ export function ActionArea({
       onPress: () => dispatch({ type: "startFix" }),
     }
   // The wrap-up's actions are in its boxes, so a closed tray hides nothing.
+  else if (item.kind === "wrap" && onStreakDone)
+    primary = { label: t.continue, onPress: onStreakDone }
   else if (item.kind === "wrap") actionless = true
   else if (item.kind === "question" && state.question && brief) {
     // The ninja's brief: Skip shows the rest at once; once it's told, Continue goes to the question.
