@@ -524,6 +524,15 @@ export function cueKindFor(
   return s.result.partial ? "close" : "sad"
 }
 
+/** Whether two states show the same piece of feedback: the same screen, attempt, and phase. */
+function sameFeedback(a: State, b: State): boolean {
+  return (
+    a.index === b.index &&
+    a.question?.attempts === b.question?.attempts &&
+    a.question?.phase === b.question?.phase
+  )
+}
+
 export type Action =
   | { type: "next" }
   | { type: "restart"; lesson: Lesson }
@@ -756,15 +765,24 @@ function Player({
   const print = React.useMemo(() => fingerprint(lesson), [lesson])
   const remember = progressKey && !startAt ? progressKey : null
   const loaded = React.useRef(false)
+  // The feedback on the screen progress resumed to was already said: he stays quiet until the
+  // learner moves on from it (a new screen, attempt, or phase).
+  const [resumed, setResumed] = React.useState<State>()
   React.useLayoutEffect(() => {
     if (!remember) return
     const storage = browserStorage()
     const saved = storage && loadProgress(storage, remember, lesson, print)
-    if (saved) dispatch({ type: "resume", state: saved })
+    if (saved) {
+      dispatch({ type: "resume", state: saved })
+      setResumed(saved)
+    }
     loaded.current = true
     // The lesson is covered by its fingerprint.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remember, print])
+  React.useEffect(() => {
+    if (resumed && !sameFeedback(state, resumed)) setResumed(undefined)
+  }, [resumed, state])
   React.useEffect(() => {
     if (!remember || !loaded.current) return
     const storage = browserStorage()
@@ -1023,10 +1041,13 @@ function Player({
   )
   const celebrate = run && (run === "perfect" ? "perfect" : "done")
   const { share, copied } = useShare(lesson.title, shareUrl)
+  const hydrated = useHydrated()
 
   return (
     <>
-      {startAt ? null : (
+      {/* Only the server's HTML runs it: React never runs a script it adds in the browser (a
+          client-side visit, a remount), and warns that it won't. */}
+      {startAt || hydrated ? null : (
         <script
           dangerouslySetInnerHTML={{ __html: resumeScript(remember, lesson) }}
         />
@@ -1146,7 +1167,11 @@ function Player({
                     ninja={ninja !== "off"}
                     level={ninja}
                     pickLine={pickLine}
-                    speak={ninja !== "off" && prefs.sound !== "off"}
+                    speak={
+                      ninja !== "off" &&
+                      prefs.sound !== "off" &&
+                      !(resumed && sameFeedback(state, resumed))
+                    }
                     onConceptDone={leaveConcept}
                     onStart={vanishIntro}
                     onBubbleRoom={setBubbleRoom}
@@ -1300,6 +1325,17 @@ function Player({
         ) : null}
       </div>
     </>
+  )
+}
+
+const noSubscribe = () => () => {}
+
+/** False while rendering on the server and hydrating its HTML; true for every render after, and for a component first drawn in the browser. */
+function useHydrated() {
+  return React.useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false
   )
 }
 

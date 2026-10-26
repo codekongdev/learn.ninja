@@ -167,8 +167,13 @@
    --ninja-energy (set by the player from the ninja setting) scales how far every move goes. */
 .ninja {
   --e: var(--ninja-energy, 1);
+  /* Whole-body moves in % of his box are written for the bare 64-unit mark; a bleeding mark's box is 96. */
+  --b: 1;
   /* His rolls and bounces swing the head past the mark's own box; don't clip them. */
   overflow: visible;
+}
+.ninja.ninja-bleed {
+  --b: calc(64 / 96);
 }
 .ninja * {
   transform-box: fill-box;
@@ -375,7 +380,7 @@
 }
 @keyframes ninja-cheer {
   30% {
-    transform: translateY(calc(-16% * var(--e))) scale(1.04, 0.96);
+    transform: translateY(calc(-16% * var(--e) * var(--b))) scale(1.04, 0.96);
   }
   60% {
     transform: translateY(0) scale(0.98, 1.03);
@@ -417,16 +422,20 @@
 }
 @keyframes ninja-tweak {
   0% {
-    transform: translate(-1.2%, 0.6%) rotate(-0.8deg);
+    transform: translate(calc(-1.2% * var(--b)), calc(0.6% * var(--b)))
+      rotate(-0.8deg);
   }
   25% {
-    transform: translate(1%, -0.8%) rotate(0.6deg);
+    transform: translate(calc(1% * var(--b)), calc(-0.8% * var(--b)))
+      rotate(0.6deg);
   }
   50% {
-    transform: translate(-0.6%, -1%) rotate(0.9deg);
+    transform: translate(calc(-0.6% * var(--b)), calc(-1% * var(--b)))
+      rotate(0.9deg);
   }
   75% {
-    transform: translate(1.2%, 0.8%) rotate(-0.5deg);
+    transform: translate(calc(1.2% * var(--b)), calc(0.8% * var(--b)))
+      rotate(-0.5deg);
   }
 }
 /* The bow: the head dips and foreshortens, holds, and comes back up. */
@@ -494,10 +503,12 @@
     transform: translateY(0) rotate(0) scale(1.08, 0.92);
   }
   15% {
-    transform: translateY(calc(-30% * var(--e))) rotate(60deg) scale(0.96, 1.06);
+    transform: translateY(calc(-30% * var(--e) * var(--b))) rotate(60deg)
+      scale(0.96, 1.06);
   }
   50% {
-    transform: translateY(calc(-55% * var(--e))) rotate(200deg) scale(1);
+    transform: translateY(calc(-55% * var(--e) * var(--b))) rotate(200deg)
+      scale(1);
   }
   85% {
     transform: translateY(0) rotate(360deg) scale(1.1, 0.9);
