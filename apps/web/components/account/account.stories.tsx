@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
+import type { DayStreak } from "@workspace/player"
+
 import type {
   ConnectedApp,
   KeySummary,
@@ -18,6 +20,7 @@ import { AuthHeading, AuthPanel, LegalConsent } from "./auth-panel"
 import { ConsentForm } from "./consent-form"
 import { HandleForm } from "./handle-form"
 import { LoginForm } from "./login-form"
+import { StreakButton } from "./streak-button"
 
 // The account screens with a fake server: any code "123456" works, the handle "taken" is taken,
 // and a picture named "big" is refused by the server (the browser refuses real oversized files first).
@@ -373,6 +376,63 @@ export const HeaderMenu: Story = {
           defaultOpen
         />
       </div>
+    </div>
+  ),
+}
+
+/**
+ * A streak as of a fixed Monday: the last seven days oldest first, one letter each (l lit, r a rest
+ * day, m missed, o today still open).
+ */
+const streakOf = (
+  current: number,
+  longest: number,
+  rest: number,
+  week: string
+): DayStreak => ({
+  current,
+  longest,
+  rest,
+  days: [...week].map((c, i) => ({
+    day: `2026-10-${String(20 + i).padStart(2, "0")}`,
+    state: ({ l: "lit", r: "rest", m: "missed", o: "open" } as const)[
+      c as "l" | "r" | "m" | "o"
+    ],
+  })),
+})
+
+export const HeaderStreak: Story = {
+  name: "Header streak",
+  render: () => (
+    // Lit once today has a lesson, unlit until then (the count holds through today), and a new
+    // account's 0. Learners without a streak at all still see the lantern, as an invitation.
+    <div className="flex flex-col gap-2 [&_header]:static">
+      <SiteHeader
+        account={{ handle: "ada-lovelace", image: PICTURE }}
+        streak={streakOf(12, 21, 2, "lllrlll")}
+      />
+      <SiteHeader
+        account={{ handle: "ada-lovelace", image: PICTURE }}
+        streak={streakOf(12, 21, 1, "lllrllo")}
+      />
+      <SiteHeader
+        account={{ handle: "ada-lovelace", image: PICTURE }}
+        streak={streakOf(0, 0, 0, "mmmmmmo")}
+      />
+    </div>
+  ),
+}
+
+export const HeaderStreakOpen: Story = {
+  name: "Header streak, open",
+  render: () => (
+    // The popover: this week's lanterns, the best streak, and the way to the activity grid.
+    <div className="flex h-72 justify-end px-8 pt-4">
+      <StreakButton
+        streak={streakOf(12, 21, 1, "lllrllo")}
+        profileHref="#profile"
+        defaultOpen
+      />
     </div>
   ),
 }

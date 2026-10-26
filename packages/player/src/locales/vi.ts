@@ -1,6 +1,6 @@
-import type { Strings } from "../strings"
+import type { Translation } from "../strings"
 
-export const vi: Strings = {
+export const vi: Translation = {
   start: "Bắt đầu bài học",
   check: "Kiểm tra đáp án",
   continue: "Tiếp tục",

@@ -67,8 +67,16 @@ export default async function PublishedLessonPage({
   const { slugId } = await params
   const view = await viewPublished(slugId)
   if (!view.record) return <LessonExpired reason={view.reason ?? "expired"} />
-  const { record, isOwner, listed, signedIn, author, liked, viewerHandle } =
-    view
+  const {
+    record,
+    isOwner,
+    listed,
+    signedIn,
+    author,
+    liked,
+    viewerHandle,
+    streak,
+  } = view
   const { ui, c, by } = await searchParams
   return (
     <div className="h-svh">
@@ -83,6 +91,7 @@ export default async function PublishedLessonPage({
         lessonId={record.id}
         canReport={listed && !isOwner}
         recordCompletion={signedIn}
+        streak={streak ?? undefined}
         likes={{ likes: record.likes, liked, signedIn }}
         loginHref={`/login?callback=${encodeURIComponent(`/l/${slugId}?like=1`)}`}
         owner={

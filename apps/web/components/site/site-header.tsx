@@ -1,9 +1,11 @@
 "use client"
 
+import type { DayStreak } from "@workspace/player"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { AccountLink, useAccount } from "@/components/account/account-link"
 import { AccountMenu } from "@/components/account/account-menu"
+import { StreakButton } from "@/components/account/streak-button"
 import type { AccountInfo } from "@/lib/auth/account-info"
 
 import { ButtonLink } from "./button-link"
@@ -14,7 +16,8 @@ import { Wordmark } from "./wordmark"
  * links home; once logged in, Explore is home, so the wordmark goes there and the links fold
  * into the account menu behind the profile picture (which also opens on hover). `start` adds
  * page-specific controls before the wordmark (the docs menu), `action` a button after it (copy
- * prompt). `account` is what a page that checked the session knows about the user; static pages
+ * prompt). `streak` puts the logged-in learner's lantern before the picture. `account` is what a
+ * page that checked the session knows about the user; static pages
  * leave it out and the marker cookie decides after hydration. Until then the visitor's links are
  * kept but invisible, so the header doesn't shift for the many visitors who aren't logged in.
  */
@@ -22,11 +25,14 @@ export function SiteHeader({
   start,
   action,
   account: known,
+  streak,
 }: {
   start?: React.ReactNode
   action?: React.ReactNode
   /** The logged-in user, or null when nobody is. */
   account?: AccountInfo | null
+  /** The logged-in learner's streak, for pages that know it. */
+  streak?: DayStreak | null
 }) {
   const account = useAccount(known)
   const visitor = account === null || account === undefined
@@ -51,7 +57,17 @@ export function SiteHeader({
               <AccountLink account={account} />
             </>
           ) : (
-            <AccountMenu account={account} />
+            <>
+              {streak ? (
+                <StreakButton
+                  streak={streak}
+                  profileHref={
+                    account.handle ? `/u/${account.handle}` : undefined
+                  }
+                />
+              ) : null}
+              <AccountMenu account={account} />
+            </>
           )}
         </nav>
       </div>

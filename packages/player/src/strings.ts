@@ -125,6 +125,23 @@ export type Strings = {
   /** The wrap-up's bar with a segment for each question (its label), and what each segment means. */
   howYouDid: string
   outcomes: { first: string; second: string; missed: string }
+  /** The streak screen before the wrap-up, on the day's first lesson: the days in a row ("12-day streak"), said to screen readers. */
+  streakDays: (days: number) => string
+  /** The words under its big number ("day streak"). */
+  streakUnit: (days: number) => string
+  /** Its line under the week: a streak going on, the first day ever, or day 1 after one broke. */
+  streakLit: string
+  streakStarts: string
+  streakAgain: string
+  /** The row of the last seven days' lanterns, to screen readers, and each day's state. */
+  streakWeek: string
+  streakDayLit: string
+  streakDayRest: string
+  streakDayUnlit: string
+  /** Today before its lesson, and the days still to come. */
+  streakDayOpen: string
+  /** The rest days saved, under the streak screen's week ("1 rest day saved"). */
+  streakRest: (days: number) => string
   /** The wrap-up's heart, before and after the learner likes the lesson. */
   like: string
   liked: string
@@ -218,6 +235,26 @@ export type Strings = {
   privacy: string
   terms: string
 }
+
+/**
+ * Strings added while translations are on hold (UI_TRANSLATIONS): only English has them, and every
+ * other language falls back to English for them (loadLanguage). Translate them and take them off
+ * this list before switching translations back on.
+ */
+export type Untranslated =
+  | "streakDays"
+  | "streakUnit"
+  | "streakLit"
+  | "streakStarts"
+  | "streakAgain"
+  | "streakWeek"
+  | "streakDayLit"
+  | "streakDayRest"
+  | "streakDayUnlit"
+  | "streakDayOpen"
+  | "streakRest"
+/** A language's own strings: everything but the ones still waiting for translation. */
+export type Translation = Omit<Strings, Untranslated>
 
 /** The ready-made changes the Make changes dialog offers. */
 export const LESSON_CHANGES = ["visual", "shorter", "examples"] as const

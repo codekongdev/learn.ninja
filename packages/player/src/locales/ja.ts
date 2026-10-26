@@ -1,6 +1,6 @@
-import type { Strings } from "../strings"
+import type { Translation } from "../strings"
 
-export const ja: Strings = {
+export const ja: Translation = {
   start: "レッスンを始める",
   check: "答えを確認",
   continue: "次へ",

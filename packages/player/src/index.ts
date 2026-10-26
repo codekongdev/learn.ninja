@@ -18,3 +18,13 @@ export { timeAgo, shortTimeAgo, exactTime, TimeAgo, timeLeft } from "./time"
 export { plainText } from "./plain-text"
 export { BRAND, LearnLogo } from "./logo"
 export { savedProgress } from "./progress"
+export {
+  Lantern,
+  LanternIcon,
+  StreakScreen,
+  StreakWeek,
+  type DayState,
+  type DayStreak,
+  type LanternLook,
+  type StreakDay,
+} from "./streak"

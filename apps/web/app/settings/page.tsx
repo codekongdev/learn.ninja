@@ -9,6 +9,7 @@ import { ConnectChatFallback } from "@/components/account/connect-chat"
 import { ConnectedApps } from "@/components/account/connected-apps"
 import { HandleForm } from "@/components/account/handle-form"
 import { ButtonLink } from "@/components/site/button-link"
+import { viewerStreak } from "@/lib/activity/server"
 import { connectedApps, listKeys, mcpConnection } from "@/lib/auth/account"
 import { accountOf } from "@/lib/auth/account-info"
 import { getAuth } from "@/lib/auth/auth"
@@ -32,13 +33,14 @@ export default async function SettingsPage() {
   const auth = await getAuth()
   const h = await headers()
   const db = await getDb()
-  const [keys, connection, apps] = await Promise.all([
+  const [keys, connection, apps, streak] = await Promise.all([
     listKeys(auth, h).then((r) => r.body.keys as KeySummary[]),
     mcpConnection(auth, h),
     connectedApps(db, actor.userId),
+    viewerStreak(actor.userId),
   ])
   return (
-    <AccountPage account={accountOf(actor)} wide>
+    <AccountPage account={accountOf(actor)} streak={streak} wide>
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
@@ -59,11 +61,7 @@ export default async function SettingsPage() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-xl font-semibold tracking-tight">Handle</h2>
           {actor.handle ? (
-            <ButtonLink
-              href={`/u/${actor.handle}`}
-              variant="outline"
-              size="sm"
-            >
+            <ButtonLink href={`/u/${actor.handle}`} variant="outline" size="sm">
               View profile
             </ButtonLink>
           ) : null}

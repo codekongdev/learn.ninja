@@ -1,6 +1,6 @@
-import type { Strings } from "../strings"
+import type { Translation } from "../strings"
 
-export const id: Strings = {
+export const id: Translation = {
   start: "Mulai pelajaran",
   check: "Periksa jawaban",
   continue: "Lanjut",

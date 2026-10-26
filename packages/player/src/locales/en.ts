@@ -125,6 +125,20 @@ export const en: Strings = {
     second: "After another go",
     missed: "Missed",
   },
+  streakDays: (days) => `${days}-day streak`,
+  streakUnit: () => "day streak",
+  streakLit:
+    "Your lantern's lit for today. Come back tomorrow to keep it going.",
+  streakStarts: "Your streak starts today. Come back tomorrow to light day 2.",
+  streakAgain:
+    "Fall seven times, get up eight. Your streak starts again today.",
+  streakWeek: "The last 7 days",
+  streakDayLit: "lesson finished",
+  streakDayRest: "rest day",
+  streakDayUnlit: "no lesson",
+  streakDayOpen: "not yet",
+  streakRest: (days) =>
+    p(days, { one: "# rest day saved", other: "# rest days saved" }),
   like: "Like",
   liked: "Liked",
   likeLogIn: "Log in to save this lesson to your likes.",

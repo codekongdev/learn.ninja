@@ -1,10 +1,10 @@
-import type { Strings } from "../strings"
+import type { Translation } from "../strings"
 
 import { plural } from "./plural"
 
 const p = plural("de")
 
-export const de: Strings = {
+export const de: Translation = {
   start: "Lektion starten",
   check: "Antwort prüfen",
   continue: "Weiter",

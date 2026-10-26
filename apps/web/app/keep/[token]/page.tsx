@@ -5,6 +5,7 @@ import { AccountPage } from "@/components/account/account-page"
 import { AuthPanel, LegalConsent } from "@/components/account/auth-panel"
 import { LoginForm } from "@/components/account/login-form"
 import { ButtonLink } from "@/components/site/button-link"
+import { viewerStreak } from "@/lib/activity/server"
 import { accountOf } from "@/lib/auth/account-info"
 import { githubFromEnv } from "@/lib/auth/auth"
 import { currentActor } from "@/lib/auth/session"
@@ -35,10 +36,11 @@ export default async function KeepPage({
     (await getLessonStore()).getByClaimTokenHash(hashToken(token)),
   ])
   const account = accountOf(actor)
+  const streak = actor ? await viewerStreak(actor.userId) : null
 
   if (!record) {
     return (
-      <AccountPage account={account}>
+      <AccountPage account={account} streak={streak}>
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">
             Nothing to keep here

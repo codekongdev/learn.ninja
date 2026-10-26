@@ -871,3 +871,22 @@
     opacity: 0;
   }
 }
+
+/* The streak's lantern swings once from its top cap as it lights (packages/player/src/streak.tsx). */
+@media (prefers-reduced-motion: no-preference) {
+  .lantern-sway {
+    transform-origin: 50% 12%;
+    animation: lantern-sway 1.2s ease-in-out;
+  }
+}
+@keyframes lantern-sway {
+  25% {
+    transform: rotate(6deg);
+  }
+  55% {
+    transform: rotate(-4deg);
+  }
+  80% {
+    transform: rotate(2deg);
+  }
+}

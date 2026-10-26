@@ -1,6 +1,6 @@
-import type { Strings } from "../strings"
+import type { Translation } from "../strings"
 
-export const th: Strings = {
+export const th: Translation = {
   start: "เริ่มบทเรียน",
   check: "ตรวจคำตอบ",
   continue: "ต่อไป",
