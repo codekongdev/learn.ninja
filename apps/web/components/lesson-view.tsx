@@ -1,33 +1,36 @@
 "use client"
 
 import * as React from "react"
-import {
-  EyeOffIcon,
-  FlagIcon,
-  GlobeIcon,
-  LinkIcon,
-  SettingsIcon,
-} from "lucide-react"
+import { FlagIcon, SettingsIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import {
   LessonPlayer,
+  parseChallenge,
+  type Challenge,
   type LessonPlayerProps,
+  type NextKind,
   type Theme,
 } from "@workspace/player"
-import {
-  DropdownMenuItem,
-  DropdownMenuLabel,
-} from "@workspace/ui/components/dropdown-menu"
+import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu"
 
 import { ReportDialog } from "@/components/explore/report-dialog"
 import { exploreApi } from "@/lib/explore/browser"
 import type { Visibility } from "@/lib/explore/queries"
 import { AGENT_PROMPT } from "@/lib/site"
 
-/** What the wrap-up's Copy prompt copies: the site's agent prompt for the suggested next lesson. */
-function nextPrompt(topic: string, after: string): string {
-  return `${AGENT_PROMPT}${topic}, as a follow-up to my lesson "${after}".`
+/** What the wrap-up's Keep learning copies: the site's agent prompt, asking for the kind of lesson picked. */
+function nextPrompt(kind: NextKind, topic: string, after: string): string {
+  switch (kind) {
+    case "next":
+      return `${AGENT_PROMPT}${topic}, as a follow-up to my lesson "${after}".`
+    case "deeper":
+      return `${AGENT_PROMPT}${topic}, going deeper than my lesson "${after}": build on what it taught instead of repeating it.`
+    case "harder":
+      return `${AGENT_PROMPT}${topic}, at a harder level than my lesson "${after}".`
+    case "other":
+      return `${AGENT_PROMPT}${topic}.`
+  }
 }
 
 export interface LessonViewProps extends LessonPlayerProps {
@@ -72,10 +75,14 @@ export function LessonView({
   const [visibility, setVisibility] = React.useState(owner?.visibility)
   // The lesson's link without ?ui= and the like, for the prompt the owner's Make changes copies.
   const [url, setUrl] = React.useState("")
+  // A challenge in the link: the server reads it for /l/ pages; prerendered pages read it here.
+  const [linkChallenge, setLinkChallenge] = React.useState<Challenge>()
   React.useEffect(() => {
     setMounted(true)
     setUrl(window.location.origin + window.location.pathname)
     const params = new URLSearchParams(window.location.search)
+    if (!props.challenge)
+      setLinkChallenge(parseChallenge(params.get("c"), params.get("by")))
     // In a transition, like the player's own language changes: the page stays up while it loads.
     React.startTransition(() => setUrlLanguage(params.get("ui") ?? undefined))
     // Back from logging in to like it (the wrap-up's Log in link adds ?like=1): the player
@@ -101,24 +108,7 @@ export function LessonView({
     <>
       {owner ? (
         <>
-          <DropdownMenuLabel className="flex items-center gap-1.5">
-            {owner.hidden ? (
-              <>
-                <EyeOffIcon className="size-3.5" aria-hidden="true" />
-                Hidden after a report
-              </>
-            ) : visibility === "public" ? (
-              <>
-                <GlobeIcon className="size-3.5" aria-hidden="true" />
-                Published in Explore
-              </>
-            ) : (
-              <>
-                <LinkIcon className="size-3.5" aria-hidden="true" />
-                Private: link only
-              </>
-            )}
-          </DropdownMenuLabel>
+          {/* Where it stands is the badge by Share; the menu keeps the way to the rest. */}
           {owner.handle ? (
             <DropdownMenuItem href={`/u/${owner.handle}`}>
               <SettingsIcon />
@@ -148,6 +138,7 @@ export function LessonView({
         onThemeChange={setTheme}
         menuItems={menuItems}
         nextPrompt={nextPrompt}
+        challenge={props.challenge ?? linkChallenge}
         creator={
           lessonId && owner
             ? {
@@ -164,6 +155,15 @@ export function LessonView({
                   if (!result.error) setVisibility("public")
                   return result
                 },
+                onUnpublish: async () => {
+                  const result = await exploreApi.setVisibility(
+                    lessonId,
+                    "unlisted"
+                  )
+                  if (!result.error) setVisibility("unlisted")
+                  return result
+                },
+                profileHref: owner.handle ? `/u/${owner.handle}` : undefined,
                 url,
               }
             : undefined

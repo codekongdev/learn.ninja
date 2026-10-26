@@ -12,7 +12,6 @@ import {
 
 import { LEVELS, type Level } from "@workspace/spec"
 import { Button } from "@workspace/ui/components/button"
-import { Card, CardContent } from "@workspace/ui/components/card"
 import { Checkbox } from "@workspace/ui/components/checkbox"
 import {
   Dialog,
@@ -22,7 +21,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog"
+import {
+  DropdownMenuItem,
+  DropdownMenuLabel,
+} from "@workspace/ui/components/dropdown-menu"
+import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
+import { Popover, PopoverTrigger } from "@workspace/ui/components/popover"
+import { toast } from "@workspace/ui/components/sonner"
+import { Switch } from "@workspace/ui/components/switch"
 import { Textarea } from "@workspace/ui/components/textarea"
 import {
   ToggleGroup,
@@ -33,78 +40,236 @@ import { cn } from "@workspace/ui/lib/utils"
 import { usePlayer } from "./context"
 import { LESSON_CHANGES, type LessonChange, type Strings } from "./strings"
 
-/**
- * The wrap-up's card for the lesson's maker, in the heart's place: where the lesson stands, Publish
- * while it's private, and Make changes, a dialog that turns a new level, ticked changes, and the
- * maker's own words into one prompt to paste back into the chat that made the lesson.
- */
-export function CreatorCard({ level }: { level: Level }) {
-  const { t, creator } = usePlayer()
-  // Publishing here moves it on without a reload.
-  const [status, setStatus] = React.useState(creator?.status ?? "private")
-  const [busy, setBusy] = React.useState(false)
-  const [failed, setFailed] = React.useState(false)
-  const [changesOpen, setChangesOpen] = React.useState(false)
-  if (!creator) return null
+type Status = "private" | "published" | "hidden"
 
-  async function publish() {
-    if (!creator?.onPublish || busy) return
+interface CreatorControls {
+  status: Status
+  busy: boolean
+  publish?: () => void
+  unpublish?: () => void
+  openChanges: () => void
+}
+
+const ControlsContext = React.createContext<CreatorControls | null>(null)
+
+/** The maker's controls, wherever the player shows them (the header, the phone menu); null for anyone else. */
+export const useCreatorControls = () => React.useContext(ControlsContext)
+
+/**
+ * Holds what the lesson's maker can do from anywhere in the player: where the lesson stands (moved
+ * on by Publish and Make private without a reload), and the Make changes dialog, which turns a new
+ * level, ticked changes, and the maker's own words into one prompt to paste back into the chat
+ * that made the lesson.
+ */
+export function CreatorProvider({
+  level,
+  children,
+}: {
+  level: Level
+  children: React.ReactNode
+}) {
+  const { t, creator } = usePlayer()
+  const [status, setStatus] = React.useState<Status>(
+    creator?.status ?? "private"
+  )
+  React.useEffect(() => {
+    if (creator) setStatus(creator.status)
+  }, [creator?.status]) // eslint-disable-line react-hooks/exhaustive-deps
+  const [busy, setBusy] = React.useState(false)
+  const [changesOpen, setChangesOpen] = React.useState(false)
+  if (!creator) return children
+  const { onPublish, onUnpublish } = creator
+
+  /** Publishes or unpublishes, then says so in a toast, with Undo when it can go back. */
+  async function move(to: "published" | "private", undoable = true) {
+    const run = to === "published" ? onPublish : onUnpublish
+    const back = to === "published" ? onUnpublish : onPublish
+    if (!run || busy) return
     setBusy(true)
-    setFailed(false)
-    const result = await creator.onPublish().catch(() => ({ error: "network" }))
+    const result = await run().catch(() => ({ error: "network" }))
     setBusy(false)
-    if (result.error) return setFailed(true)
-    setStatus("published")
+    if (result.error)
+      return void toast.error(
+        to === "published" ? t.publishFailed : t.makePrivateFailed
+      )
+    setStatus(to)
+    toast.success(to === "published" ? t.creatorPublished : t.madePrivate, {
+      description: to === "published" ? t.publishedBody : t.publishBody,
+      action:
+        undoable && back
+          ? {
+              label: t.undo,
+              onClick: () =>
+                void move(to === "published" ? "private" : "published", false),
+            }
+          : undefined,
+    })
   }
 
-  const { Icon, label, body } = standing(t)[status]
+  const controls: CreatorControls = {
+    status,
+    busy,
+    publish: onPublish ? () => void move("published") : undefined,
+    unpublish: onUnpublish ? () => void move("private") : undefined,
+    openChanges: () => setChangesOpen(true),
+  }
   return (
-    <>
-      <Card size="sm">
-        <CardContent className="flex flex-col gap-3">
-          <div aria-live="polite" className="flex flex-col gap-1">
-            <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <Icon aria-hidden="true" className="size-3.5" />
-              {label}
-            </p>
-            {status === "private" ? (
-              <p className="text-sm font-semibold">{t.publishTitle}</p>
-            ) : null}
-            <p className="text-sm text-muted-foreground">{body}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {status === "private" && creator.onPublish ? (
-              <Button
-                size="sm"
-                isDisabled={busy}
-                onPress={() => void publish()}
-              >
-                <GlobeIcon data-icon="inline-start" />
-                {t.publish}
-              </Button>
-            ) : null}
-            <Button
-              variant="outline"
-              size="sm"
-              onPress={() => setChangesOpen(true)}
-            >
-              <PencilIcon data-icon="inline-start" />
-              {t.makeChanges}
-            </Button>
-          </div>
-          {failed ? (
-            <p role="alert" className="text-sm text-destructive">
-              {t.publishFailed}
-            </p>
-          ) : null}
-        </CardContent>
-      </Card>
+    <ControlsContext.Provider value={controls}>
+      {children}
       <ChangesDialog
         isOpen={changesOpen}
         onOpenChange={setChangesOpen}
         url={creator.url}
         level={level}
       />
+    </ControlsContext.Provider>
+  )
+}
+
+const STATUS_COLOR: Record<Status, string> = {
+  published: "text-green-600",
+  hidden: "text-yellow-600 dark:text-yellow-500",
+  private: "text-muted-foreground",
+}
+
+/**
+ * The maker's Share, its icon saying where the lesson stands: a popover with the lesson's link to copy, where it stands with a switch to
+ * publish it or make it private, and Make changes.
+ */
+export function CreatorShare({
+  url,
+  className,
+}: {
+  url?: string
+  className?: string
+}) {
+  const { t, creator } = usePlayer()
+  const controls = useCreatorControls()
+  const [open, setOpen] = React.useState(false)
+  if (!controls || !creator) return null
+  const link = url ?? creator.url
+  const { Icon, label, body } = standing(t)[controls.status]
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(link)
+      toast.success(t.linkCopied)
+    } catch {
+      // The link is still in the field to copy by hand.
+      toast.error(t.copyFailed)
+    }
+  }
+
+  return (
+    <PopoverTrigger isOpen={open} onOpenChange={setOpen}>
+      {/* Where the lesson stands is the button's icon, on every screen: a lock or a globe. */}
+      <Button
+        variant="outline"
+        size="sm"
+        aria-label={`${t.share}: ${label}`}
+        className={className}
+      >
+        <Icon
+          data-icon="inline-start"
+          aria-hidden="true"
+          className={STATUS_COLOR[controls.status]}
+        />
+        {t.share}
+      </Button>
+      <Popover placement="bottom end" className="w-80 gap-0 p-0">
+        <div className="flex flex-col gap-2 p-3">
+          <p className="font-medium">{t.share}</p>
+          <div className="flex items-center gap-2">
+            <Input
+              aria-label={t.share}
+              value={link}
+              readOnly
+              dir="ltr"
+              onFocus={(e) => e.target.select()}
+              className="h-7 flex-1 text-sm text-muted-foreground md:text-sm"
+            />
+            <Button variant="outline" size="sm" onPress={() => void copy()}>
+              <CopyIcon data-icon="inline-start" />
+              {t.copyLink}
+            </Button>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 border-t p-3">
+          {/* One switch, always there: on is published, off is private; a hidden lesson can't be published. */}
+          <div className="flex items-center justify-between gap-3">
+            <p className="flex items-center gap-1.5 font-medium">
+              <Icon
+                aria-hidden="true"
+                className={cn("size-4", STATUS_COLOR[controls.status])}
+              />
+              {label}
+            </p>
+            <Switch
+              aria-label={t.creatorPublished}
+              isSelected={controls.status === "published"}
+              isDisabled={
+                controls.busy ||
+                controls.status === "hidden" ||
+                !(controls.status === "published"
+                  ? controls.unpublish
+                  : controls.publish)
+              }
+              // The toast confirms it (with Undo), so the popover gets out of its way.
+              onChange={(on) => {
+                setOpen(false)
+                const move = on ? controls.publish : controls.unpublish
+                move?.()
+              }}
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">{body}</p>
+        </div>
+        <div className="border-t p-1.5">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start"
+            onPress={controls.openChanges}
+          >
+            <PencilIcon data-icon="inline-start" />
+            {t.makeChanges}
+          </Button>
+        </div>
+      </Popover>
+    </PopoverTrigger>
+  )
+}
+
+/** The same controls in the phone's menu: where the lesson stands, Publish or Make private, and Make changes. */
+export function CreatorMenuItems() {
+  const { t } = usePlayer()
+  const controls = useCreatorControls()
+  if (!controls) return null
+  const { Icon, label } = standing(t)[controls.status]
+  return (
+    <>
+      <DropdownMenuLabel className="flex items-center gap-1.5">
+        <Icon
+          aria-hidden="true"
+          className={cn("size-3.5", STATUS_COLOR[controls.status])}
+        />
+        {label}
+      </DropdownMenuLabel>
+      {controls.status === "private" && controls.publish ? (
+        <DropdownMenuItem onAction={controls.publish}>
+          <GlobeIcon />
+          {t.publish}
+        </DropdownMenuItem>
+      ) : controls.status === "published" && controls.unpublish ? (
+        <DropdownMenuItem onAction={controls.unpublish}>
+          <LockIcon />
+          {t.makePrivate}
+        </DropdownMenuItem>
+      ) : null}
+      <DropdownMenuItem onAction={controls.openChanges}>
+        <PencilIcon />
+        {t.makeChanges}
+      </DropdownMenuItem>
     </>
   )
 }

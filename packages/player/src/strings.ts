@@ -94,11 +94,39 @@ export type Strings = {
   /** The score line on a perfect run: "All 9 on the first try". */
   allFirstTry: (total: number) => string
   takeaways: string
-  next: string
-  /** Under the suggested next lesson's title, saying what Copy prompt is for. */
+  /** The wrap-up's Keep learning list: what to ask the learner's agent for next. */
+  keepLearning: string
+  /** Its choices: the lesson's suggested next topic, this topic deeper, this topic harder, or the learner's own. */
+  keepKinds: Record<NextKind, string>
+  /** The placeholder of the field for the learner's own topic. */
+  keepPlaceholder: string
+  /** Keep learning's rows say to screen readers what their copied prompts are for. */
   nextHint: string
   copyPrompt: string
   promptCopied: string
+  /** The wrap-up's main button after a good run: the score, sent as a challenge. */
+  challengeTitle: string
+  /** The message sent with the challenge link. */
+  challengeMessage: (first: number, total: number) => string
+  /** That button for someone who was challenged themselves. */
+  challengeBack: string
+  /** The share button after a rough run: the lesson without the score. */
+  sendTitle: string
+  sendMessage: string
+  /** The toast after the challenge was copied (desktop; phones open the share sheet), and what to do next. */
+  messageCopied: string
+  challengeCopiedHint: string
+  /** What to do next with the plain link after a rough run (the toast's title is linkCopied). */
+  sendCopiedHint: string
+  /** On the title screen of a challenge link: the sender's score, `by` their handle when they were logged in. */
+  challengeFrom: (first: number, total: number, by?: string) => string
+  /** On the challenged learner's wrap-up: their first tries (`mine`) against the sender's. */
+  challengeWon: (mine: number, theirs: number, by?: string) => string
+  challengeTied: (score: number, by?: string) => string
+  challengeLost: (mine: number, theirs: number, by?: string) => string
+  /** The wrap-up's bar with a segment for each question (its label), and what each segment means. */
+  howYouDid: string
+  outcomes: { first: string; second: string; missed: string }
   /** The wrap-up's heart, before and after the learner likes the lesson. */
   like: string
   liked: string
@@ -106,16 +134,21 @@ export type Strings = {
   likeLogIn: string
   logIn: string
   likeFailed: string
-  /** The wrap-up's card for the lesson's maker: where it stands, a way to publish it, and a way to ask for changes. */
+  /** The maker's Share: where the lesson stands (its icon), the switch to publish it, and Make changes. */
   creatorPrivate: string
   creatorPublished: string
   creatorHidden: string
-  publishTitle: string
   publishBody: string
   publishedBody: string
   hiddenBody: string
   publish: string
   publishFailed: string
+  /** Takes a published lesson back out of Explore, from the maker's Share. */
+  makePrivate: string
+  makePrivateFailed: string
+  /** The toast after making it private (publishing says creatorPublished), and its button to go back. */
+  madePrivate: string
+  undo: string
   makeChanges: string
   /** The Make changes dialog: what to do with what it copies. */
   changesBody: string
@@ -149,6 +182,8 @@ export type Strings = {
   lessonName: string
   lessonMenu: string
   linkCopied: string
+  /** The button beside the lesson's link in the maker's Share. */
+  copyLink: string
   theory: string
   theoryEmpty: string
   closeTheory: string
@@ -187,12 +222,11 @@ export type Strings = {
 }
 
 /** The ready-made changes the Make changes dialog offers. */
-export const LESSON_CHANGES = [
-  "visual",
-  "shorter",
-  "examples",
-] as const
+export const LESSON_CHANGES = ["visual", "shorter", "examples"] as const
 export type LessonChange = (typeof LESSON_CHANGES)[number]
+/** What Keep learning asks the agent for, in the order its choices show. */
+export const NEXT_KINDS = ["next", "deeper", "harder", "other"] as const
+export type NextKind = (typeof NEXT_KINDS)[number]
 export type TextSize = "sm" | "md" | "lg"
 export type Theme = "system" | "light" | "dark"
 /** The ninja's character: hidden, plain and short, a calm mentor, or a nervous wreck. */

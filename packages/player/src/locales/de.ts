@@ -113,27 +113,59 @@ export const de: Strings = {
       ? "Beide beim ersten Versuch"
       : `Alle ${total} beim ersten Versuch`,
   takeaways: "Das Wichtigste",
-  next: "Vorgeschlagene nächste Lektion",
-  nextHint:
-    "Füge den Prompt in deinen KI-Agenten ein, um diese Lektion zu erstellen.",
+  keepLearning: "Weiterlernen",
+  keepKinds: {
+    next: "Als Nächstes",
+    deeper: "Tiefer eintauchen",
+    harder: "Schwieriger",
+    other: "Etwas anderes",
+  },
+  keepPlaceholder: "Was möchtest du lernen?",
+  nextHint: "Füge ihn in deinen KI-Agenten ein, um die Lektion zu erstellen.",
   copyPrompt: "Prompt kopieren",
   promptCopied: "Prompt kopiert",
+  challengeTitle: "Fordere einen Freund heraus",
+  challengeMessage: (first, total) =>
+    `Ich habe ${first} von ${total} beim ersten Versuch geschafft. Kannst du mich schlagen?`,
+  challengeBack: "Zurück herausfordern",
+  sendTitle: "Schick sie einem Freund",
+  sendMessage: "Probier diese Lektion auf learn.ninja aus.",
+  messageCopied: "Herausforderung kopiert",
+  challengeCopiedHint:
+    "Füg sie in eine Nachricht an einen Freund ein. Sein Link zeigt dein Ergebnis, das er schlagen muss.",
+  sendCopiedHint: "Füg ihn in eine Nachricht an einen Freund ein.",
+  challengeFrom: (first, total, by) =>
+    `${by ? `@${by}` : "Ein Freund"} hat ${first} von ${total} geschafft. Schaffst du mehr?`,
+  challengeWon: (mine, theirs, by) =>
+    `Du hast ${by ? `@${by}` : "deinen Freund"} geschlagen, ${mine} zu ${theirs}`,
+  challengeTied: (score, by) =>
+    `Unentschieden mit ${by ? `@${by}` : "deinem Freund"}: ${score}`,
+  challengeLost: (mine, theirs, by) =>
+    `${by ? `@${by}` : "Dein Freund"} gewinnt diese Runde, ${theirs} zu ${mine}`,
+  howYouDid: "So lief es",
+  outcomes: {
+    first: "Erster Versuch",
+    second: "Nach einem weiteren Versuch",
+    missed: "Verpasst",
+  },
   like: "Gefällt mir",
   liked: "Gefällt dir",
   likeLogIn: "Melde dich an, um diese Lektion in deinen Likes zu speichern.",
   logIn: "Anmelden",
   likeFailed: "Dein Like wurde nicht gespeichert. Versuch es noch einmal.",
   creatorPrivate: "Privat",
-  creatorPublished: "In Explore veröffentlicht",
+  creatorPublished: "Veröffentlicht",
   creatorHidden: "Nach einer Meldung ausgeblendet",
-  publishTitle: "Zufrieden damit?",
-  publishBody:
-    "Veröffentliche sie in Explore und auf deinem Profil, damit alle sie finden.",
+  publishBody: "Nur Personen mit dem Link können sie öffnen.",
   publishedBody: "Alle finden sie in Explore und auf deinem Profil.",
   hiddenBody:
     "Solange sie ausgeblendet ist, kann sie nicht veröffentlicht werden.",
   publish: "Veröffentlichen",
   publishFailed: "Veröffentlichen hat nicht geklappt. Versuch es noch einmal.",
+  makePrivate: "Privat machen",
+  makePrivateFailed: "Das hat nicht geklappt. Versuch es noch einmal.",
+  madePrivate: "Jetzt privat",
+  undo: "Rückgängig",
   makeChanges: "Änderungen vornehmen",
   changesBody:
     "Wähl aus, was sich ändern soll, ergänze den Rest und füg alles in den Chat ein, in dem du die Lektion erstellt hast. Der Link bleibt derselbe.",
@@ -169,6 +201,7 @@ export const de: Strings = {
   lessonName: "Name der Lektion",
   lessonMenu: "Lektionsmenü",
   linkCopied: "Link kopiert",
+  copyLink: "Link kopieren",
   theory: "Theorie",
   theoryEmpty: "Konzepte erscheinen hier, sobald du sie gelernt hast.",
   closeTheory: "Theorie schließen",

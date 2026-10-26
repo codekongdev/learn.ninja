@@ -51,6 +51,7 @@ import { Tooltip, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { usePlayer } from "./context"
+import { CreatorMenuItems, CreatorShare, useCreatorControls } from "./creator"
 import type { QuestionCount } from "./flow"
 import { BRAND, LearnLogo } from "./logo"
 import { Ninja, type NinjaMood } from "./ninja"
@@ -211,6 +212,7 @@ export function LessonHeader({
 }) {
   const left = useTimeLeft(expiresAt)
   const [confirmRestart, setConfirmRestart] = React.useState(false)
+  const controls = useCreatorControls()
   return (
     // On phones the header is the logo, the progress bar, and one menu: the title shows only on the
     // intro (the screen itself names the lesson after that), and the gear, Share, and the footer's
@@ -308,7 +310,12 @@ export function LessonHeader({
       )}
       <div className="flex items-center justify-end gap-2 max-sm:hidden sm:flex-1">
         {settings}
-        <ShareButton title={title} url={shareUrl} t={t} />
+        {/* The maker's Share shows where the lesson stands and holds the link and publishing. */}
+        {controls ? (
+          <CreatorShare url={shareUrl} />
+        ) : (
+          <ShareButton title={title} url={shareUrl} t={t} />
+        )}
       </div>
       <PhoneMenu
         title={title}
@@ -349,6 +356,7 @@ function PhoneMenu({
   t: Strings
 }) {
   const { share } = useShare(title, shareUrl)
+  const controls = useCreatorControls()
   return (
     <DropdownMenuTrigger>
       <Button
@@ -383,6 +391,14 @@ function PhoneMenu({
             {t.restart}
           </DropdownMenuItem>
         </DropdownMenuGroup>
+        {controls ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <CreatorMenuItems />
+            </DropdownMenuGroup>
+          </>
+        ) : null}
         {menuItems ? (
           <>
             <DropdownMenuSeparator />

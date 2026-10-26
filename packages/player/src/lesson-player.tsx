@@ -23,6 +23,7 @@ import { Badge } from "@workspace/ui/components/badge"
 import { Button, LinkButton } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { DirectionProvider } from "@workspace/ui/components/direction"
+import { Toaster } from "@workspace/ui/components/sonner"
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -46,11 +47,14 @@ import {
 import { Briefing } from "./briefing"
 import {
   PlayerProvider,
+  useIsDark,
   usePlayer,
   type LessonCreator,
   type LessonLike,
+  type NextPrompt,
 } from "./context"
-import { CreatorCard } from "./creator"
+import { challengeFor, type Challenge } from "./challenge"
+import { CreatorProvider } from "./creator"
 import {
   hasOptionCards,
   BlankBrick,
@@ -72,6 +76,7 @@ import {
   progressAt,
   questionAt,
   runFor,
+  scoredQuestions,
   summarize,
   type Item,
   type Outcome,
@@ -124,6 +129,14 @@ import {
 } from "./strings"
 import { Visual } from "./visuals"
 import {
+  ChallengeNote,
+  ChallengeVerdict,
+  KeepLearning,
+  RunBar,
+  Takeaways,
+  WrapActions,
+} from "./wrap-up"
+import {
   CADENCE,
   characterFor,
   clipFor,
@@ -173,11 +186,14 @@ export interface LessonPlayerProps {
   /** Called when the learner reaches the wrap-up (not in demos), once per run through the lesson. */
   onComplete?: () => void
   /**
-   * The prompt the wrap-up's Copy prompt button copies, for the learner's agent to make the
-   * suggested next lesson (`topic`) as a follow-up to this one (`after`, its title). Omit it to show
-   * the suggestion without the button.
+   * The prompt the wrap-up's Keep learning box copies for the learner's agent: the kind of lesson
+   * they picked, the topic in its field, and this lesson's title. Omit it to leave the box out.
    */
-  nextPrompt?: (topic: string, after: string) => string
+  nextPrompt?: NextPrompt
+  /** The score this learner was challenged to beat, read from the link (?c=, ?by=). Ignored once the lesson's question count no longer matches. */
+  challenge?: Challenge
+  /** The logged-in learner's handle, named in the challenges they send. */
+  challenger?: string
   /** The heart on the wrap-up, for a published lesson. Omit it to show no heart. */
   like?: LessonLike
   /** When the lesson's maker is playing: their card on the wrap-up (publish it, ask for changes) instead of the heart. */
@@ -217,6 +233,8 @@ function LessonInLanguage({
   progressKey,
   onComplete,
   nextPrompt,
+  challenge,
+  challenger,
   like,
   creator,
 }: LessonPlayerProps) {
@@ -252,6 +270,7 @@ function LessonInLanguage({
   }, [prefsLoaded, ui])
   const locale = ariaLocaleFor(ui)
   const dir = /^(ar|he|fa|ur)\b/i.test(ui) ? "rtl" : "ltr"
+  const dark = useIsDark()
   const appSettings = {
     theme,
     onThemeChange,
@@ -282,77 +301,95 @@ function LessonInLanguage({
           visualsCss,
           keyScope: scopeKeys ? root : undefined,
           nextPrompt,
+          shareUrl,
+          challenge: challengeFor(challenge, scoredQuestions(lesson).length),
+          challenger,
           like,
           creator,
         }}
       >
-        <div
-          ref={root}
-          dir={dir}
-          lang={ui}
-          // Hidden while the resume script (in Player) has marked it before hydration: see
-          // progress.ts. React must not report that mark as a mismatch.
-          suppressHydrationWarning
-          className="flex h-full min-h-0 flex-col bg-background text-foreground data-resuming:invisible"
-        >
-          <Player
-            lesson={shown}
-            startAt={startAt}
-            progressKey={progressKey}
-            onComplete={onComplete}
-            onRename={(next) => {
-              setTitle(next)
-              onRename?.(next)
-            }}
-            prefs={prefs}
-            onPrefs={setPrefs}
-            onShortcuts={() => setShortcutsOpen((open) => !open)}
-            headerSettings={<AppSettings {...appSettings} />}
-            phoneMenu={
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup aria-label={t.settings}>
-                  <PlayerSettingsItems prefs={prefs} onPrefs={setPrefs} t={t} />
-                  <AppSettingsItems {...appSettings} />
-                </DropdownMenuGroup>
-                {footerLinks.length ? (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup aria-label={BRAND.name}>
-                      {footerLinks.map(([href, label]) => (
-                        <DropdownMenuItem key={href} href={href}>
-                          {label}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuGroup>
-                  </>
-                ) : null}
-              </>
-            }
-            // Touch screens have no hotkeys to fall back on, and phones need the main action, so the
-            // tray stays open there.
-            trayOpen={fixedTray || prefs.tray !== "closed"}
-            onTrayToggle={() =>
-              setPrefs({ tray: prefs.tray === "closed" ? "open" : "closed" })
-            }
-            expiresAt={expiresAt}
-            homeHref={homeHref}
-            shareUrl={shareUrl}
-            menuItems={menuItems}
-            chrome={chrome}
-          />
-          {chrome ? (
-            <LessonFooter
+        <CreatorProvider level={lesson.level}>
+          <div
+            ref={root}
+            dir={dir}
+            lang={ui}
+            // Hidden while the resume script (in Player) has marked it before hydration: see
+            // progress.ts. React must not report that mark as a mismatch.
+            suppressHydrationWarning
+            className="flex h-full min-h-0 flex-col bg-background text-foreground data-resuming:invisible"
+          >
+            <Player
+              lesson={shown}
+              startAt={startAt}
+              progressKey={progressKey}
+              onComplete={onComplete}
+              onRename={(next) => {
+                setTitle(next)
+                onRename?.(next)
+              }}
+              prefs={prefs}
+              onPrefs={setPrefs}
+              onShortcuts={() => setShortcutsOpen((open) => !open)}
+              headerSettings={<AppSettings {...appSettings} />}
+              phoneMenu={
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup aria-label={t.settings}>
+                    <PlayerSettingsItems
+                      prefs={prefs}
+                      onPrefs={setPrefs}
+                      t={t}
+                    />
+                    <AppSettingsItems {...appSettings} />
+                  </DropdownMenuGroup>
+                  {footerLinks.length ? (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup aria-label={BRAND.name}>
+                        {footerLinks.map(([href, label]) => (
+                          <DropdownMenuItem key={href} href={href}>
+                            {label}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuGroup>
+                    </>
+                  ) : null}
+                </>
+              }
+              // Touch screens have no hotkeys to fall back on, and phones need the main action, so the
+              // tray stays open there.
+              trayOpen={fixedTray || prefs.tray !== "closed"}
+              onTrayToggle={() =>
+                setPrefs({ tray: prefs.tray === "closed" ? "open" : "closed" })
+              }
+              expiresAt={expiresAt}
               homeHref={homeHref}
-              privacyHref={privacyHref}
-              termsHref={termsHref}
-              docsHref={docsHref}
-              t={t}
-              shortcutsOpen={shortcutsOpen}
-              onShortcutsChange={setShortcutsOpen}
+              shareUrl={shareUrl}
+              menuItems={menuItems}
+              chrome={chrome}
             />
-          ) : null}
-        </div>
+            {chrome ? (
+              <LessonFooter
+                homeHref={homeHref}
+                privacyHref={privacyHref}
+                termsHref={termsHref}
+                docsHref={docsHref}
+                t={t}
+                shortcutsOpen={shortcutsOpen}
+                onShortcutsChange={setShortcutsOpen}
+              />
+            ) : null}
+          </div>
+          {/* Confirmations (copied, published), at the top: the tray and the ninja's bubble hold the bottom. */}
+          <Toaster
+            position="top-center"
+            // Just under the header (h-16, h-14 on phones), so the title and Share stay visible.
+            offset={{ top: 72 }}
+            mobileOffset={{ top: 64 }}
+            theme={dark ? "dark" : "light"}
+            dir={dir}
+          />
+        </CreatorProvider>
       </PlayerProvider>
     </DirectionProvider>
   )
@@ -1040,7 +1077,6 @@ function Player({
     [item.kind, lesson, state.results]
   )
   const celebrate = run && (run === "perfect" ? "perfect" : "done")
-  const { share, copied } = useShare(lesson.title, shareUrl)
   const hydrated = useHydrated()
 
   return (
@@ -1064,7 +1100,8 @@ function Player({
           count={questionAt(state.items, state.index, state.inFix)}
           startedAt={clock.start}
           endedAt={clock.end}
-          showProgress={item.kind !== "intro"}
+          // Not on the title screen, where nothing has started, or the wrap-up, whose run bar says how it went.
+          showProgress={item.kind !== "intro" && item.kind !== "wrap"}
           expiresAt={expiresAt}
           homeHref={homeHref}
           shareUrl={shareUrl}
@@ -1190,7 +1227,6 @@ function Player({
                     }
                     onRewind={rewind}
                     rewinding={rewinding}
-                    share={{ onPress: share, copied }}
                     why={
                       canWhy
                         ? {
@@ -1255,6 +1291,8 @@ function Player({
             <div
               className={cn(
                 "shrink-0 overflow-hidden",
+                // On phones the tray holds only the screen's actions, and the wrap-up has none there.
+                item.kind === "wrap" && "max-sm:hidden",
                 dragHeight === null &&
                   trayHeight !== null &&
                   "transition-[height] duration-200 ease-out motion-reduce:transition-none"
@@ -1392,6 +1430,8 @@ function VisualsAhead({ item }: { item: Item | undefined }) {
 
 function columnWidth(item: Item): string {
   if (item.kind === "intro") return "max-w-md"
+  // The wrap-up's row of actions needs a step more than a question.
+  if (item.kind === "wrap") return "max-w-xl"
   if (item.kind === "concept")
     return item.brick.visual ? "max-w-2xl" : "max-w-lg"
   if (item.kind !== "question") return "max-w-lg"
@@ -1468,6 +1508,9 @@ export function Screen({
               level={t.levels[lesson.level]}
             />
           </div>
+          <div className="vanish-fade empty:hidden">
+            <ChallengeNote />
+          </div>
         </div>
       )
     case "concept":
@@ -1488,7 +1531,14 @@ export function Screen({
         </div>
       )
     case "wrap":
-      return <WrapUp lesson={lesson} results={state.results} ninja={ninja} />
+      return (
+        <WrapUp
+          lesson={lesson}
+          results={state.results}
+          ninja={ninja}
+          onRestart={() => dispatch({ type: "restart", lesson })}
+        />
+      )
     case "question":
       return (
         <QuestionScreen
@@ -1770,10 +1820,12 @@ function WrapUp({
   lesson,
   results,
   ninja = true,
+  onRestart,
 }: {
   lesson: Lesson
   results: Record<string, Outcome>
   ninja?: boolean
+  onRestart: () => void
 }) {
   const { t, creator } = usePlayer()
   const s = summarize(lesson, results)
@@ -1788,35 +1840,25 @@ function WrapUp({
       <div className="flex flex-col items-center gap-4 text-center">
         {/* The ninja leaps up from the corner to his send-off here (NinjaStage). */}
         <NinjaSlot show={ninja} gap="-mb-4" />
-        {/* The heading and its line as on the fix screen; text in cards at the options' size. */}
+        {/* The heading and its line as on the fix screen, then the run as one bar. */}
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold">{t.done}</h1>
           <p className="text-sm font-medium text-muted-foreground">{score}</p>
         </div>
+        <RunBar lesson={lesson} results={results} />
+        <ChallengeVerdict summary={s} />
+        {/* The maker's own lesson has no heart; its status is in the header. */}
         {creator ? null : <LikeLesson />}
       </div>
-      {/* The maker's next step leads: publish it, or ask their agent for changes. */}
-      {creator ? <CreatorCard level={lesson.level} /> : null}
-      <div className="flex flex-col gap-2">
-        <ScreenLabel text={t.takeaways} />
-        {/* A check list, not cards, so the next lesson is the screen's one box. */}
-        <ul className="grid gap-2.5">
-          {lesson.wrapup.takeaways.map((k) => (
-            <li key={k} className="flex gap-2.5 text-sm font-medium">
-              {/* The solid check Explore shows on a finished lesson. */}
-              <CircleCheckIcon
-                aria-hidden="true"
-                className="mt-0.5 size-4 shrink-0 fill-green-600 text-background"
-              />
-              <RichText text={k} />
-            </li>
-          ))}
-        </ul>
-      </div>
-      {/* Not for the maker: one copied prompt on the screen, the changes. */}
-      {lesson.wrapup.next && !creator ? (
-        <NextLesson topic={lesson.wrapup.next} after={lesson.title} />
-      ) : null}
+      {/* One main action, Restart under it at the same width. */}
+      <WrapActions
+        lesson={lesson}
+        summary={s}
+        run={run}
+        onRestart={onRestart}
+      />
+      <Takeaways items={lesson.wrapup.takeaways} />
+      <KeepLearning lesson={lesson} />
     </div>
   )
 }
@@ -1907,56 +1949,6 @@ function LikeLesson() {
   )
 }
 
-/** The suggested next lesson, with a button that copies a prompt for the learner's agent to make it. */
-function NextLesson({ topic, after }: { topic: string; after: string }) {
-  const { t, nextPrompt } = usePlayer()
-  const [copied, setCopied] = React.useState(false)
-  React.useEffect(() => {
-    if (!copied) return
-    const id = setTimeout(() => setCopied(false), 2000)
-    return () => clearTimeout(id)
-  }, [copied])
-
-  async function copy() {
-    if (!nextPrompt) return
-    try {
-      await navigator.clipboard.writeText(nextPrompt(topic, after))
-      setCopied(true)
-    } catch {
-      // Clipboard blocked; nothing else to do.
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      <ScreenLabel text={t.next} />
-      <Card size="sm">
-        <CardContent className="flex flex-wrap items-center gap-x-4 gap-y-3">
-          <div className="flex min-w-0 flex-1 basis-56 flex-col gap-0.5">
-            <p className="text-sm font-semibold">{topic}</p>
-            {nextPrompt ? (
-              <p className="text-sm text-muted-foreground">{t.nextHint}</p>
-            ) : null}
-          </div>
-          {nextPrompt ? (
-            <Button variant="outline" size="sm" onPress={copy}>
-              {copied ? (
-                <CheckIcon data-icon="inline-start" />
-              ) : (
-                <CopyIcon data-icon="inline-start" />
-              )}
-              {copied ? t.promptCopied : t.copyPrompt}
-            </Button>
-          ) : null}
-        </CardContent>
-      </Card>
-      <span aria-live="polite" className="sr-only">
-        {copied ? t.promptCopied : ""}
-      </span>
-    </div>
-  )
-}
-
 // ---------- action bar ----------
 
 type Tone = "neutral" | "good" | "warn"
@@ -2023,7 +2015,6 @@ export function ActionArea({
   brief = null,
   onRewind,
   rewinding = false,
-  share,
 }: {
   lesson: Lesson
   item: Item
@@ -2064,8 +2055,6 @@ export function ActionArea({
   onRewind?: () => void
   /** The rewind is playing: the bubble fades and the buttons wait. */
   rewinding?: boolean
-  /** Shares the lesson from the wrap-up; `copied` while the link was just copied. */
-  share?: { onPress: () => void; copied: boolean }
 }) {
   const { t, keyScope, lang = "en" } = usePlayer()
   const ownPicker = React.useMemo(
@@ -2086,6 +2075,7 @@ export function ActionArea({
     onPress: () => dispatch({ type: "next" }),
   }
   let secondary: React.ReactNode = null
+  let actionless = false
   // "Why?" opens the explanation under the answer, so feedback stays one short line until the learner asks.
   let explanation: string | null = null
   // In the player the bubble says only the ninja's line; the message is a note under the answers,
@@ -2129,21 +2119,9 @@ export function ActionArea({
       label: t.fixStart,
       onPress: () => dispatch({ type: "startFix" }),
     }
-  else if (item.kind === "wrap") {
-    // After a good run Share leads; after a rough one, going again does.
-    const restart = {
-      label: t.restart,
-      onPress: () => dispatch({ type: "restart", lesson }),
-    }
-    const shareLabel = share?.copied ? t.linkCopied : t.share
-    if (share && runFor(summarize(lesson, state.results)) !== "rough") {
-      primary = { label: shareLabel, onPress: share.onPress }
-      secondary = helpButton(restart.label, restart.onPress)
-    } else {
-      primary = restart
-      if (share) secondary = helpButton(shareLabel, share.onPress)
-    }
-  } else if (item.kind === "question" && state.question && brief) {
+  // The wrap-up's actions are in its boxes, so a closed tray hides nothing.
+  else if (item.kind === "wrap") actionless = true
+  else if (item.kind === "question" && state.question && brief) {
     // The ninja's brief: Skip shows the rest at once; once it's told, Continue goes to the question.
     primary = brief.told
       ? { label: t.continue, onPress: brief.onDone }
@@ -2271,8 +2249,8 @@ export function ActionArea({
     explanationShown(state.question, item.role)
 
   // Enter runs the main action, including while an answer option has focus (Space still toggles it).
-  const run = React.useRef(primary)
-  run.current = primary
+  const run = React.useRef<typeof primary | null>(primary)
+  run.current = actionless ? null : primary
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Enter" || e.repeat || e.defaultPrevented) return
@@ -2287,7 +2265,7 @@ export function ActionArea({
         )
       )
         return
-      if (run.current.isDisabled) return
+      if (!run.current || run.current.isDisabled) return
       e.preventDefault()
       e.stopPropagation()
       run.current.onPress()
@@ -2325,7 +2303,7 @@ export function ActionArea({
     return () => observer.disconnect()
   }, [bubbleEl, tray])
 
-  const buttons = (
+  const buttons = actionless ? null : (
     <>
       <Button
         ref={primaryRef}
