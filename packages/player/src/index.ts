@@ -2,11 +2,18 @@
 // code that only needs the strings, plain text, logo, times, or saved progress imports those subpaths,
 // so it doesn't make the whole player part of every page.
 export { LessonPlayer, type LessonPlayerProps } from "./lesson-player"
-export type { LessonCreator, LessonLike } from "./context"
+export type { LessonCreator, LessonLike, NextPrompt } from "./context"
+export { parseChallenge, type Challenge } from "./challenge"
 export { BrickDemo, type BrickDemoProps } from "./brick-demo"
 export type { Answer } from "./check"
 export type { Prepared } from "./prepared"
-export { stringsFor, UI_LANGUAGES, type Strings, type Theme } from "./strings"
+export {
+  stringsFor,
+  UI_LANGUAGES,
+  type NextKind,
+  type Strings,
+  type Theme,
+} from "./strings"
 export { timeAgo, shortTimeAgo, exactTime, TimeAgo, timeLeft } from "./time"
 export { plainText } from "./plain-text"
 export { BRAND, LearnLogo } from "./logo"

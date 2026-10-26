@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 
 import { withCharts } from "@workspace/player/charts"
 
+import { parseChallenge } from "@workspace/player"
+
 import { ViewBeacon } from "@/components/explore/view-beacon"
 import { LessonView } from "@/components/lesson-view"
 import { LessonExpired } from "@/components/site/lesson-expired"
@@ -14,7 +16,7 @@ import { viewPublished } from "@/lib/published"
 
 type Props = {
   params: Promise<{ slugId: string }>
-  searchParams: Promise<{ ui?: string }>
+  searchParams: Promise<{ ui?: string; c?: string; by?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -65,14 +67,17 @@ export default async function PublishedLessonPage({
   const { slugId } = await params
   const view = await viewPublished(slugId)
   if (!view.record) return <LessonExpired reason={view.reason ?? "expired"} />
-  const { record, isOwner, listed, signedIn, author, liked } = view
-  const { ui } = await searchParams
+  const { record, isOwner, listed, signedIn, author, liked, viewerHandle } =
+    view
+  const { ui, c, by } = await searchParams
   return (
     <div className="h-svh">
       <LessonView
         lesson={record.lesson}
         prepared={withCharts(record.lesson, record.prepared)}
         uiLanguage={ui}
+        challenge={parseChallenge(c, by)}
+        challenger={viewerHandle ?? undefined}
         expiresAt={record.expiresAt ?? undefined}
         progressKey={`l/${slugId}`}
         lessonId={record.id}

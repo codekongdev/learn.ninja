@@ -36,6 +36,8 @@ export interface PublishedView {
   author: { handle: string | null; name: string; image: string | null } | null
   /** Whether the logged-in visitor has liked the lesson. */
   liked: boolean
+  /** The logged-in visitor's handle, which the challenges they send name. */
+  viewerHandle: string | null
 }
 
 /**
@@ -58,6 +60,7 @@ export const viewPublished = cache(
         listed: false,
         author: null,
         liked: false,
+        viewerHandle: actor?.handle ?? null,
       }
     const isOwner = actor !== null && record.ownerId === actor.userId
     if (record.hidden && !isOwner)
@@ -69,6 +72,7 @@ export const viewPublished = cache(
         listed: false,
         author: null,
         liked: false,
+        viewerHandle: actor?.handle ?? null,
       }
     const db = await getDb()
     const [author, liked] = await Promise.all([
@@ -86,6 +90,7 @@ export const viewPublished = cache(
         !record.hidden,
       author,
       liked: liked.has(record.id),
+      viewerHandle: actor?.handle ?? null,
     }
   }
 )

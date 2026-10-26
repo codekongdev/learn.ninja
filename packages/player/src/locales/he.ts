@@ -119,26 +119,56 @@ export const he: Strings = {
   allFirstTry: (total) =>
     total === 2 ? "שתיהן בניסיון הראשון" : `כל ה־${total} בניסיון הראשון`,
   takeaways: "נקודות מפתח",
-  next: "השיעור הבא המומלץ",
-  nextHint:
-    "הדביקו את הפרומפט בסוכן הבינה המלאכותית שלכם כדי ליצור את השיעור הזה.",
+  keepLearning: "להמשיך ללמוד",
+  keepKinds: {
+    next: "הבא בתור",
+    deeper: "להעמיק",
+    harder: "להקשות",
+  },
+  nextHint: "הדביקו אותו בסוכן הבינה המלאכותית שלכם כדי ליצור את השיעור.",
   copyPrompt: "העתקת הפרומפט",
   promptCopied: "הפרומפט הועתק",
+  challengeTitle: "אתגרו חבר",
+  challengeMessage: (first, total) =>
+    `עניתי נכון על ${first} מתוך ${total} בניסיון הראשון. אפשר לעקוף אותי?`,
+  challengeBack: "אתגרו אותו בחזרה",
+  sendTitle: "שלחו אותו לחבר",
+  sendMessage: "נסו את השיעור הזה ב־learn.ninja.",
+  messageCopied: "האתגר הועתק",
+  challengeCopiedHint:
+    "הדביקו אותו בהודעה לחבר. בקישור שלו יופיע הציון שעליו לנצח.",
+  sendCopiedHint: "הדביקו אותו בהודעה לחבר.",
+  challengeFrom: (first, total, by) =>
+    `${by ? `@${by}` : "חבר"} ענה נכון על ${first} מתוך ${total}. אפשר לעקוף?`,
+  challengeWon: (mine, theirs, by) =>
+    `עקפתם את ${by ? `@${by}` : "החבר שלכם"}, ${mine} מול ${theirs}`,
+  challengeTied: (score, by) =>
+    `תיקו עם ${by ? `@${by}` : "החבר שלכם"} על ${score}`,
+  challengeLost: (mine, theirs, by) =>
+    `${by ? `@${by}` : "החבר שלכם"} מנצח הפעם, ${theirs} מול ${mine}`,
+  howYouDid: "איך הלך לכם",
+  outcomes: {
+    first: "ניסיון ראשון",
+    second: "אחרי ניסיון נוסף",
+    missed: "פספוס",
+  },
   like: "אהבתי",
   liked: "אהבת",
   likeLogIn: "התחברו כדי לשמור את השיעור הזה בלייקים שלכם.",
   logIn: "התחברות",
   likeFailed: "לא הצלחנו לשמור את הלייק. נסו שוב.",
   creatorPrivate: "פרטי",
-  creatorPublished: "פורסם ב־Explore",
+  creatorPublished: "פורסם",
   creatorHidden: "הוסתר בעקבות דיווח",
-  publishTitle: "מרוצים?",
-  publishBody:
-    "פרסמו אותו ב־Explore ובפרופיל שלכם, כדי שכל אחד יוכל למצוא אותו.",
+  publishBody: "רק מי שיש לו את הקישור יכול לפתוח אותו.",
   publishedBody: "כל אחד יכול למצוא אותו ב־Explore ובפרופיל שלכם.",
   hiddenBody: "אי אפשר לפרסם אותו כל עוד הוא מוסתר.",
   publish: "פרסום",
   publishFailed: "הפרסום נכשל. נסו שוב.",
+  makePrivate: "להפוך לפרטי",
+  makePrivateFailed: "לא הצלחנו להפוך אותו לפרטי. נסו שוב.",
+  madePrivate: "השיעור פרטי עכשיו",
+  undo: "ביטול",
   makeChanges: "ביצוע שינויים",
   changesBody:
     "בחרו מה לשנות, הוסיפו כל דבר אחר והדביקו בצ'אט שבו יצרתם את השיעור. הקישור נשאר אותו קישור.",
@@ -172,6 +202,7 @@ export const he: Strings = {
   lessonName: "שם השיעור",
   lessonMenu: "תפריט השיעור",
   linkCopied: "הקישור הועתק",
+  copyLink: "העתקת הקישור",
   theory: "תאוריה",
   theoryEmpty: "מושגים יופיעו כאן תוך כדי הלמידה.",
   closeTheory: "סגירת התאוריה",

@@ -3,7 +3,8 @@
 import * as React from "react"
 
 import { emptyPrepared, type Prepared } from "./prepared"
-import { stringsFor, type Strings } from "./strings"
+import type { Challenge } from "./challenge"
+import { stringsFor, type NextKind, type Strings } from "./strings"
 
 interface PlayerContextValue {
   prepared: Prepared
@@ -15,13 +16,29 @@ interface PlayerContextValue {
   visualsCss: string
   /** Only take keyboard shortcuts (Enter, number keys) from inside this element, for several demos on one page. */
   keyScope?: React.RefObject<HTMLElement | null>
-  /** The prompt the wrap-up copies to make its suggested next lesson. Without it there's no copy button. */
-  nextPrompt?: (topic: string, after: string) => string
+  /** The prompt Keep learning copies for the learner's agent. Without it there's no Keep learning box. */
+  nextPrompt?: NextPrompt
+  /** The link the wrap-up's share box sends. Defaults to the current page. */
+  shareUrl?: string
+  /** The score this learner was challenged to beat, from the link they opened. */
+  challenge?: Challenge
+  /** The logged-in learner's handle, named in the challenges they send. */
+  challenger?: string
   /** The wrap-up's like. Without it there's no heart. */
   like?: LessonLike
   /** The lesson's maker is the one playing: the wrap-up shows their card instead of the heart. */
   creator?: LessonCreator
 }
+
+/**
+ * Builds the prompt Keep learning copies: `kind` is the choice the learner made, `topic` what's in
+ * its field, `after` this lesson's title.
+ */
+export type NextPrompt = (
+  kind: NextKind,
+  topic: string,
+  after: string
+) => string
 
 /** A published lesson's likes, and the learner's, for the heart on the wrap-up. */
 export interface LessonLike {
@@ -42,6 +59,10 @@ export interface LessonCreator {
   status: "private" | "published" | "hidden"
   /** Publishes the lesson to Explore, resolving to an error when it didn't go through. */
   onPublish?: () => Promise<{ error?: string }>
+  /** Takes a published lesson out of Explore, back to link only. */
+  onUnpublish?: () => Promise<{ error?: string }>
+  /** The maker's list of lessons on their profile, once they have a handle. */
+  profileHref?: string
   /** The lesson's link, which the prompt Make changes copies names, so the agent updates it. */
   url: string
 }

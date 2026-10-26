@@ -33,8 +33,8 @@ const meta = {
           {...args}
           uiLanguage={globals.ui}
           homeHref="#"
-          nextPrompt={(topic, after) =>
-            `Make me a learn.ninja lesson about ${topic}, as a follow-up to my lesson "${after}".`
+          nextPrompt={(kind, topic, after) =>
+            `Make me a learn.ninja lesson (${kind}) about ${topic}, after my lesson "${after}".`
           }
           docsHref="#"
           privacyHref="#"
@@ -201,7 +201,7 @@ const likeAfter = (likes: number, liked: boolean) => ({
     ),
 })
 
-/** Logged in, with the heart under the score: pressing it likes the lesson. */
+/** Logged in, with the heart beside the other actions: pressing it likes the lesson. */
 export const WrapUpLike: Story = {
   name: "Wrap-up: like",
   args: {
@@ -221,7 +221,7 @@ export const WrapUpLiked: Story = {
   },
   loaders: atWrap(lessons.buttons, "story-wrap-liked"),
 }
-/** Logged out: pressing the heart asks them to log in to save the lesson to their likes. */
+/** Logged out: pressing the heart shows a toast asking them to log in, with a Log in button. */
 export const WrapUpLikeLoggedOut: Story = {
   name: "Wrap-up: like, logged out",
   args: {
@@ -254,24 +254,34 @@ const publishAfter = () =>
 const LESSON_URL =
   "https://learn.ninja/l/pick-the-right-button-for-every-action-puepf71u"
 
-/** The lesson's maker, logged in, with it still private: their card replaces the heart. */
+/** The lesson's maker, logged in, with it still private: a lock on Share, which holds the link, the publish switch, and Make changes. */
 export const WrapUpCreator: Story = {
   name: "Wrap-up: creator, private",
   args: {
     lesson: lessons.buttons,
     progressKey: "story-wrap-creator",
     like: likeAfter(0, false),
-    creator: { status: "private", onPublish: publishAfter, url: LESSON_URL },
+    creator: {
+      status: "private",
+      onPublish: publishAfter,
+      onUnpublish: publishAfter,
+      url: LESSON_URL,
+    },
   },
   loaders: atWrap(lessons.buttons, "story-wrap-creator"),
 }
-/** The maker's lesson once it's in Explore: only Make changes is left. */
+/** The maker's lesson once it's in Explore: a globe on Share, and its switch to make it private again. */
 export const WrapUpCreatorPublished: Story = {
   name: "Wrap-up: creator, published",
   args: {
     lesson: lessons.buttons,
     progressKey: "story-wrap-creator-published",
-    creator: { status: "published", url: LESSON_URL },
+    creator: {
+      status: "published",
+      onUnpublish: publishAfter,
+      profileHref: "#profile",
+      url: LESSON_URL,
+    },
   },
   loaders: atWrap(lessons.buttons, "story-wrap-creator-published"),
 }
@@ -299,16 +309,21 @@ export const WrapUpCreatorPublishFails: Story = {
   },
   loaders: atWrap(lessons.buttons, "story-wrap-creator-fails"),
 }
-/** Make changes open: tick changes, add your own, and copy them as one prompt. */
+/** Make changes open (from the wrap-up's row; Share has it too): tick changes, add your own, and copy them as one prompt. */
 export const WrapUpCreatorChanges: Story = {
   name: "Wrap-up: creator, make changes",
   args: {
     lesson: lessons.buttons,
     progressKey: "story-wrap-creator-changes",
-    creator: { status: "private", onPublish: publishAfter, url: LESSON_URL },
+    creator: {
+      status: "private",
+      onPublish: publishAfter,
+      onUnpublish: publishAfter,
+      url: LESSON_URL,
+    },
   },
   loaders: atWrap(lessons.buttons, "story-wrap-creator-changes"),
-  // Opens the dialog once the wrap-up is in, in whichever language the toolbar picked.
+  // Opens the dialog from the wrap-up's row once it's in, in whichever language the toolbar picked.
   play: async ({ canvas, userEvent, globals }) => {
     const button = await canvas.findByRole(
       "button",
@@ -317,4 +332,37 @@ export const WrapUpCreatorChanges: Story = {
     )
     await userEvent.click(button)
   },
+}
+
+/** Opened from a friend's challenge link: their score to beat on the title screen. */
+export const ChallengeTitle: Story = {
+  name: "Challenge: title screen",
+  args: {
+    lesson: lessons.buttons,
+    challenge: { first: 4, total: 6, by: "colin" },
+  },
+}
+/** The challenged learner's wrap-up: How you did says who won, and the share box sends a score back. */
+export const WrapUpChallengeWon: Story = {
+  name: "Wrap-up: challenge won",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-challenge-won",
+    challenge: { first: 4, total: 6, by: "colin" },
+    challenger: "quiet-kitsune-7",
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-challenge-won"),
+}
+/** A challenge lost, from a friend who wasn't logged in. */
+export const WrapUpChallengeLost: Story = {
+  name: "Wrap-up: challenge lost",
+  args: {
+    lesson: lessons.buttons,
+    progressKey: "story-wrap-challenge-lost",
+    challenge: { first: 6, total: 6 },
+  },
+  loaders: atWrap(lessons.buttons, "story-wrap-challenge-lost", [
+    "first",
+    "second",
+  ]),
 }

@@ -114,26 +114,57 @@ export const fr: Strings = {
       ? "Les deux du premier coup"
       : `Toutes les ${total} du premier coup`,
   takeaways: "À retenir",
-  next: "Leçon suivante suggérée",
-  nextHint: "Colle le prompt dans ton agent IA pour créer cette leçon.",
+  keepLearning: "Continue d'apprendre",
+  keepKinds: {
+    next: "La suite",
+    deeper: "Aller plus loin",
+    harder: "Plus difficile",
+  },
+  nextHint: "Colle-le dans ton agent IA pour créer la leçon.",
   copyPrompt: "Copier le prompt",
   promptCopied: "Prompt copié",
+  challengeTitle: "Lance un défi à un ami",
+  challengeMessage: (first, total) =>
+    `J'ai eu ${first} sur ${total} du premier coup. Tu peux faire mieux ?`,
+  challengeBack: "Lui renvoyer le défi",
+  sendTitle: "Envoie-la à un ami",
+  sendMessage: "Essaie cette leçon sur learn.ninja.",
+  messageCopied: "Défi copié",
+  challengeCopiedHint:
+    "Colle-le dans un message à un ami. Son lien lui montre le score à battre.",
+  sendCopiedHint: "Colle-le dans un message à un ami.",
+  challengeFrom: (first, total, by) =>
+    `${by ? `@${by}` : "Un ami"} a eu ${first} sur ${total}. Peux-tu faire mieux ?`,
+  challengeWon: (mine, theirs, by) =>
+    `Tu as battu ${by ? `@${by}` : "ton ami"}, ${mine} à ${theirs}`,
+  challengeTied: (score, by) =>
+    `Égalité avec ${by ? `@${by}` : "ton ami"} : ${score}`,
+  challengeLost: (mine, theirs, by) =>
+    `${by ? `@${by}` : "Ton ami"} gagne cette fois, ${theirs} à ${mine}`,
+  howYouDid: "Ton parcours",
+  outcomes: {
+    first: "Du premier coup",
+    second: "Au deuxième essai",
+    missed: "Raté",
+  },
   like: "J'aime",
   liked: "Aimée",
   likeLogIn: "Connecte-toi pour garder cette leçon dans tes j'aime.",
   logIn: "Se connecter",
   likeFailed: "Impossible d'enregistrer ton j'aime. Réessaie.",
   creatorPrivate: "Privée",
-  creatorPublished: "Publiée dans Explore",
+  creatorPublished: "Publiée",
   creatorHidden: "Masquée après un signalement",
-  publishTitle: "Elle te plaît ?",
-  publishBody:
-    "Publie-la dans Explore et sur ton profil pour que tout le monde puisse la trouver.",
+  publishBody: "Seules les personnes qui ont le lien peuvent l'ouvrir.",
   publishedBody:
     "Tout le monde peut la trouver dans Explore et sur ton profil.",
   hiddenBody: "Elle ne peut pas être publiée tant qu'elle est masquée.",
   publish: "Publier",
   publishFailed: "Impossible de la publier. Réessaie.",
+  makePrivate: "Rendre privée",
+  makePrivateFailed: "Impossible de la rendre privée. Réessaie.",
+  madePrivate: "Désormais privée",
+  undo: "Annuler",
   makeChanges: "Modifier",
   changesBody:
     "Choisis ce qui doit changer, ajoute le reste, puis colle le tout dans le chat où tu as créé la leçon. Le lien reste le même.",
@@ -168,6 +199,7 @@ export const fr: Strings = {
   lessonName: "Nom de la leçon",
   lessonMenu: "Menu de la leçon",
   linkCopied: "Lien copié",
+  copyLink: "Copier le lien",
   theory: "Théorie",
   theoryEmpty: "Les concepts apparaissent ici au fil de la leçon.",
   closeTheory: "Fermer la théorie",

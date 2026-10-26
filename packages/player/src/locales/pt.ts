@@ -83,7 +83,11 @@ export const pt: Strings = {
   placedIn: (item, group) => `${item} está em ${group}.`,
   sortCount: (i, n) => `${i} de ${n}`,
   sortHere: "Coloque aqui",
-  sortLeft: (n) => p(n, { one: "Falta # para classificar", other: "Faltam # para classificar" }),
+  sortLeft: (n) =>
+    p(n, {
+      one: "Falta # para classificar",
+      other: "Faltam # para classificar",
+    }),
   placedAt: (item, n) => `${item} é o número ${n}.`,
   matched: (a, b) => `${a} e ${b} formam um par.`,
   notAPair: "Não é um par.",
@@ -107,25 +111,56 @@ export const pt: Strings = {
   allFirstTry: (total) =>
     total === 2 ? "As duas de primeira" : `Todas as ${total} de primeira`,
   takeaways: "Pontos-chave",
-  next: "Próxima lição sugerida",
-  nextHint: "Cole o prompt no seu agente de IA para criar esta lição.",
+  keepLearning: "Continue aprendendo",
+  keepKinds: {
+    next: "A seguir",
+    deeper: "Mais a fundo",
+    harder: "Mais difícil",
+  },
+  nextHint: "Cole no seu agente de IA para criar a lição.",
   copyPrompt: "Copiar prompt",
   promptCopied: "Prompt copiado",
+  challengeTitle: "Desafie um amigo",
+  challengeMessage: (first, total) =>
+    `Acertei ${first} de ${total} de primeira. Você consegue me superar?`,
+  challengeBack: "Desafie de volta",
+  sendTitle: "Envie para um amigo",
+  sendMessage: "Experimente esta lição no learn.ninja.",
+  messageCopied: "Desafio copiado",
+  challengeCopiedHint:
+    "Cole numa mensagem para um amigo. O link mostra a pontuação que ele tem de bater.",
+  sendCopiedHint: "Cole numa mensagem para um amigo.",
+  challengeFrom: (first, total, by) =>
+    `${by ? `@${by}` : "Um amigo"} acertou ${first} de ${total}. Você consegue superar?`,
+  challengeWon: (mine, theirs, by) =>
+    `Você venceu ${by ? `@${by}` : "seu amigo"}, ${mine} a ${theirs}`,
+  challengeTied: (score, by) =>
+    `Você empatou com ${by ? `@${by}` : "seu amigo"} em ${score}`,
+  challengeLost: (mine, theirs, by) =>
+    `${by ? `@${by}` : "Seu amigo"} vence desta vez, ${theirs} a ${mine}`,
+  howYouDid: "Como você foi",
+  outcomes: {
+    first: "De primeira",
+    second: "Depois de outra tentativa",
+    missed: "Errada",
+  },
   like: "Curtir",
   liked: "Curtiu",
   likeLogIn: "Entre para salvar esta lição nas suas curtidas.",
   logIn: "Entrar",
   likeFailed: "Não foi possível salvar sua curtida. Tente de novo.",
   creatorPrivate: "Privada",
-  creatorPublished: "Publicada no Explore",
+  creatorPublished: "Publicada",
   creatorHidden: "Oculta após uma denúncia",
-  publishTitle: "Gostou do resultado?",
-  publishBody:
-    "Publique no Explore e no seu perfil para que qualquer pessoa possa encontrá-la.",
+  publishBody: "Só quem tem o link pode abri-la.",
   publishedBody: "Qualquer pessoa pode encontrá-la no Explore e no seu perfil.",
   hiddenBody: "Não dá para publicar enquanto ela estiver oculta.",
   publish: "Publicar",
   publishFailed: "Não foi possível publicar. Tente de novo.",
+  makePrivate: "Tornar privada",
+  makePrivateFailed: "Não foi possível tornar privada. Tente de novo.",
+  madePrivate: "Agora é privada",
+  undo: "Desfazer",
   makeChanges: "Fazer alterações",
   changesBody:
     "Escolha o que deve mudar, acrescente o que quiser e cole no chat onde você criou a lição. O link continua o mesmo.",
@@ -161,6 +196,7 @@ export const pt: Strings = {
   lessonName: "Nome da lição",
   lessonMenu: "Menu da lição",
   linkCopied: "Link copiado",
+  copyLink: "Copiar link",
   theory: "Teoria",
   theoryEmpty: "Os conceitos aparecem aqui conforme você os aprende.",
   closeTheory: "Fechar a teoria",
