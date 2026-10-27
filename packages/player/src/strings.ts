@@ -102,20 +102,15 @@ export type Strings = {
   nextHint: string
   copyPrompt: string
   promptCopied: string
-  /** The wrap-up's main button after a good run: the score, sent as a challenge. */
+  /** The wrap-up's main button: the score, sent as a challenge. */
   challengeTitle: string
   /** The message sent with the challenge link. */
   challengeMessage: (first: number, total: number) => string
   /** That button for someone who was challenged themselves. */
   challengeBack: string
-  /** The share button after a rough run: the lesson without the score. */
-  sendTitle: string
-  sendMessage: string
   /** The toast after the challenge was copied (desktop; phones open the share sheet), and what to do next. */
   messageCopied: string
   challengeCopiedHint: string
-  /** What to do next with the plain link after a rough run (the toast's title is linkCopied). */
-  sendCopiedHint: string
   /** On the title screen of a challenge link: the sender's score, `by` their handle when they were logged in. */
   challengeFrom: (first: number, total: number, by?: string) => string
   /** On the challenged learner's wrap-up: their first tries (`mine`) against the sender's. */
@@ -150,11 +145,7 @@ export type Strings = {
   /** The bar toward the next rest day, and its value ("2 of 3 days"). */
   restProgress: string
   restProgressValue: (days: number, of: number) => string
-  /** The line under the bar: none toward the next yet, how many days are left, today's recharge, a rest day spent yesterday, or both saved. */
-  restStart: (days: number) => string
-  restLeft: (days: number) => string
-  restRecharged: (days: number) => string
-  restUsed: (days: number) => string
+  /** The bar's value while both are saved. */
   restFull: string
   /** The wrap-up's heart, before and after the learner likes the lesson. */
   like: string
@@ -272,10 +263,6 @@ export type Untranslated =
   | "restSaved"
   | "restProgress"
   | "restProgressValue"
-  | "restStart"
-  | "restLeft"
-  | "restRecharged"
-  | "restUsed"
   | "restFull"
 /** A language's own strings: everything but the ones still waiting for translation. */
 export type Translation = Omit<Strings, Untranslated>

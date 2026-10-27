@@ -7,7 +7,11 @@
 // GitHub's undisclosed outlier rule). A new record day re-shades the older ones.
 
 import type { DayState, DayStreak } from "@workspace/player"
-import { LEARN_PER_REST, MAX_REST } from "@workspace/player/streak-rules"
+import {
+  LEARN_PER_REST,
+  MAX_REST,
+  START_REST,
+} from "@workspace/player/streak-rules"
 
 /** A calendar day as YYYY-MM-DD. */
 export type Day = string
@@ -95,8 +99,9 @@ export function activityLevels(counts: number[]): {
 }
 
 /**
- * The streak rules, walked day by day from the first day with a lesson to today. Each day with a
- * finished lesson adds one to the run, and every LEARN_PER_REST of them saves a rest day (MAX_REST
+ * The streak rules, walked day by day from the first day with a lesson to today. A run starts with
+ * START_REST rest days saved. Each day with a finished lesson adds one to the run, and every
+ * LEARN_PER_REST of them saves a rest day (MAX_REST
  * at most; while that many are saved, learning days don't count toward the next, so spending one
  * starts its bar from empty). A day without one spends a saved rest day, which keeps the run
  * without adding to it; with none saved, the run ends, and so do the saved days. Today stays open
@@ -113,6 +118,7 @@ function walk(activeDays: Day[], today: Day) {
   const first = [...active].sort()[0]
   for (let day = first; day && day <= today; day = addDays(day, 1)) {
     if (active.has(day)) {
+      if (run === 0) rest = START_REST
       run++
       longest = Math.max(longest, run)
       if (rest < MAX_REST && ++toward === LEARN_PER_REST) {
@@ -190,6 +196,8 @@ export interface ActivityCell {
   day: Day
   lessons: number
   level: Level
+  /** A day without a lesson that a saved rest day kept in the streak, drawn in the lantern's blue. */
+  rest: boolean
 }
 
 export interface ActivityGridData {
@@ -221,7 +229,10 @@ const MONTHS = [
   "Dec",
 ]
 
-/** The grid for `today`, from every day row the person has (older rows only feed the longest streak). */
+/**
+ * The grid for `today`, from every day row the person has (older rows only feed the longest
+ * streak). Rest days come from the same walk as the streak, so the grid and the lanterns agree.
+ */
 export function buildGrid(
   rows: { day: Day; lessons: number }[],
   today: Day
@@ -231,6 +242,10 @@ export function buildGrid(
   const byDay = new Map(rows.map((r) => [r.day, r.lessons]))
   const inWindow = rows.filter((r) => r.day >= start && r.day <= today)
   const { cap, levelOf } = activityLevels(inWindow.map((r) => r.lessons))
+  const { current, longest, states } = walk(
+    rows.filter((r) => r.lessons > 0).map((r) => r.day),
+    today
+  )
   const columns: (ActivityCell | null)[][] = []
   const months: { label: string; column: number }[] = []
   for (let c = 0; c < GRID_WEEKS; c++) {
@@ -244,7 +259,12 @@ export function buildGrid(
         const day = addDays(first, d)
         if (day > today) return null
         const lessons = byDay.get(day) ?? 0
-        return { day, lessons, level: levelOf(lessons) }
+        return {
+          day,
+          lessons,
+          level: levelOf(lessons),
+          rest: states.get(day) === "rest",
+        }
       })
     )
   }
@@ -255,17 +275,15 @@ export function buildGrid(
     columns,
     months,
     cap,
-    streak: streaks(
-      rows.filter((r) => r.lessons > 0).map((r) => r.day),
-      today
-    ),
+    streak: { current, longest },
   }
 }
 
-/** "2 lessons on October 21st", the tooltip and label of one day. */
+/** "2 lessons on October 21st" or "Rest day on October 21st", the tooltip and label of one day. */
 export function describeDay(cell: ActivityCell): string {
   const [, m, d] = cell.day.split("-").map(Number) as [number, number, number]
   const when = `${MONTH_NAMES[m - 1]} ${ordinal(d)}`
+  if (cell.rest) return `Rest day on ${when}`
   if (cell.lessons === 0) return `No lessons on ${when}`
   return `${cell.lessons} ${cell.lessons === 1 ? "lesson" : "lessons"} on ${when}`
 }

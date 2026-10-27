@@ -51,6 +51,18 @@
         "--no-open"
       ],
       "port": 6007
+    },
+    {
+      "name": "sfx",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "6060",
+        "-d",
+        "spikes/ninja-sfx/out"
+      ],
+      "port": 6060
     }
   ]
 }

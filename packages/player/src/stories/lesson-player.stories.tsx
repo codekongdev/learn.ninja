@@ -165,19 +165,13 @@ const atWrap = (lesson: Lesson, key: string, outcomes: Outcome[] = []) => [
   },
 ]
 
-/** The wrap-up after a perfect run: all first tries, and Share leads. */
+/** The wrap-up after a perfect run: all first tries, and Challenge a friend leads. */
 export const WrapUpPerfect: Story = {
   name: "Wrap-up: perfect run",
   args: { lesson: lessons.buttons, progressKey: "story-wrap-perfect" },
   loaders: atWrap(lessons.buttons, "story-wrap-perfect"),
 }
-/** A good run (at most one missed): Share still leads. */
-export const WrapUpGood: Story = {
-  name: "Wrap-up: good run",
-  args: { lesson: lessons.buttons, progressKey: "story-wrap-good" },
-  loaders: atWrap(lessons.buttons, "story-wrap-good", ["first", "second"]),
-}
-/** A rough run (more than one missed): Restart leads. */
+/** A rough run (more than one missed): Challenge a friend still leads. */
 export const WrapUpRough: Story = {
   name: "Wrap-up: rough run",
   args: { lesson: lessons.buttons, progressKey: "story-wrap-rough" },
@@ -282,11 +276,11 @@ export const StreakScreen: Story = {
   args: {
     lesson: lessons.buttons,
     progressKey: "story-wrap-streak",
-    streak: streakOf(12, 21, 1, "lllrlll", 2),
+    streak: streakOf(12, 21, 1, "lllrlll", 1),
   },
   loaders: atWrap(lessons.buttons, "story-wrap-streak", ["first", "second"]),
 }
-/** The third learning day: the bar fills and a rest day's lantern turns red and swings. */
+/** A second learning day: the bar fills, a rest day's lantern turns blue and swings, and the bar empties for the next. */
 export const StreakScreenRecharged: Story = {
   name: "Streak screen: rest day recharged",
   args: {
@@ -302,7 +296,7 @@ export const StreakScreenStarts: Story = {
   args: {
     lesson: lessons.buttons,
     progressKey: "story-wrap-streak-starts",
-    streak: streakOf(1, 1, 0, "mmmmmml"),
+    streak: streakOf(1, 1, 1, "mmmmmml", 1),
   },
   loaders: atWrap(lessons.buttons, "story-wrap-streak-starts"),
 }
@@ -312,7 +306,7 @@ export const StreakScreenAgain: Story = {
   args: {
     lesson: lessons.buttons,
     progressKey: "story-wrap-streak-again",
-    streak: streakOf(1, 21, 0, "lllmmml"),
+    streak: streakOf(1, 21, 1, "lllmmml", 1),
   },
   loaders: atWrap(lessons.buttons, "story-wrap-streak-again"),
 }

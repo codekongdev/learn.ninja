@@ -118,6 +118,7 @@ import {
   useShare,
   type Preferences,
 } from "./shell"
+import { preloadSfx, SFX, unlockSfx } from "./sfx"
 import { StreakScreen, type DayStreak } from "./streak"
 import {
   ariaLocaleFor,
@@ -142,6 +143,7 @@ import {
   characterFor,
   clipFor,
   createLinePicker,
+  hasVoice,
   voiceLines,
   type LinePicker,
   type Moment,
@@ -990,6 +992,21 @@ function Player({
   // "Start lesson" makes the intro vanish in a puff of smoke before the first brick arrives.
   const [vanishing, setVanishing] = React.useState(false)
   const vanishingRef = React.useRef(false)
+  // The sound effects follow the Sound setting, which shows only in a language he speaks. A whoosh
+  // of wind as he goes, loaded ahead so it starts with the press; and the streak's lantern, fetched
+  // ahead too and let through by the first press (sfx.ts), since it lights on a timer.
+  const whoosh = React.useRef<HTMLAudioElement | null>(null)
+  const sfxOn = prefs.sound !== "off" && hasVoice(lang)
+  React.useEffect(() => {
+    if (sfxOn) whoosh.current ??= new Audio(SFX.vanish)
+  }, [sfxOn])
+  const hasStreak = !!streak
+  React.useEffect(() => {
+    if (!sfxOn || !hasStreak) return
+    preloadSfx(SFX.lantern)
+    preloadSfx(SFX.flame)
+    return unlockSfx()
+  }, [sfxOn, hasStreak])
   const vanishIntro = React.useCallback(() => {
     if (vanishingRef.current) return
     if (goStraightOn()) {
@@ -998,12 +1015,13 @@ function Player({
     }
     vanishingRef.current = true
     setVanishing(true)
+    if (sfxOn) whoosh.current?.play().catch(() => {})
     window.setTimeout(() => {
       vanishingRef.current = false
       setVanishing(false)
       dispatch({ type: "next" })
     }, 650)
-  }, [])
+  }, [sfxOn])
   const seenConcepts = state.items
     .slice(0, state.index + 1)
     .flatMap((i) => (i.kind === "concept" ? [i.brick] : []))
@@ -1095,8 +1113,7 @@ function Player({
     [item.kind, lesson, state.results]
   )
   // He waits in his corner through the streak screen, then leaps up for the wrap-up.
-  const celebrate =
-    run && !onStreak ? (run === "perfect" ? "perfect" : "done") : undefined
+  const celebrate = run && !onStreak ? run : undefined
   const hydrated = useHydrated()
 
   return (
@@ -1198,7 +1215,7 @@ function Player({
                     className="flex flex-col gap-6"
                   >
                     {onStreak ? (
-                      <StreakScreen streak={streak!} />
+                      <StreakScreen streak={streak!} sound={sfxOn} />
                     ) : (
                       <Screen
                         lesson={lesson}
@@ -1880,7 +1897,6 @@ function WrapUp({
         <WrapActions
           lesson={lesson}
           summary={s}
-          run={run}
           onRestart={onRestart}
           // The maker's own lesson has no heart; its status is on Share.
           extra={creator ? null : <LikeLesson />}
