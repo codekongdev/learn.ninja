@@ -4,7 +4,7 @@
   "properties": {
     "spec": {
       "type": "string",
-      "const": "0.8"
+      "const": "0.9"
     },
     "title": {
       "type": "string",
@@ -94,18 +94,18 @@
       "additionalProperties": false
     },
     "hook": {
-      "$ref": "#/$defs/HookBrick"
+      "$ref": "#/$defs/HookKata"
     },
-    "bricks": {
+    "katas": {
       "minItems": 3,
       "maxItems": 20,
       "type": "array",
       "items": {
-        "$ref": "#/$defs/Brick"
+        "$ref": "#/$defs/Kata"
       }
     },
     "challenge": {
-      "$ref": "#/$defs/QuestionBrick"
+      "$ref": "#/$defs/QuestionKata"
     },
     "wrapup": {
       "type": "object",
@@ -141,23 +141,23 @@
     "subject",
     "tags",
     "hook",
-    "bricks",
+    "katas",
     "challenge",
     "wrapup"
   ],
   "additionalProperties": false,
   "$defs": {
-    "HookBrick": {
+    "HookKata": {
       "oneOf": [
         {
-          "$ref": "#/$defs/ChoiceBrick"
+          "$ref": "#/$defs/ChoiceKata"
         },
         {
-          "$ref": "#/$defs/CompareBrick"
+          "$ref": "#/$defs/CompareKata"
         }
       ]
     },
-    "ChoiceBrick": {
+    "ChoiceKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1010,7 +1010,7 @@
       ],
       "additionalProperties": false
     },
-    "CompareBrick": {
+    "CompareKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1061,41 +1061,41 @@
       ],
       "additionalProperties": false
     },
-    "Brick": {
+    "Kata": {
       "oneOf": [
         {
-          "$ref": "#/$defs/ConceptBrick"
+          "$ref": "#/$defs/ConceptKata"
         },
         {
-          "$ref": "#/$defs/ChoiceBrick"
+          "$ref": "#/$defs/ChoiceKata"
         },
         {
-          "$ref": "#/$defs/CompareBrick"
+          "$ref": "#/$defs/CompareKata"
         },
         {
-          "$ref": "#/$defs/OrderBrick"
+          "$ref": "#/$defs/OrderKata"
         },
         {
-          "$ref": "#/$defs/SortBrick"
+          "$ref": "#/$defs/SortKata"
         },
         {
-          "$ref": "#/$defs/MatchBrick"
+          "$ref": "#/$defs/MatchKata"
         },
         {
-          "$ref": "#/$defs/BlankBrick"
+          "$ref": "#/$defs/BlankKata"
         },
         {
-          "$ref": "#/$defs/HotspotBrick"
+          "$ref": "#/$defs/HotspotKata"
         },
         {
-          "$ref": "#/$defs/ScenarioBrick"
+          "$ref": "#/$defs/ScenarioKata"
         },
         {
-          "$ref": "#/$defs/NumberBrick"
+          "$ref": "#/$defs/NumberKata"
         }
       ]
     },
-    "ConceptBrick": {
+    "ConceptKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1128,7 +1128,7 @@
       ],
       "additionalProperties": false
     },
-    "OrderBrick": {
+    "OrderKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1210,7 +1210,7 @@
       ],
       "additionalProperties": false
     },
-    "SortBrick": {
+    "SortKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1312,7 +1312,7 @@
       ],
       "additionalProperties": false
     },
-    "MatchBrick": {
+    "MatchKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1382,7 +1382,7 @@
       ],
       "additionalProperties": false
     },
-    "BlankBrick": {
+    "BlankKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1513,7 +1513,7 @@
       ],
       "additionalProperties": false
     },
-    "HotspotBrick": {
+    "HotspotKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1577,7 +1577,7 @@
       ],
       "additionalProperties": false
     },
-    "ScenarioBrick": {
+    "ScenarioKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1662,7 +1662,7 @@
       ],
       "additionalProperties": false
     },
-    "NumberBrick": {
+    "NumberKata": {
       "type": "object",
       "properties": {
         "id": {
@@ -1730,37 +1730,37 @@
       ],
       "additionalProperties": false
     },
-    "QuestionBrick": {
+    "QuestionKata": {
       "oneOf": [
         {
-          "$ref": "#/$defs/ChoiceBrick"
+          "$ref": "#/$defs/ChoiceKata"
         },
         {
-          "$ref": "#/$defs/CompareBrick"
+          "$ref": "#/$defs/CompareKata"
         },
         {
-          "$ref": "#/$defs/OrderBrick"
+          "$ref": "#/$defs/OrderKata"
         },
         {
-          "$ref": "#/$defs/SortBrick"
+          "$ref": "#/$defs/SortKata"
         },
         {
-          "$ref": "#/$defs/MatchBrick"
+          "$ref": "#/$defs/MatchKata"
         },
         {
-          "$ref": "#/$defs/BlankBrick"
+          "$ref": "#/$defs/BlankKata"
         },
         {
-          "$ref": "#/$defs/HotspotBrick"
+          "$ref": "#/$defs/HotspotKata"
         },
         {
-          "$ref": "#/$defs/ScenarioBrick"
+          "$ref": "#/$defs/ScenarioKata"
         },
         {
-          "$ref": "#/$defs/NumberBrick"
+          "$ref": "#/$defs/NumberKata"
         }
       ]
     }
   },
-  "title": "Lesson (spec 0.8)"
+  "title": "Lesson (spec 0.9)"
 }

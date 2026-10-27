@@ -421,7 +421,7 @@ const LIGHT_DELAY = 500
 const EMPTY_DELAY = 1200
 
 /**
- * The screen between the lesson's last brick and the wrap-up on the day's first finished lesson,
+ * The screen between the lesson's last kata and the wrap-up on the day's first finished lesson,
  * laid out like Duolingo's and Brilliant's: a big lantern that lights and swings once, the count
  * ticking up under it, then the week with today's lantern lit and a line under it, and the rest
  * days, whose bar fills with today (and, when that recharges one, empties again for the next). Day 1 says the streak starts, or starts again after one broke. Still for reduced motion: it opens lit. Continue

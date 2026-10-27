@@ -5,7 +5,7 @@ import * as React from "react"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { QuestionBrickProps } from "./bricks"
+import type { QuestionKataProps } from "./katas"
 import { usePlayer } from "./context"
 import {
   controlPadding,
@@ -18,18 +18,18 @@ import { buzz, fly, shake } from "./motion"
 import { RichText } from "./rich-text"
 import { Visual } from "./visuals"
 
-// The order brick: numbered slots wait on top and the shuffled items below. Tap the items in order and
+// The order kata: numbered slots wait on top and the shuffled items below. Tap the items in order and
 // each slides into the next open slot, leaving a dashed space in the pool so the rest never shift; tap
 // a placed item to send it back. With a keyboard, Enter or Space places or returns an item, ↑ and ↓
 // move a placed item up or down, and focus never gets lost.
 
-export function OrderBrick({
-  brick,
+export function OrderKata({
+  kata,
   answer,
   setAnswer,
   marks,
   locked,
-}: QuestionBrickProps) {
+}: QuestionKataProps) {
   const { t } = usePlayer()
   const uid = React.useId().replace(/[^\w-]/g, "")
   const root = React.useRef<HTMLDivElement>(null)
@@ -52,11 +52,11 @@ export function OrderBrick({
     if (wrong) shake(root.current)
   }, [wrong])
 
-  if (brick.type !== "order" || answer.kind !== "sequence") return null
+  if (kata.type !== "order" || answer.kind !== "sequence") return null
 
   const { slots, pool } = answer
-  const items = new Map(brick.items.map((it, i) => [it.id, { ...it, i }]))
-  const visual = brick.items.some((it) => it.visual)
+  const items = new Map(kata.items.map((it, i) => [it.id, { ...it, i }]))
+  const visual = kata.items.some((it) => it.visual)
   const next = slots.indexOf(null)
   const textOf = (id: string) => items.get(id)?.text?.replace(/[*`]/g, "") ?? id
 
@@ -177,7 +177,7 @@ export function OrderBrick({
 
   return (
     <div ref={root} className="flex flex-col gap-5">
-      <ol aria-label={brick.prompt} className="flex flex-col gap-2">
+      <ol aria-label={kata.prompt} className="flex flex-col gap-2">
         {slots.map((id, i) => (
           <li key={i} className="flex items-center gap-3">
             <span

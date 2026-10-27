@@ -233,7 +233,7 @@ describe("publishing", () => {
 
   it("rejects an invalid lesson with the spec's issues", async () => {
     const lesson = JSON.parse(buttons)
-    delete lesson.bricks[1].options[1].feedback
+    delete lesson.katas[1].options[1].feedback
     const reply = await publishLesson(
       { text: JSON.stringify(lesson), client: "x" },
       deps
@@ -242,7 +242,7 @@ describe("publishing", () => {
     expect(reply.body).toMatchObject({
       ok: false,
       error: "invalid_lesson",
-      issues: [expect.objectContaining({ path: "bricks[1].options[1]" })],
+      issues: [expect.objectContaining({ path: "katas[1].options[1]" })],
     })
   })
 
@@ -269,16 +269,16 @@ describe("publishing", () => {
       },
       deps
     )
-    expect(reply).toMatchObject({ status: 201, body: { spec: "0.8" } })
+    expect(reply).toMatchObject({ status: 201, body: { spec: "0.9" } })
   })
 
   it("upgrades a spec 0.2 lesson from an older skill", async () => {
-    const { bricks, ...rest } = JSON.parse(buttons)
+    const { katas, ...rest } = JSON.parse(buttons)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const loops: { concept: any; practice: any[] }[] = []
-    for (const { type, ...brick } of bricks)
-      if (type === "concept") loops.push({ concept: brick, practice: [] })
-      else loops.at(-1)!.practice.push({ type, ...brick })
+    for (const { type, ...kata } of katas)
+      if (type === "concept") loops.push({ concept: kata, practice: [] })
+      else loops.at(-1)!.practice.push({ type, ...kata })
     const reply = await publishLesson(
       {
         text: JSON.stringify({ ...rest, spec: "0.2", loops }),
@@ -289,7 +289,7 @@ describe("publishing", () => {
     )
     expect(reply).toMatchObject({
       status: 201,
-      body: { spec: "0.8", skill: { updateAvailable: true } },
+      body: { spec: "0.9", skill: { updateAvailable: true } },
     })
     const stored = await deps.store.get(reply.body.id as string)
     expect(stored?.lesson).toEqual(JSON.parse(buttons))
@@ -305,10 +305,10 @@ describe("publishing", () => {
       },
       deps
     )
-    expect(reply).toMatchObject({ status: 201, body: { spec: "0.8" } })
+    expect(reply).toMatchObject({ status: 201, body: { spec: "0.9" } })
     const stored = await deps.store.get(reply.body.id as string)
     expect(stored?.lesson).toMatchObject({
-      spec: "0.8",
+      spec: "0.9",
       subject: "business",
       tags: ["Startups"],
     })
@@ -821,7 +821,7 @@ describe("checking", () => {
     const reply = await checkLesson({ text: buttons, client: "x" }, deps)
     expect(reply).toMatchObject({
       status: 200,
-      body: { ok: true, spec: "0.8", skill: { updateAvailable: false } },
+      body: { ok: true, spec: "0.9", skill: { updateAvailable: false } },
     })
     expect(reply.body).not.toHaveProperty("id")
     expect(reply.body).not.toHaveProperty("editToken")
@@ -829,7 +829,7 @@ describe("checking", () => {
 
   it("lists the same issues publishing would", async () => {
     const broken = JSON.parse(buttons)
-    delete broken.bricks[1].options[1].feedback
+    delete broken.katas[1].options[1].feedback
     const text = JSON.stringify(broken)
     const checked = await checkLesson({ text, client: "x" }, deps)
     const published = await publishLesson({ text, client: "x" }, deps)
@@ -844,7 +844,7 @@ describe("checking", () => {
       d2: "idea -> draft -> review",
       alt: "An idea becomes a draft, then gets reviewed.",
     }
-    lesson.bricks[0].visual = { ...diagram, d2: "idea -> {" }
+    lesson.katas[0].visual = { ...diagram, d2: "idea -> {" }
     const checked = await checkLesson(
       { text: JSON.stringify(lesson), client: "x" },
       deps
@@ -852,12 +852,12 @@ describe("checking", () => {
     expect(checked.status).toBe(422)
     expect(checked.body.issues).toEqual([
       expect.objectContaining({
-        path: "bricks[0].visual.d2",
+        path: "katas[0].visual.d2",
         message: expect.stringMatching(/doesn't compile: line 1:/),
       }),
     ])
 
-    lesson.bricks[0].visual = diagram
+    lesson.katas[0].visual = diagram
     const reply = await publishLesson(
       { text: JSON.stringify(lesson), client: "x" },
       deps
@@ -875,7 +875,7 @@ describe("checking", () => {
       alt: "Ethanol, with its hydroxyl group marked.",
       highlight: ["[OX2H]"],
     }
-    lesson.bricks[0].visual = { ...molecule, smiles: "CC(O)1" }
+    lesson.katas[0].visual = { ...molecule, smiles: "CC(O)1" }
     const checked = await checkLesson(
       { text: JSON.stringify(lesson), client: "x" },
       deps
@@ -883,12 +883,12 @@ describe("checking", () => {
     expect(checked.status).toBe(422)
     expect(checked.body.issues).toEqual([
       expect.objectContaining({
-        path: "bricks[0].visual.smiles",
+        path: "katas[0].visual.smiles",
         message: expect.stringMatching(/^The SMILES can't be read/),
       }),
     ])
 
-    lesson.bricks[0].visual = molecule
+    lesson.katas[0].visual = molecule
     const reply = await publishLesson(
       { text: JSON.stringify(lesson), client: "x" },
       deps
@@ -900,8 +900,8 @@ describe("checking", () => {
 
   it("rejects an icon the kit doesn't have, and embeds one it does", async () => {
     const lesson = JSON.parse(buttons)
-    const visual = lesson.bricks[0].visual
-    lesson.bricks[0].visual = {
+    const visual = lesson.katas[0].visual
+    lesson.katas[0].visual = {
       ...visual,
       html: '<span class="icon-[lucide--git-brnch]"></span>',
     }
@@ -912,14 +912,14 @@ describe("checking", () => {
     expect(checked.status).toBe(422)
     expect(checked.body.issues).toEqual([
       expect.objectContaining({
-        path: "bricks[0].visual.html",
+        path: "katas[0].visual.html",
         message: expect.stringMatching(
           /icon-\[lucide--git-brnch\] doesn't exist. Did you mean icon-\[lucide--git-branch\]/
         ),
       }),
     ])
 
-    lesson.bricks[0].visual = {
+    lesson.katas[0].visual = {
       ...visual,
       html: '<span class="icon-[lucide--git-branch] text-primary"></span>',
     }

@@ -69,7 +69,7 @@ export class PostgresDraftStore implements DraftStore {
 // ---------- patches ----------
 
 /**
- * One change to a lesson. `path` uses the checker's syntax (`bricks[2].options[0].feedback`), so
+ * One change to a lesson. `path` uses the checker's syntax (`katas[2].options[0].feedback`), so
  * an issue's path can be patched as is. `set` replaces a value or adds a key (or appends at an
  * array's length); `insert` puts a new item into an array at that index; `remove` deletes a key
  * or an array item.
@@ -81,7 +81,7 @@ export type Patch =
 
 export class PatchError extends Error {}
 
-/** Splits `bricks[2].options[0].feedback` into ["bricks", 2, "options", 0, "feedback"]. */
+/** Splits `katas[2].options[0].feedback` into ["katas", 2, "options", 0, "feedback"]. */
 export function parsePath(path: string): (string | number)[] {
   const rest = path.trim()
   if (!rest) throw new PatchError("A patch needs a path.")
@@ -91,7 +91,7 @@ export function parsePath(path: string): (string | number)[] {
   while (at < rest.length) {
     let part: string | number
     if (rest[at] === "[") {
-      // An index, right after a name or another index: `bricks[2]`, `grid[1][0]`.
+      // An index, right after a name or another index: `katas[2]`, `grid[1][0]`.
       const end = rest.indexOf("]", at)
       const digits = rest.slice(at + 1, end)
       if (end === -1 || !/^\d+$/.test(digits)) throw bad()

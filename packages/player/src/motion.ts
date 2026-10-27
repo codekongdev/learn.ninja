@@ -2,7 +2,7 @@
 
 import { flushSync } from "react-dom"
 
-// Motion shared by the bricks that move items around (sort and order): items slide to their new
+// Motion shared by the katas that move items around (sort and order): items slide to their new
 // place with a view transition, headings bounce, and wrong items shake after checking. All of it
 // stays still for people who ask for reduced motion.
 

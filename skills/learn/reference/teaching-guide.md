@@ -15,24 +15,24 @@ How to turn the user's input into a lesson that's genuinely good to play. Read t
 ## 2. Shape: interleaved, not "read then quiz"
 
 ```
-hook → bricks: concept → questions → concept → questions … (1–4 concepts) → challenge → wrap-up
+hook → katas: concept → questions → concept → questions … (1–4 concepts) → challenge → wrap-up
 ```
 
 - **Hook:** a `choice` or `compare` question asked _before_ any teaching. It's a guess and isn't scored. Pick something intriguing whose answer the first concept explains, ideally a gut answer most people get wrong ("A price rises 50%, then falls 50%. Is it back where it started?") or an assumption the learner brings with them. Its `explanation` should make the learner want to know why.
-- **Concept bricks:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first brick is always a concept. Bold a key word the first time it appears, and define it in the body. How to write them:
+- **Concept katas:** one idea each, 80 words at most (the checker counts every word, so aim for 60–70). The first kata is always a concept. Bold a key word the first time it appears, and define it in the body. How to write them:
   - **Concrete before general.** Show one real case first (a worked example with real numbers, two lines of dialogue, a real screen), then state the rule it follows in one sentence.
   - **One step per line** in a worked example or procedure, so the learner sees where each part comes from.
   - **Say why, briefly.** One sentence on why it works beats a rule to memorise.
   - **Say when it applies:** the conditions, context, or setting where it holds, and where it doesn't.
   - **Keep it easy to follow in the player.** There's no calculator, notepad, or audio: pick friendly numbers (10%, 200, ¼) and nothing that needs to be heard.
   - **Never restate the visual.** The learner sees the visual first, so the body says what to notice in it and why it matters: the pattern across a table's rows, not the rows again; what the arrows in a diagram mean, not a list of its boxes. If a sentence can be read straight off the visual, cut it.
-- **Practice:** 2–4 question bricks right after each concept brick, 3–12 in total across the lesson (`reference/planning.md` has the shape for each size). Take support away as you go: **recognise** it (what does this mean, which is right), then **recall with support** (fill the missing step, word, or term from chips), then **do it** (solve, build, or decide the whole thing), then **vary it** (new context, new numbers, or run backwards).
-- **Challenge:** one harder, applied question brick that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
+- **Practice:** 2–4 question katas right after each concept kata, 3–12 in total across the lesson (`reference/planning.md` has the shape for each size). Take support away as you go: **recognise** it (what does this mean, which is right), then **recall with support** (fill the missing step, word, or term from chips), then **do it** (solve, build, or decide the whole thing), then **vary it** (new context, new numbers, or run backwards).
+- **Challenge:** one harder, applied question kata that combines the concepts, in whatever form the knowledge is really used: a decision, a flaw to find, a set of things to classify.
 - **Wrap-up:** 2–4 takeaways, each one sentence the learner could act on.
 
-## 3. Choose question bricks by fit
+## 3. Choose question katas by fit
 
-Each question brick should ask the learner to do what they'd really do with this knowledge. Start from the question you'd ask a learner face to face, then pick the type that asks it most directly. There's no quota and no set order: a lesson can use two types or six, and can repeat a type as often as the content calls for. Never pick a type for variety's sake.
+Each question kata should ask the learner to do what they'd really do with this knowledge. Start from the question you'd ask a learner face to face, then pick the type that asks it most directly. There's no quota and no set order: a lesson can use two types or six, and can repeat a type as often as the content calls for. Never pick a type for variety's sake.
 
 | Type       | Natural when the learner needs to…                                                              | Forced when…                                                                                              |
 | ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
@@ -41,32 +41,32 @@ Each question brick should ask the learner to do what they'd really do with this
 | `hotspot`  | Find something inside a realistic artifact: a screen, a recipe, a contract, a line of code      | The "artifact" is a list you built only so there's something to tap.                                      |
 | `sort`     | Classify things into categories people really use, each with a name of its own                  | The groups are invented, one is just "not the other" (Goal / Non-goal), or each group has only two items. |
 | `order`    | Sequence a real process where the order matters and mistakes have consequences                  | The order is arbitrary, or obvious from the wording.                                                      |
-| `match`    | Pair things that come in pairs: terms and meanings, words and translations, symptoms and causes | It just re-tests the concept brick's vocabulary with no thinking involved.                                |
-| `blank`    | Recall exact wording that matters: code, a phrase in another language, a formula                | It's a sentence from the concept brick with a word removed; that's recall, not understanding.             |
+| `match`    | Pair things that come in pairs: terms and meanings, words and translations, symptoms and causes | It just re-tests the concept kata's vocabulary with no thinking involved.                                |
+| `blank`    | Recall exact wording that matters: code, a phrase in another language, a formula                | It's a sentence from the concept kata with a word removed; that's recall, not understanding.             |
 | `scenario` | Make a call in a realistic situation where options have trade-offs                              | There's one obviously right answer; that's a `choice`.                                                    |
 
-Before you keep a question brick, ask:
+Before you keep a question kata, ask:
 
-- **Would a good teacher ask this, in this form?** If the honest version of the question is multiple choice, use `choice`, even if the previous brick was a `choice` too.
-- **Does it ask something new?** Each brick should test a different aspect or application of the idea, not restate the last one in another format.
-- **Can it be answered by looking up?** If the concept brick or its visual lists the answer (a table of cases, then a `sort` of the same cases; three bolded terms, then a `match` of those terms), it's a lookup, not a question. Ask about a new case the rule decides.
+- **Would a good teacher ask this, in this form?** If the honest version of the question is multiple choice, use `choice`, even if the previous kata was a `choice` too.
+- **Does it ask something new?** Each kata should test a different aspect or application of the idea, not restate the last one in another format.
+- **Can it be answered by looking up?** If the concept kata or its visual lists the answer (a table of cases, then a `sort` of the same cases; three bolded terms, then a `match` of those terms), it's a lookup, not a question. Ask about a new case the rule decides.
 - **Is the artifact real?** Hotspots, compares and scenarios work when they show something the learner will meet: a real screen, a real recipe step, a real decision.
 
 Mechanics of each type:
 
 - **compare:** exactly 2 options. Best with an HTML visual on each (two screens, two layouts, two charts), which show as cards side by side. Two short texts work too, but they show as plain rows, like a `choice`.
-- **choice:** 2–5 options, one correct (or `multiple: true` for "pick all that apply"; the player adds that instruction above the prompt, so don't write it in the prompt). When the question is about something to look at (a chart, a screen, a diagram), put it in the brick's `visual`, above text options. When the answers themselves are something to look at (which layouts, charts, or components get it right), give every option an HTML visual: they show as cards in two columns, like `compare`.
+- **choice:** 2–5 options, one correct (or `multiple: true` for "pick all that apply"; the player adds that instruction above the prompt, so don't write it in the prompt). When the question is about something to look at (a chart, a screen, a diagram), put it in the kata's `visual`, above text options. When the answers themselves are something to look at (which layouts, charts, or components get it right), give every option an HTML visual: they show as cards in two columns, like `compare`.
 - **Option visuals (`choice` and `compare`):** give each one an `alt` for screen readers. A `text` caption under the visual is optional: add one only when it says something the visual can't, such as a name to refer to it by ("Plan A") or context a chart doesn't show. Never repeat text the visual already shows, like an error message or a button label.
 - **hotspot:** tap the part of a visual that matters. In HTML, mark tappable elements with `data-hotspot="id"`; in code, list `hotspots` by line number; on a `chess` board every square is tappable, and `correct` lists squares ("Where can the knight fork the king and the rook?", or "Tap every square the bishop attacks" with `multiple: true`); on a `map` every country drawn is tappable, and `correct` lists country codes ("Tap the country where the Hittites lived", or "Tap every country where the Phoenicians founded a city" with `multiple: true`). Good for finding the mistake: one hotspot per line of a worked solution, or per word or phrase of a short message.
 - **sort:** 4–8 items into 2–3 groups. Every group should get at least one item, and every group needs a name of its own. If a group would be "Not X" or "Other", ask "Which of these are X?" as a `choice` with `multiple: true` instead.
 - **order:** 3–6 items written in the correct order (the player shuffles them). Use `alsoAccept` if another order is genuinely right too.
 - **match:** 3–5 pairs.
-- **blank:** fill gaps in a sentence, formula, or code from word chips. Each gap's `choices` include the right answer plus 1–2 believable decoys. Use `numeric` for a number gap. Accents always count, so a chip that differs only by its accent (_si_ for _sí_) is a fair decoy; one that differs only by case isn't, unless the brick is `caseSensitive`.
+- **blank:** fill gaps in a sentence, formula, or code from word chips. Each gap's `choices` include the right answer plus 1–2 believable decoys. Use `numeric` for a number gap. Accents always count, so a chip that differs only by its accent (_si_ for _sí_) is a fair decoy; one that differs only by case isn't, unless the kata is `caseSensitive`.
 - **scenario:** a short situation and 2–4 options, each with a `quality` (`best`, `okay`, `poor`) and an `outcome` that shows the consequence.
 
 ## 4. Feedback that teaches
 
-- **Feedback explains; it never introduces.** All of it shows in the ninja's speech bubble: after a miss, the question's hint (or, without one, the wrong option's feedback); after a right answer, the explanation only if the learner taps Why?. A learner who answers right may never see any of it. If a question needs a term, fact, or method, a concept brick before it teaches it. Feedback can name a mistake only in words the lesson has already taught.
+- **Feedback explains; it never introduces.** All of it shows in the ninja's speech bubble: after a miss, the question's hint (or, without one, the wrong option's feedback); after a right answer, the explanation only if the learner taps Why?. A learner who answers right may never see any of it. If a question needs a term, fact, or method, a concept kata before it teaches it. Feedback can name a mistake only in words the lesson has already taught.
 - **Every wrong option gets `feedback`** that explains _why_ it's wrong, in a sentence or two. Name the misconception: "That's simple interest. Year 2 also earns interest on year 1's $50."
 - **Build wrong options from real mistakes** people make, not from obviously silly answers. A good wrong option is tempting. Each should come from one specific slip its feedback names. Common sources:
   - a rule carried over from where it doesn't apply (a literal translation, simple interest where it compounds)
@@ -75,7 +75,7 @@ Mechanics of each type:
   - the wrong base, unit, or scale
 - **The right answer shouldn't stand out:** not the only round number, always the middle value, or the longest option.
 - **Name answers by what they say, not where they sit.** The player shuffles options and a match's right column, so "the second statement" or "option B" can point at the wrong one. Write "the nurses' statement" or "the many-causes explanation" instead. The checker rejects position words in explanations, hints, feedback, and outcomes.
-- **Every question brick gets an `explanation`** of why the right answer is right, in 30 words or fewer; aim for about 25, since the checker counts every word (the checker enforces it). It shows in the ninja's speech bubble, so apply the idea to this question; don't restate the concept the learner just read. It shows when the learner taps Why? after a right answer, and by itself once a missed answer is revealed. The warm-up shows no explanation: the concept after it does the explaining. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
+- **Every question kata gets an `explanation`** of why the right answer is right, in 30 words or fewer; aim for about 25, since the checker counts every word (the checker enforces it). It shows in the ninja's speech bubble, so apply the idea to this question; don't restate the concept the learner just read. It shows when the learner taps Why? after a right answer, and by itself once a missed answer is revealed. The warm-up shows no explanation: the concept after it does the explaining. For a calculation, put each worked step on its own line (a `\n` between lines), after an optional one-line lead: `"Each year's interest joins the balance.\nYear 1: $1,000 × 1.05 = $1,050\nYear 2: $1,050 × 1.05 = $1,102.50"`.
 - **Blanks:** add a `mistakes` entry for each decoy chip, explaining it.
 - **Hints** (optional) nudge without giving the answer away, in one short line; the player shows the hint after a miss, before the retry: "What is the one thing this page exists to help people do?" How many there are, and how much they give away, follows the level: most questions for beginners, one or two for advanced learners.
 - **Scenario outcomes** describe what happens next, so even a poor choice teaches something.
@@ -88,7 +88,7 @@ Mechanics of each type:
 - A concept's `body` can also have paragraphs (one per line) and a short list: two to four lines starting with `- `, or `1. `, `2. `… for steps in order. Use a list for a few parallel items, like named cases with their one-line definitions; keep the reasoning in sentences. Nowhere else takes a list, and no lesson text takes headings, links, images, tables, or code blocks: the title is the heading, and a table or code goes in a visual.
 - **Code goes in backticks, wherever it appears:** commands (`` `git push` ``), flags, file names, paths, identifiers, HTML tags, and values, in prompts, options, match pairs, sort and order items, blank chips, feedback, and explanations alike. The player then shows it in monospace; without the backticks it reads as plain prose, and the checker rejects it. An item that is only code (a match pair's `` `git pull` ``) renders as code without an extra box.
 - In formulas, name a quantity before its symbol ("the interest rate, `\( r \)`"), use `\times` or `\cdot` (never `*`) and `\frac`, and follow the lesson language's decimal mark (`3{,}5` in TeX).
-- Don't reveal the answer in the prompt or the concept brick's wording.
+- Don't reveal the answer in the prompt or the concept kata's wording.
 
 ## 6. Visuals
 
@@ -166,8 +166,8 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 - **Grids** (`grid-rows` or `grid-columns` in a container) place things in rows and columns instead of a graph: a timeline, the stages of a process in a row, a few cells to compare, a layout. The cells are ordinary boxes; `grid-gap: 0` joins them into a strip, and a label with a line break (`"1200 BC\nTrade thrives"`) puts a date or name above its text. Keep a row to 3 cells, or use `grid-columns: 1` to stack them, so the grid reads on a phone. Arrows inside a grid draw as straight lines between centers, so use a grid for placement and a flow for what connects.
 - **Tables** (`shape: sql_table`) show a record or a database table: each line is `name: type`, and `{constraint: primary_key}`, `foreign_key`, or `unique` marks a key (drawn as PK, FK, UNQ). An arrow from a column to another table's column (`users.team_id -> teams.id`) shows a relation. Keep to 3 to 6 columns per table and 2 or 3 tables.
 - **Class diagrams** (`shape: class`) show the classes of a program, UML style: each line is a field (`+name: string`) or a method (`+speak(): string`), with `+` public, `-` private, and `#` protected (quote a protected line, `"#id": int`, since `#` otherwise starts a comment and the line disappears). Mark the relation on the arrow the UML way: `Dog -> Animal: extends {target-arrowhead.shape: triangle; target-arrowhead.style.filled: false}` for inheritance (the hollow triangle at the parent), and `Owner <-> Pet: has {source-arrowhead.shape: diamond; target-arrowhead.shape: arrow}` for "has" (the hollow diamond at the owner; add `source-arrowhead.style.filled: true` when the parts can't exist without it). Write `<->`, not `->`, for the diamond: D2 draws nothing at the start of a one-way arrow. Keep to 2 to 4 classes and 2 to 5 lines each.
-- **Keep it small:** 3 to 8 boxes, labels of 1 to 4 words, an arrow label only where the arrow's meaning isn't obvious. A diagram wider than the lesson column is scaled down, and its text with it, most of all on a phone (about 340px): prefer `direction: down` (the default), and use `direction: right` only for a chain of 3 boxes or fewer. Split anything bigger into two bricks.
-- **Show the point, not everything:** one container for things that belong together, `style.bold: true` or `style.stroke-width: 3` on the one box the brick is about, `style.stroke-dash: 4` for something hypothetical or optional.
+- **Keep it small:** 3 to 8 boxes, labels of 1 to 4 words, an arrow label only where the arrow's meaning isn't obvious. A diagram wider than the lesson column is scaled down, and its text with it, most of all on a phone (about 340px): prefer `direction: down` (the default), and use `direction: right` only for a chain of 3 boxes or fewer. Split anything bigger into two katas.
+- **Show the point, not everything:** one container for things that belong together, `style.bold: true` or `style.stroke-width: 3` on the one box the kata is about, `style.stroke-dash: 4` for something hypothetical or optional.
 - **Right-to-left lessons:** write `direction: left` for a flow that reads across, so it runs the way the text does.
 - **Icons on boxes:** `icon: set/name` from the same kit as HTML visuals (`icon: octicon/repo-16`, `icon: lucide/database`, `icon: logos/github-icon`). Use them when the thing has a recognisable picture (a repo, a branch, a database, a browser, a language), on every box of a kind or none, not as decoration on one. The player draws the icon at 32px in the lesson's text color.
 - **Where the icon goes:** the label sits at the top of the box and the icon under it, and that default is the one that reads well. `icon.near` can move the icon (`top-left` … `bottom-right`, or `outside-top-center` and the like for outside the box) and `label.near` the label, but a `top-*` icon lands on the label, and a side position (`center-left`, `center-right`) makes D2 widen every box so the whole drawing shrinks to fit. Use them only for one box that needs it, never as the house style.
@@ -177,7 +177,7 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 ## 7. Languages
 
 - Write all learner-facing text in the lesson's `language` (a BCP 47 code such as `en`, `es`, `ar`, `pt-BR`).
-- **Language-learning lessons:** `language` is the language you're teaching _in_ and `targetLanguage` is the one being learned, with a region when the variety matters (`es-MX`, `pt-PT`). Mark every phrase in the target language with `lang`: on options, `order` and `sort` items, `sort` group labels, `blank` bricks, and `leftLang` / `rightLang` on `match` pairs. Keep each chip in one language. For beginners in a non-Latin script, add a romanisation the first time a word appears, e.g. こんにちは (konnichiwa), except in a brick that tests reading it.
+- **Language-learning lessons:** `language` is the language you're teaching _in_ and `targetLanguage` is the one being learned, with a region when the variety matters (`es-MX`, `pt-PT`). Mark every phrase in the target language with `lang`: on options, `order` and `sort` items, `sort` group labels, `blank` katas, and `leftLang` / `rightLang` on `match` pairs. Keep each chip in one language. For beginners in a non-Latin script, add a romanisation the first time a word appears, e.g. こんにちは (konnichiwa), except in a kata that tests reading it.
 - **Never translate code**, identifiers, or program output, whatever the lesson's language.
 
 ## 8. Accuracy
@@ -190,11 +190,11 @@ Overlays render in place, sized to fit the visual, so you can show them open:
 
 ## 9. v1 limits
 
-- No `number` bricks. Ask numeric questions as `choice` with 3–4 options built from common slips (wrong formula, one step short, wrong unit), each with feedback.
+- No `number` katas. Ask numeric questions as `choice` with 3–4 options built from common slips (wrong formula, one step short, wrong unit), each with feedback.
 - Every `blank` has `choices` (word chips); there's no free typing yet.
 - No images, audio, or free-text answers.
 
 ## 10. Before you publish
 
 - Run `validate` and fix every issue. The messages say exactly what to change.
-- Read the lesson once as a learner: is the hook intriguing? Does every question brick feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Is every term, fact, and method each question needs taught in an earlier concept brick, not only in feedback, a hint, or an explanation? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`, and cut any concept sentence that re-teaches what the summary says the learner knows.
+- Read the lesson once as a learner: is the hook intriguing? Does every question kata feel like the natural way to ask its question? Does each concept explain the practice that follows? Is every wrong option's feedback specific? Is the challenge harder than the practice? Is every term, fact, and method each question needs taught in an earlier concept kata, not only in feedback, a hint, or an explanation? Does it hold its level? Run the "You've drifted if…" check in `levels/{level}.md`, and cut any concept sentence that re-teaches what the summary says the learner knows.

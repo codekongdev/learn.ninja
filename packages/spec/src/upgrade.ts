@@ -1,13 +1,14 @@
 // Older lesson files, brought up to the current spec. Published lessons and older skills can
-// still hand us spec 0.2, 0.3 (with or without a concept brick's `term`, since dropped), 0.4, 0.5,
-// 0.6, or 0.7, so the server upgrades them before validating or playing them. 0.3 to 0.4 only added
+// still hand us spec 0.2, 0.3 (with or without a concept kata's `term`, since dropped), 0.4, 0.5,
+// 0.6, 0.7, or 0.8, so the server upgrades them before validating or playing them. 0.3 to 0.4 only added
 // the chart visual and 0.4 to 0.5 the diagram visual, so those lessons need nothing but their
 // version changed. 0.6 replaced the free-text `topic` label with a `subject` from a fixed list and
 // `tags`: the old label is mapped to a subject by a small lookup (and otherwise to `life`), and kept
 // as tags so nothing is lost. 0.7 split `math` into `math` and `data`: a math lesson whose tags say
 // it's about data moves over. 0.8 made tags labels as a reader sees them ("Claude Code") instead of
 // slugs (`claude-code`): a compound old label splits into one tag per part ("Git & Claude Code" →
-// "Git", "Claude Code"), and slug tags get their known spelling or sentence case.
+// "Git", "Claude Code"), and slug tags get their known spelling or sentence case. 0.9 renamed the
+// screens from bricks to katas: the `bricks` array becomes `katas`, in the same place.
 
 import { redundantTag } from "./rules"
 import { SPEC_VERSION } from "./schema"
@@ -28,52 +29,52 @@ interface LessonV02 {
 }
 
 /** Every older spec this module upgrades, newest first. */
-export const OLD_SPECS = ["0.7", "0.6", "0.5", "0.4", "0.3", "0.2"]
+export const OLD_SPECS = ["0.8", "0.7", "0.6", "0.5", "0.4", "0.3", "0.2"]
 
 /** True for data that claims an older spec, or has a concept `term`, that this module can upgrade. */
 export function canUpgrade(data: unknown): boolean {
   if (typeof data !== "object" || data === null) return false
-  const { spec, bricks } = data as { spec?: unknown; bricks?: unknown }
+  const { spec, katas } = data as { spec?: unknown; katas?: unknown }
   return (
     (typeof spec === "string" && OLD_SPECS.includes(spec)) ||
-    (Array.isArray(bricks) && bricks.some(hasTerm))
+    (Array.isArray(katas) && katas.some(hasTerm))
   )
 }
 
-function hasTerm(brick: unknown): boolean {
+function hasTerm(kata: unknown): boolean {
   return (
-    typeof brick === "object" &&
-    brick !== null &&
-    (brick as { type?: unknown }).type === "concept" &&
-    "term" in brick
+    typeof kata === "object" &&
+    kata !== null &&
+    (kata as { type?: unknown }).type === "concept" &&
+    "term" in kata
   )
 }
 
 /**
- * Brings a lesson up to the current spec. From 0.2, each loop's concept becomes a concept brick,
- * followed by its practice bricks. Concept bricks lose their `term`. A `topic` becomes a subject
- * and tags; slug tags become labels. Anything else comes back unchanged, for validateLesson to
- * judge. Running it on its own result changes nothing.
+ * Brings a lesson up to the current spec. From 0.2, each loop's concept becomes a concept kata,
+ * followed by its practice katas. Concept katas lose their `term`. A `topic` becomes a subject
+ * and tags; slug tags become labels. The `bricks` of 0.8 and before become `katas`. Anything else
+ * comes back unchanged, for validateLesson to judge. Running it on its own result changes nothing.
  */
 export function upgradeLesson(data: unknown): unknown {
   if (!canUpgrade(data)) return data
   if ((data as { spec?: unknown }).spec !== "0.2") {
-    const lesson = data as { bricks?: unknown[] }
-    return upgradeMeta({
-      ...lesson,
-      spec: SPEC_VERSION,
-      bricks: Array.isArray(lesson.bricks)
-        ? lesson.bricks.map(withoutTerm)
-        : lesson.bricks,
-    })
+    const out: Record<string, unknown> = {}
+    for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+      if (key === "spec") out.spec = SPEC_VERSION
+      else if (key === "bricks" || key === "katas")
+        out.katas = Array.isArray(value) ? value.map(withoutTerm) : value
+      else out[key] = value
+    }
+    return upgradeMeta(out)
   }
   const { loops, ...rest } = data as LessonV02
   if (!Array.isArray(loops)) return upgradeMeta({ ...rest, spec: SPEC_VERSION })
   const out: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(rest)) {
     if (key === "challenge")
-      out.bricks = loops.flatMap((loop) => [
-        conceptBrick(loop?.concept),
+      out.katas = loops.flatMap((loop) => [
+        conceptKata(loop?.concept),
         ...(Array.isArray(loop?.practice) ? loop.practice : []),
       ])
     out[key] = key === "spec" ? SPEC_VERSION : value
@@ -154,14 +155,14 @@ export function splitTopic(topic: string): string[] {
     .filter(Boolean)
 }
 
-function conceptBrick(concept: Record<string, unknown> | undefined) {
+function conceptKata(concept: Record<string, unknown> | undefined) {
   const { id, term: _term, ...rest } = concept ?? {}
   return { id, type: "concept", ...rest }
 }
 
-function withoutTerm(brick: unknown) {
-  if (!hasTerm(brick)) return brick
-  const { term: _term, ...rest } = brick as Record<string, unknown>
+function withoutTerm(kata: unknown) {
+  if (!hasTerm(kata)) return kata
+  const { term: _term, ...rest } = kata as Record<string, unknown>
   return rest
 }
 

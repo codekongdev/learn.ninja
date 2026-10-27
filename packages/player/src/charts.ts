@@ -25,17 +25,17 @@ export function withCharts(lesson: Lesson, prepared: Prepared): Prepared {
   return { ...prepared, charts }
 }
 
-/** The lesson's chart visuals: a brick's own at full size, an option's or item's compact. */
+/** The lesson's chart visuals: a kata's own at full size, an option's or item's compact. */
 export function chartsIn(
   lesson: Lesson
 ): { chart: ChartVisual; compact: boolean }[] {
   const out: { chart: ChartVisual; compact: boolean }[] = []
-  for (const brick of [lesson.hook, ...lesson.bricks, lesson.challenge]) {
-    if ("visual" in brick && brick.visual?.kind === "chart")
-      out.push({ chart: brick.visual, compact: false })
+  for (const kata of [lesson.hook, ...lesson.katas, lesson.challenge]) {
+    if ("visual" in kata && kata.visual?.kind === "chart")
+      out.push({ chart: kata.visual, compact: false })
     const cards = [
-      ...("options" in brick ? brick.options : []),
-      ...("items" in brick ? brick.items : []),
+      ...("options" in kata ? kata.options : []),
+      ...("items" in kata ? kata.items : []),
     ]
     for (const card of cards)
       if ("visual" in card && card.visual?.kind === "chart")

@@ -14,9 +14,9 @@ import {
   type MapRegion,
 } from "./map"
 import {
-  type Brick,
+  type Kata,
   type Lesson,
-  type QuestionBrick,
+  type QuestionKata,
   type Visual,
 } from "./schema"
 import { normalizeTag } from "./tags"
@@ -40,21 +40,21 @@ export interface Issue {
   kind: IssueKind
 }
 
-/** A question brick together with where it sits in the lesson, in play order. */
+/** A question kata together with where it sits in the lesson, in play order. */
 interface PlacedQuestion {
-  brick: QuestionBrick
+  kata: QuestionKata
   path: string
 }
 
 function placedQuestions(lesson: Lesson): PlacedQuestion[] {
   const practice: PlacedQuestion[] = []
-  lesson.bricks.forEach((brick, i) => {
-    if (brick.type !== "concept") practice.push({ brick, path: `bricks[${i}]` })
+  lesson.katas.forEach((kata, i) => {
+    if (kata.type !== "concept") practice.push({ kata, path: `katas[${i}]` })
   })
   return [
-    { brick: lesson.hook, path: "hook" },
+    { kata: lesson.hook, path: "hook" },
     ...practice,
-    { brick: lesson.challenge, path: "challenge" },
+    { kata: lesson.challenge, path: "challenge" },
   ]
 }
 
@@ -169,7 +169,7 @@ function unsupportedMarkdown(text: string): string | null {
   // Code and formulas may hold # or |, so they're left out of the rest.
   const prose = text.replace(/\\\([\s\S]*?\\\)|`[^`\n]*`/g, "")
   if (/^\s*#{1,6}\s/m.test(prose))
-    return "Headings don't show in lesson text: a concept's title is its heading. Start the line without #, or split the idea into another concept brick."
+    return "Headings don't show in lesson text: a concept's title is its heading. Start the line without #, or split the idea into another concept kata."
   if (/!?\[[^\]\n]+\]\([^)\n]*\)/.test(prose))
     return "Links and images don't show in lesson text, and a lesson never sends the learner elsewhere. Name a source in words, and draw a picture as a visual."
   if (/^\s*\|.*\|\s*$/m.test(prose) || /\|\s*:?-{3,}/.test(prose))
@@ -267,19 +267,19 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
 
   checkRhythm(lesson, add)
 
-  const lessonIds = [lesson.hook, ...lesson.bricks, lesson.challenge].map(
+  const lessonIds = [lesson.hook, ...lesson.katas, lesson.challenge].map(
     (b) => b.id
   )
   for (const dupe of duplicates(lessonIds)) {
     add(
       "structure",
       "",
-      `The id "${dupe}" is used more than once. Every brick id must be unique within the lesson.`
+      `The id "${dupe}" is used more than once. Every kata id must be unique within the lesson.`
     )
   }
 
-  for (const { brick, path } of questions)
-    checkBrickReferences(brick, path, add, lesson.language)
+  for (const { kata, path } of questions)
+    checkKataReferences(kata, path, add, lesson.language)
 
   // ---------- tags ----------
 
@@ -305,16 +305,16 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
 
   // ---------- v1 limits ----------
 
-  for (const { brick, path } of questions) {
-    if (brick.type === "number") {
+  for (const { kata, path } of questions) {
+    if (kata.type === "number") {
       add(
         "v1",
         path,
-        "Number bricks aren't supported in v1. Rewrite this as a choice brick whose wrong options come from common mistakes, each with feedback."
+        "Number katas aren't supported in v1. Rewrite this as a choice kata whose wrong options come from common mistakes, each with feedback."
       )
     }
-    if (brick.type === "blank") {
-      brick.blanks.forEach((b, i) => {
+    if (kata.type === "blank") {
+      kata.blanks.forEach((b, i) => {
         if (!b.choices) {
           add(
             "v1",
@@ -328,8 +328,8 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
 
   // ---------- teaching quality ----------
 
-  for (const { brick, path } of questions) {
-    const explanationWords = countWords(brick.explanation)
+  for (const { kata, path } of questions) {
+    const explanationWords = countWords(kata.explanation)
     if (explanationWords > LIMITS.explanationWords) {
       add(
         "teaching",
@@ -337,16 +337,16 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
         `The explanation has ${explanationWords} words; keep it to ${LIMITS.explanationWords} or fewer. Apply the idea to this question in a sentence or two; don't restate the concept.`
       )
     }
-    if (countWords(brick.prompt) > LIMITS.promptWords) {
+    if (countWords(kata.prompt) > LIMITS.promptWords) {
       add(
         "teaching",
         `${path}.prompt`,
-        `The prompt has ${countWords(brick.prompt)} words; keep it to ${LIMITS.promptWords} or fewer.`
+        `The prompt has ${countWords(kata.prompt)} words; keep it to ${LIMITS.promptWords} or fewer.`
       )
     }
-    if (brick.type === "choice" || brick.type === "compare") {
-      const correct = brick.type === "choice" ? brick.correct : [brick.correct]
-      brick.options.forEach((o, i) => {
+    if (kata.type === "choice" || kata.type === "compare") {
+      const correct = kata.type === "choice" ? kata.correct : [kata.correct]
+      kata.options.forEach((o, i) => {
         if (!correct.includes(o.id) && !o.feedback) {
           add(
             "teaching",
@@ -360,20 +360,20 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
 
   // The player shuffles options (and a match's right column), so "the second statement" can point
   // at the wrong one on screen. Explanations and feedback have to name an option by what it says.
-  for (const { brick, path } of questions) {
+  for (const { kata, path } of questions) {
     if (
-      brick.type !== "choice" &&
-      brick.type !== "compare" &&
-      brick.type !== "scenario" &&
-      brick.type !== "match"
+      kata.type !== "choice" &&
+      kata.type !== "compare" &&
+      kata.type !== "scenario" &&
+      kata.type !== "match"
     )
       continue
     const texts: [string, string | undefined][] = [
-      [`${path}.explanation`, brick.explanation],
-      [`${path}.hint`, brick.hint],
-      ...(brick.type === "match"
+      [`${path}.explanation`, kata.explanation],
+      [`${path}.hint`, kata.hint],
+      ...(kata.type === "match"
         ? []
-        : brick.options.flatMap((o, i): [string, string | undefined][] => [
+        : kata.options.flatMap((o, i): [string, string | undefined][] => [
             [
               `${path}.options[${i}].feedback`,
               "feedback" in o ? o.feedback : undefined,
@@ -411,7 +411,7 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
   walkRichText(lesson, (text, where) => {
     const markdown = unsupportedMarkdown(text)
     if (markdown) return add("structure", where, markdown)
-    const isBody = /^bricks\[\d+\]\.body$/.test(where)
+    const isBody = /^katas\[\d+\]\.body$/.test(where)
     const blocks = textBlocks(text)
     if (!isBody && blocks.some((b) => b.kind === "list"))
       add(
@@ -433,23 +433,23 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
       )
   })
 
-  // A brick's HTML visual is a picture to a screen reader, so it needs alt text. (Hotspot visuals
+  // A kata's HTML visual is a picture to a screen reader, so it needs alt text. (Hotspot visuals
   // are read through their tappable regions, item visuals through their captions, and option
   // visuals below. A chess or map hotspot's regions are only names, so its alt describes the
   // picture.)
   const withVisuals = [
-    ...lesson.bricks.flatMap((b, i) =>
-      b.type === "concept" ? [{ brick: b, path: `bricks[${i}]` }] : []
+    ...lesson.katas.flatMap((b, i) =>
+      b.type === "concept" ? [{ kata: b, path: `katas[${i}]` }] : []
     ),
     ...questions.filter(
       (q) =>
-        q.brick.type !== "hotspot" ||
-        q.brick.visual.kind === "chess" ||
-        q.brick.visual.kind === "map"
+        q.kata.type !== "hotspot" ||
+        q.kata.visual.kind === "chess" ||
+        q.kata.visual.kind === "map"
     ),
   ]
-  for (const { brick, path } of withVisuals) {
-    const v = brick.visual
+  for (const { kata, path } of withVisuals) {
+    const v = kata.visual
     if (v && v.kind !== "code" && v.kind !== "math" && !v.alt)
       add(
         "teaching",
@@ -460,9 +460,9 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
 
   // An option's visual is read through its alt, or its caption when it has one. A caption is for
   // what the visual can't say, so most visual options have an alt and no caption.
-  for (const { brick, path } of questions) {
-    if (brick.type !== "choice" && brick.type !== "compare") continue
-    brick.options.forEach((o, j) => {
+  for (const { kata, path } of questions) {
+    if (kata.type !== "choice" && kata.type !== "compare") continue
+    kata.options.forEach((o, j) => {
       const v = o.visual
       if (v && v.kind !== "code" && v.kind !== "math" && !v.alt && !o.text)
         add(
@@ -764,13 +764,13 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
       )
   }
 
-  lesson.bricks.forEach((brick, i) => {
-    if (brick.type !== "concept") return
-    const words = countWords(brick.body)
+  lesson.katas.forEach((kata, i) => {
+    if (kata.type !== "concept") return
+    const words = countWords(kata.body)
     if (words > LIMITS.conceptBodyWords) {
       add(
         "teaching",
-        `bricks[${i}].body`,
+        `katas[${i}].body`,
         `The concept body has ${words} words; keep it to ${LIMITS.conceptBodyWords} or fewer and one idea only.`
       )
     }
@@ -956,133 +956,133 @@ function languageName(code: string): string | null {
   }
 }
 
-/** Teach, then practise: concept bricks, each followed by the question bricks that practise it. */
+/** Teach, then practise: concept katas, each followed by the question katas that practise it. */
 function checkRhythm(
   lesson: Lesson,
   add: (k: IssueKind, p: string, m: string) => void
 ) {
   const { concepts, practicePerConcept, practiceTotal } = LIMITS
-  const conceptAt = lesson.bricks.flatMap((b, i) =>
+  const conceptAt = lesson.katas.flatMap((b, i) =>
     b.type === "concept" ? [i] : []
   )
-  if (lesson.bricks[0]?.type !== "concept") {
+  if (lesson.katas[0]?.type !== "concept") {
     add(
       "structure",
-      "bricks[0]",
-      `The first brick must be a concept brick. Teach the idea first, then add the question bricks that practise it.`
+      "katas[0]",
+      `The first kata must be a concept kata. Teach the idea first, then add the question katas that practise it.`
     )
   }
   if (conceptAt.length < concepts.min || conceptAt.length > concepts.max) {
     add(
       "structure",
-      "bricks",
-      `The lesson has ${conceptAt.length} concept bricks; it needs ${concepts.min}–${concepts.max}, one idea each.`
+      "katas",
+      `The lesson has ${conceptAt.length} concept katas; it needs ${concepts.min}–${concepts.max}, one idea each.`
     )
   }
   conceptAt.forEach((at, n) => {
-    const next = conceptAt[n + 1] ?? lesson.bricks.length
+    const next = conceptAt[n + 1] ?? lesson.katas.length
     const count = next - at - 1
     if (count < practicePerConcept.min || count > practicePerConcept.max) {
-      const id = lesson.bricks[at]!.id
+      const id = lesson.katas[at]!.id
       add(
         "structure",
-        `bricks[${at}]`,
-        `Concept brick "${id}" is followed by ${count} question bricks; it needs ${practicePerConcept.min}–${practicePerConcept.max} before the next concept brick or the challenge.`
+        `katas[${at}]`,
+        `Concept kata "${id}" is followed by ${count} question katas; it needs ${practicePerConcept.min}–${practicePerConcept.max} before the next concept kata or the challenge.`
       )
     }
   })
-  const practiceCount = lesson.bricks.length - conceptAt.length
+  const practiceCount = lesson.katas.length - conceptAt.length
   if (practiceCount < practiceTotal.min || practiceCount > practiceTotal.max) {
     add(
       "structure",
-      "bricks",
-      `The lesson has ${practiceCount} practice bricks in total; it needs ${practiceTotal.min}–${practiceTotal.max}. Add or remove question bricks (${practicePerConcept.min}–${practicePerConcept.max} after each concept brick).`
+      "katas",
+      `The lesson has ${practiceCount} practice katas in total; it needs ${practiceTotal.min}–${practiceTotal.max}. Add or remove question katas (${practicePerConcept.min}–${practicePerConcept.max} after each concept kata).`
     )
   }
 }
 
-function checkBrickReferences(
-  brick: QuestionBrick,
+function checkKataReferences(
+  kata: QuestionKata,
   path: string,
   add: (k: IssueKind, p: string, m: string) => void,
   language: string
 ) {
-  switch (brick.type) {
+  switch (kata.type) {
     case "choice": {
-      const ids = brick.options.map((o) => o.id)
+      const ids = kata.options.map((o) => o.id)
       for (const d of duplicates(ids))
         add(
           "structure",
           `${path}.options`,
           `Option id "${d}" is used more than once.`
         )
-      for (const c of brick.correct)
+      for (const c of kata.correct)
         if (!ids.includes(c))
           add(
             "structure",
             `${path}.correct`,
-            `"${c}" isn't one of this brick's option ids (${ids.join(", ")}).`
+            `"${c}" isn't one of this kata's option ids (${ids.join(", ")}).`
           )
-      if (!brick.multiple && brick.correct.length !== 1)
+      if (!kata.multiple && kata.correct.length !== 1)
         add(
           "structure",
           `${path}.correct`,
           `With "multiple": false, "correct" must list exactly one option id.`
         )
-      for (const d of duplicates(brick.correct))
+      for (const d of duplicates(kata.correct))
         add(
           "structure",
           `${path}.correct`,
           `"${d}" is listed more than once in "correct".`
         )
-      if (brick.correct.length >= ids.length)
+      if (kata.correct.length >= ids.length)
         add("teaching", `${path}.correct`, "At least one option must be wrong.")
-      sameLooking(brick.options, `${path}.options`, "Option", add)
+      sameLooking(kata.options, `${path}.options`, "Option", add)
       break
     }
     case "compare": {
-      const ids = brick.options.map((o) => o.id)
+      const ids = kata.options.map((o) => o.id)
       for (const d of duplicates(ids))
         add(
           "structure",
           `${path}.options`,
           `Option id "${d}" is used more than once.`
         )
-      if (!ids.includes(brick.correct))
+      if (!ids.includes(kata.correct))
         add(
           "structure",
           `${path}.correct`,
-          `"${brick.correct}" isn't one of this brick's option ids (${ids.join(", ")}).`
+          `"${kata.correct}" isn't one of this kata's option ids (${ids.join(", ")}).`
         )
-      sameLooking(brick.options, `${path}.options`, "Option", add)
+      sameLooking(kata.options, `${path}.options`, "Option", add)
       break
     }
     case "scenario": {
-      const ids = brick.options.map((o) => o.id)
+      const ids = kata.options.map((o) => o.id)
       for (const d of duplicates(ids))
         add(
           "structure",
           `${path}.options`,
           `Option id "${d}" is used more than once.`
         )
-      if (!brick.options.some((o) => o.quality === "best"))
+      if (!kata.options.some((o) => o.quality === "best"))
         add(
           "teaching",
           `${path}.options`,
           `A scenario needs at least one option with "quality": "best".`
         )
-      sameLooking(brick.options, `${path}.options`, "Option", add)
+      sameLooking(kata.options, `${path}.options`, "Option", add)
       break
     }
     case "order": {
-      const ids = brick.items.map((i) => i.id)
+      const ids = kata.items.map((i) => i.id)
       for (const d of duplicates(ids))
         add(
           "structure",
           `${path}.items`,
           `Item id "${d}" is used more than once.`
         )
-      ;(brick.alsoAccept ?? []).forEach((alt, i) => {
+      ;(kata.alsoAccept ?? []).forEach((alt, i) => {
         if (!sameSet(alt, ids))
           add(
             "structure",
@@ -1090,39 +1090,39 @@ function checkBrickReferences(
             `Each alternative order must list every item id exactly once (${ids.join(", ")}).`
           )
       })
-      sameLooking(brick.items, `${path}.items`, "Item", add)
+      sameLooking(kata.items, `${path}.items`, "Item", add)
       break
     }
     case "sort": {
-      const groupIds = brick.groups.map((g) => g.id)
+      const groupIds = kata.groups.map((g) => g.id)
       for (const d of duplicates(groupIds))
         add(
           "structure",
           `${path}.groups`,
           `Group id "${d}" is used more than once.`
         )
-      for (const d of duplicates(brick.items.map((i) => i.id)))
+      for (const d of duplicates(kata.items.map((i) => i.id)))
         add(
           "structure",
           `${path}.items`,
           `Item id "${d}" is used more than once.`
         )
-      brick.items.forEach((it, i) => {
+      kata.items.forEach((it, i) => {
         if (!groupIds.includes(it.group))
           add(
             "structure",
             `${path}.items[${i}].group`,
-            `"${it.group}" isn't one of this brick's group ids (${groupIds.join(", ")}).`
+            `"${it.group}" isn't one of this kata's group ids (${groupIds.join(", ")}).`
           )
       })
-      for (const i of lookalikes(brick.groups, (g) => looks({ text: g.label })))
+      for (const i of lookalikes(kata.groups, (g) => looks({ text: g.label })))
         add(
           "structure",
           `${path}.groups[${i}].label`,
-          `Group "${brick.groups[i]!.id}" has the same label as another group, so a learner can't tell which is which. Give each group its own label.`
+          `Group "${kata.groups[i]!.id}" has the same label as another group, so a learner can't tell which is which. Give each group its own label.`
         )
-      brick.items.forEach((it, i) => {
-        const twin = brick.items.find(
+      kata.items.forEach((it, i) => {
+        const twin = kata.items.find(
           (o, j) => j < i && o.group !== it.group && looks(o) === looks(it)
         )
         if (twin)
@@ -1136,7 +1136,7 @@ function checkBrickReferences(
     }
     case "match": {
       for (const side of ["left", "right"] as const)
-        for (const i of lookalikes(brick.pairs, (p) =>
+        for (const i of lookalikes(kata.pairs, (p) =>
           looks({ text: p[side] })
         ))
           add(
@@ -1147,10 +1147,10 @@ function checkBrickReferences(
       break
     }
     case "blank": {
-      const gaps = [...brick.template.matchAll(/\[\[([^\]]+)\]\]/g)].map(
+      const gaps = [...kata.template.matchAll(/\[\[([^\]]+)\]\]/g)].map(
         (m) => m[1]!
       )
-      const blankIds = brick.blanks.map((b) => b.id)
+      const blankIds = kata.blanks.map((b) => b.id)
       for (const d of duplicates(blankIds))
         add(
           "structure",
@@ -1178,11 +1178,11 @@ function checkBrickReferences(
             `Blank "${b}" doesn't appear in the template as [[${b}]].`
           )
       // Compared the way the player compares them (matchesBlank).
-      const right = (b: (typeof brick.blanks)[number], chip: string) =>
+      const right = (b: (typeof kata.blanks)[number], chip: string) =>
         b.accept.some((a) =>
-          matchesBlank(a, chip, { ...b, caseSensitive: brick.caseSensitive })
+          matchesBlank(a, chip, { ...b, caseSensitive: kata.caseSensitive })
         )
-      brick.blanks.forEach((b, i) => {
+      kata.blanks.forEach((b, i) => {
         const choices = b.choices ?? []
         if (b.choices && !choices.some((c) => right(b, c))) {
           add(
@@ -1197,7 +1197,7 @@ function checkBrickReferences(
           const matching = choices.filter((c) =>
             matchesBlank(answer, c, {
               ...b,
-              caseSensitive: brick.caseSensitive,
+              caseSensitive: kata.caseSensitive,
             })
           )
           if (matching.length < 2) return []
@@ -1217,7 +1217,7 @@ function checkBrickReferences(
             !choices.some((c) =>
               matchesBlank(m.answer, c, {
                 ...b,
-                caseSensitive: brick.caseSensitive,
+                caseSensitive: kata.caseSensitive,
               })
             )
           )
@@ -1229,10 +1229,10 @@ function checkBrickReferences(
         })
       })
       // A chip for every gap and none to spare is ordering, not a question.
-      const chips = [...new Set(brick.blanks.flatMap((b) => b.choices ?? []))]
+      const chips = [...new Set(kata.blanks.flatMap((b) => b.choices ?? []))]
       if (
         chips.length > 0 &&
-        chips.every((chip) => brick.blanks.some((b) => right(b, chip)))
+        chips.every((chip) => kata.blanks.some((b) => right(b, chip)))
       )
         add(
           "teaching",
@@ -1242,7 +1242,7 @@ function checkBrickReferences(
       break
     }
     case "hotspot": {
-      const ids = hotspotIds(brick.visual)
+      const ids = hotspotIds(kata.visual)
       if (ids.length === 0)
         add(
           "structure",
@@ -1255,26 +1255,26 @@ function checkBrickReferences(
           `${path}.visual`,
           `Hotspot id "${d}" is used more than once.`
         )
-      for (const c of brick.correct)
+      for (const c of kata.correct)
         if (!ids.includes(c))
           add(
             "structure",
             `${path}.correct`,
-            brick.visual.kind === "chess"
+            kata.visual.kind === "chess"
               ? `"${c}" isn't a square. On a chess board, "correct" lists squares: a file a–h then a rank 1–8, like "e4".`
-              : brick.visual.kind === "map"
-                ? notOnHotspotMap(c, brick.visual.region ?? "world")
+              : kata.visual.kind === "map"
+                ? notOnHotspotMap(c, kata.visual.region ?? "world")
                 : `"${c}" isn't one of this visual's hotspot ids (${ids.join(", ") || "none"}).`
           )
-      if (!brick.multiple && brick.correct.length !== 1)
+      if (!kata.multiple && kata.correct.length !== 1)
         add(
           "structure",
           `${path}.correct`,
           `With "multiple": false, "correct" must list exactly one hotspot id.`
         )
-      if (brick.visual.kind === "code") {
-        const lines = brick.visual.code.split("\n").length
-        const spots = brick.visual.hotspots ?? []
+      if (kata.visual.kind === "code") {
+        const lines = kata.visual.code.split("\n").length
+        const spots = kata.visual.hotspots ?? []
         spots.forEach((h, i) => {
           if (h.line > lines)
             add(
@@ -1292,10 +1292,10 @@ function checkBrickReferences(
             )
         })
       }
-      if (brick.visual.kind === "chess") {
+      if (kata.visual.kind === "chess") {
         // Marks on the board point the learner somewhere: on an answer square, they give it away.
-        const { highlight = [], arrows = [] } = brick.visual
-        for (const c of brick.correct) {
+        const { highlight = [], arrows = [] } = kata.visual
+        for (const c of kata.correct) {
           if (highlight.includes(c))
             add(
               "teaching",
@@ -1311,11 +1311,11 @@ function checkBrickReferences(
         }
         // The alt names the squares pieces stand on; an empty answer square named there is the
         // answer, read out before the learner taps (often as a move, like "Nc7+").
-        const read = readFen(brick.visual.fen)
-        const named = altSquares(brick.visual.alt ?? "")
+        const read = readFen(kata.visual.fen)
+        const named = altSquares(kata.visual.alt ?? "")
         const told =
           "placement" in read &&
-          brick.correct.find(
+          kata.correct.find(
             (c) => named.includes(c) && !pieceOn(read.placement, c)
           )
         if (told)
@@ -1325,10 +1325,10 @@ function checkBrickReferences(
             `The alt names ${told}, an answer, which gives it away to a screen reader. Describe the position (where the pieces stand), not the square to find.`
           )
       }
-      if (brick.visual.kind === "map") {
-        const region = brick.visual.region ?? "world"
-        const shaded = brick.visual.countries ?? []
-        for (const c of brick.correct) {
+      if (kata.visual.kind === "map") {
+        const region = kata.visual.region ?? "world"
+        const shaded = kata.visual.countries ?? []
+        for (const c of kata.correct) {
           const country = COUNTRIES[c]
           if (!country || !ids.includes(c)) continue
           // A name on the map, or the only shaded country, points the learner straight at it.
@@ -1356,12 +1356,12 @@ function checkBrickReferences(
         // among other countries is fine (the toggles name them all anyway); naming only answers
         // gives them away.
         const named = countriesNamed(
-          brick.visual.alt ?? "",
-          [...new Set([...brick.correct, ...Object.keys(DRAWN_SIZES[region])])],
+          kata.visual.alt ?? "",
+          [...new Set([...kata.correct, ...Object.keys(DRAWN_SIZES[region])])],
           language
         )
-        const answers = brick.correct.filter((c) => named.has(c))
-        const others = [...named].filter((c) => !brick.correct.includes(c))
+        const answers = kata.correct.filter((c) => named.has(c))
+        const others = [...named].filter((c) => !kata.correct.includes(c))
         if (answers.length && !others.length)
           add(
             "teaching",
@@ -1376,7 +1376,7 @@ function checkBrickReferences(
   }
 }
 
-/** Flags options or items that look like an earlier one in the same brick. */
+/** Flags options or items that look like an earlier one in the same kata. */
 function sameLooking(
   entries: { id: string; text?: string; visual?: Visual }[],
   path: string,

@@ -4,8 +4,8 @@ import * as React from "react"
 import { CheckIcon, XIcon } from "lucide-react"
 
 import type {
-  ConceptBrick as ConceptBrickData,
-  QuestionBrick,
+  ConceptKata as ConceptKataData,
+  QuestionKata,
 } from "@workspace/spec"
 import { Kbd } from "@workspace/ui/components/kbd"
 import { Selectable } from "@workspace/ui/components/selectable"
@@ -27,8 +27,8 @@ import { buzz, fly, shake } from "./motion"
 import { plainText, RichBlocks, RichText } from "./rich-text"
 import { Visual } from "./visuals"
 
-export interface QuestionBrickProps {
-  brick: QuestionBrick
+export interface QuestionKataProps {
+  kata: QuestionKata
   answer: Answer
   setAnswer: (answer: Answer) => void
   marks: Record<string, Mark>
@@ -103,17 +103,17 @@ const optionPanelStyles =
  * Theory: one idea with an optional visual. Nothing to answer. The visual sits under the title, as
  * in a question: the learner sees it first and the body explains it, and a tall one isn't missed below.
  */
-export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
+export function ConceptKata({ kata }: { kata: ConceptKataData }) {
   const title = (
-    <h2 className="text-lg font-semibold text-balance">{brick.title}</h2>
+    <h2 className="text-lg font-semibold text-balance">{kata.title}</h2>
   )
   const body = (
     <RichBlocks
-      text={brick.body}
+      text={kata.body}
       className="text-sm leading-relaxed text-pretty"
     />
   )
-  if (!brick.visual)
+  if (!kata.visual)
     return (
       <div className="flex flex-col gap-3">
         {title}
@@ -123,7 +123,7 @@ export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
   return (
     <>
       {title}
-      <Visual visual={brick.visual} />
+      <Visual visual={kata.visual} />
       {body}
     </>
   )
@@ -136,21 +136,21 @@ export function ConceptBrick({ brick }: { brick: ConceptBrickData }) {
  * visual on a panel, with its number key in the corner, and an optional caption under it. Options
  * that are only text are rows, even in a compare.
  */
-export function hasOptionCards(brick: QuestionBrick): boolean {
-  if (brick.type !== "compare" && brick.type !== "choice") return false
-  return brick.options.some((o) => o.visual)
+export function hasOptionCards(kata: QuestionKata): boolean {
+  if (kata.type !== "compare" && kata.type !== "choice") return false
+  return kata.options.some((o) => o.visual)
 }
 
 /**
  * The option row the explanation opens under: the one right answer in a list of rows. With cards,
- * several right answers, or no options, it goes below the brick instead (null).
+ * several right answers, or no options, it goes below the kata instead (null).
  */
 export function explanationAnchor(
-  brick: QuestionBrick,
+  kata: QuestionKata,
   marks: Record<string, Mark>
 ): string | null {
-  if (brick.type !== "choice" && brick.type !== "scenario") return null
-  if (hasOptionCards(brick)) return null
+  if (kata.type !== "choice" && kata.type !== "scenario") return null
+  if (hasOptionCards(kata)) return null
   const right = Object.keys(marks).filter((id) => marks[id] === "correct")
   return right.length === 1 ? right[0]! : null
 }
@@ -241,8 +241,8 @@ export function Note({
   )
 }
 
-export function OptionsBrick({
-  brick,
+export function OptionsKata({
+  kata,
   answer,
   setAnswer,
   marks,
@@ -251,7 +251,7 @@ export function OptionsBrick({
   showOutcomes,
   explanation = null,
   tried = [],
-}: QuestionBrickProps & {
+}: QuestionKataProps & {
   order: string[]
   showOutcomes: string[]
   /** Shown under the right answer's row (see explanationAnchor). */
@@ -261,11 +261,11 @@ export function OptionsBrick({
 }) {
   const { t, keyScope } = usePlayer()
   const isOptions =
-    brick.type === "choice" ||
-    brick.type === "compare" ||
-    brick.type === "scenario"
+    kata.type === "choice" ||
+    kata.type === "compare" ||
+    kata.type === "scenario"
   const selected = answer.kind === "select" ? answer.ids : []
-  const multiple = brick.type === "choice" && brick.multiple
+  const multiple = kata.type === "choice" && kata.multiple
   const toggle = (id: string) => {
     if (tried.includes(id)) return
     if (multiple)
@@ -280,7 +280,7 @@ export function OptionsBrick({
   const options = isOptions
     ? order
         .map((id) =>
-          (brick.options as { id: string }[]).find((o) => o.id === id)!
+          (kata.options as { id: string }[]).find((o) => o.id === id)!
         )
         .filter(Boolean)
     : []
@@ -307,13 +307,13 @@ export function OptionsBrick({
   }, [ids, locked, keyScope])
 
   if (!isOptions) return null
-  const cards = hasOptionCards(brick)
-  const anchor = explanation ? explanationAnchor(brick, marks) : null
+  const cards = hasOptionCards(kata)
+  const anchor = explanation ? explanationAnchor(kata, marks) : null
 
   return (
     <div
       role="group"
-      aria-label={brick.prompt}
+      aria-label={kata.prompt}
       className={cn(
         "grid gap-3",
         // Two columns from sm up. Phones keep one column for a pair (a compare's two screens need the
@@ -441,19 +441,19 @@ export function OptionsBrick({
 
 // ---------- hotspot ----------
 
-export function HotspotBrick({
-  brick,
+export function HotspotKata({
+  kata,
   answer,
   setAnswer,
   marks,
   locked,
-}: QuestionBrickProps) {
-  if (brick.type !== "hotspot") return null
+}: QuestionKataProps) {
+  if (kata.type !== "hotspot") return null
   const selected = answer.kind === "select" ? answer.ids : []
   const onToggle = (id: string) =>
     setAnswer({
       kind: "select",
-      ids: brick.multiple
+      ids: kata.multiple
         ? selected.includes(id)
           ? selected.filter((x) => x !== id)
           : [...selected, id]
@@ -461,9 +461,9 @@ export function HotspotBrick({
     })
   return (
     <Visual
-      visual={brick.visual}
+      visual={kata.visual}
       hotspots={{ selected, marks, onToggle, disabled: locked }}
-      label={brick.prompt}
+      label={kata.prompt}
     />
   )
 }
@@ -472,14 +472,14 @@ export function HotspotBrick({
 
 // Tap an item, then its match in the other column (either side can go first). Each pair is judged as
 // it's made: a right pair flashes green and stays matched, greyed out, so the board empties as you go;
-// a wrong one shakes yellow, comes apart, and costs the brick its first-try score (`onSlip`). The last
-// pair checks the brick (`onDone`), so there's no Check to press.
+// a wrong one shakes yellow, comes apart, and costs the kata its first-try score (`onSlip`). The last
+// pair checks the kata (`onDone`), so there's no Check to press.
 
-/** How long a pair shows its result before it settles (and, after the last pair, the brick checks). */
+/** How long a pair shows its result before it settles (and, after the last pair, the kata checks). */
 const PAIR_FLASH = 450
 
-export function MatchBrick({
-  brick,
+export function MatchKata({
+  kata,
   answer,
   setAnswer,
   marks,
@@ -487,11 +487,11 @@ export function MatchBrick({
   rightOrder,
   onSlip,
   onDone,
-}: QuestionBrickProps & {
+}: QuestionKataProps & {
   rightOrder: number[]
-  /** A wrong pair was made: the brick no longer counts as right first time. */
+  /** A wrong pair was made: the kata no longer counts as right first time. */
   onSlip?: () => void
-  /** The last pair is matched: check the brick. */
+  /** The last pair is matched: check the kata. */
   onDone?: () => void
 }) {
   const root = React.useRef<HTMLDivElement>(null)
@@ -518,16 +518,16 @@ export function MatchBrick({
   const done = React.useRef(onDone)
   done.current = onDone
   const complete =
-    brick.type === "match" &&
+    kata.type === "match" &&
     answer.kind === "pairs" &&
-    Object.keys(answer.links).length === brick.pairs.length
+    Object.keys(answer.links).length === kata.pairs.length
   React.useEffect(() => {
     if (!complete || locked) return
     const id = window.setTimeout(() => done.current?.(), PAIR_FLASH)
     return () => window.clearTimeout(id)
   }, [complete, locked])
 
-  if (brick.type !== "match" || answer.kind !== "pairs") return null
+  if (kata.type !== "match" || answer.kind !== "pairs") return null
   const links = answer.links
   const matchedRight = new Set(Object.values(links))
   const isArmed = (side: "left" | "right", index: number) =>
@@ -542,8 +542,8 @@ export function MatchBrick({
     setSaid(
       good
         ? t.matched(
-            plainText(brick.pairs[left]!.left),
-            plainText(brick.pairs[right]!.right)
+            plainText(kata.pairs[left]!.left),
+            plainText(kata.pairs[right]!.right)
           )
         : t.notAPair
     )
@@ -600,16 +600,16 @@ export function MatchBrick({
 
   // Both columns share the grid's rows (a subgrid), so each item is as tall as the one beside it. The
   // columns stay whole in the DOM, so keyboards and screen readers go down one column, then the other.
-  const rows = { gridRow: `span ${brick.pairs.length}` }
+  const rows = { gridRow: `span ${kata.pairs.length}` }
   return (
     <div
       ref={root}
       className="grid grid-cols-2 gap-x-3 gap-y-2"
-      style={{ gridTemplateRows: `repeat(${brick.pairs.length}, auto)` }}
+      style={{ gridTemplateRows: `repeat(${kata.pairs.length}, auto)` }}
     >
       <div className="grid min-w-0 grid-rows-subgrid" style={rows}>
-        {brick.pairs.map((p, i) =>
-          tile("left", i, p.left, brick.leftLang, i in links)
+        {kata.pairs.map((p, i) =>
+          tile("left", i, p.left, kata.leftLang, i in links)
         )}
       </div>
       <div className="grid min-w-0 grid-rows-subgrid" style={rows}>
@@ -617,8 +617,8 @@ export function MatchBrick({
           tile(
             "right",
             j,
-            brick.pairs[j]!.right,
-            brick.rightLang,
+            kata.pairs[j]!.right,
+            kata.rightLang,
             matchedRight.has(j)
           )
         )}
@@ -661,14 +661,14 @@ export function chipsInGaps(
  * onto that line, and tapping it there sends it back. A used word leaves a soft ghost in the bank,
  * so the other chips stay put.
  */
-export function BlankBrick({
-  brick,
+export function BlankKata({
+  kata,
   answer,
   setAnswer,
   marks,
   locked,
   bank,
-}: QuestionBrickProps & { bank: string[] }) {
+}: QuestionKataProps & { bank: string[] }) {
   const { t, keyScope } = usePlayer()
   const uid = React.useId().replace(/[^\w-]/g, "")
   const root = React.useRef<HTMLDivElement>(null)
@@ -683,7 +683,7 @@ export function BlankBrick({
   }, [wrong])
 
   const values = answer.kind === "gaps" ? answer.values : {}
-  const gapIds = brick.type === "blank" ? brick.blanks.map((b) => b.id) : []
+  const gapIds = kata.type === "blank" ? kata.blanks.map((b) => b.id) : []
   const firstEmpty = gapIds.find((id) => !values[id])
   const target = active && !values[active] ? active : firstEmpty
   const placed = chipsInGaps(gapIds, values, bank)
@@ -726,10 +726,10 @@ export function BlankBrick({
     return () => window.removeEventListener("keydown", onKey)
   }, [locked, keyScope, bank.length])
 
-  if (brick.type !== "blank" || answer.kind !== "gaps") return null
-  const code = brick.format === "code"
+  if (kata.type !== "blank" || answer.kind !== "gaps") return null
+  const code = kata.format === "code"
   const words = [...new Set(bank)]
-  const parts = brick.template.split(/(\[\[[^\]]+\]\])/)
+  const parts = kata.template.split(/(\[\[[^\]]+\]\])/)
   const vt = (i: number) => `learn-${uid}-w${i}`
   // One reading size: the words are the sentence's size (code's is mono), set apart by weight and chip.
   // A word is the same chip in the bank and in a gap, so it reads as one thing moving.
@@ -740,7 +740,7 @@ export function BlankBrick({
     <div ref={root} className="flex flex-col gap-8">
       {/* The sentence is the content: on the page, at reading size, with no card around it. */}
       <div
-        lang={brick.lang}
+        lang={kata.lang}
         dir={code ? "ltr" : undefined}
         className={cn(
           "whitespace-pre-wrap",
@@ -825,12 +825,12 @@ export function BlankBrick({
               isSelected={gone}
               onChange={() => !gone && place(word)}
               isDisabled={locked || gone}
-              lang={brick.lang}
+              lang={kata.lang}
               data-vt={gone ? undefined : vt(i)}
               className={cn(
                 "flex items-center gap-2",
                 gone
-                  ? // An outlined slot holds its place, so the other chips don't move (like the sort brick's empty lanes).
+                  ? // An outlined slot holds its place, so the other chips don't move (like the sort kata's empty lanes).
                     cn(slotStyles, "py-1 ps-3 pe-2 text-transparent", size)
                   : cn(controlStyles, "py-1 ps-3 pe-2", size)
               )}

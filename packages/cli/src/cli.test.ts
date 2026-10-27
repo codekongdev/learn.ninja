@@ -56,7 +56,7 @@ const bundle = (over: Partial<Record<string, unknown>> = {}) => ({
   ...manifest(over),
   files: GUIDES,
 })
-const valid = { status: 200, body: { ok: true, spec: "0.8" } }
+const valid = { status: 200, body: { ok: true, spec: "0.9" } }
 
 /** A server with current guides and a checker that accepts everything; tests override routes. */
 function setup(routes: Routes = {}) {
@@ -333,7 +333,7 @@ describe("learn validate", () => {
     const t = setup()
     expect(await run(["validate", "lesson.json"], t.io)).toBe(0)
     expect(t.methods()).toContain("POST /api/validate")
-    expect(t.out.join("\n")).toMatch(/is a valid lesson \(spec 0\.8\)/)
+    expect(t.out.join("\n")).toMatch(/is a valid lesson \(spec 0\.9\)/)
   })
 
   it("lists the server's issues", async () => {
@@ -343,13 +343,13 @@ describe("learn validate", () => {
         body: {
           ok: false,
           error: "invalid_lesson",
-          issues: [{ path: "bricks[1]", message: "Needs feedback" }],
+          issues: [{ path: "katas[1]", message: "Needs feedback" }],
         },
       },
     })
     expect(await run(["validate", "lesson.json"], t.io)).toBe(1)
     expect(t.err.join("\n")).toMatch(
-      /1 issue to fix:\n- bricks\[1\]: Needs feedback/
+      /1 issue to fix:\n- katas\[1\]: Needs feedback/
     )
   })
 
@@ -378,11 +378,11 @@ describe("learn validate", () => {
       /is a valid lesson.*\nChecked offline with the bundled rules \(couldn't reach https:\/\/learn\.ninja/
     )
     const broken = JSON.parse(lesson)
-    delete broken.bricks[1].options[1].feedback
+    delete broken.katas[1].options[1].feedback
     writeFileSync(join(t.cwd, "lesson.json"), JSON.stringify(broken))
     expect(await run(["validate", "lesson.json"], t.io)).toBe(1)
     expect(t.err.join("\n")).toMatch(
-      /1 issue to fix:\n- bricks\[1\]\.options\[1\]: Wrong option "b" has no feedback.*\nChecked offline/
+      /1 issue to fix:\n- katas\[1\]\.options\[1\]: Wrong option "b" has no feedback.*\nChecked offline/
     )
   })
 

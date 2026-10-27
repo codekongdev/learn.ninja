@@ -1,4 +1,4 @@
-import type { Lesson, QuestionBrick } from "@workspace/spec"
+import type { Lesson, QuestionKata } from "@workspace/spec"
 
 import { buildSequence, type Item, type Outcome } from "./flow"
 import { freshQuestion, type QuestionState, type State } from "./lesson-player"
@@ -6,7 +6,7 @@ import { UI_TRANSLATIONS } from "./strings"
 
 // Where a learner is in a lesson, kept in the browser so reopening the page (or reloading it)
 // carries on from the same screen instead of the intro. One entry per lesson, keyed by the page.
-// Only what can't be rebuilt from the lesson is kept: the bricks come back from the lesson itself,
+// Only what can't be rebuilt from the lesson is kept: the katas come back from the lesson itself,
 // so each save stays small however big the lesson's visuals are.
 
 const PREFIX = "learn:progress:"
@@ -15,7 +15,7 @@ const KEEP_MS = 7 * 24 * 3.6e6
 /** Bumped whenever `Kept` changes shape. Version 1 kept the whole State; it still loads. */
 const VERSION = 2
 
-/** A State without its bricks: questions are named by id. */
+/** A State without its katas: questions are named by id. */
 interface Kept {
   index: number
   results: Record<string, Outcome>
@@ -34,7 +34,7 @@ interface Saved {
   /** The lesson's content when the progress was saved; a changed lesson starts over. */
   fingerprint: string
   savedAt: number
-  /** For a feed that doesn't load the lesson: the bricks behind the learner, out of all of them. */
+  /** For a feed that doesn't load the lesson: the katas behind the learner, out of all of them. */
   progress: { done: number; total: number }
   state: Kept
 }
@@ -58,7 +58,7 @@ export function browserStorage(): Storage | null {
 
 /** A short hash (FNV-1a) of the lesson's teaching content: the title and summary may change freely. */
 export function fingerprint(lesson: Lesson): string {
-  const text = JSON.stringify([lesson.hook, lesson.bricks, lesson.challenge])
+  const text = JSON.stringify([lesson.hook, lesson.katas, lesson.challenge])
   let hash = 0x811c9dc5
   for (let i = 0; i < text.length; i++) {
     hash ^= text.charCodeAt(i)
@@ -178,7 +178,7 @@ function prune(storage: Storage) {
 
 /**
  * How far the learner got in a lesson they left midway, for a feed that doesn't hold the lesson
- * itself: the bricks behind them (the hook, the lesson's bricks, and the challenge; fix-round
+ * itself: the katas behind them (the hook, the lesson's katas, and the challenge; fix-round
  * retries don't count) out of all of them. Null when nothing is saved under the key or it's over
  * a week old. Without the lesson there's no fingerprint check, so an edited lesson still shows its
  * old progress until it's opened.
@@ -226,7 +226,7 @@ function countProgress(
   let done = 0
   let total = 0
   items.forEach((item, i) => {
-    if (!("brick" in item) || (item.kind === "question" && item.role === "fix"))
+    if (!("kata" in item) || (item.kind === "question" && item.role === "fix"))
       return
     total++
     if (i < index) done++
@@ -234,15 +234,15 @@ function countProgress(
   return { done, total }
 }
 
-/** The state without its bricks. */
+/** The state without its katas. */
 function keep(state: State): Kept {
   return {
     index: state.index,
     results: state.results,
     retries: state.items.flatMap((item) =>
-      item.kind === "question" && item.role === "fix" ? [item.brick.id] : []
+      item.kind === "question" && item.role === "fix" ? [item.kata.id] : []
     ),
-    mistakes: (state.mistakes ?? []).map((brick) => brick.id),
+    mistakes: (state.mistakes ?? []).map((kata) => kata.id),
     fixed: state.fixed,
     inFix: state.inFix,
     fixQueued: state.fixQueued,
@@ -255,27 +255,27 @@ const OUTCOMES = new Set<unknown>(["first", "second", "missed"])
 const PHASES = new Set<unknown>(["answering", "feedback", "revealed"])
 
 /**
- * The State a kept one stands for, with the bricks taken from the lesson. Anything it holds that
+ * The State a kept one stands for, with the katas taken from the lesson. Anything it holds that
  * doesn't fit (a field from an older player, a question the lesson no longer has) is replaced by
  * its default or, where nothing sensible can stand in, makes the whole thing null, so a stale save
  * starts the lesson over instead of breaking it.
  */
 function restore(kept: unknown, lesson: Lesson): State | null {
   if (!isObject(kept)) return null
-  const questions = new Map<string, QuestionBrick>(
+  const questions = new Map<string, QuestionKata>(
     [
       lesson.hook,
-      ...lesson.bricks.filter((b): b is QuestionBrick => b.type !== "concept"),
+      ...lesson.katas.filter((b): b is QuestionKata => b.type !== "concept"),
       lesson.challenge,
-    ].map((brick) => [brick.id, brick])
+    ].map((kata) => [kata.id, kata])
   )
-  const bricks = (ids: unknown) => {
+  const katas = (ids: unknown) => {
     if (!Array.isArray(ids)) return []
     const found = ids.map((id) => questions.get(id as string))
-    return found.every(Boolean) ? (found as QuestionBrick[]) : null
+    return found.every(Boolean) ? (found as QuestionKata[]) : null
   }
-  const retries = bricks(kept.retries)
-  const mistakes = bricks(kept.mistakes)
+  const retries = katas(kept.retries)
+  const mistakes = katas(kept.mistakes)
   if (!retries || !mistakes) return null
 
   const items = buildSequence(lesson)
@@ -283,7 +283,7 @@ function restore(kept: unknown, lesson: Lesson): State | null {
   items.splice(
     fixAt + 1,
     0,
-    ...retries.map((brick): Item => ({ kind: "question", brick, role: "fix" }))
+    ...retries.map((kata): Item => ({ kind: "question", kata, role: "fix" }))
   )
   const index = kept.index
   if (!Number.isInteger(index) || !items[index as number]) return null

@@ -17,7 +17,7 @@ The web app runs at http://localhost:3000: the home page, the docs at `/docs`, a
 npm run storybook
 ```
 
-Storybook runs at http://localhost:6006, with every brick type in every state.
+Storybook runs at http://localhost:6006, with every kata type in every state.
 
 ## The lesson skill
 
@@ -35,9 +35,9 @@ The docs live in [`docs/`](docs) as Markdown (`.md`) or MDX (`.mdx`) files, one 
 
 - Each page starts with a `title` and a `description`.
 - Each folder's `meta.json` sets the sidebar order. A list ending in `"..."` also picks up new files.
-- `<BrickPreview lesson="compound-interest" brick="p1" />` shows a playable brick from one of the lessons in `examples/` (MDX pages only).
+- `<KataPreview lesson="compound-interest" kata="p1" />` shows a playable kata from one of the lessons in `examples/` (MDX pages only).
 
-Edit a page, run `npm run dev`, and open http://localhost:3000/docs to see it. `npm run check` catches missing titles, sidebar entries that point nowhere, and demos that name a lesson or brick that doesn't exist.
+Edit a page, run `npm run dev`, and open http://localhost:3000/docs to see it. `npm run check` catches missing titles, sidebar entries that point nowhere, and demos that name a lesson or kata that doesn't exist.
 
 ## Checks
 
@@ -55,7 +55,7 @@ Runs lint, type-checking, and tests across every package. CI runs the same check
 | `apps/storybook`  | Storybook for the player and UI components               |
 | `docs/`           | The docs pages                                           |
 | `packages/ui`     | shadcn/ui components on React Aria, shared styles        |
-| `packages/spec`   | The lesson spec (v0.8)                                   |
+| `packages/spec`   | The lesson spec (v0.9)                                   |
 | `packages/player` | Lesson screens and building blocks                       |
 | `packages/cli`    | The `learn` command: validate and publish lessons        |
 | `skills/learn`    | The installable lesson skill                             |

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import type { Lesson } from "@workspace/spec"
 
-import { BrickDemo } from "../brick-demo"
+import { KataDemo } from "../kata-demo"
 import { Visual } from "../visuals"
 import { lessons, PlayerFrame, prepared } from "./fixtures"
 import { moleculeSamples } from "./visual-kit"
@@ -74,7 +74,7 @@ export const NotDrawn: Story = {
 const moleculeLesson: Lesson = {
   ...lessons.buttons,
   language: "en",
-  bricks: [
+  katas: [
     {
       id: "c1",
       type: "concept",
@@ -110,20 +110,20 @@ const moleculeLesson: Lesson = {
       explanation:
         "Propan-1-ol has an OH on a carbon with no C=O beside it, so it's an alcohol.",
     },
-    ...lessons.buttons.bricks.slice(2),
+    ...lessons.buttons.katas.slice(2),
   ],
 } as Lesson
 
 export const InAConcept: Story = {
   args: { visual: byName("Ethanol") },
   render: () => (
-    <BrickDemo lesson={moleculeLesson} brickId="c1" prepared={prepared} />
+    <KataDemo lesson={moleculeLesson} kataId="c1" prepared={prepared} />
   ),
 }
 
 export const AsOptions: Story = {
   args: { visual: byName("Ethanol") },
   render: () => (
-    <BrickDemo lesson={moleculeLesson} brickId="p1" prepared={prepared} />
+    <KataDemo lesson={moleculeLesson} kataId="p1" prepared={prepared} />
   ),
 }

@@ -113,9 +113,9 @@ describe("checkFunctionCharts", () => {
     const result = validateLesson(buttonHierarchy)
     if (!result.ok) throw new Error("example invalid")
     const lesson: Lesson = structuredClone(result.lesson)
-    const brick = lesson.bricks[0]!
-    if (brick.type !== "concept") throw new Error("expected a concept")
-    brick.visual = {
+    const kata = lesson.katas[0]!
+    if (kata.type !== "concept") throw new Error("expected a concept")
+    kata.visual = {
       kind: "chart",
       type: "function",
       alt: "Three curves.",
@@ -129,8 +129,8 @@ describe("checkFunctionCharts", () => {
     expect(validateLesson(lesson).ok).toBe(true)
     const issues = checkFunctionCharts(lesson)
     expect(issues.map((i) => i.path)).toEqual([
-      "bricks[0].visual.series[1].expression",
-      "bricks[0].visual.series[2].expression",
+      "katas[0].visual.series[1].expression",
+      "katas[0].visual.series[2].expression",
     ])
     expect(issues[0]!.message).toMatch(/no finite value/)
     expect(issues[1]!.message).toMatch(/formula in x/)
@@ -141,8 +141,8 @@ describe("checkFunctionCharts", () => {
     const result = validateLesson(buttonHierarchy)
     if (!result.ok) throw new Error("example invalid")
     const lesson: Lesson = structuredClone(result.lesson)
-    const brick = lesson.bricks[0]!
-    if (brick.type !== "concept") throw new Error("expected a concept")
+    const kata = lesson.katas[0]!
+    if (kata.type !== "concept") throw new Error("expected a concept")
     const chart = (y: { min?: number; max?: number }) => ({
       kind: "chart" as const,
       type: "function" as const,
@@ -151,21 +151,21 @@ describe("checkFunctionCharts", () => {
       y,
       series: [{ expression: "x^2" }],
     })
-    brick.visual = chart({ min: 2 })
+    kata.visual = chart({ min: 2 })
     expect(checkFunctionCharts(lesson)).toEqual([
       expect.objectContaining({
-        path: "bricks[0].visual.y.min",
+        path: "katas[0].visual.y.min",
         message: expect.stringMatching(/stay at or below "y.min" \(2\)/),
       }),
     ])
-    brick.visual = chart({ max: -1 })
+    kata.visual = chart({ max: -1 })
     expect(checkFunctionCharts(lesson).map((i) => i.path)).toEqual([
-      "bricks[0].visual.y.max",
+      "katas[0].visual.y.max",
     ])
     // Reaching past the given end, or with both ends given, is fine.
-    brick.visual = chart({ min: 0.5 })
+    kata.visual = chart({ min: 0.5 })
     expect(checkFunctionCharts(lesson)).toEqual([])
-    brick.visual = chart({ min: 2, max: 3 })
+    kata.visual = chart({ min: 2, max: 3 })
     expect(checkFunctionCharts(lesson)).toEqual([])
   })
 })

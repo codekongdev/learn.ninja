@@ -3,7 +3,7 @@ import type { MDXComponents } from "mdx/types"
 
 import { docsHref } from "@/lib/docs-nav"
 
-import { BrickPreview } from "./brick-preview"
+import { KataPreview } from "./kata-preview"
 import { CodeBlock } from "./code-block"
 import { CopyPrompt } from "./copy-prompt"
 
@@ -26,6 +26,6 @@ export const mdxComponents: MDXComponents = {
       <table {...props} />
     </div>
   ),
-  BrickPreview,
+  KataPreview,
   CopyPrompt,
 }

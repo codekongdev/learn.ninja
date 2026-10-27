@@ -26,7 +26,7 @@ The body is the lesson file. A valid lesson returns `201`:
   "expiresAt": "2026-10-26T09:00:00.000Z",
   "owner": null,
   "visibility": "unlisted",
-  "spec": "0.8"
+  "spec": "0.9"
 }
 ```
 
@@ -130,7 +130,7 @@ POST /api/validate
 Content-Type: application/json
 ```
 
-The body is the lesson file. Runs the checks publishing runs and stores nothing. A valid lesson returns `200` with `{ "ok": true, "spec": "0.8" }`, plus `notes` when the checker tidied something (see [Publish a lesson](#publish-a-lesson)); an invalid one returns the same errors as publishing. The skill's `validate` command uses this.
+The body is the lesson file. Runs the checks publishing runs and stores nothing. A valid lesson returns `200` with `{ "ok": true, "spec": "0.9" }`, plus `notes` when the checker tidied something (see [Publish a lesson](#publish-a-lesson)); an invalid one returns the same errors as publishing. The skill's `validate` command uses this.
 
 ## The skill's guides
 

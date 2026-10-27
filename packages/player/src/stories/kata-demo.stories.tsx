@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { BrickDemo } from "../brick-demo"
+import { KataDemo } from "../kata-demo"
 import { lessons, prepared } from "./fixtures"
 
-// One brick, playable on its own, as on the home page and in the docs. Continue starts it over.
+// One kata, playable on its own, as on the home page and in the docs. Continue starts it over.
 
 const meta = {
-  title: "Player/Brick demo",
-  component: BrickDemo,
-  args: { lesson: lessons.buttons, brickId: "p1", prepared },
+  title: "Player/Kata demo",
+  component: KataDemo,
+  args: { lesson: lessons.buttons, kataId: "p1", prepared },
   argTypes: {
     lesson: { control: false },
     prepared: { control: false },
@@ -21,14 +21,14 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof BrickDemo>
+} satisfies Meta<typeof KataDemo>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Choice: Story = {}
 
-/** Without the Check and help buttons, as in the docs: the brick can be tried but not checked. */
+/** Without the Check and help buttons, as in the docs: the kata can be tried but not checked. */
 export const NoActions: Story = {
   args: { actions: false },
 }
@@ -39,17 +39,17 @@ export const CheckedWrong: Story = {
 }
 
 export const Concept: Story = {
-  args: { lesson: lessons.compound, brickId: "c1" },
+  args: { lesson: lessons.compound, kataId: "c1" },
 }
 
 export const Sort: Story = {
-  args: { lesson: lessons.coding, brickId: "p3" },
+  args: { lesson: lessons.coding, kataId: "p3" },
 }
 
 export const BlankWithCode: Story = {
-  args: { lesson: lessons.coding, brickId: "p1" },
+  args: { lesson: lessons.coding, kataId: "p1" },
 }
 
 export const Scenario: Story = {
-  args: { lesson: lessons.prd, brickId: "ch" },
+  args: { lesson: lessons.prd, kataId: "ch" },
 }

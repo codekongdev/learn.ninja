@@ -68,7 +68,7 @@ export function validateLesson(input: string | unknown): ValidationResult {
     : { ok: true, lesson: parsed.data, issues: [], notes }
 }
 
-/** ["bricks", 2, "options", 1] → "bricks[2].options[1]" */
+/** ["katas", 2, "options", 1] → "katas[2].options[1]" */
 export function formatPath(path: PropertyKey[]): string {
   return path.reduce<string>(
     (out, key) =>

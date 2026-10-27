@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import type { Lesson, Visual as VisualSpec } from "@workspace/spec"
 
-import { BrickDemo } from "../brick-demo"
+import { KataDemo } from "../kata-demo"
 import { Visual } from "../visuals"
 import { lessons, PlayerFrame, prepared } from "./fixtures"
 import { chartSamples } from "./visual-kit"
@@ -131,7 +131,7 @@ export const CoordinatePlane: Story = figure(chartSamples[1]!.chart)
 /** Clocks as the options of a question, drawn smaller on the cards. */
 const clockLesson: Lesson = {
   ...lessons.buttons,
-  bricks: [
+  katas: [
     {
       id: "p1",
       type: "choice",
@@ -158,13 +158,13 @@ const clockLesson: Lesson = {
       explanation:
         "A quarter to four is 3:45: the minute hand on the 9, and the hour hand most of the way to the 4.",
     },
-    ...lessons.buttons.bricks.slice(1),
+    ...lessons.buttons.katas.slice(1),
   ],
 } as Lesson
 
 export const ClocksAsOptions: Story = {
   args: { visual: { kind: "clock", time: "3:45" } },
   render: () => (
-    <BrickDemo lesson={clockLesson} brickId="p1" prepared={prepared} />
+    <KataDemo lesson={clockLesson} kataId="p1" prepared={prepared} />
   ),
 }

@@ -1,5 +1,5 @@
 {
-  "spec": "0.8",
+  "spec": "0.9",
   "title": "Button hierarchy",
   "summary": "Learn how primary, secondary, and tertiary buttons tell people what to do next.",
   "objective": "Give each view one clear primary action and style the rest by importance.",
@@ -34,7 +34,7 @@
     "correct": "b",
     "explanation": "When one button stands out, people know the main action at a glance."
   },
-  "bricks": [
+  "katas": [
     {
       "id": "c1",
       "type": "concept",

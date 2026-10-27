@@ -1,4 +1,4 @@
-import type { ConceptBrick, Lesson, QuestionBrick } from "@workspace/spec"
+import type { ConceptKata, Lesson, QuestionKata } from "@workspace/spec"
 
 // The order a lesson plays in, and how the score is counted.
 
@@ -6,22 +6,22 @@ export type Role = "hook" | "practice" | "challenge" | "fix"
 
 export type Item =
   | { kind: "intro" }
-  | { kind: "concept"; brick: ConceptBrick }
-  | { kind: "question"; brick: QuestionBrick; role: Role }
+  | { kind: "concept"; kata: ConceptKata }
+  | { kind: "question"; kata: QuestionKata; role: Role }
   | { kind: "fix" }
   | { kind: "wrap" }
 
-/** Intro → hook → the lesson's bricks → challenge → fix-your-mistakes slot → wrap-up. */
+/** Intro → hook → the lesson's katas → challenge → fix-your-mistakes slot → wrap-up. */
 export function buildSequence(lesson: Lesson): Item[] {
   return [
     { kind: "intro" },
-    { kind: "question", brick: lesson.hook, role: "hook" },
-    ...lesson.bricks.map((brick): Item =>
-      brick.type === "concept"
-        ? { kind: "concept", brick }
-        : { kind: "question", brick, role: "practice" }
+    { kind: "question", kata: lesson.hook, role: "hook" },
+    ...lesson.katas.map((kata): Item =>
+      kata.type === "concept"
+        ? { kind: "concept", kata }
+        : { kind: "question", kata, role: "practice" }
     ),
-    { kind: "question", brick: lesson.challenge, role: "challenge" },
+    { kind: "question", kata: lesson.challenge, role: "challenge" },
     { kind: "fix" },
     { kind: "wrap" },
   ]
@@ -31,9 +31,9 @@ export function buildSequence(lesson: Lesson): Item[] {
 export type Outcome = "first" | "second" | "missed"
 
 /** Practice and challenge questions count toward the score; the hook and concepts don't. */
-export function scoredQuestions(lesson: Lesson): QuestionBrick[] {
+export function scoredQuestions(lesson: Lesson): QuestionKata[] {
   return [
-    ...lesson.bricks.filter((b): b is QuestionBrick => b.type !== "concept"),
+    ...lesson.katas.filter((b): b is QuestionKata => b.type !== "concept"),
     lesson.challenge,
   ]
 }
@@ -45,8 +45,8 @@ export function summarize(
   results: Record<string, Outcome>
 ): Summary {
   const summary: Summary = { first: 0, second: 0, missed: 0, total: 0 }
-  for (const brick of scoredQuestions(lesson)) {
-    summary[results[brick.id] ?? "missed"]++
+  for (const kata of scoredQuestions(lesson)) {
+    summary[results[kata.id] ?? "missed"]++
     summary.total++
   }
   return summary
@@ -82,7 +82,7 @@ export function progressAt(
   const missed = (i: Item) =>
     i.kind === "question" &&
     i.role !== "fix" &&
-    results[i.brick.id] === "missed"
+    results[i.kata.id] === "missed"
   const passed = items
     .slice(1, Math.min(index, fixAt))
     .filter((i) => !missed(i))
@@ -90,7 +90,7 @@ export function progressAt(
     .slice(fixAt + 1, Math.max(index, fixAt + 1))
     .filter(
       (i) =>
-        i.kind === "question" && i.role === "fix" && fixed.includes(i.brick.id)
+        i.kind === "question" && i.role === "fix" && fixed.includes(i.kata.id)
     )
   return Math.round(
     ((passed.length + retried.length) / Math.max(1, fixAt - 1)) * 100

@@ -1,5 +1,5 @@
 {
-  "spec": "0.8",
+  "spec": "0.9",
   "title": "Writing a PRD",
   "summary": "Learn the core parts of a product requirements document and why each one matters.",
   "objective": "Write a PRD that starts with the problem, sets measurable goals, and keeps solutions out of requirements.",
@@ -29,7 +29,7 @@
     "multiple": false,
     "explanation": "A PRD starts with the problem. Without it, nobody can judge whether dark mode is the right solution."
   },
-  "bricks": [
+  "katas": [
     {
       "id": "c1",
       "type": "concept",

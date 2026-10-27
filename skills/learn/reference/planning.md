@@ -49,7 +49,7 @@ Stay faithful to the source. If the input is an article, teach what it says; don
 
 ## Size
 
-Pick the size from how much the input covers, not from the level. Every size has the same rhythm: each concept brick is followed by 2–4 question bricks.
+Pick the size from how much the input covers, not from the level. Every size has the same rhythm: each concept kata is followed by 2–4 question katas.
 
 | Size | When | Shape | `estimatedMinutes` |
 | --- | --- | --- | --- |
@@ -57,7 +57,7 @@ Pick the size from how much the input covers, not from the level. Every size has
 | `standard` | One idea with two or three parts. **The default.** | 2–3 concepts × 2–4 (at most 8 questions) | 5–10 |
 | `long` | One idea with four parts that only make sense together, or the user asks for depth | 4 concepts × 2–3 (at most 12) | 10–15 |
 
-The checker's hard limits hold for every size: 1–4 concept bricks, 2–4 question bricks after each, 3–12 question bricks in total, at most 20 bricks in `bricks`, 3–15 minutes. Anything bigger than a long lesson becomes a path. Set `estimatedMinutes` honestly.
+The checker's hard limits hold for every size: 1–4 concept katas, 2–4 question katas after each, 3–12 question katas in total, at most 20 katas in `katas`, 3–15 minutes. Anything bigger than a long lesson becomes a path. Set `estimatedMinutes` honestly.
 
 ## Paths
 
@@ -65,7 +65,7 @@ A path is 2–6 lessons, each a complete lesson of its own, ordered from simple 
 
 1. **Plan the whole path, then write only lesson 1.** Building every lesson up front takes a long time, and learners learn more from spreading lessons over several sessions than from doing them back to back.
 2. **Keep a plan file.** Make a folder for the path with `path.md` in it: the path's title, one line on why it's in this order, and each lesson's number, title, its one idea, and its status (the link once published, or "not made yet"). Put each lesson in its own subfolder (`1-visibility/lesson.json`), so each keeps its own `.learn/state.json` and link.
-3. **Link the lessons.** Set each lesson's `wrapup.next` to the next lesson's title. A later lesson can't assume the learner remembers an earlier one: if it needs an earlier idea, restate it in a sentence in its first concept brick.
+3. **Link the lessons.** Set each lesson's `wrapup.next` to the next lesson's title. A later lesson can't assume the learner remembers an earlier one: if it needs an earlier idea, restate it in a sentence in its first concept kata.
 4. **Report the path.** After publishing lesson 1, list the remaining lessons by title and offer to make the next one. When the user asks, read `path.md`, write and publish the next lesson, and update its status.
 
 Each lesson's link expires 7 days after it's published, like any lesson.

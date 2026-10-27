@@ -157,7 +157,7 @@ async function answer(page: Page) {
       return
     }
 
-    // Everything else: tap the last control in the brick that isn't picked yet (the pool and the word
+    // Everything else: tap the last control in the kata that isn't picked yet (the pool and the word
     // bank come after what's been placed) until Check lights up.
     for (let i = 0; i < 20 && !ready(); i++) {
       const controls = [

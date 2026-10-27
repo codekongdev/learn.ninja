@@ -19,10 +19,10 @@ describe("JSON Schema", () => {
       properties: { hook: { $ref: string } }
       $defs: Record<string, Union>
     }
-    expect(schema.properties.hook.$ref).toBe("#/$defs/HookBrick")
-    const hook = schema.$defs.HookBrick!
+    expect(schema.properties.hook.$ref).toBe("#/$defs/HookKata")
+    const hook = schema.$defs.HookKata!
     const variants = (hook.oneOf ?? hook.anyOf)!.map((v) => v.$ref)
-    expect(variants).toEqual(["#/$defs/ChoiceBrick", "#/$defs/CompareBrick"])
+    expect(variants).toEqual(["#/$defs/ChoiceKata", "#/$defs/CompareKata"])
   })
 
   it("names its shared definitions so LLMs can read it", () => {

@@ -14,9 +14,9 @@ import {
 
 import {
   matchesBlank,
-  type ConceptBrick as ConceptBrickData,
+  type ConceptKata as ConceptKataData,
   type Lesson,
-  type QuestionBrick,
+  type QuestionKata,
 } from "@workspace/spec"
 import { Alert, AlertDescription } from "@workspace/ui/components/alert"
 import { Badge } from "@workspace/ui/components/badge"
@@ -57,19 +57,19 @@ import { challengeFor, type Challenge } from "./challenge"
 import { CreatorProvider } from "./creator"
 import {
   hasOptionCards,
-  BlankBrick,
-  ConceptBrick,
-  HotspotBrick,
-  MatchBrick,
+  BlankKata,
+  ConceptKata,
+  HotspotKata,
+  MatchKata,
   Explanation,
   explanationAnchor,
   Note,
-  OptionsBrick,
-} from "./bricks"
+  OptionsKata,
+} from "./katas"
 import { shortcutBlocked } from "./keys"
 import { BRAND } from "./logo"
-import { OrderBrick } from "./order"
-import { SortBrick } from "./sort"
+import { OrderKata } from "./order"
+import { SortKata } from "./sort"
 import {
   buildSequence,
   outcomeFor,
@@ -176,7 +176,7 @@ export interface LessonPlayerProps {
   onThemeChange?: (theme: Theme) => void
   /** Called when the learner renames the lesson in the header. The player shows the new name either way. */
   onRename?: (title: string) => void
-  /** For demos: open on this brick instead of the intro, shuffled the same way on the server and in the browser. */
+  /** For demos: open on this kata instead of the intro, shuffled the same way on the server and in the browser. */
   startAt?: string
   /** For demos on a page with other players: only take keyboard shortcuts from inside this player. */
   scopeKeys?: boolean
@@ -425,7 +425,7 @@ export interface QuestionState {
   optionOrder: string[]
   rightOrder: number[]
   bank: string[]
-  /** A scenario opens with the ninja's brief: false until he's told it (true for other bricks). */
+  /** A scenario opens with the ninja's brief: false until he's told it (true for other katas). */
   briefed: boolean
   /** How many times the brief has been replayed, so each telling starts fresh. */
   briefs: number
@@ -437,7 +437,7 @@ export interface State {
   items: Item[]
   index: number
   results: Record<string, Outcome>
-  mistakes: QuestionBrick[]
+  mistakes: QuestionKata[]
   /** Ids of the fix round's questions answered right. */
   fixed: string[]
   inFix: boolean
@@ -453,44 +453,44 @@ export function freshQuestion(
   random: () => number = Math.random
 ): QuestionState | null {
   if (!item || item.kind !== "question") return null
-  const brick = item.brick
+  const kata = item.kata
   const optionIds =
-    "options" in brick
-      ? (brick.options as { id: string }[]).map((o) => o.id)
+    "options" in kata
+      ? (kata.options as { id: string }[]).map((o) => o.id)
       : []
   return {
-    answer: initialAnswer(brick, random),
+    answer: initialAnswer(kata, random),
     attempts: 0,
     hintOpen: false,
     whyOpen: false,
     result: null,
     phase: "answering",
     optionOrder:
-      brick.type === "compare" ? optionIds : shuffle(optionIds, random),
+      kata.type === "compare" ? optionIds : shuffle(optionIds, random),
     rightOrder:
-      brick.type === "match"
+      kata.type === "match"
         ? shuffle(
-            brick.pairs.map((_, i) => i),
+            kata.pairs.map((_, i) => i),
             random
           )
         : [],
-    bank: brick.type === "blank" ? shuffle(wordBank(brick), random) : [],
-    briefed: brick.type !== "scenario",
+    bank: kata.type === "blank" ? shuffle(wordBank(kata), random) : [],
+    briefed: kata.type !== "scenario",
     briefs: 0,
     tried: [],
   }
 }
 
 /**
- * The word chips for a blank brick: every choice once, except a word that more than one gap accepts,
+ * The word chips for a blank kata: every choice once, except a word that more than one gap accepts,
  * which gets a chip per such gap (otherwise the second gap could never be filled).
  */
-export function wordBank(brick: Extract<QuestionBrick, { type: "blank" }>) {
-  const words = [...new Set(brick.blanks.flatMap((b) => b.choices ?? []))]
+export function wordBank(kata: Extract<QuestionKata, { type: "blank" }>) {
+  const words = [...new Set(kata.blanks.flatMap((b) => b.choices ?? []))]
   return words.flatMap((word) => {
-    const needed = brick.blanks.filter((b) =>
+    const needed = kata.blanks.filter((b) =>
       b.accept.some((a) =>
-        matchesBlank(a, word, { ...b, caseSensitive: brick.caseSensitive })
+        matchesBlank(a, word, { ...b, caseSensitive: kata.caseSensitive })
       )
     ).length
     return Array<string>(Math.max(1, needed)).fill(word)
@@ -499,9 +499,9 @@ export function wordBank(brick: Extract<QuestionBrick, { type: "blank" }>) {
 
 function start(lesson: Lesson, startAt?: string, run = 0): State {
   const items = buildSequence(lesson)
-  // A demo opens on one brick; its shuffle is seeded so the server and the browser agree.
+  // A demo opens on one kata; its shuffle is seeded so the server and the browser agree.
   const at = startAt
-    ? items.findIndex((i) => "brick" in i && i.brick.id === startAt)
+    ? items.findIndex((i) => "kata" in i && i.kata.id === startAt)
     : -1
   const index = at < 0 ? 0 : at
   return {
@@ -539,7 +539,7 @@ export function earnedMoment(
     .slice(0, state.index + 1)
     .flatMap((i) =>
       i.kind === "question" && i.role !== "hook"
-        ? [state.results[i.brick.id]]
+        ? [state.results[i.kata.id]]
         : []
     )
   let streak = 0
@@ -593,7 +593,7 @@ export type Action =
   | { type: "briefed" }
   | { type: "rebrief" }
   | { type: "check" }
-  /** A wrong pair in a match: it isn't kept, but the brick no longer counts as right first time. */
+  /** A wrong pair in a match: it isn't kept, but the kata no longer counts as right first time. */
   | { type: "slip" }
   | { type: "retry" }
   | { type: "startFix" }
@@ -622,9 +622,9 @@ export function reducer(state: State, action: Action): State {
       }
     }
     case "startFix": {
-      const retries: Item[] = state.mistakes.map((brick) => ({
+      const retries: Item[] = state.mistakes.map((kata) => ({
         kind: "question",
-        brick,
+        kata,
         role: "fix",
       }))
       const items = [
@@ -679,15 +679,15 @@ export function reducer(state: State, action: Action): State {
       if (!state.question || item?.kind !== "question") return state
       const s = state.question
       // A scenario rewinds to the decision: its marks clear and the missed pick is crossed out.
-      const rewind = item.brick.type === "scenario"
+      const rewind = item.kata.type === "scenario"
       return {
         ...state,
         question: {
           ...s,
           phase: "answering",
-          answer: retryAnswer(item.brick, s.answer),
+          answer: retryAnswer(item.kata, s.answer),
           // There's no help button: a miss earns the hint on the second try.
-          hintOpen: Boolean(item.brick.hint),
+          hintOpen: Boolean(item.kata.hint),
           ...(rewind
             ? {
                 result: null,
@@ -707,23 +707,23 @@ export function reducer(state: State, action: Action): State {
         : state
     case "check": {
       if (!state.question || item?.kind !== "question") return state
-      const { brick, role } = item
+      const { kata, role } = item
       const s = state.question
-      const result = checkAnswer(brick, s.answer)
+      const result = checkAnswer(kata, s.answer)
       if (role === "hook")
         return { ...state, question: { ...s, result, phase: "revealed" } }
       if (result.correct) {
         const results =
-          role === "fix" || brick.id in state.results
+          role === "fix" || kata.id in state.results
             ? state.results
             : {
                 ...state.results,
-                [brick.id]: outcomeFor(s.attempts),
+                [kata.id]: outcomeFor(s.attempts),
               }
         return {
           ...state,
           results,
-          fixed: role === "fix" ? [...state.fixed, brick.id] : state.fixed,
+          fixed: role === "fix" ? [...state.fixed, kata.id] : state.fixed,
           question: { ...s, result, phase: "feedback" },
         }
       }
@@ -736,9 +736,9 @@ export function reducer(state: State, action: Action): State {
       const results =
         role === "fix"
           ? state.results
-          : { ...state.results, [brick.id]: "missed" as const }
+          : { ...state.results, [kata.id]: "missed" as const }
       const mistakes =
-        role === "fix" ? state.mistakes : [...state.mistakes, brick]
+        role === "fix" ? state.mistakes : [...state.mistakes, kata]
       return {
         ...state,
         results,
@@ -748,7 +748,7 @@ export function reducer(state: State, action: Action): State {
           attempts,
           result,
           phase: "revealed",
-          answer: solution(brick),
+          answer: solution(kata),
         },
       }
     }
@@ -965,7 +965,7 @@ function Player({
     canWhy &&
     whyOpen &&
     item.kind === "question" &&
-    item.brick.type === "scenario"
+    item.kata.type === "scenario"
   React.useEffect(() => {
     if (!pathsOpen) return
     const frame = requestAnimationFrame(() => {
@@ -994,7 +994,7 @@ function Player({
       dispatch({ type: "next" })
     }, 200)
   }, [])
-  // "Start lesson" makes the intro vanish in a puff of smoke before the first brick arrives.
+  // "Start lesson" makes the intro vanish in a puff of smoke before the first kata arrives.
   const [vanishing, setVanishing] = React.useState(false)
   const vanishingRef = React.useRef(false)
   // A whoosh of wind as he goes, loaded ahead so it starts with the press. It follows the Sound
@@ -1020,7 +1020,7 @@ function Player({
   }, [whooshOn])
   const seenConcepts = state.items
     .slice(0, state.index + 1)
-    .flatMap((i) => (i.kind === "concept" ? [i.brick] : []))
+    .flatMap((i) => (i.kind === "concept" ? [i.kata] : []))
   // The ninja lives on the card and reacts to each check: pleased when it's right, sorry when it's not.
   const cardRef = React.useRef<HTMLDivElement>(null)
   const q = state.question
@@ -1070,7 +1070,7 @@ function Player({
   // there's no brief: the situation is on the question screen.
   const briefKey =
     item.kind === "question" &&
-    item.brick.type === "scenario" &&
+    item.kata.type === "scenario" &&
     q &&
     !q.briefed &&
     ninja !== "off"
@@ -1189,7 +1189,7 @@ function Player({
                   className={cn(
                     "mx-auto flex min-h-full w-full flex-col gap-8 px-4 py-16",
                     // A lesson screen starts at the top, so nothing moves when feedback or the
-                    // tray appears and each brick's prompt lands in the same place; the intro and
+                    // tray appears and each kata's prompt lands in the same place; the intro and
                     // wrap-up stay centered. On larger windows the offset follows the height, so
                     // short content still sits near the optical center.
                     item.kind === "concept" || item.kind === "question"
@@ -1440,7 +1440,7 @@ function NinjaSlot({ show, gap }: { show: boolean; gap: string }) {
   )
 }
 
-/** Questions and short screens read best narrow; visuals and side-by-side bricks need room. */
+/** Questions and short screens read best narrow; visuals and side-by-side katas need room. */
 /**
  * The next screen's HTML visual, drawn out of sight in a column as wide as that screen's, so its
  * frame has loaded and measured its height (knownHeights in visuals.tsx) before the screen arrives,
@@ -1450,9 +1450,9 @@ function NinjaSlot({ show, gap }: { show: boolean; gap: string }) {
 function VisualsAhead({ item }: { item: Item | undefined }) {
   const visual =
     (item?.kind === "concept" ||
-      (item?.kind === "question" && item.brick.type !== "hotspot")) &&
-    item.brick.visual?.kind === "html"
-      ? item.brick.visual
+      (item?.kind === "question" && item.kata.type !== "hotspot")) &&
+    item.kata.visual?.kind === "html"
+      ? item.kata.visual
       : null
   if (!visual) return null
   return (
@@ -1473,31 +1473,31 @@ function columnWidth(item: Item): string {
   // The wrap-up's row of actions needs a step more than a question.
   if (item.kind === "wrap") return "max-w-xl"
   if (item.kind === "concept")
-    return item.brick.visual ? "max-w-2xl" : "max-w-lg"
+    return item.kata.visual ? "max-w-2xl" : "max-w-lg"
   if (item.kind !== "question") return "max-w-lg"
-  const { brick } = item
+  const { kata } = item
   const wide =
-    Boolean(brick.visual) ||
-    hasOptionCards(brick) ||
-    brick.type === "sort" ||
-    brick.type === "match" ||
-    brick.type === "hotspot"
+    Boolean(kata.visual) ||
+    hasOptionCards(kata) ||
+    kata.type === "sort" ||
+    kata.type === "match" ||
+    kata.type === "hotspot"
   return wide ? "max-w-2xl" : "max-w-lg"
 }
 
 /** Instructions above the prompt, only where the interaction isn't obvious (a single pick needs none). */
-function helperFor(brick: QuestionBrick, t: Strings): string {
-  switch (brick.type) {
+function helperFor(kata: QuestionKata, t: Strings): string {
+  switch (kata.type) {
     case "choice":
-      return brick.multiple ? t.helper.choiceMany : ""
+      return kata.multiple ? t.helper.choiceMany : ""
     case "compare":
     case "scenario":
     case "number":
       return ""
     case "hotspot":
-      return brick.multiple ? t.helper.choiceMany : ""
+      return kata.multiple ? t.helper.choiceMany : ""
     default:
-      return t.helper[brick.type]
+      return t.helper[kata.type]
   }
 }
 
@@ -1558,7 +1558,7 @@ export function Screen({
         // Styled like a question (no card of its own), so the screens read as one lesson.
         <>
           {label ? <ScreenLabel text={label} className="-mb-4" /> : null}
-          <ConceptBrick brick={item.brick} />
+          <ConceptKata kata={item.kata} />
         </>
       )
     case "fix":
@@ -1691,12 +1691,12 @@ function QuestionScreen({
   storyMode?: boolean
 }) {
   const { t } = usePlayer()
-  const { brick, role } = item
-  if (brief && brick.type === "scenario")
+  const { kata, role } = item
+  if (brief && kata.type === "scenario")
     return (
       <Briefing
         key={brief.key}
-        text={brick.situation}
+        text={kata.situation}
         lang={lang}
         skip={brief.skip}
         onTold={brief.onTold}
@@ -1710,15 +1710,15 @@ function QuestionScreen({
   // learner's answer), the last pick keeps its mark beside the right one.
   const keepsPick =
     role === "hook" ||
-    brick.type === "choice" ||
-    brick.type === "compare" ||
-    brick.type === "scenario" ||
-    brick.type === "hotspot"
+    kata.type === "choice" ||
+    kata.type === "compare" ||
+    kata.type === "scenario" ||
+    kata.type === "hotspot"
   const marks: Record<string, Mark> =
-    paths && brick.type === "scenario"
+    paths && kata.type === "scenario"
       ? // Every path: each option in its own color, best, okay or poor.
         Object.fromEntries(
-          brick.options.map((o) => [
+          kata.options.map((o) => [
             o.id,
             o.quality === "best"
               ? "correct"
@@ -1730,36 +1730,36 @@ function QuestionScreen({
       : state.phase !== "revealed"
         ? (state.result?.marks ?? {})
         : keepsPick
-          ? { ...solutionMarks(brick), ...state.result?.marks }
-          : solutionMarks(brick)
+          ? { ...solutionMarks(kata), ...state.result?.marks }
+          : solutionMarks(kata)
   const explanation =
-    !inBubble && explanationShown(state, role) ? brick.explanation : null
+    !inBubble && explanationShown(state, role) ? kata.explanation : null
   const props = {
-    brick,
+    kata,
     answer: state.answer,
     setAnswer: (answer: Answer) => dispatch({ type: "answer", answer }),
     marks,
     locked,
   }
   // How to answer, when the interaction isn't obvious: above the prompt, beside the screen's label.
-  const helper = helperFor(brick, t)
+  const helper = helperFor(kata, t)
   const eyebrow = [
     label,
-    helper && !brick.prompt.includes(helper) ? helper : "",
+    helper && !kata.prompt.includes(helper) ? helper : "",
   ]
     .filter(Boolean)
     .join(" · ")
   const best =
-    brick.type === "scenario"
-      ? brick.options.filter((o) => o.quality === "best").map((o) => o.id)
+    kata.type === "scenario"
+      ? kata.options.filter((o) => o.quality === "best").map((o) => o.id)
       : []
   // In the player a pick's outcome is in the note under the answers, so rows show outcomes only
   // for Every path. A lone demo shows them under the picked row and, once revealed, the best one.
   const showOutcomes =
-    brick.type !== "scenario"
+    kata.type !== "scenario"
       ? []
       : paths
-        ? brick.options.map((o) => o.id)
+        ? kata.options.map((o) => o.id)
         : !state.result
           ? []
           : [
@@ -1769,14 +1769,14 @@ function QuestionScreen({
               ...(!inBubble && state.phase === "revealed" ? best : []),
             ]
   // After the brief, the question rises in behind him as he heads back to his corner.
-  const arrive = storyMode && brick.type === "scenario"
+  const arrive = storyMode && kata.type === "scenario"
   const at = (delay: number) =>
     arrive ? rise(delay) : { className: undefined, style: undefined }
 
   return (
     <>
       {eyebrow ? <ScreenLabel text={eyebrow} className="-mb-4" /> : null}
-      {brick.type === "scenario" ? (
+      {kata.type === "scenario" ? (
         // The situation, kept in view while choosing. In story mode it's what the ninja just said.
         <Card size="sm" className={at(0).className} style={at(0).style}>
           <CardContent className="flex items-start gap-3 text-muted-foreground [&_code]:text-foreground [&_strong]:text-foreground">
@@ -1784,7 +1784,7 @@ function QuestionScreen({
               <Ninja className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
             ) : null}
             <RichText
-              text={brick.situation}
+              text={kata.situation}
               className="min-w-0 flex-1 text-pretty"
             />
             {storyMode && state.phase === "answering" ? (
@@ -1805,16 +1805,16 @@ function QuestionScreen({
         className={cn("text-lg font-semibold", at(200).className)}
         style={at(200).style}
       >
-        <RichText text={brick.prompt} />
+        <RichText text={kata.prompt} />
       </h2>
-      {brick.visual && brick.type !== "hotspot" ? (
-        <Visual visual={brick.visual} />
+      {kata.visual && kata.type !== "hotspot" ? (
+        <Visual visual={kata.visual} />
       ) : null}
-      {brick.type === "choice" ||
-      brick.type === "compare" ||
-      brick.type === "scenario" ? (
+      {kata.type === "choice" ||
+      kata.type === "compare" ||
+      kata.type === "scenario" ? (
         <div className={at(380).className} style={at(380).style}>
-          <OptionsBrick
+          <OptionsKata
             {...props}
             order={state.optionOrder}
             showOutcomes={showOutcomes}
@@ -1822,33 +1822,33 @@ function QuestionScreen({
             tried={state.tried}
           />
         </div>
-      ) : brick.type === "hotspot" ? (
-        <HotspotBrick {...props} />
-      ) : brick.type === "sort" ? (
-        <SortBrick {...props} />
-      ) : brick.type === "order" ? (
-        <OrderBrick {...props} />
-      ) : brick.type === "match" ? (
-        <MatchBrick
+      ) : kata.type === "hotspot" ? (
+        <HotspotKata {...props} />
+      ) : kata.type === "sort" ? (
+        <SortKata {...props} />
+      ) : kata.type === "order" ? (
+        <OrderKata {...props} />
+      ) : kata.type === "match" ? (
+        <MatchKata
           {...props}
           rightOrder={state.rightOrder}
           onSlip={() => dispatch({ type: "slip" })}
           onDone={() => dispatch({ type: "check" })}
         />
-      ) : brick.type === "blank" ? (
-        <BlankBrick {...props} bank={state.bank} />
+      ) : kata.type === "blank" ? (
+        <BlankKata {...props} bank={state.bank} />
       ) : null}
-      {explanation && !explanationAnchor(brick, marks) ? (
+      {explanation && !explanationAnchor(kata, marks) ? (
         <Explanation text={explanation} />
       ) : null}
       {!inBubble &&
       state.hintOpen &&
-      brick.hint &&
+      kata.hint &&
       state.phase !== "revealed" ? (
         <Alert>
           <LightbulbIcon aria-hidden="true" />
           <AlertDescription className="text-base text-foreground">
-            <RichText text={brick.hint} />
+            <RichText text={kata.hint} />
           </AlertDescription>
         </Alert>
       ) : null}
@@ -2054,7 +2054,7 @@ export function ActionArea({
   ninja?: boolean
   /** The ninja's character, which picks the voice of the feedback lines. */
   level?: NinjaLevel
-  /** The lesson's line picker, shared across screens so lines don't repeat. A demo of one brick can omit it. */
+  /** The lesson's line picker, shared across screens so lines don't repeat. A demo of one kata can omit it. */
   pickLine?: LinePicker
   /** The ninja says his line out loud (the player, with sound on and the ninja not Off). */
   speak?: boolean
@@ -2154,12 +2154,12 @@ export function ActionArea({
       : { label: t.skip, onPress: brief.onSkip, variant: "outline" }
   } else if (item.kind === "question" && state.question) {
     const s = state.question
-    const { brick, role } = item
+    const { kata, role } = item
     const r = s.result
     const missText = (res: CheckResult) =>
       res.feedback ?? (res.missKey ? missMessage(res, t) : null)
     // In the player a scenario is a story: the ninja says what each pick led to, a miss rewinds.
-    const story = inBubble && brick.type === "scenario"
+    const story = inBubble && kata.type === "scenario"
     if (s.phase === "answering") {
       // Until every sort item is in a group, Check says how many are left instead.
       const unsorted =
@@ -2167,13 +2167,13 @@ export function ActionArea({
       primary = {
         label: unsorted ? t.sortLeft(unsorted) : t.check,
         onPress: () => dispatch({ type: "check" }),
-        isDisabled: !isReady(brick, s.answer),
+        isDisabled: !isReady(kata, s.answer),
       }
       // Try again clears the bubble: the miss already said the hint. After a scenario's rewind
       // the miss said its outcome, so the hint comes now.
-      if (story && s.tried.length > 0 && brick.hint) {
+      if (story && s.tried.length > 0 && kata.hint) {
         title = t.hint
-        message = brick.hint
+        message = kata.hint
       }
     } else if (role === "hook" && r) {
       // The hook is a guess, so a miss still moves on, but both get the colors a checked answer would.
@@ -2182,15 +2182,15 @@ export function ActionArea({
       title = say(r.correct ? "goodGuess" : "hookMiss")
       // In the player the concept after the warm-up does the explaining, so the bubble says only how it went.
       message = r.correct || inBubble ? null : missText(r)
-      if (!inBubble) explanation = brick.explanation
+      if (!inBubble) explanation = kata.explanation
       primary = { ...primary, variant: r.correct ? "success" : "warning" }
     } else if (s.phase === "feedback" && r?.correct) {
       tone = "good"
       title = say(earnedMoment(state, item) ?? "praise")
-      explanation = brick.explanation
+      explanation = kata.explanation
       // What the pick led to; with Every path open the rows show every outcome, so he says why.
-      if (story) message = why?.open ? brick.explanation : (r.feedback ?? null)
-      else if (inBubble && why?.open) message = brick.explanation
+      if (story) message = why?.open ? kata.explanation : (r.feedback ?? null)
+      else if (inBubble && why?.open) message = kata.explanation
       noteTone = "good"
       primary = { ...primary, variant: "success" }
     } else if (s.phase === "feedback" && r && story) {
@@ -2214,7 +2214,7 @@ export function ActionArea({
           ? say("nudge")
           : (missText(r) ?? say("nudge"))
       message = inBubble
-        ? (brick.hint ?? missText(r))
+        ? (kata.hint ?? missText(r))
         : r.partial
           ? missText(r)
           : null
@@ -2224,10 +2224,10 @@ export function ActionArea({
         variant: "warning",
       }
     } else if (s.phase === "revealed") {
-      // The answer and why it's right open in the brick, so the toast only points there.
+      // The answer and why it's right open in the kata, so the toast only points there.
       title = say("answer")
-      explanation = brick.explanation
-      if (inBubble) message = brick.explanation
+      explanation = kata.explanation
+      if (inBubble) message = kata.explanation
       noteTone = "good"
     }
     if (!inBubble && explanation && !explanationShown(s, role))
@@ -2268,7 +2268,7 @@ export function ActionArea({
           primaryRef.current?.focus()
         }}
       >
-        {item.kind === "question" && item.brick.type === "scenario"
+        {item.kind === "question" && item.kata.type === "scenario"
           ? t.everyPath
           : t.why}
       </Button>

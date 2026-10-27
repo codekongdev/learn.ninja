@@ -1,4 +1,4 @@
-import type { Brick, Lesson, Visual } from "./schema"
+import type { Kata, Lesson, Visual } from "./schema"
 
 // Small values and helpers the player shares with the checker, kept apart from Zod (schema.ts) and
 // KaTeX (rules.ts) so importing them doesn't pull either into the browser's bundle.
@@ -15,7 +15,7 @@ export const LIMITS = {
   /** Numbered ticks on a number line, so the numbers stay readable on a phone. */
   numberLineTicks: 21,
   concepts: { min: 1, max: 4 },
-  /** Question bricks after each concept brick. */
+  /** Question katas after each concept kata. */
   practicePerConcept: { min: 2, max: 4 },
   practiceTotal: { min: 3, max: 12 },
   promptWords: 40,
@@ -36,26 +36,26 @@ export function fractionStep(step: number): number | undefined {
   return n >= 2 && n <= 12 && Math.abs(n * step - 1) < 6e-3 ? n : undefined
 }
 
-/** Every visual in the lesson with its path: on bricks, on options, and on items. */
+/** Every visual in the lesson with its path: on katas, on options, and on items. */
 export function everyVisual(
   lesson: Lesson
 ): { visual: Visual; path: string }[] {
   const out: { visual: Visual; path: string }[] = []
-  const bricks: { brick: Brick; path: string }[] = [
-    { brick: lesson.hook, path: "hook" },
-    ...lesson.bricks.map((brick, i) => ({ brick, path: `bricks[${i}]` })),
-    { brick: lesson.challenge, path: "challenge" },
+  const katas: { kata: Kata; path: string }[] = [
+    { kata: lesson.hook, path: "hook" },
+    ...lesson.katas.map((kata, i) => ({ kata, path: `katas[${i}]` })),
+    { kata: lesson.challenge, path: "challenge" },
   ]
-  for (const { brick, path } of bricks) {
-    if ("visual" in brick && brick.visual)
-      out.push({ visual: brick.visual, path: `${path}.visual` })
-    if ("options" in brick)
-      brick.options.forEach((o, j) => {
+  for (const { kata, path } of katas) {
+    if ("visual" in kata && kata.visual)
+      out.push({ visual: kata.visual, path: `${path}.visual` })
+    if ("options" in kata)
+      kata.options.forEach((o, j) => {
         if ("visual" in o && o.visual)
           out.push({ visual: o.visual, path: `${path}.options[${j}].visual` })
       })
-    if ("items" in brick)
-      brick.items.forEach((it, j) => {
+    if ("items" in kata)
+      kata.items.forEach((it, j) => {
         if ("visual" in it && it.visual)
           out.push({ visual: it.visual, path: `${path}.items[${j}].visual` })
       })
@@ -63,7 +63,7 @@ export function everyVisual(
   return out
 }
 
-/** How a blank compares a chip with an accepted answer: its own options and the brick's caseSensitive. */
+/** How a blank compares a chip with an accepted answer: its own options and the kata's caseSensitive. */
 export interface BlankComparison {
   caseSensitive?: boolean
   numeric?: boolean

@@ -1,6 +1,6 @@
 # Levels
 
-A lesson's `level` says who it's for. It changes what the lesson assumes, how hard the questions are, and how much help they give. It doesn't change the shape: every level has the same hook, concepts with 2–4 question bricks each, challenge, and takeaways, within the same limits. The size (`reference/planning.md`) sets how many concepts.
+A lesson's `level` says who it's for. It changes what the lesson assumes, how hard the questions are, and how much help they give. It doesn't change the shape: every level has the same hook, concepts with 2–4 question katas each, challenge, and takeaways, within the same limits. The size (`reference/planning.md`) sets how many concepts.
 
 ## Pick the level
 

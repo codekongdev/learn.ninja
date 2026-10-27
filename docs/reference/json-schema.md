@@ -15,7 +15,7 @@ It's also bundled with the skill at `schema/lesson.schema.json`. Don't add a `$s
 
 Some rules span several fields, so the schema can't express them. The [CLI's `validate`](/docs/reference/cli#validate) and the [API](/docs/reference/api) check these too:
 
-- The first brick is a concept; each concept is followed by two to four question bricks.
+- The first kata is a concept; each concept is followed by two to four question katas.
 - Ids are unique, and every reference points to something real.
 - Every wrong option has feedback.
 - Formulas render, and HTML visuals contain no scripts or external URLs.

@@ -1,5 +1,5 @@
-// The one recipe for the controls inside a brick (options, chips, sort and order items, placed words),
-// so every brick's controls share a shape and a height. See "Control sizes" in the learn-ui-guidelines skill.
+// The one recipe for the controls inside a kata (options, chips, sort and order items, placed words),
+// so every kata's controls share a shape and a height. See "Control sizes" in the learn-ui-guidelines skill.
 
 /** A control's look without its states: for pictures of a control that take no pointer themselves. */
 export const controlSurface =
