@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest"
 import {
   validateLesson,
   type Lesson,
-  type QuestionBrick,
+  type QuestionKata,
 } from "@workspace/spec"
 
 import {
@@ -49,38 +49,38 @@ const allLessons = [
 ]
 const allQuestions = allLessons.flatMap((l) => [
   l.hook,
-  ...l.bricks.filter((b): b is QuestionBrick => b.type !== "concept"),
+  ...l.katas.filter((b): b is QuestionKata => b.type !== "concept"),
   l.challenge,
 ])
 
-/** The i-th question brick after a lesson's nth concept brick. */
+/** The i-th question kata after a lesson's nth concept kata. */
 const p = (l: Lesson, concept: number, i: number) => {
-  const at = l.bricks.filter((b) => b.type === "concept")[concept]!
-  return l.bricks[l.bricks.indexOf(at) + 1 + i] as QuestionBrick
+  const at = l.katas.filter((b) => b.type === "concept")[concept]!
+  return l.katas[l.katas.indexOf(at) + 1 + i] as QuestionKata
 }
 
 describe("every question in every example", () => {
   it.each(
-    allQuestions.map((s) => [s.id + ":" + s.type, s] as [string, QuestionBrick])
-  )("%s: its solution checks as correct", (_, brick) => {
-    expect(isReady(brick, solution(brick))).toBe(true)
-    expect(checkAnswer(brick, solution(brick)).correct).toBe(true)
+    allQuestions.map((s) => [s.id + ":" + s.type, s] as [string, QuestionKata])
+  )("%s: its solution checks as correct", (_, kata) => {
+    expect(isReady(kata, solution(kata))).toBe(true)
+    expect(checkAnswer(kata, solution(kata)).correct).toBe(true)
   })
 
   it.each(
-    allQuestions.map((s) => [s.id + ":" + s.type, s] as [string, QuestionBrick])
-  )("%s: the starting answer isn't already correct", (_, brick) => {
-    const start = initialAnswer(brick, () => 0.42)
-    expect(isReady(brick, start) && checkAnswer(brick, start).correct).toBe(
+    allQuestions.map((s) => [s.id + ":" + s.type, s] as [string, QuestionKata])
+  )("%s: the starting answer isn't already correct", (_, kata) => {
+    const start = initialAnswer(kata, () => 0.42)
+    expect(isReady(kata, start) && checkAnswer(kata, start).correct).toBe(
       false
     )
   })
 })
 
 describe("choice", () => {
-  const brick = p(buttons, 0, 0)
+  const kata = p(buttons, 0, 0)
   it("uses the option's own feedback for a wrong pick", () => {
-    const r = checkAnswer(brick, { kind: "select", ids: ["b"] })
+    const r = checkAnswer(kata, { kind: "select", ids: ["b"] })
     expect(r).toMatchObject({
       correct: false,
       feedback: expect.stringMatching(/pulls people away/),
@@ -92,7 +92,7 @@ describe("choice", () => {
     expect(r).toMatchObject({ correct: false, missKey: "missOne" })
   })
   it("clears the selection on retry", () => {
-    expect(retryAnswer(brick, { kind: "select", ids: ["b"] })).toEqual({
+    expect(retryAnswer(kata, { kind: "select", ids: ["b"] })).toEqual({
       kind: "select",
       ids: [],
     })
@@ -112,16 +112,16 @@ describe("scenario", () => {
 })
 
 describe("sort", () => {
-  const brick = p(buttons, 1, 0)
+  const kata = p(buttons, 1, 0)
   it("isn't ready until the pool is empty", () => {
-    expect(isReady(brick, initialAnswer(brick))).toBe(false)
+    expect(isReady(kata, initialAnswer(kata))).toBe(false)
   })
   it("counts items in the wrong group", () => {
     const answer: Answer = {
       kind: "zones",
       zones: { [POOL]: [], pri: ["a", "b"], sec: ["c"], ter: ["d", "e"] },
     }
-    expect(checkAnswer(brick, answer)).toMatchObject({
+    expect(checkAnswer(kata, answer)).toMatchObject({
       correct: false,
       missKey: "sort",
       count: 1,
@@ -133,37 +133,37 @@ describe("sort", () => {
       kind: "zones",
       zones: { [POOL]: [], pri: ["a", "b"], sec: ["c"], ter: ["d", "e"] },
     }
-    expect(retryAnswer(brick, answer)).toBe(answer)
+    expect(retryAnswer(kata, answer)).toBe(answer)
   })
 })
 
 describe("order", () => {
   it("empties only the wrong slots on a retry", () => {
-    const brick = p(buttons, 1, 1)
-    const target = solution(brick)
-    if (target.kind !== "sequence") throw new Error("not an order brick")
+    const kata = p(buttons, 1, 1)
+    const target = solution(kata)
+    if (target.kind !== "sequence") throw new Error("not an order kata")
     const [a, b, c] = target.slots as string[]
     expect(
-      retryAnswer(brick, { kind: "sequence", slots: [a!, c!, b!], pool: [] })
+      retryAnswer(kata, { kind: "sequence", slots: [a!, c!, b!], pool: [] })
     ).toEqual({ kind: "sequence", slots: [a, null, null], pool: [c, b] })
   })
 
   it("accepts an alternative order", () => {
-    const brick = {
+    const kata = {
       ...p(buttons, 1, 1),
       alsoAccept: [["b", "a", "c"]],
-    } as QuestionBrick
+    } as QuestionKata
     expect(
-      checkAnswer(brick, { kind: "sequence", slots: ["b", "a", "c"], pool: [] })
+      checkAnswer(kata, { kind: "sequence", slots: ["b", "a", "c"], pool: [] })
         .correct
     ).toBe(true)
   })
 })
 
 describe("match", () => {
-  const brick = p(spanish, 0, 0)
+  const kata = p(spanish, 0, 0)
   it("counts mismatched pairs and marks both sides", () => {
-    const r = checkAnswer(brick, {
+    const r = checkAnswer(kata, {
       kind: "pairs",
       links: { 0: 1, 1: 0, 2: 2, 3: 3 },
     })
@@ -177,9 +177,9 @@ describe("match", () => {
 })
 
 describe("blank", () => {
-  const brick = p(spanish, 1, 0)
+  const kata = p(spanish, 1, 0)
   it("uses a decoy's mistake feedback", () => {
-    const r = checkAnswer(brick, {
+    const r = checkAnswer(kata, {
       kind: "gaps",
       values: { c: "Dónde", g: "gracias" },
     })
@@ -197,7 +197,7 @@ describe("blank", () => {
   })
   it("empties only the wrong gaps on retry", () => {
     expect(
-      retryAnswer(brick, { kind: "gaps", values: { c: "Qué", g: "gracias" } })
+      retryAnswer(kata, { kind: "gaps", values: { c: "Qué", g: "gracias" } })
     ).toEqual({ kind: "gaps", values: { c: "", g: "gracias" } })
   })
 })
@@ -214,9 +214,9 @@ describe("flow", () => {
   it("plays intro, hook, each concept and its practice, challenge, fix slot, wrap-up", () => {
     const kinds = buildSequence(buttons).map((i) =>
       i.kind === "question"
-        ? `${i.role}:${i.brick.id}`
+        ? `${i.role}:${i.kata.id}`
         : i.kind === "concept"
-          ? `concept:${i.brick.id}`
+          ? `concept:${i.kata.id}`
           : i.kind
     )
     expect(kinds).toEqual([
@@ -267,8 +267,8 @@ describe("flow", () => {
         i.kind === "question" && i.role !== "hook"
     )
     const results = {
-      [a!.brick.id]: "missed" as const,
-      [b!.brick.id]: "missed" as const,
+      [a!.kata.id]: "missed" as const,
+      [b!.kata.id]: "missed" as const,
     }
     expect(progressAt(items, fixAt, results, [])).toBe(
       Math.round(100 - 2 * step)
@@ -283,7 +283,7 @@ describe("flow", () => {
     expect(progressAt(withRetries, fixAt + 2, results, [])).toBe(
       Math.round(100 - 2 * step)
     )
-    expect(progressAt(withRetries, fixAt + 2, results, [a!.brick.id])).toBe(
+    expect(progressAt(withRetries, fixAt + 2, results, [a!.kata.id])).toBe(
       Math.round(100 - step)
     )
     expect(progressAt(withRetries, fixAt + 3, results, [])).toBe(100)

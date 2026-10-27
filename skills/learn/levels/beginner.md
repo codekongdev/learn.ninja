@@ -21,7 +21,7 @@ A guess that exposes the everyday intuition the idea corrects, in concrete terms
 ## Questions
 
 - Ask the learner to recognise and understand: which is it, what does this mean, what happens next in a case that looks like the example.
-- Natural bricks: `choice`; `match` for the new terms and their meanings; `sort` into two named groups; `compare` of two clearly different examples; `blank` with chips for the key word.
+- Natural katas: `choice`; `match` for the new terms and their meanings; `sort` into two named groups; `compare` of two clearly different examples; `blank` with chips for the key word.
 - Wrong options are a newcomer's common slips: tempting, but clearly wrong once the rule is applied (the simple-interest total, the literal translation). Feedback names the slip and restates the rule.
 - Hints on most questions, and generous: point at the rule to apply or the first step. Nobody should get stuck.
 

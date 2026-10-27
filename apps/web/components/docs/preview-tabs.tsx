@@ -9,7 +9,7 @@ import {
 
 import { CopyButton } from "@/components/site/copy-button"
 
-/** "Preview" and "JSON" tabs over a live brick. */
+/** "Preview" and "JSON" tabs over a live kata. */
 export function PreviewTabs({
   preview,
   code,

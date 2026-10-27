@@ -7,20 +7,20 @@ import { validateLesson } from "./validate"
 /** An example lesson written the spec 0.2 way: loops of a concept and its practice. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function asV02(lesson: any) {
-  const { bricks, ...rest } = lesson
+  const { katas, ...rest } = lesson
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const loops: { concept: any; practice: any[] }[] = []
-  for (const brick of bricks) {
-    if (brick.type === "concept") {
-      const { type: _type, ...concept } = brick
+  for (const kata of katas) {
+    if (kata.type === "concept") {
+      const { type: _type, ...concept } = kata
       loops.push({ concept, practice: [] })
-    } else loops.at(-1)!.practice.push(brick)
+    } else loops.at(-1)!.practice.push(kata)
   }
   return { ...rest, spec: "0.2", loops }
 }
 
 describe("upgradeLesson", () => {
-  it.each(exampleFiles())("turns %s back into the same 0.8 lesson", (file) => {
+  it.each(exampleFiles())("turns %s back into the same 0.9 lesson", (file) => {
     const lesson = loadExample(file)
     const upgraded = upgradeLesson(asV02(lesson))
     expect(upgraded).toEqual(lesson)
@@ -28,8 +28,8 @@ describe("upgradeLesson", () => {
     expect(validateLesson(upgraded).ok).toBe(true)
   })
 
-  it.each(["0.3", "0.4", "0.5", "0.6", "0.7"])(
-    "brings a %s lesson to 0.8 by its version alone",
+  it.each(["0.3", "0.4", "0.5", "0.6", "0.7", "0.8"])(
+    "brings a %s lesson to 0.9 by its version alone",
     (spec) => {
       const lesson = loadExample("button-hierarchy.json")
       const old = { ...lesson, spec }
@@ -41,12 +41,27 @@ describe("upgradeLesson", () => {
     }
   )
 
-  it("drops the term from concept bricks, in 0.2 and 0.3 files", () => {
+  it("renames a 0.8 lesson's bricks to katas, in the same place", () => {
+    const lesson = loadExample("button-hierarchy.json")
+    const old = Object.fromEntries(
+      Object.entries({ ...lesson, spec: "0.8" }).map(([key, value]) => [
+        key === "katas" ? "bricks" : key,
+        value,
+      ])
+    )
+    expect(canUpgrade(old)).toBe(true)
+    const upgraded = upgradeLesson(old)
+    expect(upgraded).toEqual(lesson)
+    expect(JSON.stringify(upgraded)).toBe(JSON.stringify(lesson))
+    expect(validateLesson(upgraded).ok).toBe(true)
+  })
+
+  it("drops the term from concept katas, in 0.2 and 0.3 files", () => {
     const lesson = loadExample("button-hierarchy.json")
     const term = { word: "Primary button", definition: "The main action." }
     const withTerm = {
       ...lesson,
-      bricks: lesson.bricks.map((b: { type: string }) =>
+      katas: lesson.katas.map((b: { type: string }) =>
         b.type === "concept" ? { ...b, term } : b
       ),
     }
@@ -65,7 +80,7 @@ describe("upgradeLesson", () => {
     const old = { ...rest, spec: "0.5", topic: "UI design" }
     expect(canUpgrade(old)).toBe(true)
     const upgraded = upgradeLesson(old) as Record<string, unknown>
-    expect(upgraded.spec).toBe("0.8")
+    expect(upgraded.spec).toBe("0.9")
     expect(upgraded.subject).toBe("design")
     // The label is kept as written; its key, "ui-design", is a synonym of "user-interface".
     expect(upgraded.tags).toEqual(["UI design"])
@@ -125,7 +140,7 @@ describe("upgradeLesson", () => {
       string,
       unknown
     >
-    expect(upgraded.spec).toBe("0.8")
+    expect(upgraded.spec).toBe("0.9")
     expect(upgraded.subject).toBe(subject)
     expect(upgraded.tags).toEqual(tags)
     // Tags are required from 0.8, so a lesson left without them has that one thing to fix.
@@ -234,7 +249,7 @@ describe("upgradeLesson", () => {
     const algebra = { ...asMath, tags: ["algebra", "equations"] }
     expect(upgradeLesson(algebra)).toEqual({
       ...algebra,
-      spec: "0.8",
+      spec: "0.9",
       tags: ["Algebra", "Equations"],
     })
     // The same split applies to older files, whose topic lands in math first.

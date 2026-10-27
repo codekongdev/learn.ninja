@@ -4,7 +4,7 @@
 export { LessonPlayer, type LessonPlayerProps } from "./lesson-player"
 export type { LessonCreator, LessonLike, NextPrompt } from "./context"
 export { parseChallenge, type Challenge } from "./challenge"
-export { BrickDemo, type BrickDemoProps } from "./brick-demo"
+export { KataDemo, type KataDemoProps } from "./kata-demo"
 export type { Answer } from "./check"
 export type { Prepared } from "./prepared"
 export {

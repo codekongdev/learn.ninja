@@ -20,7 +20,7 @@ A realistic case where the basic rule, applied naively, gives the wrong answer. 
 ## Questions
 
 - Ask the learner to apply: which method fits this case, carry it out on new values, predict what happens here, run it backwards.
-- Natural bricks: `choice` on a fresh case; `scenario` with trade-offs; `order` for a real procedure; `sort` of real cases by which rule applies; `blank` for a missing step; `hotspot` for the wrong step in a worked artifact.
+- Natural katas: `choice` on a fresh case; `scenario` with trade-offs; `order` for a real procedure; `sort` of real cases by which rule applies; `blank` for a missing step; `hotspot` for the wrong step in a worked artifact.
 - Wrong options are the right idea misapplied: the right method with one step wrong, the rule used outside where it holds, the neighbouring concept. Feedback says what the option gets right and where it goes wrong.
 - Hints on the harder half of the questions. Name the step or the condition to check, not the answer.
 
@@ -34,6 +34,6 @@ When to use the method, and the one condition to check first.
 
 ## You've drifted if…
 
-- A concept brick defines a term, or shows a form or table, the summary assumes.
+- A concept kata defines a term, or shows a form or table, the summary assumes.
 - A question can be answered by rereading the concept, or only recalls a list it showed.
 - Wrong options are silly instead of being the right idea misapplied.

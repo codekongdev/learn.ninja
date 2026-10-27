@@ -21,7 +21,7 @@ import {
   XIcon,
 } from "lucide-react"
 
-import type { ConceptBrick } from "@workspace/spec"
+import type { ConceptKata } from "@workspace/spec"
 import { Button, LinkButton } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import {
@@ -1148,7 +1148,7 @@ export function TheoryPanel({
   textSize,
 }: {
   id: string
-  concepts: ConceptBrick[]
+  concepts: ConceptKata[]
   onClose: () => void
   t: Strings
   textSize: TextSize

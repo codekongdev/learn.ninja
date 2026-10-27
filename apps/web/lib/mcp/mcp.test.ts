@@ -320,7 +320,7 @@ describe("validate_lesson", () => {
 
   it("returns the checker's issues for a broken lesson", async () => {
     const broken = JSON.parse(buttons)
-    delete broken.bricks[1].options[1].feedback
+    delete broken.katas[1].options[1].feedback
     const result = await call("validate_lesson", {
       lesson: JSON.stringify(broken),
     })
@@ -708,10 +708,10 @@ describe("/mcp/{key}, the personal URL", () => {
 
 describe("drafts and patches", () => {
   const original = JSON.parse(buttons)
-  const feedback = original.bricks[1].options[1].feedback
+  const feedback = original.katas[1].options[1].feedback
   const broken = () => {
     const lesson = structuredClone(original)
-    delete lesson.bricks[1].options[1].feedback
+    delete lesson.katas[1].options[1].feedback
     return JSON.stringify(lesson)
   }
 
@@ -726,12 +726,12 @@ describe("drafts and patches", () => {
     expect(draftId).toEqual(expect.any(String))
     expect(message).toContain("patches")
     const path = issues[0]!.path
-    expect(path).toMatch(/^bricks\[1\]\.options\[1\]/)
+    expect(path).toMatch(/^katas\[1\]\.options\[1\]/)
 
     const fixed = await call("publish_lesson", {
       draftId,
       patches: [
-        { op: "set", path: "bricks[1].options[1].feedback", value: feedback },
+        { op: "set", path: "katas[1].options[1].feedback", value: feedback },
       ],
     })
     expect(fixed.isError).toBeFalsy()
@@ -778,7 +778,7 @@ describe("drafts and patches", () => {
     )
     const stored = await deps.store.get(id as string)
     expect(stored?.lesson.title).toBe("Buttons, ranked")
-    expect(stored?.lesson.bricks).toHaveLength(original.bricks.length)
+    expect(stored?.lesson.katas).toHaveLength(original.katas.length)
   })
 
   it("refuses patches to a lesson with the wrong token", async () => {
@@ -805,10 +805,10 @@ describe("drafts and patches", () => {
     const failed = await call("validate_lesson", { lesson: broken() })
     const bad = await call("publish_lesson", {
       draftId: failed.structuredContent.draftId,
-      patches: [{ op: "set", path: "bricks[99].title", value: "x" }],
+      patches: [{ op: "set", path: "katas[99].title", value: "x" }],
     })
     expect(bad.structuredContent).toMatchObject({ error: "bad_patch" })
-    expect(bad.structuredContent.message).toContain("bricks[99].title")
+    expect(bad.structuredContent.message).toContain("katas[99].title")
 
     const neither = await call("publish_lesson", {})
     expect(neither.structuredContent).toMatchObject({ error: "bad_input" })

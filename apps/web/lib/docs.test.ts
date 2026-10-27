@@ -34,29 +34,29 @@ describe("docs", () => {
     }
   )
 
-  it("every <BrickPreview> points to a real example lesson and brick", () => {
+  it("every <KataPreview> points to a real example lesson and kata", () => {
     const previews = pages.flatMap((file) =>
       [
         ...readFileSync(file, "utf8").matchAll(
-          /<BrickPreview\s+lesson="([^"]+)"\s+brick="([^"]+)"/g
+          /<KataPreview\s+lesson="([^"]+)"\s+kata="([^"]+)"/g
         ),
       ].map((m) => ({
         file: path.relative(DOCS, file),
         lesson: m[1]!,
-        brick: m[2]!,
+        kata: m[2]!,
       }))
     )
     // The docs have no demos right now; this still guards any that come back.
     for (const p of previews) {
       const lesson = getLesson(p.lesson)
       expect(lesson, `${p.file}: no example lesson "${p.lesson}"`).toBeTruthy()
-      const ids = [lesson!.hook, ...lesson!.bricks, lesson!.challenge].map(
+      const ids = [lesson!.hook, ...lesson!.katas, lesson!.challenge].map(
         (b) => b.id
       )
       expect(
         ids,
-        `${p.file}: no brick "${p.brick}" in "${p.lesson}"`
-      ).toContain(p.brick)
+        `${p.file}: no kata "${p.kata}" in "${p.lesson}"`
+      ).toContain(p.kata)
     }
   })
 

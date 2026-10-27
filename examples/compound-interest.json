@@ -1,5 +1,5 @@
 {
-  "spec": "0.8",
+  "spec": "0.9",
   "title": "How compound interest works",
   "summary": "See why money grows faster over time when interest earns interest.",
   "objective": "Calculate compound growth year by year and explain why starting early matters.",
@@ -32,7 +32,7 @@
     "multiple": false,
     "explanation": "Each year's interest joins the balance, so the next year earns interest on a bigger amount: about $1,949 after 7 years."
   },
-  "bricks": [
+  "katas": [
     {
       "id": "c1",
       "type": "concept",

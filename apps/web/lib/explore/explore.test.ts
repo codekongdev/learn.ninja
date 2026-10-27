@@ -839,9 +839,9 @@ describe("tag backfill", () => {
       .select()
       .from(lesson)
       .where(eq(lesson.id, "old12345"))
-    expect(row?.spec).toBe("0.8")
+    expect(row?.spec).toBe("0.9")
     expect(row?.lesson).toMatchObject({
-      spec: "0.8",
+      spec: "0.9",
       subject: "data",
       tags: ["Statistics"],
     })

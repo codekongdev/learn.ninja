@@ -719,7 +719,7 @@
     animation: smoke-fade 0.45s ease-in 0.1s both;
     will-change: transform, opacity, filter;
   }
-  /* The ninja goes up in smoke with the intro and turns up in his corner on the first brick. */
+  /* The ninja goes up in smoke with the intro and turns up in his corner on the first kata. */
   .ninja-vanish {
     animation: smoke-fade 0.4s ease-in both;
   }
@@ -790,7 +790,7 @@
   --typeset-flow: 1.25em;
 }
 
-/* The sort and order bricks: items slide to their new place. */
+/* The sort and order katas: items slide to their new place. */
 ::view-transition-group(.learn-item) {
   animation-duration: 280ms;
   animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);

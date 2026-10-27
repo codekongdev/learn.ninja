@@ -1,6 +1,6 @@
-import { matchesBlank, type QuestionBrick } from "@workspace/spec"
+import { matchesBlank, type QuestionKata } from "@workspace/spec"
 
-// Pure answer logic for every question brick: the starting answer, whether it's ready to check,
+// Pure answer logic for every question kata: the starting answer, whether it's ready to check,
 // checking it, the correct answer, and what to keep on a retry. No React here, so it's easy to test.
 
 export type Answer =
@@ -42,7 +42,7 @@ export function shuffle<T>(
   return a
 }
 
-/** Shuffle, but never hand back the original order (so ordering bricks aren't pre-solved). */
+/** Shuffle, but never hand back the original order (so ordering katas aren't pre-solved). */
 function shuffleAway<T>(items: readonly T[], random: () => number): T[] {
   if (items.length < 2) return [...items]
   const s = shuffle(items, random)
@@ -50,10 +50,10 @@ function shuffleAway<T>(items: readonly T[], random: () => number): T[] {
 }
 
 export function initialAnswer(
-  brick: QuestionBrick,
+  kata: QuestionKata,
   random: () => number = Math.random
 ): Answer {
-  switch (brick.type) {
+  switch (kata.type) {
     case "sort":
       return {
         kind: "zones",
@@ -61,19 +61,19 @@ export function initialAnswer(
           [
             POOL,
             shuffle(
-              brick.items.map((i) => i.id),
+              kata.items.map((i) => i.id),
               random
             ),
           ],
-          ...brick.groups.map((g) => [g.id, [] as string[]]),
+          ...kata.groups.map((g) => [g.id, [] as string[]]),
         ]),
       }
     case "order":
       return {
         kind: "sequence",
-        slots: brick.items.map(() => null),
+        slots: kata.items.map(() => null),
         pool: shuffleAway(
-          brick.items.map((i) => i.id),
+          kata.items.map((i) => i.id),
           random
         ),
       }
@@ -82,14 +82,14 @@ export function initialAnswer(
     case "blank":
       return {
         kind: "gaps",
-        values: Object.fromEntries(brick.blanks.map((b) => [b.id, ""])),
+        values: Object.fromEntries(kata.blanks.map((b) => [b.id, ""])),
       }
     default:
       return { kind: "select", ids: [] }
   }
 }
 
-export function isReady(brick: QuestionBrick, answer: Answer): boolean {
+export function isReady(kata: QuestionKata, answer: Answer): boolean {
   switch (answer.kind) {
     case "select":
       return answer.ids.length > 0
@@ -99,8 +99,8 @@ export function isReady(brick: QuestionBrick, answer: Answer): boolean {
       return answer.slots.every((id) => id !== null)
     case "pairs":
       return (
-        brick.type === "match" &&
-        Object.keys(answer.links).length === brick.pairs.length
+        kata.type === "match" &&
+        Object.keys(answer.links).length === kata.pairs.length
       )
     case "gaps":
       return Object.values(answer.values).every((v) => v !== "")
@@ -110,12 +110,12 @@ export function isReady(brick: QuestionBrick, answer: Answer): boolean {
 const sameSet = (a: string[], b: string[]) =>
   a.length === b.length && a.every((x) => b.includes(x))
 
-export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
-  switch (brick.type) {
+export function checkAnswer(kata: QuestionKata, answer: Answer): CheckResult {
+  switch (kata.type) {
     case "choice":
     case "compare": {
       const picked = answer.kind === "select" ? answer.ids : []
-      const correct = brick.type === "choice" ? brick.correct : [brick.correct]
+      const correct = kata.type === "choice" ? kata.correct : [kata.correct]
       const ok = sameSet(picked, correct)
       const marks: Record<string, Mark> = {}
       for (const id of picked)
@@ -123,7 +123,7 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
       if (ok) return { correct: true, marks }
       const wrong = picked.find((id) => !correct.includes(id))
       const feedback = wrong
-        ? brick.options.find((o) => o.id === wrong)?.feedback
+        ? kata.options.find((o) => o.id === wrong)?.feedback
         : undefined
       return feedback
         ? { correct: false, feedback, marks }
@@ -131,7 +131,7 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
     }
     case "scenario": {
       const picked = answer.kind === "select" ? answer.ids[0] : undefined
-      const option = brick.options.find((o) => o.id === picked)
+      const option = kata.options.find((o) => o.id === picked)
       if (!option) return { correct: false, marks: {} }
       const mark: Mark =
         option.quality === "best"
@@ -148,15 +148,15 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
     }
     case "hotspot": {
       const picked = answer.kind === "select" ? answer.ids : []
-      const ok = sameSet(picked, brick.correct)
+      const ok = sameSet(picked, kata.correct)
       const marks: Record<string, Mark> = {}
       for (const id of picked)
-        marks[id] = brick.correct.includes(id) ? "correct" : "wrong"
+        marks[id] = kata.correct.includes(id) ? "correct" : "wrong"
       return ok
         ? { correct: true, marks }
         : {
             correct: false,
-            missKey: brick.visual.kind === "code" ? "hotspotLine" : "hotspot",
+            missKey: kata.visual.kind === "code" ? "hotspotLine" : "hotspot",
             marks,
           }
     }
@@ -164,7 +164,7 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
       const zones = answer.kind === "zones" ? answer.zones : {}
       const marks: Record<string, Mark> = {}
       let wrong = 0
-      for (const item of brick.items) {
+      for (const item of kata.items) {
         const ok = (zones[item.group] ?? []).includes(item.id)
         marks[item.id] = ok ? "correct" : "wrong"
         if (!ok) wrong++
@@ -175,8 +175,8 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
     }
     case "order": {
       const seq = answer.kind === "sequence" ? answer.slots : []
-      const target = brick.items.map((i) => i.id)
-      const accepted = [target, ...(brick.alsoAccept ?? [])]
+      const target = kata.items.map((i) => i.id)
+      const accepted = [target, ...(kata.alsoAccept ?? [])]
       const matched = accepted.find(
         (a) => a.join("\u0000") === seq.join("\u0000")
       )
@@ -192,7 +192,7 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
       const links = answer.kind === "pairs" ? answer.links : {}
       const marks: Record<string, Mark> = {}
       let wrong = 0
-      brick.pairs.forEach((_, i) => {
+      kata.pairs.forEach((_, i) => {
         const ok = links[i] === i
         marks[`L${i}`] = ok ? "correct" : "wrong"
         if (links[i] !== undefined)
@@ -208,9 +208,9 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
       const marks: Record<string, Mark> = {}
       let feedback: string | undefined
       let anyWrong = false
-      for (const b of brick.blanks) {
+      for (const b of kata.blanks) {
         const v = values[b.id] ?? ""
-        const how = { ...b, caseSensitive: brick.caseSensitive }
+        const how = { ...b, caseSensitive: kata.caseSensitive }
         const ok = b.accept.some((a) => matchesBlank(a, v, how))
         marks[b.id] = ok ? "correct" : "wrong"
         if (!ok && !anyWrong) {
@@ -232,49 +232,49 @@ export function checkAnswer(brick: QuestionBrick, answer: Answer): CheckResult {
 }
 
 /** The answer to show after a second miss. */
-export function solution(brick: QuestionBrick): Answer {
-  switch (brick.type) {
+export function solution(kata: QuestionKata): Answer {
+  switch (kata.type) {
     case "choice":
-      return { kind: "select", ids: brick.correct }
+      return { kind: "select", ids: kata.correct }
     case "compare":
-      return { kind: "select", ids: [brick.correct] }
+      return { kind: "select", ids: [kata.correct] }
     case "scenario":
       return {
         kind: "select",
-        ids: brick.options
+        ids: kata.options
           .filter((o) => o.quality === "best")
           .map((o) => o.id)
           .slice(0, 1),
       }
     case "hotspot":
-      return { kind: "select", ids: brick.correct }
+      return { kind: "select", ids: kata.correct }
     case "sort":
       return {
         kind: "zones",
         zones: Object.fromEntries([
           [POOL, []],
-          ...brick.groups.map((g) => [
+          ...kata.groups.map((g) => [
             g.id,
-            brick.items.filter((i) => i.group === g.id).map((i) => i.id),
+            kata.items.filter((i) => i.group === g.id).map((i) => i.id),
           ]),
         ]),
       }
     case "order":
       return {
         kind: "sequence",
-        slots: brick.items.map((i) => i.id),
+        slots: kata.items.map((i) => i.id),
         pool: [],
       }
     case "match":
       return {
         kind: "pairs",
-        links: Object.fromEntries(brick.pairs.map((_, i) => [i, i])),
+        links: Object.fromEntries(kata.pairs.map((_, i) => [i, i])),
       }
     case "blank":
       return {
         kind: "gaps",
         values: Object.fromEntries(
-          brick.blanks.map((b) => [b.id, b.accept[0]!])
+          kata.blanks.map((b) => [b.id, b.accept[0]!])
         ),
       }
     case "number":
@@ -283,19 +283,19 @@ export function solution(brick: QuestionBrick): Answer {
 }
 
 /** Marks that show the whole solution as correct. */
-export function solutionMarks(brick: QuestionBrick): Record<string, Mark> {
-  const answer = solution(brick)
-  return checkAnswer(brick, answer).marks
+export function solutionMarks(kata: QuestionKata): Record<string, Mark> {
+  const answer = solution(kata)
+  return checkAnswer(kata, answer).marks
 }
 
 /**
  * What the learner keeps when they try again: selections are cleared (so they choose afresh),
  * while arrangements stay so they only fix what was wrong. Wrong gaps and wrong order slots empty out.
  */
-export function retryAnswer(brick: QuestionBrick, answer: Answer): Answer {
+export function retryAnswer(kata: QuestionKata, answer: Answer): Answer {
   if (answer.kind === "select") return { kind: "select", ids: [] }
-  if (answer.kind === "gaps" && brick.type === "blank") {
-    const result = checkAnswer(brick, answer)
+  if (answer.kind === "gaps" && kata.type === "blank") {
+    const result = checkAnswer(kata, answer)
     return {
       kind: "gaps",
       values: Object.fromEntries(
@@ -306,9 +306,9 @@ export function retryAnswer(brick: QuestionBrick, answer: Answer): Answer {
       ),
     }
   }
-  if (answer.kind === "sequence" && brick.type === "order") {
+  if (answer.kind === "sequence" && kata.type === "order") {
     // Wrong items go back to the pool; the right ones keep their slots.
-    const { marks } = checkAnswer(brick, answer)
+    const { marks } = checkAnswer(kata, answer)
     const right = (id: string | null) => id !== null && marks[id] === "correct"
     return {
       kind: "sequence",

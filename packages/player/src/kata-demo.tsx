@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import type { Brick, Lesson } from "@workspace/spec"
+import type { Kata, Lesson } from "@workspace/spec"
 import { DirectionProvider } from "@workspace/ui/components/direction"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -26,15 +26,15 @@ import {
   type TextSize,
 } from "./strings"
 
-export interface BrickDemoProps {
+export interface KataDemoProps {
   lesson: Lesson
-  /** Id of the brick to play, from `lesson.bricks` (or the hook or challenge). */
-  brickId: string
+  /** Id of the kata to play, from `lesson.katas` (or the hook or challenge). */
+  kataId: string
   /** Formulas and code prepared on the server (prepareLesson). */
   prepared?: Prepared
   /** An answer to check on load, e.g. a wrong pick to show its feedback. */
   checked?: Answer
-  /** Show the Check and help buttons (and feedback). Off, the brick can be played with but not checked. */
+  /** Show the Check and help buttons (and feedback). Off, the kata can be played with but not checked. */
   actions?: boolean
   /** Stylesheet loaded inside the sandbox for HTML visuals. */
   visualsCss?: string
@@ -42,8 +42,8 @@ export interface BrickDemoProps {
   className?: string
 }
 
-/** One brick, playable on its own: check, feedback, retry. Continue starts it over; concepts have no action. */
-export function BrickDemo(props: BrickDemoProps) {
+/** One kata, playable on its own: check, feedback, retry. Continue starts it over; concepts have no action. */
+export function KataDemo(props: KataDemoProps) {
   // Suspends until the lesson's language has loaded; hydration keeps the server's HTML meanwhile.
   return (
     <React.Suspense>
@@ -54,24 +54,24 @@ export function BrickDemo(props: BrickDemoProps) {
 
 function Demo({
   lesson,
-  brickId,
+  kataId,
   prepared = emptyPrepared,
   checked,
   actions = true,
   visualsCss = "/lesson-visuals.css",
   textSize = "md",
   className,
-}: BrickDemoProps) {
-  const brick = findBrick(lesson, brickId)
+}: KataDemoProps) {
+  const kata = findKata(lesson, kataId)
   const ui = UI_TRANSLATIONS ? lesson.language : "en"
   const t = useStrings(ui)
   const dir = /^(ar|he|fa|ur)\b/i.test(ui) ? "rtl" : "ltr"
   const [state, dispatch] = React.useReducer(
     (s: State, a: Action) =>
-      // Continue would move past the only item: start the brick over instead.
-      a.type === "next" ? begin(brick) : reducer(s, a),
+      // Continue would move past the only item: start the kata over instead.
+      a.type === "next" ? begin(kata) : reducer(s, a),
     undefined,
-    () => begin(brick, checked)
+    () => begin(kata, checked)
   )
   const scope = React.useRef<HTMLDivElement>(null)
   const item = state.items[state.index]!
@@ -127,19 +127,19 @@ function Demo({
   )
 }
 
-function findBrick(lesson: Lesson, id: string): Brick {
-  const brick = [lesson.hook, ...lesson.bricks, lesson.challenge].find(
+function findKata(lesson: Lesson, id: string): Kata {
+  const kata = [lesson.hook, ...lesson.katas, lesson.challenge].find(
     (b) => b.id === id
   )
-  if (!brick) throw new Error(`No brick "${id}" in "${lesson.title}".`)
-  return brick
+  if (!kata) throw new Error(`No kata "${id}" in "${lesson.title}".`)
+  return kata
 }
 
-function begin(brick: Brick, checked?: Answer): State {
+function begin(kata: Kata, checked?: Answer): State {
   const item: Item =
-    brick.type === "concept"
-      ? { kind: "concept", brick }
-      : { kind: "question", brick, role: "practice" }
+    kata.type === "concept"
+      ? { kind: "concept", kata }
+      : { kind: "question", kata, role: "practice" }
   let state: State = {
     items: [item],
     index: 0,
@@ -149,8 +149,8 @@ function begin(brick: Brick, checked?: Answer): State {
     inFix: false,
     fixQueued: false,
     run: 0,
-    // Seeded by the brick id: the server and the browser must shuffle the same way.
-    question: freshQuestion(item, seeded(brick.id)),
+    // Seeded by the kata id: the server and the browser must shuffle the same way.
+    question: freshQuestion(item, seeded(kata.id)),
   }
   if (checked && state.question) {
     state = reducer(state, { type: "answer", answer: checked })

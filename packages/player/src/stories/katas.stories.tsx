@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as React from "react"
 
-import type { Brick, QuestionBrick } from "@workspace/spec"
+import type { Kata, QuestionKata } from "@workspace/spec"
 
 import {
   checkAnswer,
@@ -13,31 +13,31 @@ import {
   type Mark,
 } from "../check"
 import {
-  BlankBrick,
-  ConceptBrick,
+  BlankKata,
+  ConceptKata,
   Explanation,
   explanationAnchor,
-  HotspotBrick,
-  MatchBrick,
-  OptionsBrick,
-} from "../bricks"
+  HotspotKata,
+  MatchKata,
+  OptionsKata,
+} from "../katas"
 import { RichText } from "../rich-text"
-import { OrderBrick } from "../order"
-import { SortBrick } from "../sort"
+import { OrderKata } from "../order"
+import { SortKata } from "../sort"
 import { Visual } from "../visuals"
 import { lessons, PlayerFrame } from "./fixtures"
 
-// Every brick, and every question brick in every state. Use the "state" control to switch between
+// Every kata, and every question kata in every state. Use the "state" control to switch between
 // idle (interactive), wrong (after a first miss), correct, why (correct with the explanation open),
 // and revealed (after a second miss: the last pick, the answer, and the explanation).
 
 type Mode = "idle" | "wrong" | "correct" | "why" | "revealed"
 
 interface HarnessProps {
-  brick: Brick
-  /** The wrong answer to show in the "wrong" state. Concept bricks have nothing to answer. */
+  kata: Kata
+  /** The wrong answer to show in the "wrong" state. Concept katas have nothing to answer. */
   wrong?: Answer
-  /** Where the "idle" state starts, for a brick shown partway through. */
+  /** Where the "idle" state starts, for a kata shown partway through. */
   start?: Answer
   mode: Mode
 }
@@ -48,110 +48,110 @@ function seeded(seed = 7) {
   return () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646
 }
 
-function Harness({ brick, wrong, start, mode }: HarnessProps) {
+function Harness({ kata, wrong, start, mode }: HarnessProps) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5 px-4 py-8">
-      {brick.type === "concept" ? (
-        <ConceptBrick brick={brick} />
+      {kata.type === "concept" ? (
+        <ConceptKata kata={kata} />
       ) : (
-        <Question brick={brick} wrong={wrong!} start={start} mode={mode} />
+        <Question kata={kata} wrong={wrong!} start={start} mode={mode} />
       )}
     </div>
   )
 }
 
 function Question({
-  brick,
+  kata,
   wrong,
   start: from,
   mode,
 }: {
-  brick: QuestionBrick
+  kata: QuestionKata
   wrong: Answer
   start?: Answer
   mode: Mode
 }) {
   const start = (): Answer =>
     mode === "idle"
-      ? (from ?? initialAnswer(brick, seeded()))
+      ? (from ?? initialAnswer(kata, seeded()))
       : mode === "wrong"
         ? wrong
-        : solution(brick)
+        : solution(kata)
   const [answer, setAnswer] = React.useState<Answer>(start)
   // As in the player: where marks name options, a revealed answer keeps the last pick's mark.
   const keepsPick = ["choice", "compare", "scenario", "hotspot"].includes(
-    brick.type
+    kata.type
   )
   const marks: Record<string, Mark> =
     mode === "idle"
       ? {}
       : mode === "wrong"
-        ? checkAnswer(brick, wrong).marks
+        ? checkAnswer(kata, wrong).marks
         : mode === "correct" || mode === "why"
-          ? checkAnswer(brick, solution(brick)).marks
+          ? checkAnswer(kata, solution(kata)).marks
           : keepsPick
-            ? { ...solutionMarks(brick), ...checkAnswer(brick, wrong).marks }
-            : solutionMarks(brick)
+            ? { ...solutionMarks(kata), ...checkAnswer(kata, wrong).marks }
+            : solutionMarks(kata)
   const explanation =
-    mode === "why" || mode === "revealed" ? brick.explanation : null
-  const props = { brick, answer, setAnswer, marks, locked: mode !== "idle" }
+    mode === "why" || mode === "revealed" ? kata.explanation : null
+  const props = { kata, answer, setAnswer, marks, locked: mode !== "idle" }
   const optionIds =
-    "options" in brick
-      ? (brick.options as { id: string }[]).map((o) => o.id)
+    "options" in kata
+      ? (kata.options as { id: string }[]).map((o) => o.id)
       : []
   const showOutcomes =
-    brick.type === "scenario" && mode !== "idle" && answer.kind === "select"
+    kata.type === "scenario" && mode !== "idle" && answer.kind === "select"
       ? answer.ids
       : []
 
   return (
     <>
       <h2 className="text-lg font-semibold">
-        <RichText text={brick.prompt} />
+        <RichText text={kata.prompt} />
       </h2>
-      {brick.type === "scenario" ? (
+      {kata.type === "scenario" ? (
         <div className="rounded-e-2xl border-s-[3px] border-primary bg-muted px-4 py-3">
-          <RichText text={brick.situation} />
+          <RichText text={kata.situation} />
         </div>
       ) : null}
-      {brick.visual && brick.type !== "hotspot" ? (
-        <Visual visual={brick.visual} />
+      {kata.visual && kata.type !== "hotspot" ? (
+        <Visual visual={kata.visual} />
       ) : null}
-      {brick.type === "choice" ||
-      brick.type === "compare" ||
-      brick.type === "scenario" ? (
-        <OptionsBrick
+      {kata.type === "choice" ||
+      kata.type === "compare" ||
+      kata.type === "scenario" ? (
+        <OptionsKata
           {...props}
           order={
-            brick.type === "compare" ? optionIds : shuffle(optionIds, seeded())
+            kata.type === "compare" ? optionIds : shuffle(optionIds, seeded())
           }
           showOutcomes={showOutcomes}
           explanation={explanation}
         />
-      ) : brick.type === "hotspot" ? (
-        <HotspotBrick {...props} />
-      ) : brick.type === "sort" ? (
-        <SortBrick {...props} />
-      ) : brick.type === "order" ? (
-        <OrderBrick {...props} />
-      ) : brick.type === "match" ? (
-        <MatchBrick
+      ) : kata.type === "hotspot" ? (
+        <HotspotKata {...props} />
+      ) : kata.type === "sort" ? (
+        <SortKata {...props} />
+      ) : kata.type === "order" ? (
+        <OrderKata {...props} />
+      ) : kata.type === "match" ? (
+        <MatchKata
           {...props}
           rightOrder={shuffle(
-            brick.pairs.map((_, i) => i),
+            kata.pairs.map((_, i) => i),
             seeded()
           )}
         />
-      ) : brick.type === "blank" ? (
-        <BlankBrick
+      ) : kata.type === "blank" ? (
+        <BlankKata
           {...props}
           bank={shuffle(
-            [...new Set(brick.blanks.flatMap((b) => b.choices ?? []))],
+            [...new Set(kata.blanks.flatMap((b) => b.choices ?? []))],
             seeded()
           )}
         />
       ) : null}
-      {explanation && !explanationAnchor(brick, marks) ? (
+      {explanation && !explanationAnchor(kata, marks) ? (
         <Explanation text={explanation} />
       ) : null}
     </>
@@ -159,7 +159,7 @@ function Question({
 }
 
 const meta = {
-  title: "Player/Bricks",
+  title: "Player/Katas",
   component: Harness,
   argTypes: {
     mode: {
@@ -167,7 +167,7 @@ const meta = {
       control: "inline-radio",
       options: ["idle", "wrong", "correct", "why", "revealed"],
     },
-    brick: { control: false },
+    kata: { control: false },
     wrong: { control: false },
     start: { control: false },
   },
@@ -183,36 +183,36 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const { buttons, prd, compound, spanish, coding, bronze } = lessons
-/** A lesson's nth concept brick. */
+/** A lesson's nth concept kata. */
 const concept = (l: typeof buttons, n: number) =>
-  l.bricks.filter((b) => b.type === "concept")[n]!
-/** The i-th question brick after a lesson's nth concept brick. */
+  l.katas.filter((b) => b.type === "concept")[n]!
+/** The i-th question kata after a lesson's nth concept kata. */
 const practice = (l: typeof buttons, n: number, i: number) =>
-  l.bricks[l.bricks.indexOf(concept(l, n)) + 1 + i]!
+  l.katas[l.katas.indexOf(concept(l, n)) + 1 + i]!
 
-/** Concept bricks have no answer, so the state control does nothing for them. */
+/** Concept katas have no answer, so the state control does nothing for them. */
 const noState = { mode: { table: { disable: true } } } as const
 
 export const Concept: Story = {
   name: "Concept, visual",
-  args: { brick: concept(buttons, 0) },
+  args: { kata: concept(buttons, 0) },
   argTypes: noState,
 }
 export const ConceptDiagram: Story = {
   name: "Concept, diagram",
-  args: { brick: concept(bronze, 2) },
+  args: { kata: concept(bronze, 2) },
   argTypes: noState,
 }
 export const ConceptFormula: Story = {
   name: "Concept, formula",
-  args: { brick: concept(compound, 0) },
+  args: { kata: concept(compound, 0) },
   argTypes: noState,
 }
 /** A body with paragraphs and both kinds of list, under a chess visual. */
 export const ConceptList: Story = {
   name: "Concept, list",
   args: {
-    brick: {
+    kata: {
       id: "c1",
       type: "concept",
       title: "Openings are named first moves",
@@ -231,65 +231,65 @@ export const ConceptList: Story = {
 
 export const MultipleChoice: Story = {
   args: {
-    brick: practice(buttons, 0, 0),
+    kata: practice(buttons, 0, 0),
     wrong: { kind: "select", ids: ["b"] },
   },
 }
 export const MultipleChoiceWithCode: Story = {
   args: {
-    brick: practice(coding, 0, 1),
+    kata: practice(coding, 0, 1),
     wrong: { kind: "select", ids: ["b"] },
   },
 }
 export const MultipleChoiceVisual: Story = {
   name: "Multiple Choice, visual",
   args: {
-    brick: practice(compound, 1, 2),
+    kata: practice(compound, 1, 2),
     wrong: { kind: "select", ids: ["b"] },
   },
 }
 export const MultiSelect: Story = {
   args: {
-    brick: practice(prd, 0, 1),
+    kata: practice(prd, 0, 1),
     wrong: { kind: "select", ids: ["a", "c"] },
   },
 }
 export const MultiSelectVisual: Story = {
   name: "Multi Select, visual",
   args: {
-    brick: practice(buttons, 1, 2),
+    kata: practice(buttons, 1, 2),
     wrong: { kind: "select", ids: ["a", "b"] },
   },
 }
 export const CompareVisual: Story = {
   name: "Compare (A vs B), visual",
-  args: { brick: buttons.hook, wrong: { kind: "select", ids: ["a"] } },
+  args: { kata: buttons.hook, wrong: { kind: "select", ids: ["a"] } },
 }
 export const CompareText: Story = {
   name: "Compare (A vs B), text",
   args: {
-    brick: practice(compound, 1, 1),
+    kata: practice(compound, 1, 1),
     wrong: { kind: "select", ids: ["b"] },
   },
 }
 export const HotspotHtml: Story = {
   name: "Hotspot, HTML",
   args: {
-    brick: practice(buttons, 0, 1),
+    kata: practice(buttons, 0, 1),
     wrong: { kind: "select", ids: ["create"] },
   },
 }
 export const HotspotCode: Story = {
   name: "Hotspot, code lines",
   args: {
-    brick: practice(coding, 1, 1),
+    kata: practice(coding, 1, 1),
     wrong: { kind: "select", ids: ["l1"] },
   },
 }
 export const HotspotChess: Story = {
   name: "Hotspot, chess board",
   args: {
-    brick: {
+    kata: {
       id: "fork",
       type: "hotspot",
       prompt: "Where can the knight fork the king and the rook?",
@@ -310,7 +310,7 @@ export const HotspotChess: Story = {
 export const HotspotMap: Story = {
   name: "Hotspot, map",
   args: {
-    brick: {
+    kata: {
       id: "hittites",
       type: "hotspot",
       prompt: "Tap the country where the Hittite capital, Hattusa, stood.",
@@ -330,7 +330,7 @@ export const HotspotMap: Story = {
 export const Sort: Story = {
   name: "Sort, three groups",
   args: {
-    brick: practice(buttons, 1, 0),
+    kata: practice(buttons, 1, 0),
     wrong: {
       kind: "zones",
       zones: { pool: [], pri: ["a"], sec: ["c"], ter: ["b", "d", "e"] },
@@ -340,7 +340,7 @@ export const Sort: Story = {
 export const SortTwoGroups: Story = {
   name: "Sort, two groups",
   args: {
-    brick: practice(coding, 1, 0),
+    kata: practice(coding, 1, 0),
     wrong: {
       kind: "zones",
       zones: { pool: [], map: ["a", "b"], each: ["c", "d"] },
@@ -371,37 +371,37 @@ export const SortPhoneThree: Story = {
 export const OrderVisual: Story = {
   name: "Order, visual items",
   args: {
-    brick: practice(buttons, 1, 1),
+    kata: practice(buttons, 1, 1),
     wrong: { kind: "sequence", slots: ["c", "a", "b"], pool: [] },
   },
 }
 export const OrderText: Story = {
   name: "Order, dialogue",
   args: {
-    brick: spanish.challenge,
+    kata: spanish.challenge,
     wrong: { kind: "sequence", slots: ["b", "a", "c", "d"], pool: [] },
   },
 }
 export const Match: Story = {
   args: {
-    brick: practice(spanish, 0, 0),
+    kata: practice(spanish, 0, 0),
     wrong: { kind: "pairs", links: { 0: 1, 1: 0, 2: 2, 3: 3 } },
   },
 }
 export const BlankText: Story = {
   name: "Blank, word chips",
   args: {
-    brick: practice(spanish, 1, 0),
+    kata: practice(spanish, 1, 0),
     wrong: { kind: "gaps", values: { c: "Dónde", g: "gracias" } },
   },
 }
 export const BlankCode: Story = {
   name: "Blank, code",
   args: {
-    brick: practice(coding, 0, 0),
+    kata: practice(coding, 0, 0),
     wrong: { kind: "gaps", values: { m: "forEach" } },
   },
 }
 export const Scenario: Story = {
-  args: { brick: buttons.challenge, wrong: { kind: "select", ids: ["b"] } },
+  args: { kata: buttons.challenge, wrong: { kind: "select", ids: ["b"] } },
 }

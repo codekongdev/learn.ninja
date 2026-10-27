@@ -139,7 +139,7 @@ describe("saved progress", () => {
 })
 
 describe("what a save keeps", () => {
-  it("names bricks by id instead of copying the lesson", () => {
+  it("names katas by id instead of copying the lesson", () => {
     const storage = fakeStorage()
     saveProgress(storage, "l/x", lesson, midway())
     const raw = storage.getItem("learn:progress:l/x")!
@@ -174,7 +174,7 @@ describe("what a save keeps", () => {
     expect(loadProgress(storage, "l/x", lesson)).toEqual(state)
     expect(savedProgress(storage, "l/x")).toEqual({
       done: 1,
-      total: lesson.bricks.length + 2,
+      total: lesson.katas.length + 2,
     })
   })
 
@@ -231,9 +231,9 @@ describe("browser storage", () => {
 })
 
 describe("progress for the feed", () => {
-  const total = lesson.bricks.length + 2
+  const total = lesson.katas.length + 2
 
-  it("counts the bricks behind the learner", () => {
+  it("counts the katas behind the learner", () => {
     const storage = fakeStorage()
     const state = { ...fresh(), items: buildSequence(lesson), index: 3 }
     saveProgress(storage, "l/x", lesson, state)
@@ -246,7 +246,7 @@ describe("progress for the feed", () => {
     const fixAt = items.findIndex((i) => i.kind === "fix")
     items.splice(fixAt, 0, {
       kind: "question",
-      brick: lesson.hook,
+      kata: lesson.hook,
       role: "fix",
     })
     saveProgress(storage, "l/x", lesson, { ...fresh(), items, index: fixAt })

@@ -273,7 +273,7 @@ function HtmlFrame({
     return () => window.removeEventListener("keydown", onKey)
   }, [interactive, order, keyScope])
 
-  // The tappable parts' corners show when the brick arrives, then while the pointer is over the
+  // The tappable parts' corners show when the kata arrives, then while the pointer is over the
   // stage, or while a finger holds it (phones have no hover).
   const [reveal, setReveal] = React.useState(interactive)
   const hold = React.useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -407,7 +407,7 @@ function frameInset(el: HTMLElement) {
 
 /**
  * A tappable part of a visual, marked by four small corners like a viewfinder. They show when the
- * brick arrives, while the pointer is over the stage, or while a finger holds it, so the visual stays
+ * kata arrives, while the pointer is over the stage, or while a finger holds it, so the visual stays
  * clean the rest of the time. Picking a part closes them into one rounded ring that stands off the
  * part, whatever its own corners.
  */

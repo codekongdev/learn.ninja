@@ -37,20 +37,20 @@ const compound = () => loadExample("compound-interest.json")
 describe("visuals", () => {
   it("wants alt text on a concept's HTML visual", () => {
     const lesson = buttons()
-    delete lesson.bricks[0].visual.alt
-    expectIssue(lesson, { path: "bricks[0].visual", message: /no "alt"/ })
+    delete lesson.katas[0].visual.alt
+    expectIssue(lesson, { path: "katas[0].visual", message: /no "alt"/ })
   })
 
   it("wants alt text on a question's HTML visual", () => {
     const lesson = compound()
-    delete lesson.bricks[6].visual.alt
-    expectIssue(lesson, { path: "bricks[6].visual", message: /no "alt"/ })
+    delete lesson.katas[6].visual.alt
+    expectIssue(lesson, { path: "katas[6].visual", message: /no "alt"/ })
   })
 
   it("doesn't need alt text on a hotspot visual", () => {
     const lesson = buttons()
-    expect(lesson.bricks[2].type).toBe("hotspot")
-    expect(lesson.bricks[2].visual.alt).toBeUndefined()
+    expect(lesson.katas[2].type).toBe("hotspot")
+    expect(lesson.katas[2].visual.alt).toBeUndefined()
     expect(validateLesson(lesson).ok).toBe(true)
   })
 
@@ -81,8 +81,8 @@ describe("schema", () => {
 
   it("rejects unknown fields, so typos are caught", () => {
     const l = buttons()
-    l.bricks[1].colour = "blue"
-    expectIssue(l, { path: "bricks[1]", message: /colour/ })
+    l.katas[1].colour = "blue"
+    expectIssue(l, { path: "katas[1]", message: /colour/ })
   })
 
   it("only allows choice or compare as the hook", () => {
@@ -91,16 +91,16 @@ describe("schema", () => {
     expectIssue(l, { path: "hook.type", message: /choice|compare/ })
   })
 
-  it("only allows question bricks as the challenge", () => {
+  it("only allows question katas as the challenge", () => {
     const l = buttons()
-    l.challenge = { ...l.bricks[0], id: "ch" }
+    l.challenge = { ...l.katas[0], id: "ch" }
     expectIssue(l, { path: "challenge.type", message: /concept|choice/ })
   })
 
   it("requires the current spec version", () => {
     const l = buttons()
     l.spec = "0.1"
-    expectIssue(l, { path: "spec", message: /0\.8/ })
+    expectIssue(l, { path: "spec", message: /0\.9/ })
   })
 
   it("requires a subject from the list, and names every subject when it's wrong or missing", () => {
@@ -213,7 +213,7 @@ describe("chart visuals", () => {
   })
   function withChart(over: Record<string, unknown>) {
     const l = buttons()
-    l.bricks[0].visual = chart(over)
+    l.katas[0].visual = chart(over)
     return l
   }
 
@@ -245,8 +245,8 @@ describe("chart visuals", () => {
 
   it("wants alt text, like an HTML visual", () => {
     const l = withChart({})
-    delete l.bricks[0].visual.alt
-    expectIssue(l, { path: "bricks[0].visual", message: /chart has no "alt"/ })
+    delete l.katas[0].visual.alt
+    expectIssue(l, { path: "katas[0].visual", message: /chart has no "alt"/ })
   })
 
   it("wants numbers on a scatter's x axis", () => {
@@ -257,7 +257,7 @@ describe("chart visuals", () => {
           { x: 2, y: 2 },
         ],
       }),
-      { path: "bricks[0].visual", message: /number for every point/ }
+      { path: "katas[0].visual", message: /number for every point/ }
     )
   })
 
@@ -326,14 +326,14 @@ describe("chart visuals", () => {
 
   it("checks charts on options too", () => {
     const l = buttons()
-    l.bricks[1].options[0].visual = chart({
+    l.katas[1].options[0].visual = chart({
       data: [
         { x: "A", y: 1 },
         { x: 2, y: 2 },
       ],
     })
     expectIssue(l, {
-      path: "bricks[1].options[0].visual",
+      path: "katas[1].options[0].visual",
       message: /number for every point/,
     })
   })
@@ -350,7 +350,7 @@ describe("function charts", () => {
   })
   function withCurve(over: Record<string, unknown> = {}) {
     const l = buttons()
-    l.bricks[0].visual = curve(over)
+    l.katas[0].visual = curve(over)
     return l
   }
 
@@ -382,14 +382,14 @@ describe("function charts", () => {
 
   it("wants alt text and an x range that goes up", () => {
     const l = withCurve()
-    delete l.bricks[0].visual.alt
-    expectIssue(l, { path: "bricks[0].visual", message: /chart has no "alt"/ })
+    delete l.katas[0].visual.alt
+    expectIssue(l, { path: "katas[0].visual", message: /chart has no "alt"/ })
     expectIssue(withCurve({ x: { min: 3, max: 3 } }), {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /"x.min" \(3\) must be less than its "x.max" \(3\)/,
     })
     expectIssue(withCurve({ y: { min: 2, max: -2 } }), {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /"y.min" \(2\) must be less than its "y.max" \(-2\)/,
     })
   })
@@ -402,7 +402,7 @@ describe("function charts", () => {
           { expression: "2x", label: "f" },
         ],
       }),
-      { path: "bricks[0].visual", message: /"f" is used twice/ }
+      { path: "katas[0].visual", message: /"f" is used twice/ }
     )
     expectIssue(
       withCurve({ series: [{ expression: "x" }, { expression: "x" }] }),
@@ -428,7 +428,7 @@ describe("function charts", () => {
 describe("diagram visuals", () => {
   function withDiagram(over: Record<string, unknown> = {}) {
     const l = buttons()
-    l.bricks[0].visual = {
+    l.katas[0].visual = {
       kind: "diagram",
       d2: "request -> server -> response",
       alt: "A request goes to the server, which sends a response.",
@@ -443,9 +443,9 @@ describe("diagram visuals", () => {
 
   it("wants alt text, like an HTML visual", () => {
     const l = withDiagram()
-    delete l.bricks[0].visual.alt
+    delete l.katas[0].visual.alt
     expectIssue(l, {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /diagram has no "alt"/,
     })
   })
@@ -460,7 +460,7 @@ describe("diagram visuals", () => {
 describe("function chart points", () => {
   function withChart(over: Record<string, unknown> = {}) {
     const l = buttons()
-    l.bricks[0].visual = {
+    l.katas[0].visual = {
       kind: "chart",
       type: "function",
       alt: "Three points on a plane.",
@@ -480,18 +480,18 @@ describe("function chart points", () => {
 
   it("needs curves or points", () => {
     expectIssue(withChart({ points: undefined }), {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /needs curves in "series", points in "points", or both/,
     })
   })
 
   it("rejects a point outside the axes", () => {
     expectIssue(withChart({ points: [{ x: 6, y: 0 }] }), {
-      path: "bricks[0].visual.points[0]",
+      path: "katas[0].visual.points[0]",
       message: /\(6, 0\) is outside/,
     })
     expectIssue(withChart({ y: { max: 2 } }), {
-      path: "bricks[0].visual.points[0]",
+      path: "katas[0].visual.points[0]",
       message: /\(2, 3\) is outside/,
     })
   })
@@ -500,7 +500,7 @@ describe("function chart points", () => {
 describe("number lines", () => {
   function withLine(over: Record<string, unknown> = {}) {
     const l = buttons()
-    l.bricks[0].visual = {
+    l.katas[0].visual = {
       kind: "numberline",
       alt: "A hop of 4 from 3 lands on 7.",
       min: 0,
@@ -532,13 +532,13 @@ describe("number lines", () => {
 
   it("wants alt text, named as a number line", () => {
     const l = withLine()
-    delete l.bricks[0].visual.alt
+    delete l.katas[0].visual.alt
     expectIssue(l, { message: /This number line has no "alt"/ })
   })
 
   it("keeps the ticks few enough to read", () => {
     expectIssue(withLine({ max: 100, jumps: undefined, points: undefined }), {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /101 ticks; keep it to 21/,
     })
     expect(
@@ -571,7 +571,7 @@ describe("number lines", () => {
         jumps: undefined,
         points: undefined,
       }),
-      { path: "bricks[0].visual.step", message: /a "step" of 1\/2, 1\/3/ }
+      { path: "katas[0].visual.step", message: /a "step" of 1\/2, 1\/3/ }
     )
     // JSON can't hold 1/3, so thirds, sixths, and twelfths written to 3 places count.
     for (const step of [0.333, 0.3333, 0.167, 0.083, 1 / 7])
@@ -594,17 +594,17 @@ describe("number lines", () => {
         jumps: undefined,
         points: undefined,
       }),
-      { path: "bricks[0].visual.step", message: /0\.333 for thirds/ }
+      { path: "katas[0].visual.step", message: /0\.333 for thirds/ }
     )
   })
 
   it("keeps points, ranges, and jumps on the line", () => {
     expectIssue(withLine({ points: [{ value: 11 }] }), {
-      path: "bricks[0].visual.points[0]",
+      path: "katas[0].visual.points[0]",
       message: /11 is off the line/,
     })
     expectIssue(withLine({ ranges: [{}] }), {
-      path: "bricks[0].visual.ranges[0]",
+      path: "katas[0].visual.ranges[0]",
       message: /needs "from", "to", or both/,
     })
     expectIssue(withLine({ ranges: [{ from: 5, to: 2 }] }), {
@@ -617,7 +617,7 @@ describe("number lines", () => {
       message: /starts and lands on 3/,
     })
     expectIssue(withLine({ jumps: [{ from: 8, to: 12 }] }), {
-      path: "bricks[0].visual.jumps[0]",
+      path: "katas[0].visual.jumps[0]",
       message: /start and land on the line/,
     })
   })
@@ -626,7 +626,7 @@ describe("number lines", () => {
 describe("fractions and clocks", () => {
   function withVisual(visual: Record<string, unknown>) {
     const l = buttons()
-    l.bricks[0].visual = visual
+    l.katas[0].visual = visual
     return l
   }
   const wall = {
@@ -647,7 +647,7 @@ describe("fractions and clocks", () => {
 
   it("shades no more parts than the whole has", () => {
     expectIssue(withVisual({ ...wall, fractions: [{ parts: 4, shaded: 5 }] }), {
-      path: "bricks[0].visual.fractions[0]",
+      path: "katas[0].visual.fractions[0]",
       message: /5 shaded parts is more than the 4/,
     })
   })
@@ -671,7 +671,7 @@ describe("chess visuals", () => {
     "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
   function withChess(over: Record<string, unknown> = {}) {
     const l = buttons()
-    l.bricks[0].visual = {
+    l.katas[0].visual = {
       kind: "chess",
       fen: AFTER_NF3,
       alt: "After 1. e4 e5 2. Nf3, the white knight attacks the pawn on e5.",
@@ -691,9 +691,9 @@ describe("chess visuals", () => {
 
   it("wants alt text", () => {
     const l = withChess()
-    delete l.bricks[0].visual.alt
+    delete l.katas[0].visual.alt
     expectIssue(l, {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /chess position has no "alt"/,
     })
   })
@@ -701,25 +701,25 @@ describe("chess visuals", () => {
   it("names the rank that doesn't add up to 8 squares", () => {
     expectIssue(
       withChess({ fen: "rnbqkbnr/pppp1ppp/8/4p3/4P4/5N2/PPPP1PPP/RNBQKB1R" }),
-      { path: "bricks[0].visual.fen", message: /Rank 4 \("4P4"\) covers 9/ }
+      { path: "katas[0].visual.fen", message: /Rank 4 \("4P4"\) covers 9/ }
     )
     expectIssue(withChess({ fen: "8/8/8/8/8/8/8" }), {
-      path: "bricks[0].visual.fen",
+      path: "katas[0].visual.fen",
       message: /has 7/,
     })
     expectIssue(withChess({ fen: "8/8/8/8/8/8/8/4X3" }), {
-      path: "bricks[0].visual.fen",
+      path: "katas[0].visual.fen",
       message: /"X", which isn't a piece/,
     })
     expectIssue(withChess({ fen: "8/8/8/8/8/8/8/K6K" }), {
-      path: "bricks[0].visual.fen",
+      path: "katas[0].visual.fen",
       message: /at most one king/,
     })
   })
 
   it("rejects an arrow from an empty square, unless an arrow brought a piece there", () => {
     expectIssue(withChess({ arrows: [{ from: "g5", to: "e6" }] }), {
-      path: "bricks[0].visual.arrows[0]",
+      path: "katas[0].visual.arrows[0]",
       message: /starts on g5, which is empty/,
     })
     expect(
@@ -740,7 +740,7 @@ describe("chess visuals", () => {
   it("checks squares and highlights", () => {
     expectIssue(withChess({ highlight: ["e9"] }), { message: /like "e4"/ })
     expectIssue(withChess({ highlight: ["e5", "e5"] }), {
-      path: "bricks[0].visual.highlight",
+      path: "katas[0].visual.highlight",
       message: /"e5" is listed twice/,
     })
   })
@@ -749,14 +749,14 @@ describe("chess visuals", () => {
     // Black to move: which square does the knight on f3 attack?
     function chessHotspot(over: Record<string, unknown> = {}) {
       const l = buttons()
-      l.bricks[2].visual = {
+      l.katas[2].visual = {
         kind: "chess",
         fen: AFTER_NF3,
         alt: "After 1. e4 e5 2. Nf3, with Black to move.",
         highlight: ["f3"],
       }
-      l.bricks[2].correct = ["e5"]
-      Object.assign(l.bricks[2], over)
+      l.katas[2].correct = ["e5"]
+      Object.assign(l.katas[2], over)
       return l
     }
 
@@ -767,46 +767,46 @@ describe("chess visuals", () => {
           .ok
       ).toBe(true)
       expectIssue(chessHotspot({ correct: ["create"] }), {
-        path: "bricks[2].correct",
+        path: "katas[2].correct",
         message: /"create" isn't a square/,
       })
     })
 
     it("wants alt text, since the squares are only names", () => {
       const l = chessHotspot()
-      delete l.bricks[2].visual.alt
+      delete l.katas[2].visual.alt
       expectIssue(l, {
-        path: "bricks[2].visual",
+        path: "katas[2].visual",
         message: /chess position has no "alt"/,
       })
     })
 
     it("doesn't let a highlight or an arrow give the answer away", () => {
       const highlighted = chessHotspot()
-      highlighted.bricks[2].visual.highlight = ["f3", "e5"]
+      highlighted.katas[2].visual.highlight = ["f3", "e5"]
       expectIssue(highlighted, {
-        path: "bricks[2].visual.highlight",
+        path: "katas[2].visual.highlight",
         message: /e5 is an answer and it's highlighted/,
       })
       const arrow = chessHotspot()
-      arrow.bricks[2].visual.arrows = [{ from: "f3", to: "e5" }]
+      arrow.katas[2].visual.arrows = [{ from: "f3", to: "e5" }]
       expectIssue(arrow, {
-        path: "bricks[2].visual.arrows",
+        path: "katas[2].visual.arrows",
         message: /An arrow ends on e5/,
       })
     })
 
     it("doesn't let the alt name an empty answer square", () => {
       const told = chessHotspot()
-      told.bricks[2].correct = ["d4"]
-      told.bricks[2].visual.alt = "After 2. Nf3, White can strike with d4."
+      told.katas[2].correct = ["d4"]
+      told.katas[2].visual.alt = "After 2. Nf3, White can strike with d4."
       expectIssue(told, {
-        path: "bricks[2].visual.alt",
+        path: "katas[2].visual.alt",
         message: /The alt names d4, an answer/,
       })
       // e5 holds Black's pawn, so the alt has to name it to describe the position.
       const described = chessHotspot()
-      described.bricks[2].visual.alt =
+      described.katas[2].visual.alt =
         "After 1. e4 e5 2. Nf3: Black's pawn on e5 and White's knight on f3."
       expect(validateLesson(described).ok).toBe(true)
     })
@@ -816,7 +816,7 @@ describe("chess visuals", () => {
 describe("map visuals", () => {
   function withMap(over: Record<string, unknown> = {}) {
     const l = buttons()
-    l.bricks[0].visual = {
+    l.katas[0].visual = {
       kind: "map",
       region: "europe",
       alt: "The six founders of the European Coal and Steel Community.",
@@ -844,20 +844,20 @@ describe("map visuals", () => {
 
   it("wants alt text, and something on the map", () => {
     const l = withMap()
-    delete l.bricks[0].visual.alt
+    delete l.katas[0].visual.alt
     expectIssue(l, {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /This map has no "alt"/,
     })
     expectIssue(withMap({ countries: undefined, points: undefined }), {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /shade "countries", mark "points"/,
     })
   })
 
   it("names the code to use for one the map doesn't know", () => {
     const code = (c: string) => withMap({ countries: [{ code: c }] })
-    const at = { path: "bricks[0].visual.countries[0]" }
+    const at = { path: "katas[0].visual.countries[0]" }
     expectIssue(code("UK"), { ...at, message: /United Kingdom is "GB"/ })
     expectIssue(code("FRA"), { ...at, message: /"FR" for France/ })
     expectIssue(code("fr"), { ...at, message: /capital letters: "FR"/ })
@@ -871,7 +871,7 @@ describe("map visuals", () => {
 
   it("keeps countries on the region and lists each once", () => {
     expectIssue(withMap({ countries: [{ code: "JP" }] }), {
-      path: "bricks[0].visual.countries[0]",
+      path: "katas[0].visual.countries[0]",
       message:
         /Japan \("JP"\) isn't on the "europe" map\. .*"asia", "east-asia"/,
     })
@@ -889,7 +889,7 @@ describe("map visuals", () => {
       ).ok
     ).toBe(true)
     expectIssue(withMap({ countries: [{ code: "FR" }, { code: "FR" }] }), {
-      path: "bricks[0].visual.countries",
+      path: "katas[0].visual.countries",
       message: /"FR" is listed twice/,
     })
   })
@@ -899,7 +899,7 @@ describe("map visuals", () => {
     expectIssue(
       withMap({ points: [{ lat: 40.71, lon: 74.01, label: "NYC" }] }),
       {
-        path: "bricks[0].visual.points[0]",
+        path: "katas[0].visual.points[0]",
         message:
           /"NYC" \(lat 40\.71, lon 74\.01\) is outside the "europe" map \(34°N to 71°N, 25°W to 45°E\)\. Check its signs/,
       }
@@ -918,7 +918,7 @@ describe("map visuals", () => {
   it("wants a group on every country or none, and at most 3", () => {
     expectIssue(
       withMap({ countries: [{ code: "FR", group: "Allies" }, { code: "DE" }] }),
-      { path: "bricks[0].visual.countries[1]", message: /"DE" has none/ }
+      { path: "katas[0].visual.countries[1]", message: /"DE" has none/ }
     )
     expectIssue(
       withMap({
@@ -927,21 +927,21 @@ describe("map visuals", () => {
           group: code,
         })),
       }),
-      { path: "bricks[0].visual.countries", message: /at most 3 groups/ }
+      { path: "katas[0].visual.countries", message: /at most 3 groups/ }
     )
   })
   describe("as a hotspot", () => {
     // Where did the Hittites live? Five countries of the eastern Mediterranean shaded, none named.
     function mapHotspot(over: Record<string, unknown> = {}) {
       const l = buttons()
-      l.bricks[2].visual = {
+      l.katas[2].visual = {
         kind: "map",
         region: "eastern-mediterranean",
         alt: "The eastern Mediterranean, with Greece, Turkey, Cyprus, Syria, and Egypt shaded.",
         countries: ["GR", "TR", "CY", "SY", "EG"].map((code) => ({ code })),
       }
-      l.bricks[2].correct = ["TR"]
-      Object.assign(l.bricks[2], over)
+      l.katas[2].correct = ["TR"]
+      Object.assign(l.katas[2], over)
       return l
     }
 
@@ -956,23 +956,23 @@ describe("map visuals", () => {
 
     it("rejects an answer that isn't a two-letter code, with the format", () => {
       expectIssue(mapHotspot({ correct: ["Turkey"] }), {
-        path: "bricks[2].correct",
+        path: "katas[2].correct",
         message:
           /"Turkey" isn't a country code\. .*two capital letters, like "FR"/,
       })
       expectIssue(mapHotspot({ correct: ["TUR"] }), {
-        path: "bricks[2].correct",
+        path: "katas[2].correct",
         message: /"TR" for Türkiye/,
       })
       expectIssue(mapHotspot({ correct: ["tr"] }), {
-        path: "bricks[2].correct",
+        path: "katas[2].correct",
         message: /capital letters: "TR"/,
       })
     })
 
     it("rejects an answer off the region, naming one that shows it", () => {
       expectIssue(mapHotspot({ correct: ["FR"] }), {
-        path: "bricks[2].correct",
+        path: "katas[2].correct",
         message:
           /France \("FR"\) isn't on the "eastern-mediterranean" map, so it can't be tapped\. Pick a region that shows it: .*"europe"/,
       })
@@ -980,18 +980,18 @@ describe("map visuals", () => {
 
     it("wants alt text, since the countries are only names", () => {
       const l = mapHotspot()
-      delete l.bricks[2].visual.alt
+      delete l.katas[2].visual.alt
       expectIssue(l, {
-        path: "bricks[2].visual",
+        path: "katas[2].visual",
         message: /This map has no "alt"/,
       })
     })
 
     it("doesn't let a label or a lone shading give the answer away", () => {
       const labeled = mapHotspot()
-      labeled.bricks[2].visual.countries[1].label = "Anatolia"
+      labeled.katas[2].visual.countries[1].label = "Anatolia"
       expectIssue(labeled, {
-        path: "bricks[2].visual.countries[1].label",
+        path: "katas[2].visual.countries[1].label",
         message: /Türkiye \("TR"\) is an answer and it's labeled/,
       })
       expectIssue(
@@ -1004,26 +1004,26 @@ describe("map visuals", () => {
           },
         }),
         {
-          path: "bricks[2].visual.countries[0]",
+          path: "katas[2].visual.countries[0]",
           message: /the only country shaded, which gives it away/,
         }
       )
       // A label on another country is fine: it names a landmark, not the answer.
       const other = mapHotspot()
-      other.bricks[2].visual.countries[4].label = "Egypt"
+      other.katas[2].visual.countries[4].label = "Egypt"
       expect(validateLesson(other).ok).toBe(true)
     })
 
     it("doesn't let the alt name only the answers", () => {
       const alt = (text: string, over: Record<string, unknown> = {}) => {
         const l = mapHotspot(over)
-        l.bricks[2].visual.alt = text
+        l.katas[2].visual.alt = text
         return l
       }
       expectIssue(
         alt("The eastern Mediterranean, with central Turkey marked."),
         {
-          path: "bricks[2].visual.alt",
+          path: "katas[2].visual.alt",
           message: /The alt names Türkiye, an answer, and no other country/,
         }
       )
@@ -1090,7 +1090,7 @@ describe("map visuals", () => {
           correct: ["CY"],
         }),
         {
-          path: "bricks[2].visual.region",
+          path: "katas[2].visual.region",
           message:
             /Cyprus \("CY"\) is too small to find and tap on the "world" map\. Pick a tighter region: .*"eastern-mediterranean"/,
         }
@@ -1104,7 +1104,7 @@ describe("map visuals", () => {
 describe("molecule visuals", () => {
   function withMolecule(over: Record<string, unknown> = {}) {
     const l = buttons()
-    l.bricks[0].visual = {
+    l.katas[0].visual = {
       kind: "molecule",
       smiles: "CC(=O)O",
       alt: "Acetic acid, with its carboxyl group marked.",
@@ -1121,23 +1121,23 @@ describe("molecule visuals", () => {
 
   it("wants alt text", () => {
     const l = withMolecule()
-    delete l.bricks[0].visual.alt
+    delete l.katas[0].visual.alt
     expectIssue(l, {
-      path: "bricks[0].visual",
+      path: "katas[0].visual",
       message: /molecule has no "alt"/,
     })
   })
 
   it("rejects a SMILES with spaces, pointing to the dot", () => {
     expectIssue(withMolecule({ smiles: "[Na+] [Cl-]" }), {
-      path: "bricks[0].visual.smiles",
+      path: "katas[0].visual.smiles",
       message: /separate them with "\."/,
     })
   })
 
   it("wants each highlight once", () => {
     expectIssue(withMolecule({ highlight: ["C=O", "C=O"] }), {
-      path: "bricks[0].visual.highlight",
+      path: "katas[0].visual.highlight",
       message: /"C=O" is listed twice/,
     })
   })
@@ -1148,67 +1148,67 @@ describe("molecule visuals", () => {
 })
 
 describe("structure rules", () => {
-  it("starts the bricks with a concept brick", () => {
+  it("starts the katas with a concept kata", () => {
     const l = buttons()
-    l.bricks = [l.bricks[1], l.bricks[0], ...l.bricks.slice(2)]
-    expectIssue(l, { path: "bricks[0]", message: /must be a concept brick/ })
+    l.katas = [l.katas[1], l.katas[0], ...l.katas.slice(2)]
+    expectIssue(l, { path: "katas[0]", message: /must be a concept kata/ })
   })
 
-  it("requires at least 2 question bricks after each concept brick", () => {
+  it("requires at least 2 question katas after each concept kata", () => {
     const l = buttons()
-    l.bricks.splice(2, 1)
+    l.katas.splice(2, 1)
     expectIssue(l, {
-      path: "bricks[0]",
-      message: /"c1" is followed by 1 question bricks; it needs 2–4/,
+      path: "katas[0]",
+      message: /"c1" is followed by 1 question katas; it needs 2–4/,
     })
   })
 
-  it("allows at most 4 question bricks after a concept brick", () => {
+  it("allows at most 4 question katas after a concept kata", () => {
     const l = buttons()
-    const extra = [0, 1, 2].map((n) => ({ ...l.bricks[1], id: `x${n}` }))
-    l.bricks = [l.bricks[0], ...extra, ...l.bricks.slice(1, 3)]
+    const extra = [0, 1, 2].map((n) => ({ ...l.katas[1], id: `x${n}` }))
+    l.katas = [l.katas[0], ...extra, ...l.katas.slice(1, 3)]
     expectIssue(l, {
-      path: "bricks[0]",
-      message: /"c1" is followed by 5 question bricks; it needs 2–4/,
+      path: "katas[0]",
+      message: /"c1" is followed by 5 question katas; it needs 2–4/,
     })
   })
 
-  it("allows at most 4 concept bricks", () => {
+  it("allows at most 4 concept katas", () => {
     const l = buttons()
-    const loop = l.bricks.slice(0, 2)
-    l.bricks = [0, 1, 2, 3, 4].flatMap((n) =>
+    const loop = l.katas.slice(0, 2)
+    l.katas = [0, 1, 2, 3, 4].flatMap((n) =>
       loop.map((b: { id: string }) => ({ ...b, id: `${b.id}-${n}` }))
     )
     expectIssue(l, {
-      path: "bricks",
-      message: /5 concept bricks; it needs 1–4/,
+      path: "katas",
+      message: /5 concept katas; it needs 1–4/,
     })
   })
 
-  it("requires 3–12 practice bricks in total", () => {
+  it("requires 3–12 practice katas in total", () => {
     const l = buttons()
-    l.bricks = l.bricks.slice(0, 3)
+    l.katas = l.katas.slice(0, 3)
     expectIssue(l, {
-      path: "bricks",
-      message: /2 practice bricks in total; it needs 3–12/,
+      path: "katas",
+      message: /2 practice katas in total; it needs 3–12/,
     })
   })
 
   it("rejects options that look the same, as a learner can't tell them apart", () => {
     const l = buttons()
-    const options = l.bricks[1].options
+    const options = l.katas[1].options
     options[1].text = ` ${options[0].text}  `.replace(/ /g, "  ")
     delete options[1].visual
     delete options[0].visual
     expectIssue(l, {
-      path: "bricks[1].options[1]",
+      path: "katas[1].options[1]",
       message: /looks the same as option/,
     })
   })
 
   it("keeps options that differ only in case", () => {
     const l = loadExample("compound-interest.json")
-    const [a, b] = l.bricks[5].options
+    const [a, b] = l.katas[5].options
     a.text = "Lunes"
     b.text = "lunes"
     delete a.visual
@@ -1220,122 +1220,122 @@ describe("structure rules", () => {
 
   it("rejects a correct id listed twice", () => {
     const l = buttons()
-    l.bricks[1].multiple = true
-    l.bricks[1].correct = [l.bricks[1].correct[0], l.bricks[1].correct[0]]
+    l.katas[1].multiple = true
+    l.katas[1].correct = [l.katas[1].correct[0], l.katas[1].correct[0]]
     expectIssue(l, {
-      path: "bricks[1].correct",
+      path: "katas[1].correct",
       message: /listed more than once/,
     })
   })
 
   it("rejects order items that look the same", () => {
     const l = buttons()
-    const items = l.bricks[5].items
+    const items = l.katas[5].items
     items[2] = { ...items[0], id: items[2].id }
     expectIssue(l, {
-      path: "bricks[5].items[2]",
+      path: "katas[5].items[2]",
       message: /looks the same as item/,
     })
   })
 
   it("rejects sort items that read the same in different groups, and groups with one label", () => {
     const l = buttons()
-    const sort = l.bricks[4]
+    const sort = l.katas[4]
     const other = sort.items.findIndex(
       (it: { group: string }) => it.group !== sort.items[0].group
     )
     sort.items[other].text = sort.items[0].text
     expectIssue(l, {
-      path: `bricks[4].items[${other}]`,
+      path: `katas[4].items[${other}]`,
       message: /belongs in another group/,
     })
     sort.groups[1].label = sort.groups[0].label
     expectIssue(l, {
-      path: "bricks[4].groups[1].label",
+      path: "katas[4].groups[1].label",
       message: /same label as another group/,
     })
   })
 
   it("rejects match pairs with the same side twice", () => {
     const l = loadExample("spanish-greetings.json")
-    const pairs = l.bricks[1].pairs
+    const pairs = l.katas[1].pairs
     pairs[2].right = pairs[0].right
     expectIssue(l, {
-      path: "bricks[1].pairs[2].right",
+      path: "katas[1].pairs[2].right",
       message: /right side is the same as another pair's/,
     })
   })
 
   it("rejects two code hotspots on one line", () => {
     const l = loadExample("map-vs-foreach.json")
-    const spots = l.bricks[5].visual.hotspots
+    const spots = l.katas[5].visual.hotspots
     spots[1].line = spots[0].line
     expectIssue(l, {
-      path: "bricks[5].visual.hotspots[1]",
+      path: "katas[5].visual.hotspots[1]",
       message: /both on line/,
     })
   })
 
-  it("rejects duplicate brick ids", () => {
+  it("rejects duplicate kata ids", () => {
     const l = buttons()
-    l.bricks[2].id = "p1"
+    l.katas[2].id = "p1"
     expectIssue(l, { message: /"p1" is used more than once/ })
   })
 
   it("checks that correct answers point to real options", () => {
     const l = buttons()
-    l.bricks[1].correct = ["z"]
+    l.katas[1].correct = ["z"]
     expectIssue(l, {
-      path: "bricks[1].correct",
-      message: /"z" isn't one of this brick's option ids/,
+      path: "katas[1].correct",
+      message: /"z" isn't one of this kata's option ids/,
     })
   })
 
   it("checks that sort items point to real groups", () => {
     const l = buttons()
-    l.bricks[4].items[0].group = "nope"
+    l.katas[4].items[0].group = "nope"
     expectIssue(l, {
-      path: "bricks[4].items[0].group",
-      message: /"nope" isn't one of this brick's group ids/,
+      path: "katas[4].items[0].group",
+      message: /"nope" isn't one of this kata's group ids/,
     })
   })
 
   it("checks that template gaps and blanks match", () => {
     const l = compound()
-    l.bricks[2].template = "$1,000 × [[x]] = $1,050"
+    l.katas[2].template = "$1,000 × [[x]] = $1,050"
     expectIssue(l, { message: /\[\[x\]\] has no matching entry/ })
     expectIssue(l, { message: /Blank "g" doesn't appear in the template/ })
   })
 
   it("requires a blank's accepted answer to be among its chips", () => {
     const l = compound()
-    l.bricks[2].blanks[0].choices = ["0.05", "1.5"]
+    l.katas[2].blanks[0].choices = ["0.05", "1.5"]
     expectIssue(l, {
-      path: "bricks[2].blanks[0].choices",
+      path: "katas[2].blanks[0].choices",
       message: /can't be answered/,
     })
   })
 
   it("checks that hotspot answers exist in the visual", () => {
     const l = buttons()
-    l.bricks[2].correct = ["missing"]
+    l.katas[2].correct = ["missing"]
     expectIssue(l, {
-      path: "bricks[2].correct",
+      path: "katas[2].correct",
       message: /isn't one of this visual's hotspot ids \(create, learn\)/,
     })
   })
 
   it("checks that code hotspots point to real lines", () => {
     const l = loadExample("map-vs-foreach.json")
-    l.bricks[5].visual.hotspots[2].line = 9
+    l.katas[5].visual.hotspots[2].line = 9
     expectIssue(l, { message: /Line 9 doesn't exist; the code has 3 lines/ })
   })
 
   it("checks alternative orders list every item once", () => {
     const l = buttons()
-    l.bricks[5].alsoAccept = [["a", "b"]]
+    l.katas[5].alsoAccept = [["a", "b"]]
     expectIssue(l, {
-      path: "bricks[5].alsoAccept[0]",
+      path: "katas[5].alsoAccept[0]",
       message: /every item id exactly once/,
     })
   })
@@ -1360,9 +1360,9 @@ describe("structure rules", () => {
 
   it("rejects formulas KaTeX can't render", () => {
     const l = compound()
-    l.bricks[0].visual.tex = "\\frac{1}{"
+    l.katas[0].visual.tex = "\\frac{1}{"
     expectIssue(l, {
-      path: "bricks[0].visual.tex",
+      path: "katas[0].visual.tex",
       message: /doesn't render/,
     })
   })
@@ -1375,7 +1375,7 @@ describe("structure rules", () => {
 })
 
 describe("v1 rules", () => {
-  it("rejects number bricks", () => {
+  it("rejects number katas", () => {
     const l = compound()
     l.challenge = {
       id: "ch",
@@ -1387,15 +1387,15 @@ describe("v1 rules", () => {
     expectIssue(l, {
       path: "challenge",
       kind: "v1",
-      message: /Number bricks aren't supported in v1/,
+      message: /Number katas aren't supported in v1/,
     })
   })
 
   it("rejects blanks without word chips", () => {
     const l = compound()
-    delete l.bricks[2].blanks[0].choices
+    delete l.katas[2].blanks[0].choices
     expectIssue(l, {
-      path: "bricks[2].blanks[0]",
+      path: "katas[2].blanks[0]",
       kind: "v1",
       message: /add a "choices" word bank/,
     })
@@ -1405,29 +1405,29 @@ describe("v1 rules", () => {
 describe("teaching rules", () => {
   it("requires feedback on every wrong option", () => {
     const l = buttons()
-    delete l.bricks[1].options[1].feedback
+    delete l.katas[1].options[1].feedback
     expectIssue(l, {
-      path: "bricks[1].options[1]",
+      path: "katas[1].options[1]",
       message: /Wrong option "b" has no feedback/,
     })
   })
 
-  it("lets a lesson repeat one brick type when that's what fits", () => {
+  it("lets a lesson repeat one kata type when that's what fits", () => {
     const l = compound()
-    l.bricks[2] = { ...l.bricks[1], id: "p2" }
+    l.katas[2] = { ...l.katas[1], id: "p2" }
     expect(validateLesson(l).ok).toBe(true)
   })
 
   it("keeps prompts to 40 words", () => {
     const l = buttons()
-    l.bricks[1].prompt = Array(45).fill("word").join(" ")
-    expectIssue(l, { path: "bricks[1].prompt", message: /45 words/ })
+    l.katas[1].prompt = Array(45).fill("word").join(" ")
+    expectIssue(l, { path: "katas[1].prompt", message: /45 words/ })
   })
 
   it("requires at least one wrong option", () => {
     const l = buttons()
-    l.bricks[1].correct = ["a", "b", "c"]
-    l.bricks[1].multiple = true
+    l.katas[1].correct = ["a", "b", "c"]
+    l.katas[1].multiple = true
     expectIssue(l, { message: /At least one option must be wrong/ })
   })
 
@@ -1438,7 +1438,7 @@ describe("teaching rules", () => {
   })
 })
 
-describe("blank bricks", () => {
+describe("blank katas", () => {
   const spanish = () => loadExample("spanish-greetings.json")
 
   it("compare chips the way the player does", () => {
@@ -1455,31 +1455,31 @@ describe("blank bricks", () => {
 
   it("accept an answer whose chip differs only in case, as the player does", () => {
     const l = spanish()
-    l.bricks[4].blanks[0].accept = ["cómo"]
+    l.katas[4].blanks[0].accept = ["cómo"]
     expect(validateLesson(l).ok).toBe(true)
   })
 
   it("reject a decoy that counts as the answer", () => {
     const l = spanish()
-    l.bricks[4].blanks[0].choices.push("CÓMO")
+    l.katas[4].blanks[0].choices.push("CÓMO")
     expectIssue(l, {
-      path: "bricks[4].blanks[0].choices",
+      path: "katas[4].blanks[0].choices",
       message: /"CÓMO" counts as a right answer/,
     })
   })
 
   it("reject feedback for a mistake that isn't a chip", () => {
     const l = spanish()
-    l.bricks[4].blanks[0].mistakes[0].answer = "Cuándo"
+    l.katas[4].blanks[0].mistakes[0].answer = "Cuándo"
     expectIssue(l, {
-      path: "bricks[4].blanks[0].mistakes[0]",
+      path: "katas[4].blanks[0].mistakes[0]",
       message: /isn't one of blank "c"'s chips/,
     })
   })
 
   it("want a decoy among the chips", () => {
     const l = spanish()
-    const [c, g] = l.bricks[4].blanks
+    const [c, g] = l.katas[4].blanks
     c.choices = ["Cómo", "gracias"]
     g.choices = ["gracias", "Cómo"]
     delete c.mistakes
@@ -1518,13 +1518,13 @@ describe("safety rules", () => {
     ['<style>@import "https://evil.example/x.css";</style>', /external URLs/],
   ])("rejects %s in a visual", (html, message) => {
     const l = buttons()
-    l.bricks[0].visual.html = html
+    l.katas[0].visual.html = html
     expectIssue(l, { kind: "safety", message })
   })
 
   it("lets a visual show a URL or a CSS rule as text", () => {
     const l = buttons()
-    l.bricks[0].visual.html =
+    l.katas[0].visual.html =
       "<p>Fonts load with <code>@import</code> from https://fonts.example.</p>" +
       "<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'></svg>"
     expect(validateLesson(l).issues.filter((i) => i.kind === "safety")).toEqual(
@@ -1540,13 +1540,13 @@ describe("safety rules", () => {
     "<style>.box { min-height: 50svh }</style><div class='box'>Tall</div>",
   ])("rejects a visual sized to the screen's height: %s", (html) => {
     const l = buttons()
-    l.bricks[0].visual.html = html
+    l.katas[0].visual.html = html
     expectIssue(l, { message: /screen's height/ })
   })
 
   it("lets a visual mention vh in its text", () => {
     const l = buttons()
-    l.bricks[0].visual.html =
+    l.katas[0].visual.html =
       "<p>Use <code>100vh</code> or <code>h-screen</code> for a full-height hero.</p>"
     expect(
       validateLesson(l).issues.filter((i) => /screen's height/.test(i.message))
@@ -1555,7 +1555,7 @@ describe("safety rules", () => {
 
   it("checks a long visual in linear time", () => {
     const l = buttons()
-    l.bricks[0].visual.html = `<div>${"x".repeat(400 * 1024)}</div>`
+    l.katas[0].visual.html = `<div>${"x".repeat(400 * 1024)}</div>`
     const started = performance.now()
     validateLesson(l)
     expect(performance.now() - started).toBeLessThan(1000)
@@ -1563,7 +1563,7 @@ describe("safety rules", () => {
 
   it("limits each HTML visual to 20 KB", () => {
     const l = buttons()
-    l.bricks[0].visual.html = `<div>${"x".repeat(21 * 1024)}</div>`
+    l.katas[0].visual.html = `<div>${"x".repeat(21 * 1024)}</div>`
     expectIssue(l, {
       kind: "safety",
       message: /keep each HTML visual under 20 KB/,
@@ -1574,9 +1574,9 @@ describe("safety rules", () => {
 describe("answers named by their place", () => {
   it("rejects an explanation that points at a shuffled option by position", () => {
     const lesson = loadExample("writing-a-prd.json") as {
-      bricks: { type: string; explanation: string }[]
+      katas: { type: string; explanation: string }[]
     }
-    const compare = lesson.bricks.find((b) => b.type === "compare")!
+    const compare = lesson.katas.find((b) => b.type === "compare")!
     compare.explanation = "The second statement names who is hurting."
     const issues = issuesFor(lesson)
     expect(issues.map((i) => i.message).join(" ")).toContain(
@@ -1597,12 +1597,12 @@ describe("answers named by their place", () => {
 describe("code outside backticks", () => {
   it("rejects a match pair that writes a command as plain text", () => {
     const lesson = loadExample("spanish-greetings.json") as {
-      bricks: { type: string; pairs: { left: string; right: string }[] }[]
+      katas: { type: string; pairs: { left: string; right: string }[] }[]
     }
-    const match = lesson.bricks.find((b) => b.type === "match")!
+    const match = lesson.katas.find((b) => b.type === "match")!
     match.pairs[0]!.left = "git push"
     expectIssue(lesson, {
-      path: "bricks[1].pairs[0].left",
+      path: "katas[1].pairs[0].left",
       message: /"git push" looks like code, but it isn't in backticks/,
       kind: "teaching",
     })
@@ -1610,9 +1610,9 @@ describe("code outside backticks", () => {
 
   it("accepts the same command in backticks", () => {
     const lesson = loadExample("spanish-greetings.json") as {
-      bricks: { type: string; pairs: { left: string; right: string }[] }[]
+      katas: { type: string; pairs: { left: string; right: string }[] }[]
     }
-    const match = lesson.bricks.find((b) => b.type === "match")!
+    const match = lesson.katas.find((b) => b.type === "match")!
     match.pairs[0]!.left = "`git push`"
     expect(validateLesson(lesson).ok).toBe(true)
   })
@@ -1642,7 +1642,7 @@ describe("code outside backticks", () => {
 describe("markdown in lesson text", () => {
   const withBody = (body: string) => {
     const lesson = buttons()
-    lesson.bricks[0].body = body
+    lesson.katas[0].body = body
     return lesson
   }
 
@@ -1658,7 +1658,7 @@ describe("markdown in lesson text", () => {
 
   it("rejects a list with one item", () => {
     expectIssue(withBody("Openings:\n- Italian Game"), {
-      path: "bricks[0].body",
+      path: "katas[0].body",
       message: /two or more items/,
     })
   })

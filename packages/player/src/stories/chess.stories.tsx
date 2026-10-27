@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import type { ChessVisual, Lesson } from "@workspace/spec"
 
-import { BrickDemo } from "../brick-demo"
+import { KataDemo } from "../kata-demo"
 import { Visual } from "../visuals"
 import { lessons, PlayerFrame, prepared } from "./fixtures"
 
@@ -61,7 +61,7 @@ export const Flipped: Story = { args: { visual: { ...italian, flip: true } } }
 const chessLesson: Lesson = {
   ...lessons.buttons,
   language: "en",
-  bricks: [
+  katas: [
     {
       id: "c1",
       type: "concept",
@@ -126,21 +126,21 @@ const chessLesson: Lesson = {
       explanation:
         "A knight in the middle reaches eight squares, two along and one across in every direction. Here it hits the pawns on d7 and f7.",
     },
-    ...lessons.buttons.bricks.slice(2),
+    ...lessons.buttons.katas.slice(2),
   ],
 } as Lesson
 
 export const InAConcept: Story = {
   args: { visual: fork },
   render: () => (
-    <BrickDemo lesson={chessLesson} brickId="c1" prepared={prepared} />
+    <KataDemo lesson={chessLesson} kataId="c1" prepared={prepared} />
   ),
 }
 
 export const AsOptions: Story = {
   args: { visual: fork },
   render: () => (
-    <BrickDemo lesson={chessLesson} brickId="p1" prepared={prepared} />
+    <KataDemo lesson={chessLesson} kataId="p1" prepared={prepared} />
   ),
 }
 
@@ -148,6 +148,6 @@ export const AsOptions: Story = {
 export const AsAHotspot: Story = {
   args: { visual: fork },
   render: () => (
-    <BrickDemo lesson={chessLesson} brickId="p2" prepared={prepared} />
+    <KataDemo lesson={chessLesson} kataId="p2" prepared={prepared} />
   ),
 }

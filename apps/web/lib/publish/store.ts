@@ -11,7 +11,12 @@ import {
   type Db,
 } from "@workspace/db"
 import type { Prepared } from "@workspace/player"
-import { normalizeTag, type Lesson } from "@workspace/spec"
+import {
+  canUpgrade,
+  normalizeTag,
+  upgradeLesson,
+  type Lesson,
+} from "@workspace/spec"
 
 // Where published lessons live. The app only talks to LessonStore, which keeps them in Postgres:
 // Neon in production (DATABASE_URL), PGlite in a local folder in development and in memory in tests.
@@ -222,11 +227,13 @@ export class PostgresLessonStore implements LessonStore {
 }
 
 function toStored(row: typeof lesson.$inferSelect): StoredLesson {
+  // A row from before a spec bump plays as is until `tags:backfill` rewrites it.
+  const data = canUpgrade(row.lesson) ? upgradeLesson(row.lesson) : row.lesson
   return {
     id: row.id,
     slug: row.slug,
     spec: row.spec,
-    lesson: row.lesson as Lesson,
+    lesson: data as Lesson,
     prepared: row.prepared as Prepared,
     editTokenHash: row.editTokenHash,
     claimTokenHash: row.claimTokenHash,

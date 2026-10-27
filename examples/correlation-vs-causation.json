@@ -1,5 +1,5 @@
 {
-  "spec": "0.8",
+  "spec": "0.9",
   "title": "Correlation isn't causation",
   "summary": "You can read a scatter plot. Learn the three questions that tell you whether two things that move together are cause and effect.",
   "objective": "Given a correlation, name a plausible confounder or reverse cause, and say what evidence would support a causal claim.",
@@ -50,7 +50,7 @@
     "multiple": false,
     "explanation": "Hot weather. More people swim and more people buy ice cream; neither causes the other. That hidden third thing is where this lesson starts."
   },
-  "bricks": [
+  "katas": [
     {
       "id": "c1",
       "type": "concept",

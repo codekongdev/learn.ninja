@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import type { Lesson, MapVisual } from "@workspace/spec"
 
-import { BrickDemo } from "../brick-demo"
+import { KataDemo } from "../kata-demo"
 import { Visual } from "../visuals"
 import { lessons, PlayerFrame, prepared } from "./fixtures"
 
@@ -173,7 +173,7 @@ export const Regions: Story = {
 const mapLesson: Lesson = {
   ...lessons.buttons,
   language: "en",
-  bricks: [
+  katas: [
     {
       id: "c1",
       type: "concept",
@@ -243,21 +243,21 @@ const mapLesson: Lesson = {
       explanation:
         "Carthage stood by today's Tunis, in Tunisia, and Gades is Cádiz, in southern Spain: the two ends of the Phoenicians' western trade.",
     },
-    ...lessons.buttons.bricks.slice(2),
+    ...lessons.buttons.katas.slice(2),
   ],
 } as Lesson
 
 export const InAConcept: Story = {
   args: { visual: founders },
   render: () => (
-    <BrickDemo lesson={mapLesson} brickId="c1" prepared={prepared} />
+    <KataDemo lesson={mapLesson} kataId="c1" prepared={prepared} />
   ),
 }
 
 export const AsOptions: Story = {
   args: { visual: founders },
   render: () => (
-    <BrickDemo lesson={mapLesson} brickId="p1" prepared={prepared} />
+    <KataDemo lesson={mapLesson} kataId="p1" prepared={prepared} />
   ),
 }
 
@@ -265,6 +265,6 @@ export const AsOptions: Story = {
 export const AsAHotspot: Story = {
   args: { visual: founders },
   render: () => (
-    <BrickDemo lesson={mapLesson} brickId="p2" prepared={prepared} />
+    <KataDemo lesson={mapLesson} kataId="p2" prepared={prepared} />
   ),
 }

@@ -199,11 +199,11 @@ export const Row: Story = {
   ),
 }
 
-/** Saves progress for a row the way the player would: `done` of `total` bricks behind the learner. */
+/** Saves progress for a row the way the player would: `done` of `total` katas behind the learner. */
 function seedProgress(lesson: LessonSummary, done: number, total: number) {
   const items = [
     { kind: "intro" },
-    ...Array.from({ length: total }, () => ({ kind: "concept", brick: {} })),
+    ...Array.from({ length: total }, () => ({ kind: "concept", kata: {} })),
     { kind: "fix" },
     { kind: "wrap" },
   ]
@@ -261,10 +261,10 @@ export const RowStates: Story = {
       <Labeled label="Logged in, liked and completed">
         <LessonRow lesson={LESSONS[0]!} viewer={signedIn} />
       </Labeled>
-      <Labeled label="Logged in, not liked, 3 of 8 bricks done">
+      <Labeled label="Logged in, not liked, 3 of 8 katas done">
         <LessonRow lesson={LESSONS[1]!} viewer={signedIn} />
       </Labeled>
-      <Labeled label="Big numbers, 6 of 8 bricks done">
+      <Labeled label="Big numbers, 6 of 8 katas done">
         <LessonRow lesson={LESSONS[5]!} viewer={signedIn} />
       </Labeled>
       <Labeled label="Owner has no handle yet">
@@ -273,7 +273,7 @@ export const RowStates: Story = {
       <Labeled label="Anonymous (liked before anyone kept it)">
         <LessonRow lesson={ANONYMOUS} viewer={signedIn} />
       </Labeled>
-      <Labeled label="Yours, private, 3 of 8 bricks done">
+      <Labeled label="Yours, private, 3 of 8 katas done">
         {/* Your own rows' menu needs Next's router, which Storybook doesn't mount. */}
         <AppRouterContext.Provider value={stubRouter}>
           <LessonRow

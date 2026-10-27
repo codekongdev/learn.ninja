@@ -11,7 +11,7 @@ const t = stringsFor("en")
 
 /**
  * A lesson's length on its row, or, for a lesson the viewer left midway, the minutes left beside
- * an amber pie filled to the share of bricks behind them, with the count on hover or focus.
+ * an amber pie filled to the share of katas behind them, with the count on hover or focus.
  * CompletedCheck takes its place once the lesson is finished. Progress lives only in this browser
  * (the player saves it under the lesson's path), so it's read after hydration and the server
  * renders the length.
@@ -67,7 +67,7 @@ export function LessonTime({
         {left} min left
       </span>
       <Tooltip>
-        {progress.done} of {progress.total} bricks done
+        {progress.done} of {progress.total} katas done
       </Tooltip>
     </TooltipTrigger>
   )

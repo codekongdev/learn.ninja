@@ -70,9 +70,9 @@ export type Strings = {
   sortLeft: (n: number) => string
   /** Announced when an order item lands in a numbered slot. */
   placedAt: (item: string, n: number) => string
-  /** Announced in a match brick when a pair is made right. */
+  /** Announced in a match kata when a pair is made right. */
   matched: (left: string, right: string) => string
-  /** Announced in a match brick when two items don't go together. */
+  /** Announced in a match kata when two items don't go together. */
   notAPair: string
   /** A checked answer's result as words, for screen readers. */
   markCorrect: string

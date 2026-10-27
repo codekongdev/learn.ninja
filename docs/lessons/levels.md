@@ -24,4 +24,4 @@ The agent tells you which level it chose. Ask for another and it remakes the les
 
 ## What stays the same
 
-The structure and the checker's limits are identical at every level: one hook, 1–4 concept bricks of 80 words or fewer, 2–4 question bricks after each, a harder challenge, and 2–4 takeaways, in 3–15 minutes. The level guides live in the skill at `levels/{level}.md`, next to `levels/index.md`, which says how the agent chooses.
+The structure and the checker's limits are identical at every level: one hook, 1–4 concept katas of 80 words or fewer, 2–4 question katas after each, a harder challenge, and 2–4 takeaways, in 3–15 minutes. The level guides live in the skill at `levels/{level}.md`, next to `levels/index.md`, which says how the agent chooses.

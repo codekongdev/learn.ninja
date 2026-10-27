@@ -12,12 +12,12 @@ import { source } from "@/lib/source"
 
 type Page = InferPageType<typeof source>
 
-/** A docs page as Markdown, with live brick demos swapped for their JSON and a link to the lesson. */
+/** A docs page as Markdown, with live kata demos swapped for their JSON and a link to the lesson. */
 export async function pageMarkdown(page: Page): Promise<string> {
   const body = (await page.data.getText("processed"))
     .replace(
-      /<BrickPreview\s+lesson="([^"]+)"\s+brick="([^"]+)"[^>]*\/>/g,
-      (_, slug: string, id: string) => brickMarkdown(slug, id)
+      /<KataPreview\s+lesson="([^"]+)"\s+kata="([^"]+)"[^>]*\/>/g,
+      (_, slug: string, id: string) => kataMarkdown(slug, id)
     )
     // The copy button is only for the browser; the prompt itself follows it in a code block.
     .replace(/^<CopyPrompt\s*\/>$/gm, "")
@@ -30,13 +30,13 @@ export async function pageMarkdown(page: Page): Promise<string> {
   return lines.join("\n")
 }
 
-function brickMarkdown(slug: string, id: string): string {
+function kataMarkdown(slug: string, id: string): string {
   const lesson = getLesson(slug)
-  const brick = lesson
-    ? [lesson.hook, ...lesson.bricks, lesson.challenge].find((b) => b.id === id)
+  const kata = lesson
+    ? [lesson.hook, ...lesson.katas, lesson.challenge].find((b) => b.id === id)
     : undefined
-  if (!brick) return ""
-  return ["```json", JSON.stringify(brick, null, 2), "```"].join("\n")
+  if (!kata) return ""
+  return ["```json", JSON.stringify(kata, null, 2), "```"].join("\n")
 }
 
 export function docsIndex(): string {
@@ -54,7 +54,7 @@ export function llmsTxt(): string {
 
 > ${SITE.description}
 
-${SITE.name} is a skill for AI agents. The agent turns what the user gives it (a topic, an article, notes, docs, a transcript, or code) into one short, interactive lesson in a JSON format, checks it, and publishes it to a link like ${SITE.url}/l/how-compound-interest-works-k3x9a2mq. Learners play it in the browser: short screens called bricks, with feedback on every answer.
+${SITE.name} is a skill for AI agents. The agent turns what the user gives it (a topic, an article, notes, docs, a transcript, or code) into one short, interactive lesson in a JSON format, checks it, and publishes it to a link like ${SITE.url}/l/how-compound-interest-works-k3x9a2mq. Learners play it in the browser: short screens called katas, with feedback on every answer.
 
 ## When to use it
 
@@ -113,7 +113,7 @@ In a chat app (Claude, ChatGPT) or any other MCP client, connect to the MCP serv
 
 ## What's in a lesson
 
-One idea in 3 to 15 minutes: a guess before any teaching, one to four short concepts each followed by practice, a final challenge, and takeaways. The agent picks a level and a size from what you ask, and splits a big topic into a path of lessons. Practice uses nine kinds of bricks: concept, choice, compare, hotspot, sort, order, match, blank, and scenario. Every wrong option explains the mistake behind it. Every lesson names one \`subject\` from a fixed list (${SUBJECTS.join(", ")}), picked by what the learner will do afterwards; the format reference has each one's scope. One to five \`tags\`, short labels as a reader should see them ("Claude Code", "Compound interest"), say what it's specifically about; they're stored for browsing and not shown yet.
+One idea in 3 to 15 minutes: a guess before any teaching, one to four short concepts each followed by practice, a final challenge, and takeaways. The agent picks a level and a size from what you ask, and splits a big topic into a path of lessons. Practice uses nine kinds of katas: concept, choice, compare, hotspot, sort, order, match, blank, and scenario. Every wrong option explains the mistake behind it. Every lesson names one \`subject\` from a fixed list (${SUBJECTS.join(", ")}), picked by what the learner will do afterwards; the format reference has each one's scope. One to five \`tags\`, short labels as a reader should see them ("Claude Code", "Compound interest"), say what it's specifically about; they're stored for browsing and not shown yet.
 
 ## Questions
 

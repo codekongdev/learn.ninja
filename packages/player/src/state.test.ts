@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs"
 
 import { describe, expect, it } from "vitest"
 
-import type { Lesson, QuestionBrick } from "@workspace/spec"
+import type { Lesson, QuestionKata } from "@workspace/spec"
 
-import { chipsInGaps } from "./bricks"
+import { chipsInGaps } from "./katas"
 import { buildSequence, type Item, type Outcome } from "./flow"
 import {
   earnedMoment,
@@ -16,7 +16,7 @@ import {
 
 // The player's state: what a fresh question starts with and how answering moves it along.
 
-const blank: Extract<QuestionBrick, { type: "blank" }> = {
+const blank: Extract<QuestionKata, { type: "blank" }> = {
   id: "b",
   type: "blank",
   prompt: "Declare both.",
@@ -29,7 +29,7 @@ const blank: Extract<QuestionBrick, { type: "blank" }> = {
   ],
 }
 
-const sort: Extract<QuestionBrick, { type: "sort" }> = {
+const sort: Extract<QuestionKata, { type: "sort" }> = {
   id: "s",
   type: "sort",
   prompt: "Sort them.",
@@ -46,8 +46,8 @@ const sort: Extract<QuestionBrick, { type: "sort" }> = {
   ],
 }
 
-function stateFor(brick: QuestionBrick): State {
-  const item: Item = { kind: "question", brick, role: "practice" }
+function stateFor(kata: QuestionKata): State {
+  const item: Item = { kind: "question", kata, role: "practice" }
   return {
     items: [item],
     index: 0,
@@ -111,7 +111,7 @@ describe("retry", () => {
   })
 
   it("scores a match with a wrong pair along the way as a second try", () => {
-    const match: Extract<QuestionBrick, { type: "match" }> = {
+    const match: Extract<QuestionKata, { type: "match" }> = {
       id: "m",
       type: "match",
       prompt: "Match them.",
@@ -169,14 +169,14 @@ describe("earned moments", () => {
     n: number,
     outcomes: Outcome[],
     attempts = 0,
-    mistakes: QuestionBrick[] = []
+    mistakes: QuestionKata[] = []
   ): State {
     const { index, item } = scored[n]!
     const results: Record<string, Outcome> = {}
     scored.slice(0, n).forEach((q, i) => {
-      results[q.item.brick.id] = outcomes[i]!
+      results[q.item.kata.id] = outcomes[i]!
     })
-    results[item.brick.id] = attempts > 0 ? "second" : "first"
+    results[item.kata.id] = attempts > 0 ? "second" : "first"
     const question = freshQuestion(item, () => 0.5)!
     return {
       items,
@@ -221,7 +221,7 @@ describe("earned moments", () => {
     const final = scored.length - 1
     expect(at(answered(final, Array(final).fill("first")))).toBe("last")
     // With a mistake to fix, more questions follow, so this isn't the last (and four in a row is no streak).
-    const mistake = scored[0]!.item.brick
+    const mistake = scored[0]!.item.kata
     expect(
       at(
         answered(
@@ -235,7 +235,7 @@ describe("earned moments", () => {
   })
 })
 
-const scenario: Extract<QuestionBrick, { type: "scenario" }> = {
+const scenario: Extract<QuestionKata, { type: "scenario" }> = {
   id: "sc",
   type: "scenario",
   prompt: "What do you do?",
@@ -265,7 +265,7 @@ const scenario: Extract<QuestionBrick, { type: "scenario" }> = {
 }
 
 describe("scenario story mode", () => {
-  it("opens a scenario with the brief, and other bricks without", () => {
+  it("opens a scenario with the brief, and other katas without", () => {
     expect(stateFor(scenario).question?.briefed).toBe(false)
     expect(stateFor(sort).question?.briefed).toBe(true)
   })

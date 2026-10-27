@@ -87,7 +87,7 @@ type Section = keyof typeof GUIDE_SECTIONS
 const SECTIONS = Object.keys(GUIDE_SECTIONS) as [Section, ...Section[]]
 
 const PATH_HELP =
-  "A path in the checker's syntax, e.g. `bricks[2].options[0].feedback`: an issue's `path` works as is."
+  "A path in the checker's syntax, e.g. `katas[2].options[0].feedback`: an issue's `path` works as is."
 
 const patch = z.discriminatedUnion("op", [
   z.object({
@@ -95,7 +95,7 @@ const patch = z.discriminatedUnion("op", [
     path: z.string().describe(PATH_HELP),
     value: z
       .unknown()
-      .describe("The new value: any JSON, such as a string or a whole brick."),
+      .describe("The new value: any JSON, such as a string or a whole kata."),
   }),
   z.object({
     op: z.literal("insert"),
@@ -159,7 +159,7 @@ function registerTools(server: McpServer, deps: McpDeps) {
           .enum(SECTIONS)
           .default("all")
           .describe(
-            "all: every guide but the schema. steps: what to do, in order. planning: scope, size, reading age. teaching: how to teach, which brick to use, visuals. format: every field of the lesson file. levels: picking the level, and each level's guide. schema: the formal JSON Schema, rarely needed."
+            "all: every guide but the schema. steps: what to do, in order. planning: scope, size, reading age. teaching: how to teach, which kata to use, visuals. format: every field of the lesson file. levels: picking the level, and each level's guide. schema: the formal JSON Schema, rarely needed."
           ),
       }),
       annotations: {

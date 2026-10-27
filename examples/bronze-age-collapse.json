@@ -1,5 +1,5 @@
 {
-  "spec": "0.8",
+  "spec": "0.9",
   "title": "Why the Bronze Age collapsed",
   "summary": "Sea Peoples, drought, earthquakes, revolt, or a fragile trade web? Weigh the evidence for each and see why historians now blame all of them.",
   "objective": "Judge which evidence supports which proposed cause of the Late Bronze Age collapse, spot inferences the evidence can't carry, and explain the systems-collapse view.",
@@ -40,7 +40,7 @@
     "multiple": false,
     "explanation": "Each cause has real evidence behind it and real sites it can't explain. The question isn't *which one* but *how do you weigh them*."
   },
-  "bricks": [
+  "katas": [
     {
       "id": "c1",
       "type": "concept",

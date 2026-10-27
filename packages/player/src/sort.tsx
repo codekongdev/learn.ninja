@@ -7,7 +7,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Kbd } from "@workspace/ui/components/kbd"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { QuestionBrickProps } from "./bricks"
+import type { QuestionKataProps } from "./katas"
 import { POOL } from "./check"
 import { usePlayer } from "./context"
 import {
@@ -22,7 +22,7 @@ import { useMarkWord } from "./marks"
 import { buzz, calm, fly, pulse, shake } from "./motion"
 import { RichText } from "./rich-text"
 
-// The sort brick, as lanes: the groups head the columns as bins (cells styled like the rows) and every
+// The sort kata, as lanes: the groups head the columns as bins (cells styled like the rows) and every
 // item keeps its own row. An unsorted item spans the row; tap the side it belongs on (or swipe it there)
 // and it slides into that lane. Tap a placed item to take it back out, or an empty lane to move it
 // across. Each row is a radio group, so a keyboard moves the item with the arrow keys and a screen
@@ -51,13 +51,13 @@ export function moveItem(
 /** How far a finger has to travel before a swipe counts. */
 const SWIPE = 48
 
-export function SortBrick({
-  brick,
+export function SortKata({
+  kata,
   answer,
   setAnswer,
   marks,
   locked,
-}: QuestionBrickProps) {
+}: QuestionKataProps) {
   const { t, dir } = usePlayer()
   const markWord = useMarkWord()
   const uid = React.useId().replace(/[^\w-]/g, "")
@@ -82,8 +82,8 @@ export function SortBrick({
   const swipedAt = React.useRef(0)
   const radios = React.useRef<Record<string, HTMLDivElement | null>>({})
 
-  const groups = brick.type === "sort" ? brick.groups : []
-  const items = brick.type === "sort" ? brick.items : []
+  const groups = kata.type === "sort" ? kata.groups : []
+  const items = kata.type === "sort" ? kata.items : []
   const zones = answer.kind === "zones" ? answer.zones : {}
   // Rows keep the order they started in, so nothing jumps when an item changes lanes.
   const [order] = React.useState(() => [
@@ -99,7 +99,7 @@ export function SortBrick({
     if (wrong) shake(root.current)
   }, [wrong])
 
-  if (brick.type !== "sort" || answer.kind !== "zones") return null
+  if (kata.type !== "sort" || answer.kind !== "zones") return null
 
   const n = groups.length
   const rows = [

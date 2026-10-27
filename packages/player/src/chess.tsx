@@ -30,7 +30,7 @@ export default function ChessBoard({
   board: ChessVisual
   /** On an option or item card: smaller, so the coordinates and their gutter are left off. */
   plain: boolean
-  /** On a hotspot brick: every square is tappable, its id the square's name. */
+  /** On a hotspot kata: every square is tappable, its id the square's name. */
   hotspots?: HotspotControl
 }) {
   // React's ids carry characters a fragment link might not survive.

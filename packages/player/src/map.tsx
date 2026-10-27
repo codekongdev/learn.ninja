@@ -76,7 +76,7 @@ export default function WorldMap({
   map: MapVisual
   /** On an option or item card: shorter, to fit the card. */
   plain: boolean
-  /** On a hotspot brick: every country drawn is tappable, its id the country's code. */
+  /** On a hotspot kata: every country drawn is tappable, its id the country's code. */
   hotspots?: HotspotControl
 }) {
   const { dir, lang } = usePlayer()

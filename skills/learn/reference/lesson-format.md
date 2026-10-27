@@ -1,12 +1,12 @@
-# Lesson format (spec 0.8)
+# Lesson format (spec 0.9)
 
-A lesson is one JSON file with four slots: `hook`, `bricks`, `challenge`, `wrapup`. A brick is one screen: either a `concept` brick (theory) or a question brick (`choice`, `compare`, `hotspot`, `sort`, `order`, `match`, `blank`, `scenario`). `schema/lesson.schema.json` is the formal definition; the checker (`scripts/learn.mjs validate`) also enforces the cross-field rules listed at the end.
+A lesson is one JSON file with four slots: `hook`, `katas`, `challenge`, `wrapup`. A kata is one screen: either a `concept` kata (theory) or a question kata (`choice`, `compare`, `hotspot`, `sort`, `order`, `match`, `blank`, `scenario`). `schema/lesson.schema.json` is the formal definition; the checker (`scripts/learn.mjs validate`) also enforces the cross-field rules listed at the end.
 
 ## Lesson
 
 | Field              | Required | Description                                                                                                                                                         |
 | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `spec`             | yes      | Always `"0.8"`                                                                                                                                                      |
+| `spec`             | yes      | Always `"0.9"`                                                                                                                                                      |
 | `title`            | yes      | Up to 60 characters; also used in the link                                                                                                                          |
 | `summary`          | yes      | One sentence shown before starting, up to 160 characters                                                                                                            |
 | `objective`        | yes      | What the learner can do afterwards                                                                                                                                  |
@@ -17,13 +17,13 @@ A lesson is one JSON file with four slots: `hook`, `bricks`, `challenge`, `wrapu
 | `subject`          | yes      | One of the subjects below, by what the learner will do afterwards. The checker refuses anything else                                                              |
 | `tags`             | yes      | 1–5 short labels as a reader should see them (`"Claude Code"`, `"Compound interest"`), 2–30 characters each; the first is the lesson's label. See Subjects and tags |
 | `source`           | no       | `{ "title": "…", "url": "https://…" }` credit for the material                                                                                                      |
-| `hook`             | yes      | One `choice` or `compare` brick; not scored                                                                                                                         |
-| `bricks`           | yes      | The lesson in play order: 1–4 `concept` bricks, each followed by 2–4 question bricks that practise it; 3–12 question bricks in total, at most 20 bricks. The first brick is a `concept` |
-| `challenge`        | yes      | One question brick of any type except `number`                                                                                                                      |
+| `hook`             | yes      | One `choice` or `compare` kata; not scored                                                                                                                         |
+| `katas`           | yes      | The lesson in play order: 1–4 `concept` katas, each followed by 2–4 question katas that practise it; 3–12 question katas in total, at most 20 katas. The first kata is a `concept` |
+| `challenge`        | yes      | One question kata of any type except `number`                                                                                                                      |
 | `wrapup`           | yes      | `{ "takeaways": [2–4 strings], "next": "suggested next lesson" }` (`next` is optional)                                                                              |
 
 ```json
-"bricks": [
+"katas": [
   { "id": "c1", "type": "concept", … },
   { "id": "p1", "type": "choice", … },
   { "id": "p2", "type": "sort", … },
@@ -33,7 +33,7 @@ A lesson is one JSON file with four slots: `hook`, `bricks`, `challenge`, `wrapu
 ]
 ```
 
-Brick ids are unique across the whole lesson, including the hook and the challenge.
+Kata ids are unique across the whole lesson, including the hook and the challenge.
 
 ## Subjects and tags
 
@@ -67,7 +67,7 @@ Brick ids are unique across the whole lesson, including the hook and the challen
 - Don't repeat what the fields say: no tag whose key is the subject (`"Programming"` on a `programming` lesson), a level (`"Beginner"`), or a language the lesson sets (`"Spanish"` when `targetLanguage` is `es`). Another subject's name is fine as a tag: that's where a lesson that straddles two goes.
 - No duplicates, including two labels with one key (`"JavaScript"` and `"JS"`).
 
-## Concept bricks
+## Concept katas
 
 `{ "id", "type": "concept", "title" (≤60 chars), "body" (rich text, ≤80 words), "visual"? }`
 
@@ -86,7 +86,7 @@ With a visual, the player shows the title, then the visual, then the body, so th
 "body": "Each piece has a letter; no letter means a pawn.\n- **N** is a knight\n- **B** is a bishop\n- **Q** is the queen"
 ```
 
-## Every question brick
+## Every question kata
 
 `{ "id", "type", "prompt" (rich text, ≤40 words), "visual"?, "hint"?, "explanation" }` plus the fields for its type.
 
@@ -110,7 +110,7 @@ With a visual, the player shows the title, then the visual, then the body, so th
 { "kind": "molecule", "alt": "Ethanol, with its hydroxyl group marked.", "smiles": "CCO", "style": "full", "highlight": ["[OX2H]"] }
 ```
 
-`alt` is one sentence saying what the visual shows, for screen readers, at most 200 characters; it's required on every concept's or question's visual but code and math, and on an option's visual (other than code or math) that has no caption (hotspot visuals are read through their regions, item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` bricks.
+`alt` is one sentence saying what the visual shows, for screen readers, at most 200 characters; it's required on every concept's or question's visual but code and math, and on an option's visual (other than code or math) that has no caption (hotspot visuals are read through their regions, item visuals through their captions). `height` is optional (the player sizes HTML visuals to their content). `hotspots` on code are only for `hotspot` katas.
 
 A chart is drawn by the player from its `data` (2 to 60 points, in the order given): `type` is `scatter` (numbers on both axes; `label` names a point, `trend: true` fits a line), `bar`, or `line` (`x` is a category name or a number, one point per `x`). Axis labels are optional (`x.label`, `y.label`, at most 60 characters). `series` on a point groups points into up to 3 lines or colors, named in the chart; bars have no series. Colors, sizes, and fonts are the player's.
 
@@ -122,9 +122,9 @@ A `fraction` draws `fractions` (1 to 4), each `parts` (1 to 24) with `shaded` of
 
 A `clock` shows `time` as `H:MM` in 12- or 24-hour form (`"3:45"`, `"15:45"`). `numbers: false` hides the numbers 1 to 12.
 
-A chess visual is drawn from its `fen`: the piece placement field (`rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR`), ranks 8 to 1 separated by `/`, each rank's files a to h as pieces (`KQRBNP` for White, `kqrbnp` for Black) and counts of empty squares (`1`–`8`) that add up to 8. The full FEN works too; the player reads only its first field. `highlight` lists 1 to 8 squares (`"e4"`) to mark, each once. `arrows` lists 1 to 4 moves, each `from` a square holding a piece (or one an earlier arrow moved a piece to) `to` another. `flip: true` shows the board from Black's side. The board, pieces, and colors are the player's. As a `hotspot` brick's visual, every square is tappable and `correct` lists squares (`["c7"]`); a highlight or an arrow may not land on an answer square.
+A chess visual is drawn from its `fen`: the piece placement field (`rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR`), ranks 8 to 1 separated by `/`, each rank's files a to h as pieces (`KQRBNP` for White, `kqrbnp` for Black) and counts of empty squares (`1`–`8`) that add up to 8. The full FEN works too; the player reads only its first field. `highlight` lists 1 to 8 squares (`"e4"`) to mark, each once. `arrows` lists 1 to 4 moves, each `from` a square holding a piece (or one an earlier arrow moved a piece to) `to` another. `flip: true` shows the board from Black's side. The board, pieces, and colors are the player's. As a `hotspot` kata's visual, every square is tappable and `correct` lists squares (`["c7"]`); a highlight or an arrow may not land on an answer square.
 
-A map is drawn by the player from Natural Earth's countries, with today's borders. `region` is one of `world` (the default; Antarctica is left off), `africa`, `europe`, `asia`, `middle-east`, `south-asia`, `east-asia`, `southeast-asia`, `north-america`, `central-america` (with the Caribbean), `south-america`, `oceania`, `mediterranean`, or `eastern-mediterranean` (Greece to the Euphrates and the Nile delta). `countries` (1 to 60) shades countries by ISO 3166-1 alpha-2 code (`"FR"`, `"GB"` for the United Kingdom, `"XK"` for Kosovo), each listed once and each on the region; `label` (at most 24 characters) names it on the map, and `group` (at most 24 characters) gives countries with the same group one color, named in a legend: up to 3 groups, and every country gets one or none does. `points` (1 to 8) marks places at `lat` and `lon` in decimal degrees (north and east positive, south and west negative), each inside the region, with an optional `label` (at most 24 characters). A map needs `countries`, `points`, or both. A country too small for the map's data (Tuvalu, Gibraltar) or drawn as part of another (French Guiana in France) is marked with a point instead. Colors, sizes, and where names go are the player's. As a `hotspot` brick's visual, every country the region draws is tappable and `correct` lists country codes (`["TR"]`); an answer country can't be labeled, be the only one shaded, or be the only country the `alt` names, and must be drawn large enough to tap on the region.
+A map is drawn by the player from Natural Earth's countries, with today's borders. `region` is one of `world` (the default; Antarctica is left off), `africa`, `europe`, `asia`, `middle-east`, `south-asia`, `east-asia`, `southeast-asia`, `north-america`, `central-america` (with the Caribbean), `south-america`, `oceania`, `mediterranean`, or `eastern-mediterranean` (Greece to the Euphrates and the Nile delta). `countries` (1 to 60) shades countries by ISO 3166-1 alpha-2 code (`"FR"`, `"GB"` for the United Kingdom, `"XK"` for Kosovo), each listed once and each on the region; `label` (at most 24 characters) names it on the map, and `group` (at most 24 characters) gives countries with the same group one color, named in a legend: up to 3 groups, and every country gets one or none does. `points` (1 to 8) marks places at `lat` and `lon` in decimal degrees (north and east positive, south and west negative), each inside the region, with an optional `label` (at most 24 characters). A map needs `countries`, `points`, or both. A country too small for the map's data (Tuvalu, Gibraltar) or drawn as part of another (French Guiana in France) is marked with a point instead. Colors, sizes, and where names go are the player's. As a `hotspot` kata's visual, every country the region draws is tappable and `correct` lists country codes (`["TR"]`); an answer country can't be labeled, be the only one shaded, or be the only country the `alt` names, and must be drawn large enough to tap on the region.
 
 A molecule is drawn by the player from its `smiles` (at most 200 characters, no spaces): ring closures as digits, branches in parentheses, aromatic atoms lowercase (`c1ccccc1`), stereo with `@`, `@@`, `/`, and `\`, and atoms outside `B C N O P S F Cl Br I` (and any with a charge or a set hydrogen count) in brackets (`[Na+]`, `[NH4+]`, `[O-]`). Separate molecules and ions with `.`. `style` is `skeletal` (the default: carbons as corners and line ends, hydrogens on carbon left out) or `full` (every atom and bond, carbons and hydrogens labelled; at most 16 atoms besides hydrogen, against 60 for a skeletal formula). `highlight` (1 to 3) marks groups in the accent color, each a SMARTS pattern (at most 100 characters) that matches the molecule: `[OX2H]` hydroxyl, `C(=O)[OH]` carboxyl, `[NX3;H2]` amine, `C=O` carbonyl, `C(=O)O[#6]` ester, `c1ccccc1` benzene ring; in a `full` drawing a group keeps the hydrogens on its oxygen or nitrogen. The layout, colors (oxygen red, nitrogen blue), and sizes are the player's: one scale for every molecule, so a small one stays small.
 
@@ -181,7 +181,7 @@ Colors and fonts are the player's: don't set `style.fill`, `style.stroke`, or `s
 
 Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedback"? (required on wrong options), "lang"? }`. Give each option text or a visual. Options with visuals show as cards in two columns; in a `choice`, give either every option a visual or none. Give each option visual an `alt` (screen readers announce it). `text` under a visual is a caption: add one only for what the visual can't show, like a name to refer to it by, never text the visual already shows.
 
-## The question bricks
+## The question katas
 
 ```json
 { "id": "p1", "type": "choice", "prompt": "…", "options": [ … 2–5 … ], "correct": ["a"], "multiple": false, "explanation": "…" }
@@ -225,17 +225,17 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
 ```
 
 - `blank` with `"format": "code"` takes a `language` and is usually `"caseSensitive": true`.
-- `blank` options: `numeric` and `tolerance` (number chips compare by value, so "0.5" is "0.50"), and the brick's `caseSensitive` (case is ignored otherwise). Accents always count, since the learner picks the exact chip: _si_ is a fair decoy for _sí_, and `strictAccents` changes nothing while answers are chips.
-- `number` bricks exist in the spec but aren't allowed in v1.
+- `blank` options: `numeric` and `tolerance` (number chips compare by value, so "0.5" is "0.50"), and the kata's `caseSensitive` (case is ignored otherwise). Accents always count, since the learner picks the exact chip: _si_ is a fair decoy for _sí_, and `strictAccents` changes nothing while answers are chips.
+- `number` katas exist in the spec but aren't allowed in v1.
 
 ## Rules the checker enforces
 
-- Hook is `choice` or `compare`; the first brick is a `concept`; 1–4 concept bricks; 2–4 question bricks after each concept brick; 3–12 question bricks in `bricks` in total; at most 20 bricks; the challenge is a question brick.
+- Hook is `choice` or `compare`; the first kata is a `concept`; 1–4 concept katas; 2–4 question katas after each concept kata; 3–12 question katas in `katas` in total; at most 20 katas; the challenge is a question kata.
 - Unique ids; every reference points to something real (`correct`, `group`, `alsoAccept`, `[[gap]]` ids, hotspot ids, code hotspot lines, squares on a chess hotspot, countries on a map hotspot).
-- Every `choice` has `multiple`, even when it's `false`; every wrong `choice`/`compare` option has `feedback`; every question brick has an `explanation`; a `choice` has at least one wrong option; a `scenario` has a `best` option.
+- Every `choice` has `multiple`, even when it's `false`; every wrong `choice`/`compare` option has `feedback`; every question kata has an `explanation`; a `choice` has at least one wrong option; a `scenario` has a `best` option.
 - Prompts ≤40 words; concept bodies ≤80 words.
 - Lists only in a concept's body, with two or more items; no headings, links, images, tables, or code blocks in any lesson text (code and formulas may hold `#` and `|`).
-- No `number` bricks; every `blank` has `choices` that include an accepted answer.
+- No `number` katas; every `blank` has `choices` that include an accepted answer.
 - Formulas in `\( … \)` are balanced and render; language codes are valid BCP 47.
 - Code sits in backticks: a command like `git push`, a flag, a call, a file name, a path, or an HTML tag written as plain text in a prompt, option, pair, item, feedback, or explanation is rejected.
 - `subject` is one of the slugs above; 1–5 `tags`, each a label of 2–30 characters (letters, digits, spaces, and `- + # . & / '`, not starting with `#`), none whose key repeats the subject, a level, or a language the lesson sets, no two with the same key.

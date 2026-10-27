@@ -1,5 +1,5 @@
 {
-  "spec": "0.8",
+  "spec": "0.9",
   "title": "Basic Spanish greetings",
   "summary": "Say hello the right way for the time of day, and ask how someone is.",
   "objective": "Greet someone in Spanish at any time of day and ask how they are, formally or informally.",
@@ -32,7 +32,7 @@
     "multiple": false,
     "explanation": "**Buenos días** means good morning, the natural greeting before lunch."
   },
-  "bricks": [
+  "katas": [
     {
       "id": "c1",
       "type": "concept",

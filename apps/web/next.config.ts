@@ -232,16 +232,16 @@ const nextConfig: NextConfig = {
       ),
       ...moved("/docs/lessons/sharing", "/docs/reference/api", "api"),
       ...moved(
-        "/docs/bricks",
+        "/docs/katas",
         "/docs/lessons/lesson-format",
-        "the-question-bricks"
+        "the-question-katas"
       ),
       // Subjects were folded into the skill's teaching guide.
       ...moved("/docs/subjects", "/docs", "introduction"),
       ...moved("/docs/skills", "/docs", "introduction"),
       {
-        source: "/docs/bricks/:path+",
-        destination: "/docs#the-question-bricks",
+        source: "/docs/katas/:path+",
+        destination: "/docs#the-question-katas",
         permanent: true,
       },
       {
