@@ -13,12 +13,12 @@ import {
 
 import { tagRows } from "../publish/store"
 
-// A one-off for lessons published before the tag table existed, or before tags were labels
-// (`npm run tags:backfill -w web`): brings every stored lesson's JSON up to the current spec, the
-// way the lesson page does on read, and rebuilds its lesson_tag rows (key and label). Rewriting
-// the JSON matters because Explore's subject index reads `lesson->>'subject'`, which older rows
-// don't have, and rows read their labels from the JSON. Safe to run again: it only writes what the
-// current code would write on an update.
+// For lessons published before the tag table existed, or before tags were labels, or before any
+// spec bump (`npm run tags:backfill -w web`, and every production build): brings every stored
+// lesson's JSON up to the current spec, the way the lesson page does on read, and rebuilds its
+// lesson_tag rows (key and label). Rewriting the JSON matters because Explore's subject index
+// reads `lesson->>'subject'`, which older rows don't have, and rows read their labels from the
+// JSON. Safe to run again: it only writes what the current code would write on an update.
 
 export interface BackfillChange {
   id: string
@@ -99,6 +99,27 @@ export async function backfillTags(
     }
   }
   return summary
+}
+
+/**
+ * Whether the production build should run the backfill (`scripts/backfill-on-deploy.ts`): only a
+ * production deploy with a database. Preview builds share the production database, so a preview
+ * on a branch with a newer spec must never rewrite live lessons.
+ */
+export function deployBackfill(
+  env: Record<string, string | undefined>
+): { run: true } | { run: false; reason: string } {
+  if (env.VERCEL_ENV !== "production")
+    return {
+      run: false,
+      reason: `Not a production deploy (VERCEL_ENV is ${env.VERCEL_ENV ?? "unset"}); skipping the tag backfill.`,
+    }
+  if (!env.DATABASE_URL)
+    return {
+      run: false,
+      reason: "DATABASE_URL isn't set; skipping the tag backfill.",
+    }
+  return { run: true }
 }
 
 /** The summary as text for a terminal. */

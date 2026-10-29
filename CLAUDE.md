@@ -33,7 +33,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `npm run voice -w @workspace/player`: speak the ninja's English lines (`packages/player/src/locales/voices/en.ts`) with his ElevenLabs voice into `apps/web/public/voice/en/` and `packages/player/src/voice-clips.json`, after changing them (a test fails if a clip is missing); only new lines cost credits, and it reads `ELEVENLABS_API_KEY` from `apps/web/.env.local`
 - `npm run favicon -w web`: rebuild `apps/web/app/favicon.ico` from `app/icon.svg` after changing the icon
 - `npm run tags -w web`: the weekly tag report (subjects by lesson count, top tags per subject, tags used once) from `DATABASE_URL` or `apps/web/.env.local`, else the local PGlite; read it to add synonyms to `packages/spec/src/tags.ts`
-- `npm run tags:backfill -w web`: brings every stored lesson up to the current spec and rebuilds its `lesson_tag` rows (dry run; `-- --write` applies); run it after a spec bump that changes subjects or tags
+- `npm run tags:backfill -w web`: brings every stored lesson up to the current spec and rebuilds its `lesson_tag` rows (dry run; `-- --write` applies). The production build runs it automatically after the migrations on every deploy (`scripts/backfill-on-deploy.ts`, skipped on previews); run it by hand only for a local PGlite or a one-off
 - `npm run handles:backfill -w web`: gives every account without a handle a random one (dry run; `-- --write` applies)
 - `npm run share -w web`: re-render the share images in `brand/` (GitHub social preview, X banner, square post) from the link preview card in `apps/web/lib/og.tsx`
 - Add shadcn components from `apps/web`: `npx shadcn@latest add <name>` (they land in `packages/ui`)
