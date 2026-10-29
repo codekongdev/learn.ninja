@@ -17,7 +17,7 @@
     "tags:backfill": "tsx --tsconfig scripts/tsconfig.json scripts/backfill-tags.ts",
     "handles:backfill": "tsx --tsconfig scripts/tsconfig.json scripts/backfill-handles.ts",
     "predev": "npm run visuals:css",
-    "prebuild": "npm run visuals:css && npm run migrate -w @workspace/db",
+    "prebuild": "npm run visuals:css && npm run migrate -w @workspace/db && tsx --tsconfig scripts/tsconfig.json scripts/backfill-on-deploy.ts",
     "test": "vitest run",
     "postinstall": "fumadocs-mdx",
     "e2e": "playwright test"

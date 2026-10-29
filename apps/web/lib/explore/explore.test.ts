@@ -45,7 +45,7 @@ import {
   trendingScore,
 } from "./queries"
 import { reportText, type ReportMail } from "./report-email"
-import { backfillTags, formatBackfill } from "./backfill"
+import { backfillTags, deployBackfill, formatBackfill } from "./backfill"
 import { formatTagReport, tagReport } from "./tag-report"
 
 // Explore over an in-memory Postgres: what gets listed, how the tabs sort, likes, visibility,
@@ -951,5 +951,29 @@ describe("tag backfill", () => {
     const again = await backfillTags(db, { write: true })
     expect(again.upgraded).toEqual([])
     expect(formatBackfill(again)).toContain("2 lessons, 0 rewritten")
+  })
+})
+
+describe("tag backfill on deploy", () => {
+  it("runs only in a production build with a database", () => {
+    const url = "postgres://example"
+    expect(
+      deployBackfill({ VERCEL_ENV: "production", DATABASE_URL: url })
+    ).toEqual({ run: true })
+    // Previews build against the production database too: never write from one.
+    expect(
+      deployBackfill({ VERCEL_ENV: "preview", DATABASE_URL: url })
+    ).toEqual({
+      run: false,
+      reason: expect.stringContaining("VERCEL_ENV is preview"),
+    })
+    expect(deployBackfill({ DATABASE_URL: url })).toEqual({
+      run: false,
+      reason: expect.stringContaining("VERCEL_ENV is unset"),
+    })
+    expect(deployBackfill({ VERCEL_ENV: "production" })).toEqual({
+      run: false,
+      reason: expect.stringContaining("DATABASE_URL"),
+    })
   })
 })
