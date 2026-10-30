@@ -22,6 +22,12 @@ export const LIMITS = {
   /** An explanation is shown in the ninja's speech bubble, so it stays short. */
   explanationWords: 30,
   conceptBodyWords: 80,
+  /** How much longer than every wrong option a right answer can be before its length gives it away. */
+  answerLengthRatio: 1.5,
+  /** Below this many characters a gap in length says nothing ("$1,950" against "$700"). */
+  answerLengthMin: 30,
+  /** Questions a lesson needs before "the right answer is usually the longest" can be called a pattern. */
+  answerPatternMin: 4,
   htmlVisualBytes: 20 * 1024,
   lessonBytes: 500 * 1024,
 } as const

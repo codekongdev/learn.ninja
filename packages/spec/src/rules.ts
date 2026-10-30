@@ -210,6 +210,43 @@ function decoded(text: string): string {
     .replace(/\\([^\n])/g, "$1")
 }
 
+/**
+ * The visible length of a one-answer question's right option and of its longest wrong one, or null
+ * when length can't be compared: fewer than 3 options, pictures, or formulas, whose TeX isn't what
+ * the learner sees.
+ */
+function answerLengths(
+  kata: QuestionKata
+): { right: number; wrong: number } | null {
+  if (kata.type !== "choice" && kata.type !== "scenario") return null
+  const options =
+    kata.type === "scenario"
+      ? kata.options.map((o) => ({
+          text: o.text,
+          right: o.quality === "best",
+        }))
+      : kata.options.map((o) => ({
+          text: o.visual ? undefined : o.text,
+          right: kata.correct.includes(o.id),
+        }))
+  const shown = options.flatMap(({ text, right }) =>
+    text && !text.includes("\\(")
+      ? [{ right, size: text.replace(/[*`]/g, "").trim().length }]
+      : []
+  )
+  const rightOnes = shown.filter((o) => o.right)
+  if (
+    options.length < 3 ||
+    shown.length < options.length ||
+    rightOnes.length !== 1
+  )
+    return null
+  return {
+    right: rightOnes[0]!.size,
+    wrong: Math.max(...shown.filter((o) => !o.right).map((o) => o.size)),
+  }
+}
+
 function duplicates(values: string[]): string[] {
   const seen = new Set<string>()
   const dupes = new Set<string>()
@@ -357,6 +394,31 @@ export function checkLesson(lesson: Lesson, raw: string): Issue[] {
       })
     }
   }
+
+  // A right answer that's longer than the rest can be picked without knowing anything: on one
+  // question when the gap is wide, and across a lesson when it keeps happening.
+  const lengths = questions.flatMap(({ kata, path }) => {
+    const found = answerLengths(kata)
+    return found ? [{ ...found, path }] : []
+  })
+  for (const { right, wrong, path } of lengths) {
+    if (
+      right >= LIMITS.answerLengthMin &&
+      right >= wrong * LIMITS.answerLengthRatio
+    )
+      add(
+        "teaching",
+        `${path}.options`,
+        `The right answer is ${right} characters and the longest wrong one ${wrong}, so its length gives it away. Move the reasoning into the explanation, or give the wrong options the same detail, so no option stands out.`
+      )
+  }
+  const longest = lengths.filter((q) => q.right > q.wrong).length
+  if (lengths.length >= LIMITS.answerPatternMin && longest * 2 > lengths.length)
+    add(
+      "teaching",
+      "",
+      `The right answer is the longest option in ${longest} of ${lengths.length} questions, so a learner can pass by always picking the longest. Make a wrong option the longest in some of them.`
+    )
 
   // The player shuffles options (and a match's right column), so "the second statement" can point
   // at the wrong one on screen. Explanations and feedback have to name an option by what it says.
@@ -1136,9 +1198,7 @@ function checkKataReferences(
     }
     case "match": {
       for (const side of ["left", "right"] as const)
-        for (const i of lookalikes(kata.pairs, (p) =>
-          looks({ text: p[side] })
-        ))
+        for (const i of lookalikes(kata.pairs, (p) => looks({ text: p[side] })))
           add(
             "structure",
             `${path}.pairs[${i}].${side}`,

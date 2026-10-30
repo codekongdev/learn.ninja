@@ -196,21 +196,21 @@
       "options": [
         {
           "id": "a",
-          "text": "Drought is consistent with the timing, but the cores can't show it caused any particular city's fall"
+          "text": "Drought fits the timing, but no core can show it felled a city"
         },
         {
           "id": "b",
-          "text": "Drought was the main cause: the dates match",
+          "text": "Drought was the main cause, since the dates match the collapse",
           "feedback": "Matching dates are necessary, not sufficient. Core dating is coarse, the region had survived droughts before, and drought doesn't explain earthquake damage or an emptied-then-burned Hattusa."
         },
         {
           "id": "c",
-          "text": "Little: pollen records plants, not politics",
+          "text": "Little: pollen records plants, not the politics of palaces",
           "feedback": "Vegetation tracks rainfall, rainfall tracks harvests, and letters from the period ask for grain. The cores corroborate the texts."
         },
         {
           "id": "d",
-          "text": "It rules out the Sea Peoples",
+          "text": "It rules out the Sea Peoples as a cause of the collapse",
           "feedback": "Drought and migration aren't rivals. A long drought is one of the better explanations for why people moved in the first place."
         }
       ],
@@ -283,7 +283,7 @@
     "options": [
       {
         "id": "a",
-        "text": "Pottery and radiocarbon dates spread the destructions across several decades"
+        "text": "Dates put the destructions several decades apart"
       },
       {
         "id": "b",

@@ -136,21 +136,21 @@
       "options": [
         {
           "id": "a",
-          "text": "Heavy watchers tap *Skip intro* because they're already bingeing; the arrow probably points the other way"
+          "text": "Heavy watching may cause the tapping, not the reverse"
         },
         {
           "id": "b",
-          "text": "The sample is too small to trust",
+          "text": "The sample may be too small to show a real effect",
           "feedback": "A streaming app has plenty of users; the correlation is probably real. The problem is what it means, not how reliable it is."
         },
         {
           "id": "c",
-          "text": "It's a coincidence",
+          "text": "The link could be a coincidence that fades with time",
           "feedback": "With this much data, chance is unlikely. Ask instead which variable drives which."
         },
         {
           "id": "d",
-          "text": "A bigger button won't change tapping",
+          "text": "A bigger button won't change how often people tap it",
           "feedback": "It might. But even if everyone tapped it, nothing suggests tapping makes people watch more."
         }
       ],
@@ -330,25 +330,25 @@
       {
         "id": "a",
         "quality": "best",
-        "text": "Ask who the non-drinkers are. People who quit coffee for health reasons would drag that group down. Look for studies that follow healthy people over time or control for prior illness.",
-        "outcome": "You've named a confounder and reverse causation in one go, and said what evidence would change your mind."
+        "text": "Ask who the non-drinkers are: people who quit coffee for their health would drag that group down.",
+        "outcome": "You've named a confounder and reverse causation in one go. Next, look for studies that follow healthy people over time."
       },
       {
         "id": "b",
         "quality": "okay",
-        "text": "Ask for a bigger study before deciding.",
+        "text": "Ask for a bigger study first, since 10,000 adults is too few to settle a question like this.",
         "outcome": "A bigger sample gives the same biased answer with more precision. Size doesn't fix confounding."
       },
       {
         "id": "c",
         "quality": "poor",
-        "text": "Go ahead; 10,000 people is strong evidence.",
+        "text": "Go ahead: 10,000 people is strong evidence, and studies that size rarely turn out wrong.",
         "outcome": "Strong evidence of a correlation, not of a cause. If sick people avoid coffee, the claim is backwards."
       },
       {
         "id": "d",
         "quality": "poor",
-        "text": "Dismiss it; correlation never means anything.",
+        "text": "Dismiss it: correlation never means anything, so a study like this tells us nothing about coffee.",
         "outcome": "Too far the other way. A correlation is a reason to look closer, and some real causal findings start exactly here."
       }
     ],

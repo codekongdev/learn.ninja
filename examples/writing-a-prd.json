@@ -16,12 +16,12 @@
       { "id": "a", "text": "What problem does this solve, and for whom?" },
       {
         "id": "b",
-        "text": "How long will it take to build?",
+        "text": "How long will it take to build, and who will do it?",
         "feedback": "Important later, but you can't estimate work before you know the problem."
       },
       {
         "id": "c",
-        "text": "Which design tool should we use?",
+        "text": "Which design tool should we use for the mockups?",
         "feedback": "That's a *how* question. A PRD starts with *why*."
       }
     ],
@@ -113,12 +113,12 @@
       "options": [
         {
           "id": "a",
-          "text": "Make search better",
+          "text": "Make search better for the people who use it most",
           "feedback": "Better how? Nobody can tell when this is done."
         },
         {
           "id": "b",
-          "text": "Users love saved searches",
+          "text": "Users love saved searches and come back to them often",
           "feedback": "Hard to measure directly. What behavior would show it?"
         },
         {
@@ -170,7 +170,7 @@
       {
         "id": "a",
         "quality": "best",
-        "text": "List it as a non-goal for this version, explain why, and note it for the next one",
+        "text": "List it as a non-goal, and note it for the next version",
         "outcome": "The VP sees it was considered, scope stays stable, and the idea isn't lost."
       },
       {
@@ -182,7 +182,7 @@
       {
         "id": "c",
         "quality": "poor",
-        "text": "Quietly add it to the requirements",
+        "text": "Quietly add it to the requirements and keep the date",
         "outcome": "Engineering finds out late, estimates break, and trust in the PRD drops."
       }
     ],
