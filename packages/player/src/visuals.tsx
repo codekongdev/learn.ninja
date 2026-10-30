@@ -27,6 +27,7 @@ import {
   moleculeKey,
   type CodeLines,
 } from "./prepared"
+import { markSpots, SPOT_CSS } from "./spots"
 
 /** Hotspot wiring for interactive visuals: which regions are selected or marked, and what a tap does. */
 export interface HotspotControl {
@@ -150,16 +151,15 @@ function HtmlFrame({
   const ref = React.useRef<HTMLIFrameElement>(null)
   const [measured, setMeasured] = React.useState<number | null>(null)
   const [loaded, setLoaded] = React.useState(0)
-  const hotspotsRef = React.useRef(hotspots)
-  hotspotsRef.current = hotspots
+  const interactive = Boolean(hotspots)
 
   // The document is fixed per lesson visual; the theme is applied after load without reloading. Its
   // direction is its own (dir="auto"), like lesson text: the interface's language doesn't mirror it.
   const srcDoc = React.useMemo(
     () =>
       // Without an explicit height the body keeps its natural size, so the player can measure it.
-      `<!doctype html><html dir="auto"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${VISUAL_CSP}"><link rel="stylesheet" href="${visualsCss}"><style>${inStyle(prepared.visualsCss)}</style><style>html,body{background:transparent}body{margin:0;padding:16px;display:flex;justify-content:center;align-items:center;box-sizing:border-box${height ? ";min-height:100vh" : ""}}${inStyle(css ?? "")}</style></head><body>${html}</body></html>`,
-    [html, css, visualsCss, height, prepared.visualsCss]
+      `<!doctype html><html dir="auto"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${VISUAL_CSP}"><link rel="stylesheet" href="${visualsCss}"><style>${inStyle(prepared.visualsCss)}</style><style>html,body{background:transparent}body{margin:0;padding:16px;display:flex;justify-content:center;align-items:center;box-sizing:border-box${height ? ";min-height:100vh" : ""}}${inStyle(css ?? "")}${interactive ? SPOT_CSS : ""}</style></head><body>${html}</body></html>`,
+    [html, css, visualsCss, height, prepared.visualsCss, interactive]
   )
 
   // A height known from before, set ahead of the first paint: the frame has its width by now.
@@ -218,7 +218,6 @@ function HtmlFrame({
   // Hotspots: Safari won't run event listeners inside a sandbox without allow-scripts, so the taps
   // land on buttons the player lays over each [data-hotspot] element instead. That also keeps focus
   // in the page, so Enter still checks the answer.
-  const interactive = Boolean(hotspots)
   const [spots, setSpots] = React.useState<SpotBox[]>([])
   React.useEffect(() => {
     const doc = ref.current?.contentDocument
@@ -238,8 +237,6 @@ function HtmlFrame({
             left: r.left,
             width: r.width,
             height: r.height,
-            radius: getComputedStyle(el).borderRadius,
-            frame: frameInset(el),
           }
         })
       )
@@ -273,8 +270,8 @@ function HtmlFrame({
     return () => window.removeEventListener("keydown", onKey)
   }, [interactive, order, keyScope])
 
-  // The tappable parts' corners show when the kata arrives, then while the pointer is over the
-  // stage, or while a finger holds it (phones have no hover).
+  // Every part shows its tile when the kata arrives, and while a finger holds the stage: phones have
+  // no hover to find the parts with.
   const [reveal, setReveal] = React.useState(interactive)
   const hold = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   React.useEffect(() => {
@@ -287,6 +284,23 @@ function HtmlFrame({
     hold.current = null
     setReveal(false)
   }
+
+  // What's marked in the frame: the parts picked or checked, and the one the pointer is on.
+  const [hovered, setHovered] = React.useState<string | null>(null)
+  const lit = new Map<string, "on" | Mark>()
+  if (hovered) lit.set(hovered, "on")
+  hotspots?.selected.forEach((id) => lit.set(id, "on"))
+  Object.entries(hotspots?.marks ?? {}).forEach(([id, m]) => lit.set(id, m))
+  const litKey = JSON.stringify([...lit])
+  React.useEffect(() => {
+    const doc = ref.current?.contentDocument
+    if (!doc?.body || !interactive) return
+    markSpots(doc, {
+      lit: new Map(JSON.parse(litKey) as [string, "on" | Mark][]),
+      hint: reveal,
+    })
+  }, [loaded, interactive, litKey, reveal])
+
   const picked = hotspots
     ? spots.filter((s) => hotspots.selected.includes(s.id)).map((s) => s.label)
     : []
@@ -297,7 +311,6 @@ function HtmlFrame({
     <div
       role={interactive ? "group" : "img"}
       aria-label={alt ?? label ?? t.visual}
-      data-reveal={(interactive && reveal) || undefined}
       onPointerDown={
         interactive
           ? (e) => {
@@ -314,7 +327,7 @@ function HtmlFrame({
         interactive
           ? // A hotspot's visual sits on a filled stage: no frame around it, so nothing boxes it twice.
             !plain &&
-              "group/stage overflow-hidden rounded-2xl bg-muted py-3 select-none dark:bg-input/30"
+              "overflow-hidden rounded-2xl bg-muted py-3 select-none dark:bg-input/30"
           : // On the page's own surface, like the lesson around it, with room above and below.
             !plain && "overflow-hidden rounded-xl border bg-background py-6"
       )}
@@ -333,7 +346,12 @@ function HtmlFrame({
         />
         {hotspots
           ? spots.map((spot) => (
-              <HotspotButton key={spot.id} spot={spot} control={hotspots} />
+              <HotspotButton
+                key={spot.id}
+                spot={spot}
+                control={hotspots}
+                onHover={setHovered}
+              />
             ))
           : null}
       </div>
@@ -362,17 +380,8 @@ interface SpotBox {
   left: number
   width: number
   height: number
-  radius: string
-  /** How far in from the box its corners and ring sit (see frameInset). */
-  frame: { top: number; right: number; bottom: number; left: number }
 }
 
-/**
- * Where to frame a tappable part. A small control (a pill, a button) is framed just outside its own
- * box, but a block with roomy padding, like a card's full-width header, is framed around its content:
- * its box runs to the card's edges, and a frame outside it would sit outside the card. The whole box
- * stays the tap target either way.
- */
 type Box = { x: number; y: number; width: number; height: number }
 
 /**
@@ -391,45 +400,29 @@ export function centeredViewBox(view: Box, drawing: Box): string | null {
   return [x, y, view.width, view.height].map(round).join(" ")
 }
 
-function frameInset(el: HTMLElement) {
-  const cs = getComputedStyle(el)
-  const side = (padding: string, border: string) => {
-    const p = parseFloat(padding) || 0
-    return p >= 12 ? p + (parseFloat(border) || 0) : 0
-  }
-  return {
-    top: side(cs.paddingTop, cs.borderTopWidth),
-    right: side(cs.paddingRight, cs.borderRightWidth),
-    bottom: side(cs.paddingBottom, cs.borderBottomWidth),
-    left: side(cs.paddingLeft, cs.borderLeftWidth),
-  }
-}
-
 /**
- * A tappable part of a visual, marked by four small corners like a viewfinder. They show when the
- * kata arrives, while the pointer is over the stage, or while a finger holds it, so the visual stays
- * clean the rest of the time. Picking a part closes them into one rounded ring that stands off the
- * part, whatever its own corners.
+ * A tappable part of a visual: an empty button over the part, since Safari won't run listeners
+ * inside the sandbox. The part's look is drawn in the frame (spots.ts).
  */
 function HotspotButton({
   spot,
   control,
+  onHover,
 }: {
   spot: SpotBox
   control: HotspotControl
+  onHover: (id: string | null) => void
 }) {
-  const mark = control.marks[spot.id]
-  const selected = control.selected.includes(spot.id)
-  const radius = Math.max(parseFloat(spot.radius) || 0, 8)
-  const { frame } = spot
   return (
     <Selectable
       aria-label={spot.label}
-      isSelected={selected}
+      isSelected={control.selected.includes(spot.id)}
       onChange={() => control.onToggle(spot.id)}
+      onHoverStart={() => onHover(spot.id)}
+      onHoverEnd={() => onHover(null)}
       isDisabled={control.disabled}
-      data-status={mark}
-      className="group/spot absolute cursor-pointer rounded-lg"
+      data-status={control.marks[spot.id]}
+      className="absolute cursor-pointer rounded-md"
       // Measured positions inside the frame, so physical edges are right in both directions.
       style={{
         top: spot.top,
@@ -437,53 +430,9 @@ function HotspotButton({
         width: spot.width,
         height: spot.height,
       }}
-    >
-      {/* The frame: the ring when picked, the corners otherwise. Physical sides, like the box. */}
-      <span
-        aria-hidden="true"
-        className={cn(
-          "pointer-events-none absolute outline-2 outline-offset-4 transition-[outline-color] outline-solid",
-          mark === "correct"
-            ? "outline-green-600"
-            : mark === "wrong"
-              ? "outline-yellow-500"
-              : selected
-                ? "outline-primary"
-                : "outline-transparent"
-        )}
-        style={{
-          top: frame.top,
-          right: frame.right,
-          bottom: frame.bottom,
-          left: frame.left,
-          borderRadius: frame.top || frame.left ? 8 : radius,
-        }}
-      >
-        {!selected && !mark && !control.disabled
-          ? CORNERS.map((corner) => (
-              <span
-                key={corner}
-                className={cn(
-                  "absolute size-2.5 border-muted-foreground opacity-0 transition-[opacity,border-color] duration-200 motion-reduce:transition-none",
-                  // Touch screens have no hover to hint with, so there the corners stay on.
-                  "group-hover/spot:border-foreground group-data-reveal/stage:opacity-100 pointer-coarse:opacity-100 pointer-fine:group-hover/stage:opacity-100",
-                  corner
-                )}
-              />
-            ))
-          : null}
-      </span>
-    </Selectable>
+    />
   )
 }
-
-/** The four corners of the viewfinder, just outside the part's box. */
-const CORNERS = [
-  "-start-1.5 -top-1.5 rounded-ss-sm border-s-2 border-t-2",
-  "-end-1.5 -top-1.5 rounded-se-sm border-e-2 border-t-2",
-  "-start-1.5 -bottom-1.5 rounded-es-sm border-s-2 border-b-2",
-  "-end-1.5 -bottom-1.5 rounded-ee-sm border-e-2 border-b-2",
-]
 
 // ---------- code: highlighted on the server, lines tappable for code hotspots ----------
 

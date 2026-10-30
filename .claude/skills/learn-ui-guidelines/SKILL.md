@@ -65,7 +65,7 @@ The control recipe lives in one place, `packages/player/src/controls.ts`; katas 
 
 - Use logical utilities only (`ms-*`, `pe-*`, `start-*`, `end-*`, `text-start`). Directional icons get `rtl:-scale-x-100` or `rtl:rotate-180`.
 - Content columns max out around `max-w-2xl`. Phones (375px) get edge-to-edge cards, icon-only secondary buttons, and no horizontal scroll. Grids that hold long content use `grid-cols-[minmax(0,1fr)]`.
-- Visuals on phones: a picture, diagram, or chart (not a hotspot, code, or a card's visual) gets an expand button that opens it full screen at a desktop column's width (`w-160`) to pan and pinch; code wraps under each line's start instead of scrolling; hotspot corners stay on (no hover to hint with); and three or more picture options sit in two columns (a pair keeps one).
+- Visuals on phones: a picture, diagram, or chart (not a hotspot, code, or a card's visual) gets an expand button that opens it full screen at a desktop column's width (`w-160`) to pan and pinch; code wraps under each line's start instead of scrolling; and three or more picture options sit in two columns (a pair keeps one).
 
 ### The player on phones (below `sm`)
 
@@ -83,6 +83,7 @@ Phones get a focused player, not the desktop frame squeezed down. Everything is 
 
 - **Match judges each pair as it's made**, on every screen: a right pair flashes green and settles as a dashed, muted tile out of play; a wrong one shakes yellow, comes apart, and costs the kata its first-try score (the `slip` action). The last pair checks the kata, so there's no Check to press.
 - Sort and order slide items with a view transition, which lets taps through (`::view-transition { pointer-events: none }`), so quick taps in a row all land.
+- **An HTML hotspot stays clean at rest.** The part under the pointer or picked gets a grey tile and the rest dims; a checked part takes the answer's color with a solid edge. No frames or corners. All of it is drawn inside the visual's frame (`packages/player/src/spots.ts`), and the buttons over it take the taps. Phones have no hover, so every part shows its tile when the kata arrives and while a finger holds the stage.
 - Wrap user handles and code in `<bdi dir="ltr">` so they stay readable in Arabic.
 
 ## States and interaction
