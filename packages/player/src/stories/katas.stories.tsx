@@ -96,9 +96,7 @@ function Question({
     mode === "why" || mode === "revealed" ? kata.explanation : null
   const props = { kata, answer, setAnswer, marks, locked: mode !== "idle" }
   const optionIds =
-    "options" in kata
-      ? (kata.options as { id: string }[]).map((o) => o.id)
-      : []
+    "options" in kata ? (kata.options as { id: string }[]).map((o) => o.id) : []
   const showOutcomes =
     kata.type === "scenario" && mode !== "idle" && answer.kind === "select"
       ? answer.ids
@@ -277,6 +275,27 @@ export const HotspotHtml: Story = {
   args: {
     kata: practice(buttons, 0, 1),
     wrong: { kind: "select", ids: ["create"] },
+  },
+}
+/** Stacked rows close together, whose tiles have to stay out of each other's way. */
+export const HotspotList: Story = {
+  name: "Hotspot, file list",
+  args: {
+    kata: {
+      id: "rebuild",
+      type: "hotspot",
+      prompt:
+        "A teammate deleted `node_modules`. Tap the file npm reads to rebuild it.",
+      visual: {
+        kind: "html",
+        html: "<div class='card max-w-sm mx-auto'><header><h2>my-site</h2></header><section><ul class='flex flex-col gap-2 text-sm'><li data-hotspot='readme' class='p-2'>README.md</li><li data-hotspot='index' class='p-2'>index.js</li><li data-hotspot='package' class='p-2'>package.json</li></ul></section></div>",
+      },
+      correct: ["package"],
+      multiple: false,
+      explanation:
+        "`package.json` lists the project's dependencies, so `npm install` can rebuild `node_modules` from it.",
+    },
+    wrong: { kind: "select", ids: ["index"] },
   },
 }
 export const HotspotCode: Story = {
