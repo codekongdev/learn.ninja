@@ -24,13 +24,15 @@ export function GetStarted() {
       <Separator />
       <div className="flex flex-col items-start gap-6">
         <SetupPicker />
-        <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-          Get started
-        </h2>
-        <p className="max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">
-          Copy the prompt, paste it into your agent, and finish it with what you
-          want to learn.
-        </p>
+        <div className="flex flex-col gap-2">
+          <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+            Get started
+          </h2>
+          <p className="max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">
+            Copy the prompt, paste it into your agent, and finish it with what
+            you want to learn.
+          </p>
+        </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <CopyButton text={SETUPS[setup].prompt} size="lg">
             Copy prompt for agent

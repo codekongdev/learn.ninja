@@ -9,8 +9,8 @@ import { logoMask } from "@/components/site/agent-logos"
 import { SETUPS, type SetupId } from "@/lib/site"
 import { setSetup, useSetup } from "@/lib/use-setup"
 
-/** The CLI/MCP toggle and who each one is for, shared by the hero and "Get started". */
-export function SetupPicker() {
+/** The CLI/MCP toggle, and with `agents` who each one is for. Shared by the hero and "Get started". */
+export function SetupPicker({ agents = false }: { agents?: boolean }) {
   const setup = useSetup()
 
   return (
@@ -38,22 +38,24 @@ export function SetupPicker() {
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
-      <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-        For
-        {SETUPS[setup].agents.map((agent) => (
-          <span key={agent.name} className="flex items-center gap-0.5">
-            <span
-              role="img"
-              aria-label={agent.name}
-              title={agent.name}
-              className="block size-4 bg-foreground/70"
-              style={logoMask(agent.logo)}
-            />
-            ,
-          </span>
-        ))}
-        and more.
-      </p>
+      {agents ? (
+        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          For
+          {SETUPS[setup].agents.map((agent) => (
+            <span key={agent.name} className="flex items-center gap-0.5">
+              <span
+                role="img"
+                aria-label={agent.name}
+                title={agent.name}
+                className="block size-4 bg-foreground/70"
+                style={logoMask(agent.logo)}
+              />
+              ,
+            </span>
+          ))}
+          and more.
+        </p>
+      ) : null}
     </div>
   )
 }
