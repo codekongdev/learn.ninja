@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, type ReactNode } from "react"
 
 import { LearnLogo } from "@workspace/player/logo"
 
@@ -15,14 +15,21 @@ const REACH = 100
  * The site's logo, with eyes that follow the mouse and blink now and then. The server renders the
  * still logo; the motion starts after mount and moves the eyes directly, so React never re-renders.
  * Reduced motion keeps it still, and touch input only gets the blinks. The lesson player uses the
- * plain `LearnLogo`, whose ninja does the moving.
+ * plain `LearnLogo`, whose ninja does the moving. `children` swaps the logo for the player's `Ninja`,
+ * for a mark that also needs his moods.
  */
-export function LivelyLogo({ className }: { className?: string }) {
+export function LivelyLogo({
+  className,
+  children,
+}: {
+  className?: string
+  children?: ReactNode
+}) {
   const ref = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     const svg = ref.current?.querySelector("svg")
-    const eyes = svg?.querySelector<SVGGElement>("[data-eyes]")
+    const eyes = svg?.querySelector<SVGGElement>("[data-eyes], .ninja-eyes")
     if (!svg || !eyes) return
     const lids = Array.from(eyes.querySelectorAll("ellipse"))
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -73,7 +80,8 @@ export function LivelyLogo({ className }: { className?: string }) {
       }
 
       const blink = () => {
-        if (!document.hidden) {
+        // A mood sets his eyelids itself: a blink would flash his eyes open in the middle of a bow.
+        if (!document.hidden && !svg!.matches('[class*=" e-"]')) {
           for (const lid of lids) {
             lid.style.transformBox = "fill-box"
             lid.style.transformOrigin = "center"
@@ -124,7 +132,7 @@ export function LivelyLogo({ className }: { className?: string }) {
 
   return (
     <span ref={ref} className="contents">
-      <LearnLogo className={className} />
+      {children ?? <LearnLogo className={className} />}
     </span>
   )
 }

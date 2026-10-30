@@ -18,6 +18,9 @@ export const SITE = {
   ],
   /** Placeholder until the learn.ninja account exists. */
   xUrl: "https://x.com",
+  tiktokUrl: "https://www.tiktok.com/@learn.ninja",
+  youtubeUrl: "https://www.youtube.com/@learndotninja",
+  instagramUrl: "https://www.instagram.com/learndotninja",
 }
 
 export const INSTALL_COMMAND = "npx skills add https://learn.ninja -g"
@@ -26,8 +29,34 @@ export const INSTALL_COMMAND = "npx skills add https://learn.ninja -g"
 export const MCP_URL = `${SITE.url}/mcp`
 export const MCP_INSTALL_COMMAND = `claude mcp add --transport http learn ${MCP_URL}`
 
-/** What "Copy prompt for agent" copies. */
+/** What "Copy prompt for agent" copies where there's no choice of setup. */
 export const AGENT_PROMPT = `Connect to the learn.ninja MCP server at ${MCP_URL} (or install the skill with \`${INSTALL_COMMAND}\`), then read ${SITE.url}/docs and make me a lesson about `
+
+/** The two ways to set up learn.ninja; `prompt` is what the home page's copy buttons copy for each. */
+export const SETUPS = {
+  cli: {
+    id: "cli",
+    label: "CLI",
+    agents: [
+      { name: "Claude Code", logo: "claudecode" },
+      { name: "Codex", logo: "codex" },
+      { name: "Cursor", logo: "cursor" },
+    ],
+    prompt: `Install the learn.ninja skill with \`${INSTALL_COMMAND}\`, then read ${SITE.url}/docs and make me a lesson about `,
+  },
+  mcp: {
+    id: "mcp",
+    label: "MCP",
+    agents: [
+      { name: "Claude", logo: "claude" },
+      { name: "ChatGPT", logo: "openai" },
+      { name: "Grok", logo: "grok" },
+    ],
+    prompt: `Connect to the learn.ninja MCP server at ${MCP_URL}. If you can't add it yourself, give me the steps for this app from ${SITE.url}/docs/reference/mcp.md and wait until I've done that. Once it's connected, call \`get_guide\` and make me a lesson about `,
+  },
+} as const
+
+export type SetupId = keyof typeof SETUPS
 
 /** The hero's copy button; the header shows its own once this scrolls under it. */
 export const HERO_CTA_ID = "hero-cta"

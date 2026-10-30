@@ -1,15 +1,22 @@
+"use client"
+
 import { AgentLogos } from "@/components/site/agent-logos"
 import { CopyButton } from "@/components/site/copy-button"
-import { AGENT_PROMPT, HERO_CTA_ID } from "@/lib/site"
+import { HERO_CTA_ID, SETUPS } from "@/lib/site"
+import { useSetup } from "@/lib/use-setup"
 
 import { RotatingWord } from "./rotating-word"
+import { SetupPicker } from "./setup-picker"
 
 const TOPICS = ["design", "coding", "data", "math", "science", "history"]
 
 export function Hero() {
+  const setup = useSetup()
+
   return (
     <section className="mx-auto flex w-full max-w-3xl flex-col items-center gap-24 px-4 py-20 sm:px-6 sm:py-28">
       <div className="flex w-full flex-col items-start gap-6">
+        <SetupPicker agents />
         <h1 className="font-mono text-3xl font-semibold tracking-tight sm:text-5xl sm:leading-[1.05]">
           Vibe learn <span className="sr-only">anything</span>
           <span aria-hidden="true">
@@ -23,7 +30,7 @@ export function Hero() {
           writes one short lesson you play in the browser, and gives you a link
           to share. Free, no account.
         </p>
-        <CopyButton id={HERO_CTA_ID} text={AGENT_PROMPT} size="lg">
+        <CopyButton id={HERO_CTA_ID} text={SETUPS[setup].prompt} size="lg">
           Copy prompt for agent
         </CopyButton>
       </div>
