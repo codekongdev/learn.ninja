@@ -37,10 +37,17 @@ export async function viewerStreak(userId: string): Promise<DayStreak> {
 }
 
 /**
- * The streak finishing a lesson will light, for the streak screen before its wrap-up, or null when
- * today already has a lesson. Replays count too, so any lesson lights an empty today.
+ * For a lesson page: the streak as it stands, for the header's lantern, and the streak finishing a
+ * lesson will light, for the streak screen before its wrap-up, or null when today already has a
+ * lesson. Replays count too, so any lesson lights an empty today.
  */
-export async function comingStreak(userId: string): Promise<DayStreak | null> {
+export async function lessonStreaks(userId: string): Promise<{
+  current: DayStreak
+  coming: DayStreak | null
+}> {
   const { days, today } = await daysAndToday(userId)
-  return days.includes(today) ? null : streakAfterFinish(days, today)
+  return {
+    current: dayStreak(days, today),
+    coming: days.includes(today) ? null : streakAfterFinish(days, today),
+  }
 }

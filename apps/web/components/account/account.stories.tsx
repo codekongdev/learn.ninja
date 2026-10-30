@@ -19,6 +19,7 @@ import { ConnectedApps } from "./connected-apps"
 import { AuthHeading, AuthPanel, LegalConsent } from "./auth-panel"
 import { ConsentForm } from "./consent-form"
 import { HandleForm } from "./handle-form"
+import { LessonAccount } from "./lesson-account"
 import { LogInMethods } from "./log-in-methods"
 import { LoginForm } from "./login-form"
 import { SettingsView } from "./settings-view"
@@ -540,6 +541,20 @@ export const HeaderStreakFull: Story = {
 }
 
 /** The consent step of a chat app logging in over OAuth (/consent). */
+// The end of a lesson's header: the lantern and picture, or Sign up for a visitor.
+export const LessonHeaderEnd: Story = {
+  name: "Lesson header end",
+  render: () => (
+    <div className="flex items-center gap-4">
+      <LessonAccount
+        account={{ handle: "ada-lovelace", image: PICTURE }}
+        streak={streakOf(12, 21, 2, "lllrllo")}
+      />
+      <LessonAccount account={null} />
+    </div>
+  ),
+}
+
 export const Consent: Story = {
   render: () => (
     <AuthPanel>

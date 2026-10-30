@@ -3,7 +3,8 @@ import { cache } from "react"
 import type { DayStreak } from "@workspace/player"
 import { upgradeLesson, type Lesson } from "@workspace/spec"
 
-import { comingStreak } from "./activity/server"
+import { lessonStreaks } from "./activity/server"
+import { accountOf, type AccountInfo } from "./auth/account-info"
 import { currentActor } from "./auth/session"
 import { authorOf, likedIds } from "./explore/queries"
 import { idFromParam } from "./publish/ids"
@@ -40,6 +41,10 @@ export interface PublishedView {
   liked: boolean
   /** The logged-in visitor's handle, which the challenges they send name. */
   viewerHandle: string | null
+  /** What the header shows about the visitor; null when nobody is logged in. */
+  account: AccountInfo | null
+  /** The logged-in visitor's streak as it stands, for the header's lantern. */
+  currentStreak: DayStreak | null
   /** The streak finishing it will light, for the streak screen; null when it won't light today. */
   streak: DayStreak | null
 }
@@ -65,6 +70,8 @@ export const viewPublished = cache(
         author: null,
         liked: false,
         viewerHandle: actor?.handle ?? null,
+        account: accountOf(actor),
+        currentStreak: null,
         streak: null,
       }
     const isOwner = actor !== null && record.ownerId === actor.userId
@@ -78,13 +85,15 @@ export const viewPublished = cache(
         author: null,
         liked: false,
         viewerHandle: actor?.handle ?? null,
+        account: accountOf(actor),
+        currentStreak: null,
         streak: null,
       }
     const db = await getDb()
-    const [author, liked, streak] = await Promise.all([
+    const [author, liked, streaks] = await Promise.all([
       record.ownerId ? authorOf(db, record.ownerId) : null,
       actor ? likedIds(db, actor.userId, [record.id]) : new Set<string>(),
-      actor ? comingStreak(actor.userId) : null,
+      actor ? lessonStreaks(actor.userId) : null,
     ])
     return {
       record,
@@ -98,7 +107,9 @@ export const viewPublished = cache(
       author,
       liked: liked.has(record.id),
       viewerHandle: actor?.handle ?? null,
-      streak,
+      account: accountOf(actor),
+      currentStreak: streaks?.current ?? null,
+      streak: streaks?.coming ?? null,
     }
   }
 )

@@ -173,7 +173,14 @@ export interface LessonPlayerProps {
   shareUrl?: string
   /** The app's own entries for the lesson menu (the chevron by the title), after the player's. */
   menuItems?: React.ReactNode
-  /** The app's color theme. Pass both to show the theme setting in the footer. */
+  /**
+   * The app's account controls, last in the header on every screen size: the streak and profile
+   * picture, or a way to sign up.
+   */
+  headerAccount?: React.ReactNode
+  /** The account's entries for the phone menu, for what `headerAccount` leaves out on phones. */
+  phoneAccount?: React.ReactNode
+  /** The app's color theme. Pass both to show the theme setting in the header. */
   theme?: Theme
   onThemeChange?: (theme: Theme) => void
   /** Called when the learner renames the lesson in the header. The player shows the new name either way. */
@@ -246,6 +253,8 @@ function LessonInLanguage({
   termsHref,
   shareUrl,
   menuItems,
+  headerAccount,
+  phoneAccount,
   theme,
   onThemeChange,
   onRename,
@@ -362,7 +371,13 @@ function LessonInLanguage({
               onPrefs={setPrefs}
               soundOn={prefsLoaded && prefs.sound !== "off"}
               onShortcuts={() => setShortcutsOpen((open) => !open)}
-              headerSettings={<AppSettings {...appSettings} />}
+              // The gear stays away while it would open an empty menu.
+              headerSettings={
+                onThemeChange || UI_TRANSLATIONS ? (
+                  <AppSettings {...appSettings} />
+                ) : undefined
+              }
+              account={headerAccount}
               phoneMenu={
                 <>
                   <DropdownMenuSeparator />
@@ -384,6 +399,12 @@ function LessonInLanguage({
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuGroup>
+                    </>
+                  ) : null}
+                  {phoneAccount ? (
+                    <>
+                      <DropdownMenuSeparator />
+                      {phoneAccount}
                     </>
                   ) : null}
                 </>
@@ -784,6 +805,7 @@ function Player({
   soundOn,
   onShortcuts,
   headerSettings,
+  account,
   phoneMenu,
   trayOpen,
   onTrayToggle,
@@ -807,6 +829,8 @@ function Player({
   onShortcuts: () => void
   /** The app's settings, shown in the header. */
   headerSettings?: React.ReactNode
+  /** The app's account controls, last in the header. */
+  account?: React.ReactNode
   /** The end of the header's menu on phones: the settings and links that have no room there. */
   phoneMenu?: React.ReactNode
   trayOpen: boolean
@@ -1179,6 +1203,7 @@ function Player({
           homeHref={homeHref}
           shareUrl={shareUrl}
           settings={headerSettings}
+          account={account}
           menuItems={menuItems}
           phoneMenu={phoneMenu}
           onRestart={() => {

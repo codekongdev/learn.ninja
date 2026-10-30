@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic"
 
 /**
- * GitHub or an email code; `?callback=` says where to go afterwards (the /keep link uses it). A
- * chat app logging in over OAuth arrives with the authorize request in the query instead, and goes
+ * GitHub or an email code; `?callback=` says where to go afterwards (the /keep link uses it), and
+ * `?signup=1` titles it for a visitor coming to make an account, which logging in does too. A chat app logging in over OAuth arrives with the authorize request in the query instead, and goes
  * back into it (then to /consent) once logged in. Drawn in the same bare panel as /consent, so
  * connecting an app looks like one flow.
  */
@@ -36,6 +36,7 @@ export default async function LoginPage({
       <LoginForm
         github={githubFromEnv() !== null}
         callback={callback}
+        {...(params.signup && { title: "Sign up" })}
         {...(resume && {
           title: "Log in to connect your app",
           description:

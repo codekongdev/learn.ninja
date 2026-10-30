@@ -73,7 +73,8 @@ import { hasVoice } from "./voices"
 // follows the Figma frame "Learn" (node 2004:15459).
 //
 // Three kinds of controls, each in its own place: the header is about this lesson (title, progress,
-// share, restart) plus a gear menu for the app (theme, language); the tray is about how you play
+// share, restart) plus the app's own controls at its end (the streak and account, or Sign up, and a
+// gear for language when there's anything to pick); the tray is about how you play
 // (the screen's actions in the middle, the ninja at the start where he lives, text size at the end);
 // the footer holds the credit, the legal and docs links, and the keyboard shortcuts.
 
@@ -178,6 +179,7 @@ export function LessonHeader({
   homeHref,
   shareUrl,
   settings,
+  account,
   menuItems,
   phoneMenu,
   onRestart,
@@ -198,6 +200,8 @@ export function LessonHeader({
   shareUrl?: string
   /** The app's settings menu, shown before Share. */
   settings?: React.ReactNode
+  /** The app's account controls, last in the header, on phones too. */
+  account?: React.ReactNode
   /** The app's own entries for the lesson menu, after Restart. */
   menuItems?: React.ReactNode
   /**
@@ -214,9 +218,9 @@ export function LessonHeader({
   const [confirmRestart, setConfirmRestart] = React.useState(false)
   const controls = useCreatorControls()
   return (
-    // On phones the header is the logo, the progress bar, and one menu: the title shows only on the
-    // intro (the screen itself names the lesson after that), and the gear, Share, and the footer's
-    // links move into the menu.
+    // On phones the header is the logo, the progress bar, the app's account controls, and one menu:
+    // the title shows only on the intro (the screen itself names the lesson after that), and the
+    // gear, Share, and the footer's links move into the menu.
     <header className="flex h-14 shrink-0 items-center gap-2 px-4 max-sm:gap-3 sm:h-16 sm:px-8">
       <div
         className={cn(
@@ -308,24 +312,27 @@ export function LessonHeader({
         // Holds the middle of the header so the buttons don't shift when the bar appears.
         <div aria-hidden="true" className="min-w-0 max-sm:hidden sm:flex-1" />
       )}
-      <div className="flex items-center justify-end gap-2 max-sm:hidden sm:flex-1">
-        {settings}
-        {/* The maker's Share shows where the lesson stands and holds the link and publishing. */}
-        {controls ? (
-          <CreatorShare url={shareUrl} />
-        ) : (
-          <ShareButton title={title} url={shareUrl} t={t} />
-        )}
+      <div className="flex shrink-0 items-center justify-end gap-2 sm:flex-1">
+        <div className="flex items-center gap-2 max-sm:hidden">
+          {settings}
+          {/* The maker's Share shows where the lesson stands and holds the link and publishing. */}
+          {controls ? (
+            <CreatorShare url={shareUrl} />
+          ) : (
+            <ShareButton title={title} url={shareUrl} t={t} />
+          )}
+        </div>
+        {account}
+        <PhoneMenu
+          title={title}
+          expires={left ? t.expires[left.unit](left.count) : null}
+          shareUrl={shareUrl}
+          onRestart={() => setConfirmRestart(true)}
+          menuItems={menuItems}
+          phoneMenu={phoneMenu}
+          t={t}
+        />
       </div>
-      <PhoneMenu
-        title={title}
-        expires={left ? t.expires[left.unit](left.count) : null}
-        shareUrl={shareUrl}
-        onRestart={() => setConfirmRestart(true)}
-        menuItems={menuItems}
-        phoneMenu={phoneMenu}
-        t={t}
-      />
     </header>
   )
 }

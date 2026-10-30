@@ -34,17 +34,21 @@ const CLOSE_DELAY = 200
  * The header's account control once logged in: the profile picture, with a menu of everywhere
  * the user can go (Explore, their profile, their lessons, settings, the docs in a new tab) and
  * log out. With a mouse the menu opens on hover and stays while the pointer is on it; a tap,
- * a click, or Enter opens it too, so phones and keyboards aren't left out.
+ * a click, or Enter opens it too, so phones and keyboards aren't left out. A lesson turns the hover
+ * off (`hover={false}`), so passing the picture on the way to Share doesn't open anything.
  */
 export function AccountMenu({
   account,
   api = accountApi,
   navigate,
+  hover = true,
   defaultOpen = false,
   className,
 }: {
   account: AccountInfo
   api?: AccountApi
+  /** Whether a resting mouse opens the menu, as well as a click. */
+  hover?: boolean
   /** Where to go after logging out; the browser's own navigation by default. */
   navigate?: (to: string) => void
   /** For stories: start with the menu open. */
@@ -63,9 +67,8 @@ export function AccountMenu({
   React.useEffect(() => () => clearTimeout(timer.current), [])
   const enter = () => later(() => setOpen(true), OPEN_DELAY)
   const leave = () => later(() => setOpen(false), CLOSE_DELAY)
-  const byMouse = (e: React.PointerEvent) => e.pointerType !== "touch"
+  const byMouse = (e: React.PointerEvent) => hover && e.pointerType !== "touch"
 
-  const name = account.handle ? `@${account.handle}` : "Account"
   return (
     <DropdownMenuTrigger
       isOpen={open}
@@ -78,16 +81,24 @@ export function AccountMenu({
       <Button
         variant="ghost"
         size="icon-sm"
-        aria-label={`${name}: account menu`}
+        aria-label={`${accountName(account)}: account menu`}
         className={cn("ms-1 rounded-full", className)}
-        onHoverStart={() => {
-          overTrigger.current = true
-          enter()
-        }}
-        onHoverEnd={() => {
-          overTrigger.current = false
-          leave()
-        }}
+        onHoverStart={
+          hover
+            ? () => {
+                overTrigger.current = true
+                enter()
+              }
+            : undefined
+        }
+        onHoverEnd={
+          hover
+            ? () => {
+                overTrigger.current = false
+                leave()
+              }
+            : undefined
+        }
       >
         <UserAvatar
           image={account.image}
@@ -107,19 +118,7 @@ export function AccountMenu({
         }}
       >
         <DropdownMenuGroup aria-label="Account">
-          <DropdownMenuLabel>
-            <bdi dir="ltr">{name}</bdi>
-          </DropdownMenuLabel>
-          {account.handle ? (
-            <DropdownMenuItem href={`/u/${account.handle}`}>
-              <UserRoundIcon />
-              Profile
-            </DropdownMenuItem>
-          ) : null}
-          <DropdownMenuItem href="/settings">
-            <SettingsIcon />
-            Settings
-          </DropdownMenuItem>
+          <AccountPlaces account={account} />
           <DropdownMenuItem href="/docs" target="_blank" textValue="Docs">
             <BookOpenIcon />
             Docs
@@ -131,14 +130,58 @@ export function AccountMenu({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            onAction={() => void logOutAndLeave(api, navigate)}
-          >
-            <LogOutIcon />
-            Log out
-          </DropdownMenuItem>
+          <LogOutItem api={api} navigate={navigate} />
         </DropdownMenuGroup>
       </DropdownMenu>
     </DropdownMenuTrigger>
+  )
+}
+
+/** The account's rows for a lesson's phone menu, which has no profile picture to open this menu. */
+export function AccountMenuItems({ account }: { account: AccountInfo }) {
+  return (
+    <DropdownMenuGroup aria-label="Account">
+      <AccountPlaces account={account} />
+      <LogOutItem />
+    </DropdownMenuGroup>
+  )
+}
+
+function accountName(account: AccountInfo) {
+  return account.handle ? `@${account.handle}` : "Account"
+}
+
+function AccountPlaces({ account }: { account: AccountInfo }) {
+  return (
+    <>
+      <DropdownMenuLabel>
+        <bdi dir="ltr">{accountName(account)}</bdi>
+      </DropdownMenuLabel>
+      {account.handle ? (
+        <DropdownMenuItem href={`/u/${account.handle}`}>
+          <UserRoundIcon />
+          Profile
+        </DropdownMenuItem>
+      ) : null}
+      <DropdownMenuItem href="/settings">
+        <SettingsIcon />
+        Settings
+      </DropdownMenuItem>
+    </>
+  )
+}
+
+function LogOutItem({
+  api = accountApi,
+  navigate,
+}: {
+  api?: AccountApi
+  navigate?: (to: string) => void
+}) {
+  return (
+    <DropdownMenuItem onAction={() => void logOutAndLeave(api, navigate)}>
+      <LogOutIcon />
+      Log out
+    </DropdownMenuItem>
   )
 }

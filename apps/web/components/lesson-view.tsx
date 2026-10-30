@@ -2,19 +2,22 @@
 
 import * as React from "react"
 import { FlagIcon, SettingsIcon } from "lucide-react"
-import { useTheme } from "next-themes"
 
 import {
   LessonPlayer,
   parseChallenge,
   type Challenge,
+  type DayStreak,
   type LessonPlayerProps,
   type NextKind,
-  type Theme,
 } from "@workspace/player"
 import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu"
 
+import { useAccount } from "@/components/account/account-link"
+import { AccountMenuItems } from "@/components/account/account-menu"
+import { LessonAccount } from "@/components/account/lesson-account"
 import { ReportDialog } from "@/components/explore/report-dialog"
+import type { AccountInfo } from "@/lib/auth/account-info"
 import { exploreApi } from "@/lib/explore/browser"
 import { keepFinish, sendFinishes } from "@/lib/explore/finishes"
 import type { Visibility } from "@/lib/explore/queries"
@@ -49,14 +52,18 @@ export interface LessonViewProps extends LessonPlayerProps {
   likes?: { likes: number; liked: boolean; signedIn: boolean }
   /** Where a logged-out viewer logs in to like the lesson; send them back with ?like=1 to make the like. */
   loginHref?: string
+  /** The logged-in user, or null when nobody is. Prerendered pages leave it out for the marker cookie. */
+  account?: AccountInfo | null
+  /** The logged-in learner's streak as it stands, for the header's lantern. */
+  currentStreak?: DayStreak
 }
 
 /**
- * The lesson player with the footer's theme setting connected to next-themes. A page that doesn't
- * pass `uiLanguage` (the prerendered /lessons pages) still honors ?ui=, read after mounting, the
- * same moment the player loads saved preferences, so the page can stay static. Published lessons
- * add the site's own items to the lesson menu: a report, or the owner's listing status, tell the
- * server how far a logged-in viewer gets and when they reach the wrap-up, and give the wrap-up its heart.
+ * The lesson player with the site's account controls in its header. A page that doesn't pass
+ * `uiLanguage` (the prerendered /lessons pages) still honors ?ui=, read after mounting, the same
+ * moment the player loads saved preferences, so the page can stay static. Published lessons add
+ * the site's own items to the lesson menu: a report, or the owner's listing status, tell the server
+ * how far a logged-in viewer gets and when they reach the wrap-up, and give the wrap-up its heart.
  */
 export function LessonView({
   lessonId,
@@ -65,11 +72,13 @@ export function LessonView({
   recordCompletion = false,
   likes,
   loginHref,
+  account: knownAccount,
+  currentStreak,
   ...props
 }: LessonViewProps) {
-  const { theme, setTheme } = useTheme()
-  // next-themes only knows the saved theme after mounting; show "System" until then.
-  const [mounted, setMounted] = React.useState(false)
+  const account = useAccount(knownAccount)
+  // The lantern as it stands, until this finish lights it alongside the streak screen.
+  const [lantern, setLantern] = React.useState(currentStreak)
   const [urlLanguage, setUrlLanguage] = React.useState<string>()
   const [reportOpen, setReportOpen] = React.useState(false)
   // Kept here, not in the wrap-up, so a replay's wrap-up shows the like the last one made.
@@ -83,7 +92,6 @@ export function LessonView({
   // The last progress sent, which the finish waits for.
   const sentProgress = React.useRef<Promise<unknown>>(Promise.resolve())
   React.useEffect(() => {
-    setMounted(true)
     // Lessons this browser finished logged out, now that it's logged in.
     if (recordCompletion) void sendFinishes()
     setUrl(window.location.origin + window.location.pathname)
@@ -138,11 +146,15 @@ export function LessonView({
         docsHref="/docs"
         privacyHref="/privacy"
         termsHref="/terms"
+        // Once logged in, Explore is home, as in the site's header.
+        homeHref={account ? "/explore" : "/"}
         {...props}
         uiLanguage={props.uiLanguage ?? urlLanguage}
-        theme={mounted ? ((theme as Theme | undefined) ?? "system") : "system"}
-        onThemeChange={setTheme}
         menuItems={menuItems}
+        headerAccount={<LessonAccount account={account} streak={lantern} />}
+        phoneAccount={
+          account ? <AccountMenuItems account={account} /> : undefined
+        }
         nextPrompt={nextPrompt}
         challenge={props.challenge ?? linkChallenge}
         creator={
@@ -213,6 +225,7 @@ export function LessonView({
             ? undefined
             : recordCompletion
               ? () => {
+                  if (props.streak) setLantern(props.streak)
                   // After the last progress lands, or that would mark the lesson in progress again.
                   void sentProgress.current.then(() =>
                     fetch(`/api/lessons/${lessonId}/complete`, {

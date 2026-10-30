@@ -14,6 +14,8 @@ function ThemeProvider({
       attribute="class"
       defaultTheme="dark"
       enableSystem
+      // Dark for everyone until the theme has a setting again; D still flips it while developing.
+      forcedTheme={process.env.NODE_ENV === "development" ? undefined : "dark"}
       disableTransitionOnChange
       {...props}
     >
