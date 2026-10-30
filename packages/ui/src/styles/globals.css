@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./typeset.css";
+@import "./smoke.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @plugin "tailwindcss-react-aria-components";
@@ -616,11 +617,13 @@
 }
 
 /* The smoke behind the intro (Aura in packages/player/src/ninja.tsx): overlapping puffs of one smoke
-   texture, each turning at its own pace. The textures carry their own color (gray with a faint tint
-   of the lesson's hue), one per theme. --aura-shift (set by the player) moves it with the content
-   when the ninja's slot folds away. Only transform and opacity move, so Safari keeps it on the GPU. */
+   texture, each turning at its own pace. The textures live in smoke.css, inside the stylesheet, so
+   the smoke is there on the first paint. It has no fade-in: Safari holds a fade on a player that
+   starts hidden (see resumeScript) partway until it ends. --aura-shift (set by the player) moves it
+   with the content when the ninja's slot folds away. Only transform and opacity move, so Safari
+   keeps it on the GPU. */
 :root {
-  --smoke-a: 0.4;
+  --smoke-a: 0.8;
 }
 .dark {
   --smoke-a: 0.6;
@@ -645,21 +648,13 @@
 .smoke-spin {
   width: 100%;
   height: 100%;
-  background: var(--sprite-a) center / 100% 100% no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   transform: rotate(var(--turn));
-}
-.smoke-b {
-  background-image: var(--sprite-b);
-}
-.dark .smoke-a {
-  background-image: var(--sprite-a-dark);
-}
-.dark .smoke-b {
-  background-image: var(--sprite-b-dark);
 }
 @media (prefers-reduced-motion: no-preference) {
   .smoke {
-    animation: smoke-in 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
     transition: top 0.3s ease-out;
   }
   .smoke-spin {
@@ -675,12 +670,6 @@
   }
   .smoke[data-vanishing] .smoke-puff {
     transform: translate(var(--bx), var(--by)) scale(1.5);
-  }
-}
-@keyframes smoke-in {
-  from {
-    opacity: 0;
-    scale: 0.85;
   }
 }
 @keyframes smoke-turn {

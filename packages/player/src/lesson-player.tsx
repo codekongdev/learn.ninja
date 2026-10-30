@@ -85,7 +85,6 @@ import {
 } from "./flow"
 import {
   Aura,
-  hueFor,
   SmokeWords,
   Ninja,
   NinjaStage,
@@ -1237,7 +1236,6 @@ function Player({
             >
               {item.kind === "intro" ? (
                 <Aura
-                  hue={hueFor(lesson.subject)}
                   // Half of the slot (88px) and its gap (20px): the content moves up this far without the ninja.
                   shift={ninja === "off" ? -54 : 0}
                   vanishing={vanishing}
