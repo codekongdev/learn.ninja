@@ -1,7 +1,8 @@
-// Speaks the ninja's English lines (src/locales/voices/en.ts) with his ElevenLabs voice: one mp3 per
-// line in apps/web/public/voice/en/, named by a hash of the voice, model, and text, and the table
-// the player looks them up in (src/voice-clips.json). Only new or changed lines cost credits; clips
-// for lines that are gone are deleted. Run it after changing the English lines:
+// Speaks the ninja's English lines (src/locales/voices/en.ts and src/footer-lines.ts) with his
+// ElevenLabs voice: one mp3 per line in apps/web/public/voice/en/, named by a hash of the voice,
+// model, and text, and the tables they're looked up in (src/voice-clips.json for the player,
+// src/footer-clips.json for the site's footer). Only new or changed lines cost credits; clips for
+// lines that are gone are deleted. Run it after changing the English lines:
 // `npm run voice -w @workspace/player`. It reads ELEVENLABS_API_KEY from apps/web/.env.local.
 
 import { createHash } from "node:crypto"
@@ -15,6 +16,7 @@ import {
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 
+import { FOOTER_LINES } from "../src/footer-lines"
 import { en } from "../src/locales/voices/en"
 import type { VoiceClips } from "../src/voices"
 
@@ -28,6 +30,7 @@ const AT_ONCE = 3
 
 const here = fileURLToPath(new URL(".", import.meta.url))
 const manifestPath = join(here, "../src/voice-clips.json")
+const footerManifestPath = join(here, "../src/footer-clips.json")
 const dir = join(here, "../../../apps/web/public/voice/en")
 
 try {
@@ -36,13 +39,14 @@ try {
   // No env file: the key may be in the environment, or every clip already exists.
 }
 
-const lines = [
+const lessonLines = [
   ...new Set(
     Object.values(en).flatMap((voice) =>
       Object.values(voice).flatMap(({ plain, flavor }) => [...plain, ...flavor])
     )
   ),
 ]
+const lines = [...new Set([...lessonLines, ...FOOTER_LINES])]
 const clip = (text: string) =>
   createHash("sha256")
     .update(`${VOICE}\n${MODEL}\n${text}`)
@@ -90,9 +94,19 @@ for (const file of stale) rmSync(join(dir, file))
 const manifest: VoiceClips = {
   voice: VOICE,
   model: MODEL,
-  clips: { en: clips },
+  clips: {
+    en: Object.fromEntries(lessonLines.map((text) => [text, clips[text]!])),
+  },
 }
 writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
+writeFileSync(
+  footerManifestPath,
+  `${JSON.stringify(
+    Object.fromEntries(FOOTER_LINES.map((text) => [text, clips[text]])),
+    null,
+    2
+  )}\n`
+)
 console.log(
   `${lines.length} lines: ${missing.length} spoken, ${stale.length} stale clips removed`
 )

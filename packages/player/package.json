@@ -10,6 +10,8 @@
     "./strings": "./src/strings.ts",
     "./plain-text": "./src/plain-text.ts",
     "./logo": "./src/logo.tsx",
+    "./ninja": "./src/ninja.tsx",
+    "./footer-lines": "./src/footer-lines.ts",
     "./time": "./src/time.tsx",
     "./progress": "./src/progress.ts",
     "./streak-rules": "./src/streak-rules.ts"

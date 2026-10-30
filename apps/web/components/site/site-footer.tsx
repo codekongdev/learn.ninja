@@ -5,7 +5,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { SITE } from "@/lib/site"
 
-import { LivelyLogo } from "./lively-logo"
+import { FooterNinja } from "./footer-ninja"
 import { InstagramLogo, TikTokLogo, XLogo, YouTubeLogo } from "./social-icons"
 
 const COLUMNS = [
@@ -41,9 +41,9 @@ const SMALL_LINK_CLASS =
   "shrink-0 rounded-md outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
 
 /**
- * The bottom of every page, on the page background: the ninja on its own row (pulled back by the
- * empty edge of his drawing, so he lines up with the name), the name and the links level under it,
- * and the legal row last. `className` sets its width to match the page (`max-w-*`).
+ * The bottom of every page, on the page background: the ninja on his own row, the name and the
+ * links level under him, and the legal row last. `className` sets its width to match the page
+ * (`max-w-*`).
  */
 export function SiteFooter({ className }: { className?: string }) {
   return (
@@ -54,13 +54,7 @@ export function SiteFooter({ className }: { className?: string }) {
       )}
     >
       <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-2">
-          <LivelyLogo className="-ms-1 size-16" />
-          {/* One of his praise lines, in the player's green speech bubble (`TOAST` in packages/player). */}
-          <p className="rounded-[18px] bg-[color-mix(in_srgb,var(--color-green-500)_18%,var(--background))] px-3.5 py-2 text-sm font-medium text-foreground">
-            Yosh! Nice work.
-          </p>
-        </div>
+        <FooterNinja />
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-center gap-1.5 text-sm font-medium">

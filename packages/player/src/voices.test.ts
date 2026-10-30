@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url"
 
 import { describe, expect, it } from "vitest"
 
+import { FOOTER_LINES, footerClip } from "./footer-lines"
 import { UI_LANGUAGES } from "./strings"
 import {
   CADENCE,
@@ -185,6 +186,18 @@ describe("voices", () => {
           expect(existsSync(publicDir + url), `${url} for "${line}"`).toBe(true)
         }
       }
+  })
+
+  it("speaks every footer line, from a clip in the web app", () => {
+    // Stale after changing the footer's lines: run `npm run voice -w @workspace/player`.
+    const publicDir = fileURLToPath(
+      new URL("../../../apps/web/public", import.meta.url)
+    )
+    for (const line of FOOTER_LINES) {
+      const url = footerClip(line)
+      expect(url, `a clip for "${line}"`).not.toBeNull()
+      expect(existsSync(publicDir + url), `${url} for "${line}"`).toBe(true)
+    }
   })
 
   it("stays quiet in languages without clips", () => {
