@@ -233,6 +233,7 @@ Used by `choice` and `compare`: `{ "id", "text"? (rich text), "visual"?, "feedba
 - Hook is `choice` or `compare`; the first kata is a `concept`; 1–4 concept katas; 2–4 question katas after each concept kata; 3–12 question katas in `katas` in total; at most 20 katas; the challenge is a question kata.
 - Unique ids; every reference points to something real (`correct`, `group`, `alsoAccept`, `[[gap]]` ids, hotspot ids, code hotspot lines, squares on a chess hotspot, countries on a map hotspot).
 - Every `choice` has `multiple`, even when it's `false`; every wrong `choice`/`compare` option has `feedback`; every question kata has an `explanation`; a `choice` has at least one wrong option; a `scenario` has a `best` option.
+- A right answer can't give itself away by length: at 30 characters or more it stays under 1.5 times the longest wrong option, and in a lesson with 4 or more one-answer text questions it isn't the longest option in most of them.
 - Prompts ≤40 words; concept bodies ≤80 words.
 - Lists only in a concept's body, with two or more items; no headings, links, images, tables, or code blocks in any lesson text (code and formulas may hold `#` and `|`).
 - No `number` katas; every `blank` has `choices` that include an accepted answer.

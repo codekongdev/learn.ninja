@@ -1697,6 +1697,68 @@ describe("markdown in lesson text", () => {
   })
 })
 
+describe("answers given away by length", () => {
+  const long = "Open it and confirm the article exists and says what it claims"
+
+  it("rejects a right answer far longer than every wrong one", () => {
+    const l = buttons()
+    l.katas[1].options[0].text = long
+    expectIssue(l, {
+      path: "katas[1].options",
+      message: /length gives it away/,
+      kind: "teaching",
+    })
+  })
+
+  it("checks a scenario's best option", () => {
+    const l = buttons()
+    l.challenge.options[0].text = long.repeat(2)
+    expectIssue(l, { path: "challenge.options", message: /length gives it/ })
+  })
+
+  it("accepts the same answer once a wrong option carries as much detail", () => {
+    const l = buttons()
+    l.katas[1].options[0].text = long
+    l.katas[1].options[1].text =
+      "Continue shopping so people can add a few more items first"
+    expect(validateLesson(l).ok).toBe(true)
+  })
+
+  it("leaves short answers alone", () => {
+    const l = compound()
+    l.hook.options[1].text = "About $1,950 in all"
+    expect(validateLesson(l).ok).toBe(true)
+  })
+
+  it("leaves formulas alone, since their TeX isn't what the learner sees", () => {
+    const l = buttons()
+    l.katas[1].options[0].text =
+      "\\( \\frac{\\text{orders placed}}{\\text{visits}} \\times 100 \\)"
+    expect(validateLesson(l).ok).toBe(true)
+  })
+
+  it("leaves pick-all questions alone", () => {
+    const l = buttons()
+    l.katas[1].multiple = true
+    l.katas[1].correct = ["a", "b"]
+    l.katas[1].options[0].text = long
+    expect(validateLesson(l).ok).toBe(true)
+  })
+
+  it("rejects a lesson where the right answer is usually the longest", () => {
+    const l = loadExample("bronze-age-collapse.json")
+    const questions = [l.hook, ...l.katas, l.challenge].filter(
+      (k) => k.type === "choice" && !k.multiple
+    )
+    for (const k of questions) {
+      const options: { id: string; text: string }[] = k.options
+      const longest = Math.max(...options.map((o) => o.text.length))
+      options.find((o) => o.id === k.correct[0])!.text = "x".repeat(longest + 1)
+    }
+    expectIssue(l, { path: "", message: /the longest option in \d+ of \d+/ })
+  })
+})
+
 describe("explanation length", () => {
   it("rejects an explanation over the word limit", () => {
     const lesson = loadExample("writing-a-prd.json") as {

@@ -231,7 +231,7 @@
       {
         "id": "a",
         "quality": "best",
-        "text": "Save as primary, Reset as secondary, Delete as a red text button placed apart from the others",
+        "text": "Save as primary, Reset as secondary, Delete as red text set apart",
         "outcome": "The main action is clear, and the dangerous one is hard to hit by accident."
       },
       {
@@ -243,7 +243,7 @@
       {
         "id": "c",
         "quality": "poor",
-        "text": "All three as primary buttons so they're easy to find",
+        "text": "All three as primary buttons so each one is easy to find and reach",
         "outcome": "Nothing stands out, and Delete is as tempting as Save."
       }
     ],
