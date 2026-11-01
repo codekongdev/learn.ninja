@@ -6,8 +6,7 @@ import type { SetupId } from "@/lib/site"
 
 const DEFAULT_SETUP: SetupId = "cli"
 
-// A store rather than page state: the header's copy button sits outside the page's sections, and
-// it has to copy the same prompt as the toggles.
+// A store rather than page state: the bottom bar sits outside the page's sections, and they follow it.
 let current = DEFAULT_SETUP as SetupId
 const listeners = new Set<() => void>()
 
@@ -23,7 +22,7 @@ export function setSetup(setup: SetupId) {
   listeners.forEach((listener) => listener())
 }
 
-/** The CLI or MCP choice, shared by every toggle and copy button on the home page. */
+/** The CLI or MCP choice, shared by the bottom bar and everything on the home page that follows it. */
 export function useSetup() {
   return useSyncExternalStore(
     subscribe,
