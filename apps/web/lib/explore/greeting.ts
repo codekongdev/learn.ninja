@@ -38,7 +38,7 @@ export function greetingFor(hour: number): Greeting {
   if (hour >= 5 && hour < 12)
     return { word: "Ohayō", meaning: "Good morning", line: "fresh mind" }
   if (hour >= 12 && hour < 18)
-    return { word: "Konnichiwa", meaning: "Hello", line: "welcome back" }
+    return { word: "Konnichiwa", meaning: "Hello", line: "get learning" }
   if (hour >= 18 && hour < 22)
     return { word: "Konbanwa", meaning: "Good evening", line: "still time" }
   return { word: "Konbanwa", meaning: "Good evening", line: "quiet hours" }
