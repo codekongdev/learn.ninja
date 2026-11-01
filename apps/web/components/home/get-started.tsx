@@ -28,7 +28,7 @@ export function GetStarted() {
       </div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <CopyButton text={SETUPS[setup].prompt} size="lg">
-          Copy prompt for agent
+          Copy prompt
         </CopyButton>
         <Link
           href={guide.href}

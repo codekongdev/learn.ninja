@@ -26,7 +26,7 @@ test("the home page explains the product", async ({ page }) => {
     "Vibe learn"
   )
   await expect(
-    page.getByRole("button", { name: "Copy prompt for agent" }).first()
+    page.getByRole("button", { name: "Copy prompt" }).first()
   ).toBeVisible()
 })
 
