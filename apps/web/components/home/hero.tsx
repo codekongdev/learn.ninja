@@ -1,6 +1,7 @@
 "use client"
 
 import { AgentLogos } from "@/components/site/agent-logos"
+import { ButtonLink } from "@/components/site/button-link"
 import { CopyButton } from "@/components/site/copy-button"
 import { HERO_CTA_ID, SETUPS } from "@/lib/site"
 import { useSetup } from "@/lib/use-setup"
@@ -30,9 +31,14 @@ export function Hero() {
           writes one short lesson you play in the browser, and gives you a link
           to share. Free, no account.
         </p>
-        <CopyButton id={HERO_CTA_ID} text={SETUPS[setup].prompt} size="lg">
-          Copy prompt for agent
-        </CopyButton>
+        <div className="flex flex-wrap items-center gap-2">
+          <CopyButton id={HERO_CTA_ID} text={SETUPS[setup].prompt} size="lg">
+            Copy prompt for agent
+          </CopyButton>
+          <ButtonLink href="/explore" variant="outline" size="lg">
+            Explore
+          </ButtonLink>
+        </div>
       </div>
       <AgentLogos />
     </section>
