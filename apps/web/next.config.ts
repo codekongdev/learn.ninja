@@ -129,7 +129,7 @@ const nextConfig: NextConfig = {
       ])
     ),
     "/lessons/[slug]": PREPARE_FILES,
-    "/docs": PREPARE_FILES,
+    "/docs/[[...slug]]": PREPARE_FILES,
     // The site's link preview card reads the agent logos from public/ (lib/og.tsx).
     "/opengraph-image": ["./public/agents/*.svg"],
   },
@@ -186,23 +186,11 @@ const nextConfig: NextConfig = {
     ]
   },
   async redirects() {
-    // The docs are one page: each old page is an anchor on it. Only browsers are redirected; agents
-    // asking for text still get each file's Markdown through the rewrites above.
-    const HTML = {
-      has: [{ type: "header" as const, key: "accept", value: ".*text/html.*" }],
-    }
-    const section = (from: string, anchor: string) => [
-      {
-        source: from,
-        destination: `/docs#${anchor}`,
-        permanent: true,
-        ...HTML,
-      },
-    ]
-    // Pages that were cut; their Markdown moved too.
-    const moved = (from: string, to: string, anchor: string) => [
-      { source: from, destination: `/docs#${anchor}`, permanent: true },
-      { source: `${from}.md`, destination: `${to}.md`, permanent: true },
+    // Pages that were cut or moved; their Markdown moved too. The docs are a page per file in
+    // docs/, so a cut page points at the page that covers it now, with an anchor where there's a heading.
+    const moved = (from: string, to: string) => [
+      { source: from, destination: to, permanent: true },
+      { source: `${from}.md`, destination: `${to.split("#")[0]}.md`, permanent: true },
     ]
     return [
       // Once logged in, Explore is home. The header's marker cookie (lib/auth/browser.ts) says so
@@ -217,31 +205,18 @@ const nextConfig: NextConfig = {
       { source: "/create", destination: "/docs", permanent: false },
       // The login page was /sign-in until October 2026; old links and keep emails still point there.
       { source: "/sign-in", destination: "/login", permanent: true },
-      ...section("/docs/lessons/lesson-format", "lesson-format"),
-      ...section("/docs/lessons/levels", "levels"),
-      ...section("/docs/reference/cli", "cli"),
-      ...section("/docs/reference/api", "api"),
-      ...section("/docs/reference/json-schema", "json-schema"),
-      ...moved("/docs/install", "/docs", "install"),
-      ...moved("/docs/quick-start", "/docs", "introduction"),
-      ...moved("/docs/reference/agents", "/docs", "plain-text"),
-      ...moved(
-        "/docs/lessons/how-lessons-work",
-        "/docs/lessons/lesson-format",
-        "lesson-format"
-      ),
-      ...moved("/docs/lessons/sharing", "/docs/reference/api", "api"),
-      ...moved(
-        "/docs/katas",
-        "/docs/lessons/lesson-format",
-        "the-question-katas"
-      ),
+      ...moved("/docs/install", "/docs#install"),
+      ...moved("/docs/quick-start", "/docs"),
+      ...moved("/docs/reference/agents", "/docs#plain-text"),
+      ...moved("/docs/lessons/how-lessons-work", "/docs/lessons/lesson-format"),
+      ...moved("/docs/lessons/sharing", "/docs/reference/api"),
+      ...moved("/docs/katas", "/docs/lessons/lesson-format#the-question-katas"),
       // Subjects were folded into the skill's teaching guide.
-      ...moved("/docs/subjects", "/docs", "introduction"),
-      ...moved("/docs/skills", "/docs", "introduction"),
+      ...moved("/docs/subjects", "/docs"),
+      ...moved("/docs/skills", "/docs"),
       {
         source: "/docs/katas/:path+",
-        destination: "/docs#the-question-katas",
+        destination: "/docs/lessons/lesson-format#the-question-katas",
         permanent: true,
       },
       {
@@ -251,7 +226,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/docs/:dir(skills|subjects)/:path+",
-        destination: "/docs#introduction",
+        destination: "/docs",
         permanent: true,
       },
     ]

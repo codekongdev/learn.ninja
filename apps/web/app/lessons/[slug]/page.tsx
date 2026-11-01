@@ -4,6 +4,8 @@ import { notFound } from "next/navigation"
 import { prepareLesson } from "@workspace/player/prepare"
 
 import { LessonView } from "@/components/lesson-view"
+import { JsonLd } from "@/components/site/json-ld"
+import { lessonJsonLd } from "@/lib/json-ld"
 import { getLesson, LESSON_SLUGS } from "@/lib/lessons"
 import { shareMetadata } from "@/lib/metadata"
 
@@ -34,6 +36,7 @@ export default async function LessonPage({ params }: Props) {
   const prepared = await prepareLesson(lesson)
   return (
     <div className="h-svh">
+      <JsonLd data={lessonJsonLd({ lesson, path: `/lessons/${slug}` })} />
       <LessonView
         lesson={lesson}
         prepared={prepared}

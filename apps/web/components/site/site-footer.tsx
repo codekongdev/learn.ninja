@@ -19,7 +19,7 @@ const COLUMNS = [
   {
     title: "Developers",
     links: [
-      { href: "/docs#api", label: "API" },
+      { href: "/docs/reference/api", label: "API" },
       { href: "/llms.txt", label: "llms.txt" },
       { href: "/contributors", label: "Contributors" },
     ],

@@ -6,7 +6,9 @@ import { parseChallenge } from "@workspace/player"
 
 import { ViewBeacon } from "@/components/explore/view-beacon"
 import { LessonView } from "@/components/lesson-view"
+import { JsonLd } from "@/components/site/json-ld"
 import { LessonExpired } from "@/components/site/lesson-expired"
+import { lessonJsonLd } from "@/lib/json-ld"
 import { shareMetadata } from "@/lib/metadata"
 import { OG_SIZE } from "@/lib/og"
 import { viewPublished } from "@/lib/published"
@@ -82,6 +84,18 @@ export default async function PublishedLessonPage({
   const { ui, c, by } = await searchParams
   return (
     <div className="h-svh">
+      {/* Only listed lessons are indexed, so only they describe themselves to search engines. */}
+      {listed ? (
+        <JsonLd
+          data={lessonJsonLd({
+            lesson: record.lesson,
+            path: `/l/${slugId}`,
+            author: author?.handle,
+            publishedAt: record.createdAt,
+            updatedAt: record.updatedAt,
+          })}
+        />
+      ) : null}
       <LessonView
         lesson={record.lesson}
         prepared={withCharts(record.lesson, record.prepared)}

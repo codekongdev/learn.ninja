@@ -89,7 +89,7 @@ export function ConnectedApps({
       ) : (
         <p className="text-sm text-muted-foreground">
           <Link
-            href="/docs#connect-with-your-account"
+            href="/docs/reference/mcp#connect-with-your-account"
             className="underline underline-offset-3 hover:text-foreground"
           >
             How to connect a chat app

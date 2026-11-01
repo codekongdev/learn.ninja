@@ -82,7 +82,7 @@ export function ConnectChat({
 
   const docs = (
     <Link
-      href="/docs#connect-with-your-account"
+      href="/docs/reference/mcp#connect-with-your-account"
       className="underline underline-offset-3 hover:text-foreground"
     >
       how to add it

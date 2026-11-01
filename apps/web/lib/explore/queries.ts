@@ -468,3 +468,36 @@ export async function authorOf(
     .where(eq(user.id, ownerId))
   return row ?? null
 }
+
+/** A listed lesson as the sitemap names it, with who published it. */
+export interface SitemapLesson {
+  slug: string
+  id: string
+  updatedAt: number
+  handle: string | null
+}
+
+/**
+ * Every listed lesson, newest first, for the sitemap: owned, public, not hidden, so the same
+ * set Explore shows and the lesson page lets search engines index. Profiles come from their
+ * handles. Capped well above today's count; split the sitemap before raising it past 50,000.
+ */
+export async function sitemapLessons(
+  db: Db,
+  now = Date.now(),
+  limit = 10_000
+): Promise<SitemapLesson[]> {
+  const rows = await db
+    .select({
+      slug: lesson.slug,
+      id: lesson.id,
+      updatedAt: lesson.updatedAt,
+      handle: user.handle,
+    })
+    .from(lesson)
+    .leftJoin(user, eq(user.id, lesson.ownerId))
+    .where(listed(now))
+    .orderBy(desc(lesson.createdAt), desc(lesson.id))
+    .limit(limit)
+  return rows.map((r) => ({ ...r, updatedAt: r.updatedAt.getTime() }))
+}

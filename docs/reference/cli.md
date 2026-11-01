@@ -64,7 +64,7 @@ node scripts/learn.mjs login --email you@example.com
 node scripts/learn.mjs login --email you@example.com --code 123456
 ```
 
-Codes work for 5 minutes and three tries. The tool saves an API key for this machine in `~/.config/learn/credentials` (readable only by you; `$XDG_CONFIG_HOME/learn/credentials` if that's set), then prints which lessons from this folder it kept and that they're saved to your handle, private until you publish them. From then on, `publish` sends the key and lessons are saved to your account. You can also set `LEARN_API_KEY` instead, with a key made at [learn.ninja/settings](https://learn.ninja/settings).
+Codes work for 5 minutes and three tries. The tool saves an API key for this machine in `~/.config/learn/credentials` (readable only by you; `$XDG_CONFIG_HOME/learn/credentials` if that's set), then prints which lessons from this folder it kept and that they're saved to your handle and published in Explore. From then on, `publish` sends the key and lessons are saved to your account. You can also set `LEARN_API_KEY` instead, with a key made at [learn.ninja/settings](https://learn.ninja/settings).
 
 ### `keep`
 
