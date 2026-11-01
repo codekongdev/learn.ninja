@@ -58,9 +58,6 @@ export const SETUPS = {
 
 export type SetupId = keyof typeof SETUPS
 
-/** The hero's copy button; the header shows its own once this scrolls under it. */
-export const HERO_CTA_ID = "hero-cta"
-
 /** Agents shown on the home page. Logos live in public/agents/ (see its README). */
 export const AGENTS = [
   { name: "Claude Code", logo: "claudecode" },
