@@ -17,7 +17,7 @@ import {
 } from "./tags"
 
 describe("subjects", () => {
-  it("are the plan's 16 plus data, each with a name, scope notes, and a hue of its own", () => {
+  it("are the plan's 16 plus data, each with a name and scope notes", () => {
     expect(SUBJECTS).toHaveLength(17)
     expect(new Set(SUBJECTS).size).toBe(17)
     for (const subject of SUBJECTS) {
@@ -29,11 +29,7 @@ describe("subjects", () => {
       ).toBeLessThanOrEqual(3)
       expect(info.covers).toMatch(/\S/)
       expect(info.notThis).toMatch(/\S/)
-      expect(info.hue).toBeGreaterThanOrEqual(0)
-      expect(info.hue).toBeLessThan(360)
     }
-    const hues = SUBJECTS.map((s) => SUBJECT_INFO[s].hue)
-    expect(new Set(hues).size).toBe(SUBJECTS.length)
     expect(isSubject("history")).toBe(true)
     expect(isSubject("coding")).toBe(false)
   })

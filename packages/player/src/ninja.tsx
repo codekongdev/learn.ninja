@@ -2,7 +2,6 @@
 
 import * as React from "react"
 
-import { SUBJECT_INFO, type Subject } from "@workspace/spec"
 import { cn } from "@workspace/ui/lib/utils"
 
 import type { NinjaLevel } from "./strings"
@@ -1030,19 +1029,6 @@ async function leap(
 
 // ---------- the smoke ----------
 
-/** The hue of a lesson's light: one per subject (subjects.ts in the spec), so lessons on the same subject share it and the light says something. */
-export function hueFor(subject: Subject): number {
-  return SUBJECT_INFO[subject].hue
-}
-
-// One smoke texture, drawn once by the browser as an image: noise pushed through a soft blob, with
-// the noise's own streaks as its density. The color is baked in (a background image moves on the GPU
-// in Safari; a mask repaints every frame), so each theme gets its own copy.
-function smokeSprite(seed: number, color: string) {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='f' filterUnits='userSpaceOnUse' x='0' y='0' width='200' height='200'><feTurbulence type='fractalNoise' baseFrequency='0.022' numOctaves='5' seed='${seed}' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='70' xChannelSelector='R' yChannelSelector='G' result='d'/><feColorMatrix in='n' type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.2 0 0 0 -0.6' result='t'/><feComposite in='t' in2='d' operator='in' result='m'/><feFlood flood-color='${color}'/><feComposite in2='m' operator='in'/><feGaussianBlur stdDeviation='1.2'/></filter><radialGradient id='g'><stop offset='0' stop-color='#fff'/><stop offset='0.5' stop-color='#fff' stop-opacity='0.6'/><stop offset='1' stop-color='#fff' stop-opacity='0'/></radialGradient><circle cx='100' cy='100' r='72' fill='url(#g)' filter='url(#f)'/></svg>`
-  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
-}
-
 // The puffs: where each sits (% of the smoke box), its size (% of the box's width), its starting
 // turn, how long one turn takes (s), which way it turns, and how strong it is. Few and large: every
 // layer costs Safari memory and drawing time.
@@ -1067,39 +1053,23 @@ const PUFFS: {
 ]
 
 /**
- * The smoke behind the intro: overlapping puffs of one smoke texture, faintly tinted with the
- * lesson's hue, each turning slowly at its own pace, so together they curl and billow. `shift` moves
- * it up or down (px) to follow the content, e.g. when the ninja's slot folds away. `vanishing` flares
- * it and blows the puffs outward as the intro disappears. No scripts, nothing loaded.
+ * The smoke behind the intro: overlapping puffs of one smoke texture, each turning slowly at its own
+ * pace, so together they curl and billow. `shift` moves it up or down (px) to follow the content,
+ * e.g. when the ninja's slot folds away. `vanishing` flares it and blows the puffs outward as the
+ * intro disappears. No scripts, nothing loaded: the textures are in the stylesheet (smoke.css).
  */
 export function Aura({
-  hue,
   shift = 0,
   vanishing = false,
 }: {
-  hue: number
   shift?: number
   vanishing?: boolean
 }) {
-  const sprites = React.useMemo(
-    () => ({
-      "--sprite-a": smokeSprite(3, `hsl(${hue} 8% 55%)`),
-      "--sprite-b": smokeSprite(11, `hsl(${hue} 8% 55%)`),
-      "--sprite-a-dark": smokeSprite(3, `hsl(${hue} 10% 78%)`),
-      "--sprite-b-dark": smokeSprite(11, `hsl(${hue} 10% 78%)`),
-    }),
-    [hue]
-  )
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[inherit]"
-      style={
-        {
-          ...sprites,
-          "--aura-shift": `${shift}px`,
-        } as React.CSSProperties
-      }
+      style={{ "--aura-shift": `${shift}px` } as React.CSSProperties}
     >
       <div className="smoke" data-vanishing={vanishing || undefined}>
         {PUFFS.map((p, i) => (
