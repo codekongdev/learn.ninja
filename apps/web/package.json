@@ -21,7 +21,8 @@
     "prebuild": "npm run visuals:css && npm run migrate -w @workspace/db && tsx --tsconfig scripts/tsconfig.json scripts/backfill-on-deploy.ts",
     "test": "vitest run",
     "postinstall": "fumadocs-mdx",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "bento": "tsx --conditions=react-server --tsconfig scripts/tsconfig.json scripts/build-bento.tsx"
   },
   "dependencies": {
     "@better-auth/api-key": "^1.7.12",

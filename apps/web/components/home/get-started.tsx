@@ -8,7 +8,7 @@ import { useSetup } from "@/lib/use-setup"
 
 const GUIDES = {
   cli: { href: "/docs#install", link: "Install guide" },
-  mcp: { href: "/docs#mcp", link: "How to connect" },
+  mcp: { href: "/docs/reference/mcp", link: "How to connect" },
 }
 
 export function GetStarted() {

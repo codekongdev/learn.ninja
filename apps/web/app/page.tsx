@@ -5,7 +5,9 @@ import { GetStarted } from "@/components/home/get-started"
 import { Hero } from "@/components/home/hero"
 import { SetupBar } from "@/components/home/setup-bar"
 import { SiteFooter } from "@/components/site/site-footer"
+import { JsonLd } from "@/components/site/json-ld"
 import { SiteHeader } from "@/components/site/site-header"
+import { homeJsonLd } from "@/lib/json-ld"
 
 export const metadata: Metadata = {
   alternates: {
@@ -19,6 +21,7 @@ export default function HomePage() {
     // The padding keeps the footer clear of the fixed bar.
     <div className="flex min-h-svh flex-col pb-[calc(3rem+1px+env(safe-area-inset-bottom))]">
       <SiteHeader />
+      <JsonLd data={homeJsonLd()} />
       <main className="flex-1">
         <Hero />
         <Faq />

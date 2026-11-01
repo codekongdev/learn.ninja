@@ -42,6 +42,7 @@ import {
   likedIds,
   listLessons,
   profileByHandle,
+  sitemapLessons,
   trendingScore,
 } from "./queries"
 import { reportText, type ReportMail } from "./report-email"
@@ -201,6 +202,23 @@ describe("what Explore lists", () => {
   it("respects the limit", async () => {
     for (let i = 0; i < 3; i++) await published("ada", { visibility: "public" })
     expect(await listLessons(db, "new", 2, { now })).toHaveLength(2)
+  })
+
+  it("names the same lessons for the sitemap, with their makers' handles", async () => {
+    const shown = await published("ada", { visibility: "public" })
+    await published(null, { visibility: "public" })
+    await published("ada")
+    await published("bob", { visibility: "public", hidden: true })
+    const noHandle = await published("new", { visibility: "public" })
+    const rows = await sitemapLessons(db, now)
+    expect(rows.map((r) => r.id).sort()).toEqual([shown, noHandle].sort())
+    expect(rows.find((r) => r.id === shown)).toEqual({
+      id: shown,
+      slug: "button-hierarchy",
+      handle: "ada",
+      updatedAt: expect.any(Number),
+    })
+    expect(rows.find((r) => r.id === noHandle)?.handle).toBeNull()
   })
 
   it("lists a lesson whose owner has no handle yet, without a handle", async () => {

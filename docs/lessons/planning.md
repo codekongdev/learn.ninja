@@ -3,7 +3,7 @@ title: Planning
 description: How the agent sizes a lesson, when it splits a topic into a path, and when it asks before writing.
 ---
 
-Before writing, the agent reads what you asked for and decides how big the lesson is, who reads it, and its [level](#pick-a-level). Most requests say enough, so it decides without asking and tells you its choices after publishing, in one line like "Beginner · standard · adult". Ask for any of them to change and it remakes the lesson.
+Before writing, the agent reads what you asked for and decides how big the lesson is, who reads it, and its [level](/docs/lessons/levels#pick-a-level). Most requests say enough, so it decides without asking and tells you its choices after publishing, in one line like "Beginner · standard · adult". Ask for any of them to change and it remakes the lesson.
 
 ## When the agent asks first
 

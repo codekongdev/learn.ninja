@@ -5,22 +5,14 @@ import type { Node, Root } from "fumadocs-core/page-tree"
 import type { NavPage, NavSection } from "@/components/docs/docs-nav"
 import { source } from "@/lib/source"
 
-// The docs are one page: every file in docs/ is a section of it, in sidebar order, reached by anchor.
+// The docs are one page per file in docs/, in sidebar order; the sidebar's sections are the
+// separators in docs/meta.json, with the files after each one under it.
 
 export type DocPage = InferPageType<typeof source>
 
-/** The anchor of a docs file's section on the page: the file name, or "introduction" for the index. */
-export function sectionId(page: DocPage): string {
-  return page.slugs.at(-1) ?? "introduction"
-}
-
-/** A docs link (`/docs/reference/cli#validate`) as an anchor on the one page (`#validate`). */
-export function docsHref(href: string): string {
-  if (!/^\/docs(\/|#|$)/.test(href) || href.endsWith(".md")) return href
-  const [path, hash] = href.split("#")
-  if (hash) return `#${hash}`
-  const page = source.getPages().find((p) => p.url === path)
-  return page ? `#${sectionId(page)}` : href
+/** The path of a docs page's Markdown: /docs.md for the index, /docs/{path}.md for the rest. */
+export function markdownPath(page: DocPage): string {
+  return `${page.url}.md`
 }
 
 /** The docs files in sidebar order. */
@@ -53,7 +45,6 @@ export function docsNavSections(
     const source = pages.get(node.url)
     if (!source) return
     const page: NavPage = {
-      id: sectionId(source),
       name: String(node.name),
       url: node.url,
       headings: source.data.toc
@@ -68,22 +59,7 @@ export function docsNavSections(
     else sections.push({ name: page.name, pages: [page] })
   }
   tree.children.forEach(add)
-  const result = sections.filter((section) => section.pages.length > 0)
-  assertUniqueIds(result)
-  return result
-}
-
-/** Every anchor on the page must be unique, or links and the sidebar point at the wrong place. */
-function assertUniqueIds(sections: NavSection[]) {
-  const seen = new Set<string>()
-  for (const page of sections.flatMap((s) => s.pages))
-    for (const id of [page.id, ...page.headings.map((h) => h.id)]) {
-      if (seen.has(id))
-        throw new Error(
-          `Docs: the anchor "#${id}" appears twice. Rename one of the headings.`
-        )
-      seen.add(id)
-    }
+  return sections.filter((section) => section.pages.length > 0)
 }
 
 /** A heading's text. Headings with inline code or links come through as React nodes. */

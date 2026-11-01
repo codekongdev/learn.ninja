@@ -14,7 +14,9 @@
     "./footer-lines": "./src/footer-lines.ts",
     "./time": "./src/time.tsx",
     "./progress": "./src/progress.ts",
-    "./streak-rules": "./src/streak-rules.ts"
+    "./streak-rules": "./src/streak-rules.ts",
+    "./draw": "./src/draw.ts",
+    "./streak": "./src/streak.tsx"
   },
   "scripts": {
     "lint": "eslint",

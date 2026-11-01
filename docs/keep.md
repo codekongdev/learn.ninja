@@ -1,9 +1,9 @@
 ---
 title: Keep a lesson
-description: Save a lesson to an account so it stops expiring, and publish it to Explore when it's ready. For people and for the agents that do it for them.
+description: Save a lesson to an account so it stops expiring and is published in Explore under your handle. For people and for the agents that do it for them.
 ---
 
-A lesson is published anonymously and lasts 7 days. **Keeping** it saves it to an account: it stops expiring, you can publish it to [Explore](/explore) under your handle when it's ready, and every lesson you publish from then on is saved too. There's no password: you log in once, with GitHub or an email code.
+A lesson is published anonymously and lasts 7 days. **Keeping** it saves it to an account: it stops expiring, it's published in [Explore](/explore) under your handle, and every lesson you publish from then on is saved too. There's no password: you log in once, with GitHub or an email code.
 
 ## Say keep
 

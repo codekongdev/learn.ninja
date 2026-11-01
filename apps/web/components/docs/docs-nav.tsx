@@ -1,30 +1,30 @@
 "use client"
 
 import * as React from "react"
-import { AnchorProvider, TOCItem, useActiveAnchor } from "fumadocs-core/toc"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { AnchorProvider, TOCItem } from "fumadocs-core/toc"
 import { MenuIcon } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
 import { Sheet, SheetTitle } from "@workspace/ui/components/sheet"
 import { cn } from "@workspace/ui/lib/utils"
 
-/** A heading in a docs file, as a sidebar link. */
+/** A heading in a docs page, as a sidebar link. */
 export type NavHeading = { title: string; id: string }
-/** A docs file: a section of the one docs page, with its anchor. */
+/** A docs page, with its level-2 headings. */
 export type NavPage = {
-  id: string
   name: string
   url: string
   headings: NavHeading[]
 }
-/** A sidebar section: a separator in docs/meta.json and the files after it. */
+/** A sidebar section: a separator in docs/meta.json and the pages after it. */
 export type NavSection = { name: string; pages: NavPage[] }
 
 /**
- * The docs sidebar for the one-page docs. Sections collapse to their name; the one being read opens
- * on its own, and a click opens or closes any of them. An open section lists its files as small labels
- * with each file's headings under them (or just the headings when it has one file), marking the
- * heading in view.
+ * The docs sidebar. Sections collapse to their name; the one holding the page being read opens on
+ * its own, and a click opens or closes any of them. An open section lists its pages, and under the
+ * page being read its headings, marking the one in view.
  */
 export function DocsNav({
   sections,
@@ -33,40 +33,42 @@ export function DocsNav({
   sections: NavSection[]
   onNavigate?: () => void
 }) {
-  const toc = sections.flatMap((section) =>
-    section.pages.flatMap((page) => [
-      { title: page.name, url: `#${page.id}`, depth: 2 },
-      ...page.headings.map((h) => ({
-        title: h.title,
-        url: `#${h.id}`,
-        depth: 3,
-      })),
-    ])
-  )
+  const pathname = usePathname()
+  const current = sections
+    .flatMap((s) => s.pages)
+    .find((page) => page.url === pathname)
+  const toc = (current?.headings ?? []).map((h) => ({
+    title: h.title,
+    url: `#${h.id}`,
+    depth: 2,
+  }))
   return (
     <AnchorProvider toc={toc} single>
-      <NavSections sections={sections} onNavigate={onNavigate} />
+      <NavSections
+        sections={sections}
+        current={current}
+        onNavigate={onNavigate}
+      />
     </AnchorProvider>
   )
 }
 
 function NavSections({
   sections,
+  current,
   onNavigate,
 }: {
   sections: NavSection[]
+  current?: NavPage
   onNavigate?: () => void
 }) {
-  const active = useActiveAnchor()
   const reading = sections.find((section) =>
-    section.pages.some(
-      (page) => page.id === active || page.headings.some((h) => h.id === active)
-    )
+    section.pages.some((page) => page.url === current?.url)
   )?.name
   // Sections the reader opened or closed by hand, on top of the one being read.
   const [opened, setOpened] = React.useState<Set<string>>(() => new Set())
   const [closed, setClosed] = React.useState<Set<string>>(() => new Set())
-  // Scrolling into another section starts over, so one section is open at a time, like an accordion.
+  // Moving to another section starts over, so one section is open at a time, like an accordion.
   React.useEffect(() => {
     setOpened(new Set())
     setClosed(new Set())
@@ -88,9 +90,9 @@ function NavSections({
         const open = isOpen(section.name)
         return (
           <div key={section.name}>
-            {/* Opens the section and goes to it; a second click only closes it. */}
-            <a
-              href={`#${first.id}`}
+            {/* Opens the section and goes to its first page; a second click only closes it. */}
+            <Link
+              href={first.url}
               aria-expanded={open}
               onClick={(e) => {
                 const nowOpen = toggle(section.name)
@@ -103,24 +105,39 @@ function NavSections({
               )}
             >
               {section.name}
-            </a>
+            </Link>
             {open ? (
               <div className="ms-3 mt-1 flex flex-col border-s ps-2">
                 {section.pages.length === 1 ? (
-                  <PageHeadings page={first} onNavigate={onNavigate} />
+                  <PageHeadings
+                    page={first}
+                    current={first.url === current?.url}
+                    onNavigate={onNavigate}
+                  />
                 ) : (
-                  section.pages.map((page) => (
-                    <div key={page.id} className="mt-2 first:mt-0">
-                      <TOCItem
-                        href={`#${page.id}`}
-                        onClick={onNavigate}
-                        className="block rounded-md px-2 pt-1 pb-1 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-[active=true]:text-foreground"
-                      >
-                        {page.name}
-                      </TOCItem>
-                      <PageHeadings page={page} onNavigate={onNavigate} />
-                    </div>
-                  ))
+                  section.pages.map((page) => {
+                    const here = page.url === current?.url
+                    return (
+                      <div key={page.url} className="mt-2 first:mt-0">
+                        <Link
+                          href={page.url}
+                          aria-current={here ? "page" : undefined}
+                          onClick={onNavigate}
+                          className={cn(
+                            "block rounded-md px-2 pt-1 pb-1 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
+                            here && "text-foreground"
+                          )}
+                        >
+                          {page.name}
+                        </Link>
+                        <PageHeadings
+                          page={page}
+                          current={here}
+                          onNavigate={onNavigate}
+                        />
+                      </div>
+                    )
+                  })
                 )}
               </div>
             ) : null}
@@ -139,15 +156,17 @@ function edit(set: Set<string>, name: string, add: boolean): Set<string> {
   return next
 }
 
-/** A file's headings, marking the one in view. */
+/** A page's headings, marking the one in view on the page being read. Other pages show none. */
 function PageHeadings({
   page,
+  current,
   onNavigate,
 }: {
   page: NavPage
+  current: boolean
   onNavigate?: () => void
 }) {
-  if (page.headings.length === 0) return null
+  if (!current || page.headings.length === 0) return null
   return (
     <div className="flex flex-col">
       {page.headings.map((heading) => (

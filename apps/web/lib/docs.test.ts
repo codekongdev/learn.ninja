@@ -25,6 +25,15 @@ function walk(dir: string): string[] {
 const files = walk(DOCS)
 const pages = files.filter((f) => /\.mdx?$/.test(f))
 
+/** A heading's anchor, as the Markdown pipeline (github-slugger) makes it. */
+const slug = (heading: string) =>
+  heading
+    .toLowerCase()
+    .replace(/`/g, "")
+    .replace(/[^\p{L}\p{N}\s-]/gu, "")
+    .trim()
+    .replace(/\s+/g, "-")
+
 describe("docs", () => {
   it.each(pages.map((f) => [path.relative(DOCS, f), f]))(
     "%s has a title and description",
@@ -57,6 +66,22 @@ describe("docs", () => {
         ids,
         `${p.file}: no kata "${p.kata}" in "${p.lesson}"`
       ).toContain(p.kata)
+    }
+  })
+
+  // Each file is its own page, so a bare #anchor can only reach a heading in the same file.
+  it("every bare #anchor link points at a heading in the same file", () => {
+    for (const file of pages) {
+      const text = readFileSync(file, "utf8")
+      const ids = [...text.matchAll(/^#{2,6} (.+?)(?: \[#([^\]]+)\])?$/gm)].map(
+        (m) => m[2] ?? slug(m[1]!)
+      )
+      for (const [, anchor] of text.matchAll(/\]\(#([^)]+)\)/g)) {
+        expect(
+          ids,
+          `${path.relative(DOCS, file)}: #${anchor} is not a heading here; link to the page that has it`
+        ).toContain(anchor)
+      }
     }
   })
 

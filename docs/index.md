@@ -3,7 +3,7 @@ title: Introduction
 description: learn.ninja turns anything you give your agent into one short, interactive lesson, published as a link.
 ---
 
-learn.ninja is a skill for AI agents. The agent turns a topic, an article, notes, docs, a transcript, or code into one short lesson: usually 5 to 10 minutes of small interactive screens called **katas** (like the forms a martial artist drills: one move at a time, with feedback on every answer). It checks the lesson and publishes it to a link like `https://learn.ninja/l/how-compound-interest-works-k3x9a2mq`, which anyone can open in a browser. Free, no account. Links last 7 days, or for good once you [keep them](/docs/keep) in an account: say so, and you log in once (in a chat app, the app asks; in a terminal, your agent sends you an email code). Kept lessons start private; publish any of them to [Explore](/explore), credited to you, from your profile.
+learn.ninja is a skill for AI agents. The agent turns a topic, an article, notes, docs, a transcript, or code into one short lesson: usually 5 to 10 minutes of small interactive screens called **katas** (like the forms a martial artist drills: one move at a time, with feedback on every answer). It checks the lesson and publishes it to a link like `https://learn.ninja/l/how-compound-interest-works-k3x9a2mq`, which anyone can open in a browser. Free, no account. Links last 7 days, or for good once you [keep them](/docs/keep) in an account: say so, and you log in once (in a chat app, the app asks; in a terminal, your agent sends you an email code). Kept lessons are published in [Explore](/explore), credited to you; make any of them private again from your profile.
 
 ## Install
 
@@ -33,7 +33,7 @@ An agent that can't run commands (a chat app, or an agent on a locked-down host)
 
 - **Connect the MCP server** at `https://learn.ninja/mcp` ([how, for each app](/docs/reference/mcp)). Its `get_guide` tool returns the same steps and guides the skill follows, and `publish_lesson` checks and publishes the lesson. This is the way for Claude.ai, Claude Desktop, ChatGPT, and other chat apps.
 - **Or call the API** directly:
-  1. Read the [lesson format](/docs/lessons/lesson-format.md) and the [JSON Schema](/schema/lesson.schema.json).
+  1. Fetch the guides: `GET https://learn.ninja/api/skill` returns the steps, the teaching guide, planning, the levels, the [lesson format](/docs/lessons/lesson-format.md), and the [JSON Schema](/schema/lesson.schema.json) as one JSON bundle (see [the API](/docs/reference/api#the-skills-guides)). Follow the steps there as the skill would.
   2. Write the lesson as JSON.
   3. Publish it with the [API](/docs/reference/api): `POST https://learn.ninja/api/lessons`. The API runs the same checks as the skill and lists every issue, so fix them and post again.
 
