@@ -29,7 +29,7 @@ export const INSTALL_COMMAND = "npx skills add https://learn.ninja -g"
 export const MCP_URL = `${SITE.url}/mcp`
 export const MCP_INSTALL_COMMAND = `claude mcp add --transport http learn ${MCP_URL}`
 
-/** What "Copy prompt for agent" copies where there's no choice of setup. */
+/** What "Copy prompt" copies where there's no choice of setup. */
 export const AGENT_PROMPT = `Connect to the learn.ninja MCP server at ${MCP_URL} (or install the skill with \`${INSTALL_COMMAND}\`), then read ${SITE.url}/docs and make me a lesson about `
 
 /** The two ways to set up learn.ninja; `prompt` is what the home page's copy buttons copy for each. */

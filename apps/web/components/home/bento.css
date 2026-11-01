@@ -1,0 +1,725 @@
+/* The home page's bento. The grid, the tiles' surfaces and copy are Tailwind in bento.tsx; this
+   file draws the pictures inside the tiles. The kata hero is a stage in the site's look (the same
+   fixed dark values as hero-demo.css); the other tiles are plain page markup in theme tokens. */
+
+/* ---- The grid: stacked, then hero and strip once the column is wide enough ---- */
+
+.bn {
+  container-type: inline-size;
+}
+
+.bn-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 480px 300px 320px 320px;
+  grid-template-areas: "kata" "agents" "subjects" "streak";
+  gap: 14px;
+}
+
+.bn-tile[data-tile="kata"] {
+  grid-area: kata;
+}
+.bn-tile[data-tile="agents"] {
+  grid-area: agents;
+}
+.bn-tile[data-tile="subjects"] {
+  grid-area: subjects;
+}
+.bn-tile[data-tile="streak"] {
+  grid-area: streak;
+}
+
+/* Stacked but wide enough for the desktop card: the kata tile is only as tall as the card needs */
+@container (min-width: 420px) {
+  .bn-grid {
+    grid-template-rows: 400px 300px 320px 320px;
+  }
+}
+
+@container (min-width: 640px) {
+  .bn-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: 380px 320px;
+    grid-template-areas: "kata kata agents" "subjects subjects streak";
+  }
+}
+
+/* ---- The kata (hero): the stage in the site's look ---- */
+
+/* The phone player in a phone column, the desktop card everywhere wider */
+.bn-player--desktop {
+  display: none;
+}
+
+@container (min-width: 420px) {
+  .bn-player--desktop {
+    display: block;
+  }
+
+  .bn-player--phone {
+    display: none;
+  }
+}
+
+.bn-stage .ss-stage {
+  --ss-canvas: transparent;
+  --ss-surface: #1f1f1f;
+  --ss-chrome: #1f1f1f;
+  --ss-raised: #262626;
+  --ss-well: #171717;
+  --ss-line: rgba(255, 255, 255, 0.1);
+  --ss-line-faint: rgba(255, 255, 255, 0.06);
+  --ss-text-strong: #fafafa;
+  --ss-text: #d4d4d8;
+  --ss-text-faint: #a1a1aa;
+  --ss-font: var(--font-inter), "Inter", system-ui, sans-serif;
+  --ss-radius-sm: 6px;
+  --ss-radius-md: 8px;
+  --ss-radius-lg: 10px;
+  /* The player's answer green (Tailwind green-500, green-400, and the 10% tint) */
+  --bn-green: #22c55e;
+  --bn-green-text: #4ade80;
+  --bn-green-tint: rgba(34, 197, 94, 0.1);
+  --bn-ink: #fafafa;
+  --bn-ink-2: #a1a1aa;
+  --bn-line: rgba(255, 255, 255, 0.1);
+  --bn-control: rgba(255, 255, 255, 0.045);
+  overflow: hidden;
+  background: transparent;
+  font-family: var(--ss-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The lesson card: the player's window (outlined, no fill), one gutter in from the top and the
+   left, off the right. Its tray sits along its foot, a gutter above the stage's edge. */
+.bn-card {
+  position: absolute;
+  top: 12px;
+  left: 24px;
+  height: 264px;
+  border: 1px solid var(--bn-line);
+  border-radius: 16px;
+}
+
+.bn-kata {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 26px 32px 0;
+  color: var(--bn-ink);
+}
+
+.bn-stage--phone .bn-kata {
+  padding: 16px 16px 0;
+}
+
+.bn-prompt {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+}
+
+/* The sentence at reading size, the gap a line as wide as the longest word (the player's blank kata) */
+.bn-sentence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+  font-size: 16px;
+  line-height: 36px;
+  white-space: nowrap;
+}
+
+.bn-gap {
+  display: inline-grid;
+  align-items: center;
+  justify-items: center;
+  line-height: normal;
+  border-bottom: 2px solid rgba(161, 161, 170, 0.4);
+  transition: border-color 0.2s ease;
+}
+
+.bn-gap[data-filled] {
+  border-bottom-color: transparent;
+}
+
+.bn-gap__size {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  padding: 0 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.bn-gap__word {
+  grid-area: 1 / 1;
+  opacity: 0;
+}
+
+.bn-gap__word[data-shown] {
+  opacity: 1;
+}
+
+.bn-caret {
+  grid-area: 1 / 1;
+  display: inline-block;
+  translate: 0 0.2em;
+}
+
+.bn-caret > span {
+  display: block;
+  width: 2px;
+  height: 1.1em;
+  border-radius: 9999px;
+  background: var(--bn-ink);
+  animation: bn-blink 1s ease-in-out infinite;
+}
+
+@keyframes bn-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* A word chip: the player's control on a card, at the sentence's size */
+.bn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--bn-line);
+  border-radius: 6px;
+  background: var(--bn-control);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--bn-ink);
+  white-space: nowrap;
+  /* A lasting layer, so the text doesn't hop as the chip glides or lands */
+  will-change: transform;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.25s ease,
+    color 0.2s ease;
+}
+
+.bn-bank .bn-chip {
+  padding: 0 8px 0 12px;
+}
+
+.bn-chip[data-hover="true"] {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.bn-chip[data-pressed="true"] {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* The chip's place in the bank once it has left: a dashed slot, so the others keep still */
+.bn-chip[data-state="gone"] {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  color: transparent;
+}
+
+.bn-chip[data-state="gone"] .bn-key {
+  visibility: hidden;
+}
+
+.bn-key {
+  transition: opacity 0.25s ease;
+}
+
+.bn-key[data-hidden] {
+  opacity: 0;
+}
+
+.bn-chip[data-state="correct"] {
+  border-color: var(--bn-green);
+  background: var(--bn-green-tint);
+}
+
+.bn-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid var(--bn-line);
+  border-radius: 4px;
+  font-family: var(--ss-font);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--bn-ink-2);
+}
+
+.bn-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* The flyer waits unseen over its chip in the bank and takes its surface as it lifts; the kit
+   scales it from the bank chip's box to the gap's */
+.bn-stage .ss-fly .bn-chip {
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.bn-stage .ss-fly[data-go] .bn-chip {
+  opacity: 1;
+}
+
+/* The sensei in the card's bottom start corner, his line in a bubble once the answer is checked */
+.bn-sensei {
+  position: absolute;
+  bottom: 70px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--bn-ink);
+}
+
+.bn-sensei__mark {
+  color: var(--bn-ink);
+}
+
+.bn-bubble {
+  padding: 6px 12px;
+  border-radius: 18px;
+  background: #1f3a2a;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  opacity: 0;
+  transform: translateY(4px) scale(0.96);
+  transform-origin: left center;
+  will-change: transform;
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bn-sensei[data-on] .bn-bubble {
+  opacity: 1;
+  transform: none;
+}
+
+/* The tray along the card's foot: Check answer in the middle, a pill, as the player's is */
+.bn-tray {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 56px;
+  border-top: 1px solid var(--bn-line);
+}
+
+.bn-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(250, 250, 250, 0.5);
+  white-space: nowrap;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+/* Primary once there's something to check; the answer's green once it's right */
+.bn-button[data-ready] {
+  background: #fafafa;
+  color: #171717;
+}
+
+.bn-button[data-pressed="true"] {
+  transform: scale(0.97);
+}
+
+.bn-button[data-done] {
+  background: var(--bn-green);
+  color: #052e16;
+}
+
+.bn-button .ss-states__item {
+  gap: 8px;
+}
+
+/* ---- The phone player (compact): the screen is the stage ---- */
+
+.bn-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bn-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 16px;
+  color: var(--bn-ink);
+}
+
+.bn-progress {
+  flex: 1;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.bn-progress__fill {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--bn-ink);
+  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bn-menu {
+  display: flex;
+  gap: 3px;
+  margin-inline-start: 4px;
+}
+
+.bn-menu span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--bn-ink);
+}
+
+/* The phone's tray is the card's color, its button full width and under the thumb; checked, the
+   whole tray takes the answer's tone, with the line on top and the sensei's line above the button */
+.bn-stage--phone .bn-tray {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  height: auto;
+  padding: 12px 16px;
+  border-top: 1px solid var(--bn-line);
+  background: #1f1f1f;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.bn-stage--phone .bn-tray[data-checked] {
+  border-top-color: var(--bn-green);
+  background: #19291f;
+}
+
+.bn-tray__line {
+  display: none;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--bn-ink);
+}
+
+.bn-stage--phone .bn-tray[data-checked] .bn-tray__line {
+  display: block;
+}
+
+.bn-stage--phone .bn-button {
+  position: relative;
+  height: 48px;
+  font-size: 16px;
+}
+
+/* The sensei's face at the start of the phone's Continue button, as the player draws him */
+.bn-button__mark {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  padding: 7px;
+  border-radius: 50%;
+  background: #171717;
+  color: var(--bn-ink);
+  opacity: 0;
+  transform: translateY(-50%) scale(0.6);
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bn-button[data-done] .bn-button__mark {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+/* ---- Agents (collection): marks in a grid, off the right and the bottom ---- */
+
+.bn-marks {
+  position: relative;
+  margin: 20px 0 0 24px;
+  display: grid;
+  grid-template-columns: repeat(6, 60px);
+  gap: 12px;
+}
+
+/* A third of the grid: four columns, so the marks run well past the tile's edge at every width */
+@container (min-width: 640px) {
+  .bn-marks {
+    grid-template-columns: repeat(4, 60px);
+  }
+}
+
+/* The wide grid: bigger marks, still past the tile's right edge and off its foot */
+@container (min-width: 900px) {
+  .bn-marks {
+    grid-template-columns: repeat(4, 68px);
+    gap: 16px;
+  }
+
+  .bn-mark {
+    width: 68px;
+    height: 68px;
+  }
+
+  .bn-mark__logo {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.bn-mark {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--input) 30%, transparent);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bn-marks[data-on] .bn-mark {
+  opacity: 1;
+  transform: none;
+}
+
+.bn-mark__logo {
+  display: block;
+  width: 28px;
+  height: 28px;
+  background: color-mix(in oklab, var(--foreground) 60%, transparent);
+}
+
+/* The one in focus: the agent most people start with, in full ink on a lit surface */
+.bn-mark[data-lead] {
+  background: var(--muted);
+}
+
+.bn-mark[data-lead] .bn-mark__logo {
+  background: var(--foreground);
+}
+
+/* ---- Subjects (collection): real lesson drawings on cards, off the right and the bottom ---- */
+
+.bn-cards {
+  position: relative;
+  margin: 20px 0 0 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 176px);
+  gap: 12px;
+}
+
+@container (min-width: 640px) {
+  .bn-cards {
+    grid-template-columns: repeat(3, 156px);
+  }
+}
+
+/* The wide grid (the bento past the page's column): bigger cards, still off the right and bottom */
+@container (min-width: 900px) {
+  .bn-cards {
+    grid-template-columns: repeat(3, 210px);
+    gap: 16px;
+  }
+
+  .bn-lesson {
+    height: 136px;
+  }
+}
+
+/* The player's visual frame: outlined, no fill; the drawing centered inside */
+.bn-lesson {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  height: 120px;
+  padding: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--background);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bn-cards[data-on] .bn-lesson {
+  opacity: 1;
+  transform: none;
+}
+
+.bn-lesson__visual {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.bn-lesson__visual svg {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+}
+
+.bn-lesson[data-visual="chess"] .bn-lesson__visual svg {
+  width: 100px;
+}
+
+.bn-lesson[data-visual="chart"] .bn-lesson__visual svg {
+  width: 100%;
+  height: 100%;
+}
+
+.bn-lesson[data-visual="molecule"] .bn-lesson__visual svg,
+.bn-lesson[data-visual="clock"] .bn-lesson__visual svg {
+  height: 96px;
+  width: auto;
+}
+
+/* A question in Arabic: the kata's prompt and two options, right to left */
+.bn-arabic {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  color: var(--foreground);
+}
+
+.bn-arabic__q {
+  margin-bottom: 2px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.bn-arabic__opt {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--input) 30%, transparent);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Streak (stat): type and lanterns, no picture ---- */
+
+.bn-streak {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 16px 24px 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "count lantern"
+    "week week";
+  align-items: center;
+  gap: 16px 12px;
+}
+
+.bn-streak__count {
+  grid-area: count;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--foreground);
+}
+
+.bn-streak__number {
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.bn-streak__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.bn-streak__lantern {
+  grid-area: lantern;
+  justify-self: end;
+}
+
+.bn-week {
+  grid-area: week;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+.bn-week li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bn-week li[data-today] {
+  font-weight: 500;
+  color: var(--foreground);
+}

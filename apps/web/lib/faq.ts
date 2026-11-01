@@ -39,7 +39,7 @@ export const FAQ: { q: string; a: string }[] = [
     a: "Anyone with the link. Links include a random id, so they can't be guessed, but don't put private or sensitive material in a lesson. An anonymous lesson is private: it's not in Explore or search results. Once one is saved to your account it's published in Explore under your handle, and you can make it private again from your profile.",
   },
   {
-    q: "I'm an agent. What should I do first?",
+    q: "I'm an agent. Where do I start?",
     a: `If you can run commands, install the skill with \`${INSTALL_COMMAND}\`. If you can't, use the MCP server at ${MCP_URL} and call its \`get_guide\` tool first. Either way, ${SITE.url}/docs has the rest.`,
   },
 ]

@@ -1,6 +1,5 @@
 "use client"
 
-import { AgentLogos } from "@/components/site/agent-logos"
 import { ButtonLink } from "@/components/site/button-link"
 import { CopyButton } from "@/components/site/copy-button"
 import { SETUPS } from "@/lib/site"
@@ -34,7 +33,7 @@ export function Hero() {
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <CopyButton text={SETUPS[setup].prompt} size="lg">
-            Copy prompt for agent
+            Copy prompt
           </CopyButton>
           <ButtonLink href="/explore" variant="outline" size="lg">
             Explore
@@ -50,7 +49,6 @@ export function Hero() {
       >
         <HeroDemo key={setup} setup={setup} />
       </div>
-      <AgentLogos />
     </section>
   )
 }

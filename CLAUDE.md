@@ -36,6 +36,7 @@ Planning doc (decisions, lesson spec, tech stack, test lessons): https://claude.
 - `npm run tags -w web`: the weekly tag report (subjects by lesson count, top tags per subject, tags used once) from `DATABASE_URL` or `apps/web/.env.local`, else the local PGlite; read it to add synonyms to `packages/spec/src/tags.ts`
 - `npm run tags:backfill -w web`: brings every stored lesson up to the current spec and rebuilds its `lesson_tag` rows (dry run; `-- --write` applies). The production build runs it automatically after the migrations on every deploy (`scripts/backfill-on-deploy.ts`, skipped on previews); run it by hand only for a local PGlite or a one-off
 - `npm run handles:backfill -w web`: gives every account without a handle a random one (dry run; `-- --write` applies)
+- `npm run bento -w web`: redraw the home page bento's lesson visuals (`apps/web/components/home/bento-visuals.generated.json`) with the player's own renderers after changing `apps/web/lib/bento-visuals.ts` (a test fails if it's stale)
 - `npm run share -w web`: re-render the share images in `brand/` (GitHub social preview, X banner, square post) from the link preview card in `apps/web/lib/og.tsx`
 - Add shadcn components from `apps/web`: `npx shadcn@latest add <name>` (they land in `packages/ui`)
 
