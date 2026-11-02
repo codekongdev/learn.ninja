@@ -92,8 +92,7 @@ export function FeedbackDialog({
           <DialogHeader>
             <DialogTitle>Something broken?</DialogTitle>
             <DialogDescription>
-              Tell us what happened, or what you expected instead. The page
-              you&apos;re on and your browser are sent along with it.
+              Tell us what went wrong and we&apos;ll take a look.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-2">
@@ -105,7 +104,6 @@ export function FeedbackDialog({
               onChange={(e) => setMessage(e.target.value)}
               maxLength={FEEDBACK_MAX}
               disabled={busy}
-              placeholder="I tapped Check and nothing happened…"
               className="min-h-28"
             />
             <FormError>{error}</FormError>
