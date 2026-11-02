@@ -19,7 +19,8 @@ import { Wordmark } from "./wordmark"
  * links home; once logged in, Explore is home, so the wordmark goes there and the links fold
  * into the account menu behind the profile picture (which also opens on hover). `start` adds
  * page-specific controls before the wordmark (the docs menu), `action` a button after it (copy
- * prompt). The bug button sits at the start of the links on every page. `streak` puts the logged-in learner's lantern before the picture. `account` is what a
+ * prompt). `feedback` adds the bug button at the start of the links, for the app's own pages
+ * (not the marketing pages or the docs). `streak` puts the logged-in learner's lantern before the picture. `account` is what a
  * page that checked the session knows about the user; static pages
  * leave it out and the marker cookie decides after hydration. Until then the visitor's links are
  * kept but invisible, so the header doesn't shift for the many visitors who aren't logged in.
@@ -30,6 +31,7 @@ export function SiteHeader({
   action,
   account: known,
   streak,
+  feedback = false,
 }: {
   start?: React.ReactNode
   action?: React.ReactNode
@@ -37,6 +39,8 @@ export function SiteHeader({
   account?: AccountInfo | null
   /** The logged-in learner's streak, for pages that know it. */
   streak?: DayStreak | null
+  /** Show the bug button: on the app's pages, not on marketing pages or the docs. */
+  feedback?: boolean
 }) {
   const account = useAccount(known)
   const visitor = account === null || account === undefined
@@ -51,7 +55,7 @@ export function SiteHeader({
         <Wordmark href={visitor ? "/" : "/explore"} className="me-2" />
         {action}
         <nav aria-label="Site" className="ms-auto flex items-center gap-1">
-          <FeedbackButton />
+          {feedback ? <FeedbackButton /> : null}
           {visitor ? (
             <>
               <ButtonLink href="/explore" variant="ghost" size="sm">

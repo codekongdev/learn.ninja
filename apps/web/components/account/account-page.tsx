@@ -21,7 +21,7 @@ export function AccountPage({
 }) {
   return (
     <div className="flex min-h-svh flex-col">
-      <SiteHeader account={account} streak={streak} />
+      <SiteHeader account={account} streak={streak} feedback />
       <main
         className={
           wide

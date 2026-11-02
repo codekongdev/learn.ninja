@@ -20,7 +20,7 @@ export default async function FeedLayout({
   const streak = actor ? await viewerStreak(actor.userId) : null
   return (
     <div className="flex min-h-svh flex-col">
-      <SiteHeader account={accountOf(actor)} streak={streak} />
+      <SiteHeader account={accountOf(actor)} streak={streak} feedback />
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 py-12 sm:px-6 sm:py-16">
         {children}
       </main>
