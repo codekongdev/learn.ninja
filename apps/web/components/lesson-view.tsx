@@ -17,6 +17,7 @@ import { useAccount } from "@/components/account/account-link"
 import { AccountMenuItems } from "@/components/account/account-menu"
 import { LessonAccount } from "@/components/account/lesson-account"
 import { ReportDialog } from "@/components/explore/report-dialog"
+import { FeedbackButton } from "@/components/feedback/feedback-button"
 import type { AccountInfo } from "@/lib/auth/account-info"
 import { exploreApi } from "@/lib/explore/browser"
 import { keepFinish, sendFinishes } from "@/lib/explore/finishes"
@@ -151,7 +152,15 @@ export function LessonView({
         {...props}
         uiLanguage={props.uiLanguage ?? urlLanguage}
         menuItems={menuItems}
-        headerAccount={<LessonAccount account={account} streak={lantern} />}
+        headerAccount={
+          <div className="flex items-center gap-1">
+            <FeedbackButton
+              lessonId={lessonId}
+              onReport={canReport ? () => setReportOpen(true) : undefined}
+            />
+            <LessonAccount account={account} streak={lantern} />
+          </div>
+        }
         phoneAccount={
           account ? <AccountMenuItems account={account} /> : undefined
         }

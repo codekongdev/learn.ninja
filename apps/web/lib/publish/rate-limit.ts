@@ -12,6 +12,8 @@ export const VALIDATE_LIMIT = { requests: 120, windowSeconds: 60 * 60 }
 export const CODE_LIMIT = { requests: 5, windowSeconds: 60 * 60 }
 /** Reports per client: each one is an email to the maker. */
 export const REPORT_LIMIT = { requests: 5, windowSeconds: 60 * 60 }
+/** Bug reports and feedback per client: each one is a Slack message. */
+export const FEEDBACK_LIMIT = { requests: 10, windowSeconds: 60 * 60 }
 /** Views per client: a learner opens a few lessons an hour, a script opens thousands. */
 export const VIEW_LIMIT = { requests: 120, windowSeconds: 60 * 60 }
 /** Profile picture uploads per user: each one is decoded and resized on the server. */
@@ -22,6 +24,7 @@ const LIMITS = {
   validate: VALIDATE_LIMIT,
   code: CODE_LIMIT,
   report: REPORT_LIMIT,
+  feedback: FEEDBACK_LIMIT,
   view: VIEW_LIMIT,
   avatar: AVATAR_LIMIT,
 }
