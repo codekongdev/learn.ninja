@@ -81,3 +81,9 @@ A lesson is made of **katas**, one per screen: `concept` katas (theory) and ques
 ## v1 scope reminders
 
 No accounts (progress is kept in the browser only, per lesson page), lessons expire after 7 days, no typed answers (word chips instead), no `number` katas (multiple choice instead), no images. Multiple languages and right-to-left matter from day one: lessons are written in any language. The player's own interface is English-only for now (`UI_TRANSLATIONS` in `packages/player/src/strings.ts`) until people can test the translations; keep them up to date, and check one with `?ui=`.
+
+## Dev servers on the Mac mini
+
+Sessions here may run on the Mac mini (Remote Control), where Colin previews from the MacBook or phone over Tailscale. So a dev server must bind to all interfaces, not just localhost, and use a port no other running session is using. Pick the port below unless it is taken, then say the preview URL: `http://mac-mini.tail15f234.ts.net:<port>` (also `http://mac-mini:<port>` with MagicDNS).
+
+Web app: `npm run dev -w apps/web -- -H 0.0.0.0 -p 3030`.
