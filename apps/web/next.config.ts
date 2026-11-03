@@ -80,6 +80,7 @@ const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_VISUALS_CSS: visualsCssUrl() },
   transpilePackages: [
     "@workspace/ui",
+    "@workspace/cli",
     "@workspace/player",
     "@workspace/spec",
     "@workspace/db",
