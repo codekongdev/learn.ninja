@@ -35,6 +35,9 @@
     "packages/*"
   ],
   "overrides": {
-    "mdast-util-to-markdown": "2.1.2"
+    "mdast-util-to-markdown": "2.1.2",
+    "@joshwooding/vite-plugin-react-docgen-typescript": {
+      "glob": "^14.0.2"
+    }
   }
 }
