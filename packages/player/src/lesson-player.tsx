@@ -177,6 +177,8 @@ export interface LessonPlayerProps {
    * picture, or a way to sign up.
    */
   headerAccount?: React.ReactNode
+  /** The app's own buttons before Share (and the gear), on phones too: the bug button. */
+  headerActions?: React.ReactNode
   /** The account's entries for the phone menu, for what `headerAccount` leaves out on phones. */
   phoneAccount?: React.ReactNode
   /** The app's color theme. Pass both to show the theme setting in the header. */
@@ -253,6 +255,7 @@ function LessonInLanguage({
   shareUrl,
   menuItems,
   headerAccount,
+  headerActions,
   phoneAccount,
   theme,
   onThemeChange,
@@ -376,6 +379,7 @@ function LessonInLanguage({
                   <AppSettings {...appSettings} />
                 ) : undefined
               }
+              actions={headerActions}
               account={headerAccount}
               phoneMenu={
                 <>
@@ -804,6 +808,7 @@ function Player({
   soundOn,
   onShortcuts,
   headerSettings,
+  actions,
   account,
   phoneMenu,
   trayOpen,
@@ -828,6 +833,8 @@ function Player({
   onShortcuts: () => void
   /** The app's settings, shown in the header. */
   headerSettings?: React.ReactNode
+  /** The app's own buttons, before Share. */
+  actions?: React.ReactNode
   /** The app's account controls, last in the header. */
   account?: React.ReactNode
   /** The end of the header's menu on phones: the settings and links that have no room there. */
@@ -1202,6 +1209,7 @@ function Player({
           homeHref={homeHref}
           shareUrl={shareUrl}
           settings={headerSettings}
+          actions={actions}
           account={account}
           menuItems={menuItems}
           phoneMenu={phoneMenu}
