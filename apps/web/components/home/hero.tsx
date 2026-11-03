@@ -35,7 +35,15 @@ export function Hero() {
           <CopyButton text={SETUPS[setup].prompt} size="lg">
             Copy prompt
           </CopyButton>
-          <ButtonLink href="/explore" variant="outline" size="lg">
+          {/* Play one before installing anything: the Spanish greetings the bento's kata comes from */}
+          <ButtonLink
+            href="/lessons/spanish-greetings"
+            variant="outline"
+            size="lg"
+          >
+            Try a lesson
+          </ButtonLink>
+          <ButtonLink href="/explore" variant="ghost" size="lg">
             Explore
           </ButtonLink>
         </div>
