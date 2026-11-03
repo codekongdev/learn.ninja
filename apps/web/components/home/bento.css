@@ -6,6 +6,10 @@
 
 .bn {
   container-type: inline-size;
+  /* The player's answer green (Tailwind green-500, green-400, and the 10% tint) */
+  --bn-green: #22c55e;
+  --bn-green-text: #4ade80;
+  --bn-green-tint: rgba(34, 197, 94, 0.1);
 }
 
 .bn-grid {
@@ -61,7 +65,8 @@
 
 /* ---- The picture area: under the copy, cropped by the tile, faded where a picture runs off ----
    Every picture keeps the tile's 24px inset on the start and top; it may run off the end or the
-   bottom (the activity grid, oldest weeks first, off the start), and only there it fades out. */
+   bottom, and only there it fades out. The activity grid runs off the start instead and fades its
+   own strip (.bn-days-clip) with the same --bn-fade. */
 
 .bn-pic {
   position: relative;
@@ -94,14 +99,6 @@
   mask-composite: intersect;
 }
 
-.bn-pic[data-fade="start"] {
-  mask-image: linear-gradient(
-    to left,
-    #000 calc(100% - var(--bn-fade)),
-    transparent
-  );
-}
-
 [dir="rtl"] .bn-pic[data-fade="end"] {
   mask-image: linear-gradient(
     to left,
@@ -114,14 +111,6 @@
   mask-image:
     linear-gradient(to left, #000 calc(100% - var(--bn-fade)), transparent),
     linear-gradient(to bottom, #000 calc(100% - var(--bn-fade)), transparent);
-}
-
-[dir="rtl"] .bn-pic[data-fade="start"] {
-  mask-image: linear-gradient(
-    to right,
-    #000 calc(100% - var(--bn-fade)),
-    transparent
-  );
 }
 
 /* The phone player fits its tile: nothing to fade */
@@ -163,10 +152,6 @@
   --ss-radius-sm: 6px;
   --ss-radius-md: 8px;
   --ss-radius-lg: 10px;
-  /* The player's answer green (Tailwind green-500, green-400, and the 10% tint) */
-  --bn-green: #22c55e;
-  --bn-green-text: #4ade80;
-  --bn-green-tint: rgba(34, 197, 94, 0.1);
   /* A miss: the player's yellow (Tailwind yellow-500 and its 10% tint) */
   --bn-yellow: #eab308;
   --bn-yellow-tint: rgba(234, 179, 8, 0.1);
@@ -185,7 +170,7 @@
 .bn-card {
   position: absolute;
   top: 12px;
-  left: 24px;
+  inset-inline-start: 24px;
   height: 304px;
   border: 1px solid var(--bn-line);
   border-radius: 16px;
@@ -894,8 +879,8 @@
 }
 
 .bn-phone__option[data-correct] {
-  border-color: #16a34a;
-  background: rgba(22, 163, 74, 0.1);
+  border-color: var(--bn-green);
+  background: var(--bn-green-tint);
 }
 
 /* ---- Activity (stat): the last weeks of the profile's grid in ink shades, newest at the end edge ---- */
@@ -912,11 +897,11 @@
   inset-inline: 0;
   height: 136px;
   overflow: hidden;
-  mask-image: linear-gradient(to left, #000 calc(100% - 56px), transparent);
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--bn-fade)), transparent);
 }
 
 [dir="rtl"] .bn-days-clip {
-  mask-image: linear-gradient(to right, #000 calc(100% - 56px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--bn-fade)), transparent);
 }
 
 /* The grid sits against the end edge and runs off the start, as many weeks as the tile shows */

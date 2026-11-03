@@ -35,7 +35,7 @@ export function Hero() {
           <CopyButton text={SETUPS[setup].prompt} size="lg">
             Copy prompt
           </CopyButton>
-          {/* Play one before installing anything: the Spanish greetings the bento's kata comes from */}
+          {/* Play one before installing anything: the bundled Spanish greetings lesson */}
           <ButtonLink
             href="/lessons/spanish-greetings"
             variant="outline"

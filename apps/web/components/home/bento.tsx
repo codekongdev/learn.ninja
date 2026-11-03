@@ -81,7 +81,7 @@ function Tile({
   children: React.ReactNode
   picture?: React.ReactNode
   /** The edges the picture runs off, faded out (bento.css) */
-  fade?: "end" | "bottom" | "end bottom" | "start"
+  fade?: "end" | "bottom" | "end bottom"
   className?: string
 }) {
   return (
@@ -152,8 +152,9 @@ function useInView<T extends Element>(delay: number) {
 
 /* ---------------- Kata (hero) ---------------- */
 
-// Real strings: the prompt, the sentence, three word chips, the buttons, the sensei's lines (from
-// the player's English voices), and the wrong chip's feedback as a lesson would write it.
+// The Spanish greetings lesson (examples/spanish-greetings.json) turned into a blank: its 9 a.m.
+// in Madrid and its three greetings as word chips. The buttons and the sensei's lines are the
+// player's real ones (its English voices); the wrong chip's feedback is written as a lesson would.
 const PROMPT = "It's 9 a.m. in Madrid. Finish the greeting."
 const BEFORE = "—Buenos"
 const AFTER = ", ¿cómo estás?"
@@ -173,9 +174,23 @@ type S = {
   placed: boolean
   /** Checked: a miss (yellow, the ninja nudges, the feedback shows) or right (green, Continue) */
   checked: "miss" | "right" | null
+  /** What the sensei last said: kept after Try again, so the bubble fades out on its own words */
+  said: "miss" | "right"
 }
-const initial: S = { aim: WRONG, flying: false, placed: false, checked: null }
-const poster: S = { aim: RIGHT, flying: false, placed: true, checked: "right" }
+const initial: S = {
+  aim: WRONG,
+  flying: false,
+  placed: false,
+  checked: null,
+  said: "miss",
+}
+const poster: S = {
+  aim: RIGHT,
+  flying: false,
+  placed: true,
+  checked: "right",
+  said: "right",
+}
 
 const script = async (a: Act<S>) => {
   await a.wait(LEAD)
@@ -188,7 +203,7 @@ const script = async (a: Act<S>) => {
   await a.wait(700)
   a.mark("check")
   await a.click("check")
-  a.put({ checked: "miss" })
+  a.put({ checked: "miss", said: "miss" })
   a.mark("miss")
   // Long enough to read the feedback
   await a.wait(2600)
@@ -202,7 +217,7 @@ const script = async (a: Act<S>) => {
   a.put({ flying: false, placed: true })
   await a.wait(600)
   await a.click("check")
-  a.put({ checked: "right" })
+  a.put({ checked: "right", said: "right" })
   a.mark("payoff")
 }
 
@@ -377,11 +392,11 @@ function Desktop({ width }: { width: number }) {
           <div
             className="bn-sensei"
             data-on={s.checked || undefined}
-            data-tone={s.checked ?? undefined}
+            data-tone={s.said}
           >
             <Mark size={28} className="bn-sensei__mark" />
             <span className="bn-bubble">
-              {s.checked === "miss" ? NUDGE : PRAISE}
+              {s.said === "miss" ? NUDGE : PRAISE}
             </span>
           </div>
           <div className="bn-tray" data-checked={s.checked ?? undefined}>
@@ -592,8 +607,9 @@ function Subjects() {
 
 /* ---------------- Share (UI) ---------------- */
 
-// Real strings from examples/correlation-vs-causation.json; the link is a published lesson's shape.
-const LINK = "learn.ninja/l/correlation-isnt-causation-x7k2p9"
+// Real strings from examples/correlation-vs-causation.json; the link is slugify() of its title and an
+// id of the publish shape (lib/publish/ids.ts: eight of 0-9 and a-z).
+const LINK = "learn.ninja/l/correlation-isn-t-causation-m4q8z2tw"
 const SHARED = {
   prompt:
     "Among children aged 5 to 12, shoe size correlates with reading score. Which confounder explains it?",
